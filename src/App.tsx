@@ -5,6 +5,12 @@ import { Toaster } from "@/components/ui/toaster";
 import Index from "./pages/Index";
 import Home from "./pages/Home";
 import EventDetail from "./pages/EventDetail";
+import Admin from "./pages/Admin";
+import About from "./pages/About";
+import Auth from "./pages/Auth";
+import ElectedOfficials from "./pages/ElectedOfficials";
+import MyElectedLookup from "./pages/MyElectedLookup";
+import RegisterToVote from "./pages/RegisterToVote";
 import NotFound from "./pages/NotFound";
 import "./index.css";
 
@@ -25,6 +31,12 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/home" element={<Home />} />
           <Route path="/event/:id" element={<EventDetail />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/elected-officials" element={<ElectedOfficials />} />
+          <Route path="/my-elected-lookup" element={<MyElectedLookup />} />
+          <Route path="/register-to-vote" element={<RegisterToVote />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />

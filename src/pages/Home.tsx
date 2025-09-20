@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { EventCard } from '@/components/EventCard';
 import { EventCalendar } from '@/components/EventCalendar';
 import SearchBar from '@/components/SearchBar';
+import Navbar from '@/components/Navbar';
 import { supabase } from '@/integrations/supabase/client';
 import { Calendar, MapPin, Users, Grid, CalendarDays } from 'lucide-react';
 
@@ -97,7 +98,9 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <Navbar />
+      <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <div className="gradient-hero text-primary-foreground py-20 px-4">
         <div className="container mx-auto text-center">
@@ -216,7 +219,8 @@ const Home = () => {
           )}
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 };
 
