@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
-import { Calendar, Clock, MapPin, Users, ArrowLeft, Tag, ExternalLink } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, ArrowLeft, Tag, Download, Mail } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 
 interface Event {
@@ -75,13 +75,13 @@ const EventDetail = () => {
     });
   };
 
-  const addToCalendar = () => {
+  const generateCalendarFile = () => {
     if (!event) return;
     
-    const startDate = new Date(`${event.event_date}T${event.event_time}`);
-    const endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000); // Add 2 hours
+    const eventDateTime = new Date(`${event.event_date}T${event.event_time}`);
+    const endDateTime = new Date(eventDateTime.getTime() + 2 * 60 * 60 * 1000); // +2 hours
     
-    const formatLocalDate = (date: Date) => {
+    const formatICSDate = (date: Date) => {
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
       const day = String(date.getDate()).padStart(2, '0');
@@ -90,16 +90,46 @@ const EventDetail = () => {
       const seconds = String(date.getSeconds()).padStart(2, '0');
       return `${year}${month}${day}T${hours}${minutes}${seconds}`;
     };
+
+    const icsContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Event Calendar//EN',
+      'BEGIN:VEVENT',
+      `UID:${event.id}@events.com`,
+      `DTSTART:${formatICSDate(eventDateTime)}`,
+      `DTEND:${formatICSDate(endDateTime)}`,
+      `SUMMARY:${event.title}`,
+      `DESCRIPTION:${event.description.replace(/\n/g, '\\n')}`,
+      `LOCATION:${event.location}`,
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\n');
+
+    const blob = new Blob([icsContent], { type: 'text/calendar' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${event.title.replace(/\s+/g, '-').toLowerCase()}.ics`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const emailCalendarInvite = () => {
+    if (!event) return;
     
-    const details = {
-      text: event.title,
-      dates: `${formatLocalDate(startDate)}/${formatLocalDate(endDate)}`,
-      details: event.description,
-      location: event.location
-    };
-    
-    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(details.text)}&dates=${details.dates}&details=${encodeURIComponent(details.details)}&location=${encodeURIComponent(details.location)}`;
-    window.open(url, '_blank');
+    const subject = encodeURIComponent(`Event: ${event.title}`);
+    const body = encodeURIComponent(
+      `You're invited to: ${event.title}\n\n` +
+      `Date: ${formatDate(event.event_date)}\n` +
+      `Time: ${formatTime(event.event_time)}\n` +
+      `Location: ${event.location}\n\n` +
+      `Description: ${event.description}\n\n` +
+      `Elected Officials: ${event.elected_officials.join(', ')}`
+    );
+    window.open(`mailto:?subject=${subject}&body=${body}`);
   };
 
   if (loading) {
@@ -180,7 +210,7 @@ const EventDetail = () => {
                     {event.age_group}
                   </Badge>
                 </div>
-                <Button onClick={addToCalendar} size="lg">
+                <Button onClick={generateCalendarFile} size="lg">
                   <Calendar className="w-4 h-4 mr-2" />
                   Add to Calendar
                 </Button>
@@ -265,21 +295,22 @@ const EventDetail = () => {
               )}
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t">
-                <Button onClick={addToCalendar} className="flex-1">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Add to Google Calendar
+              <div className="flex gap-4 pt-6 border-t">
+                <Button
+                  onClick={generateCalendarFile}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Add to Calendar
                 </Button>
-                <Button variant="outline" className="flex-1" asChild>
-                  <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <MapPin className="w-4 h-4 mr-2" />
-                    View Location
-                    <ExternalLink className="w-4 h-4 ml-2" />
-                  </a>
+                <Button
+                  onClick={emailCalendarInvite}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  <Mail className="w-4 h-4 mr-2" />
+                  Email Invite
                 </Button>
               </div>
             </div>
