@@ -297,6 +297,20 @@ const EventDetail = () => {
                 </div>
               </div>
 
+              {/* Elected Officials */}
+              {event.elected_officials && event.elected_officials.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold mb-3">Participating Officials</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {event.elected_officials.map((official, index) => (
+                      <Badge key={index} variant="secondary">
+                        {official}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Tags */}
               {event.tags && event.tags.length > 0 && (
                 <div className="mb-8">
@@ -321,20 +335,6 @@ const EventDetail = () => {
                   <p className="text-muted-foreground whitespace-pre-wrap">{event.description}</p>
                 </div>
               </div>
-
-              {/* Elected Officials */}
-              {event.elected_officials && event.elected_officials.length > 0 && (
-                <div className="mb-8">
-                  <h3 className="text-lg font-semibold mb-3">Participating Officials</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {event.elected_officials.map((official, index) => (
-                      <Badge key={index} variant="secondary">
-                        {official}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               {/* Additional Images */}
               {event.additional_images && event.additional_images.length > 0 && (
