@@ -180,7 +180,7 @@ const SearchBar = ({ onEventClick, onSearch }: SearchBarProps) => {
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search events by name or tag (leave blank to search all events)..."
+              placeholder="Search events by name or tag..."
               className="pl-10 pr-4 py-2 sm:py-3 text-base"
               onFocus={() => query && setIsOpen(true)}
             />
@@ -209,6 +209,7 @@ const SearchBar = ({ onEventClick, onSearch }: SearchBarProps) => {
           <div className="mt-4 pt-4 border-t space-y-4">
             <div className="text-sm text-muted-foreground mb-3">
               <p>Advanced filters will work with your search terms above. Leave search blank to filter all events.</p>
+              <p>Date fields are optional - leave blank to include all dates.</p>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
