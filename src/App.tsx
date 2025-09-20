@@ -3,6 +3,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
 import Index from "./pages/Index";
+import Home from "./pages/Home";
+import EventDetail from "./pages/EventDetail";
 import NotFound from "./pages/NotFound";
 import "./index.css";
 
@@ -21,6 +23,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/event/:id" element={<EventDetail />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />
