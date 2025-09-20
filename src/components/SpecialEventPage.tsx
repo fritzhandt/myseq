@@ -368,9 +368,20 @@ const SpecialEventPage = ({ onExit }: SpecialEventPageProps) => {
                   <div key={date} className="space-y-4 sm:space-y-6">
                     {/* Day Header */}
                     <div className="text-center">
-                      <h2 className="text-2xl sm:text-3xl font-bold mb-2">
-                        {dayInfo?.title || format(new Date(date), 'EEEE, MMMM d, yyyy')}
-                      </h2>
+                      {dayInfo?.title ? (
+                        <>
+                          <h2 className="text-2xl sm:text-3xl font-bold mb-2">
+                            {dayInfo.title}
+                          </h2>
+                          <p className="text-muted-foreground text-sm sm:text-base mb-2">
+                            {format(new Date(date), 'EEEE, MMMM d, yyyy')}
+                          </p>
+                        </>
+                      ) : (
+                        <h2 className="text-2xl sm:text-3xl font-bold mb-2">
+                          {format(new Date(date), 'EEEE, MMMM d, yyyy')}
+                        </h2>
+                      )}
                       {dayInfo?.description && (
                         <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto">
                           {dayInfo.description}
