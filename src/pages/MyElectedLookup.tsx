@@ -1,10 +1,23 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Search, ArrowLeft } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { ExternalLink, Search, ArrowLeft, AlertTriangle } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 
 const MyElectedLookup = () => {
   const navigate = useNavigate();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<{title: string, url: string} | null>(null);
+  
   const lookupOptions = [
     {
       title: "Assemblymember",
@@ -26,8 +39,16 @@ const MyElectedLookup = () => {
     }
   ];
 
-  const handleLookup = (url: string) => {
-    window.open(url, '_blank', 'noopener,noreferrer');
+  const handleLookupClick = (option: {title: string, url: string}) => {
+    setSelectedOption(option);
+    setIsDialogOpen(true);
+  };
+
+  const handleProceed = () => {
+    if (selectedOption) {
+      window.open(selectedOption.url, '_blank', 'noopener,noreferrer');
+    }
+    setIsDialogOpen(false);
   };
 
   return (
@@ -63,14 +84,44 @@ const MyElectedLookup = () => {
                     {option.description}
                   </p>
                 </div>
-                <Button
-                  onClick={() => handleLookup(option.url)}
-                  className="w-full"
-                  size="lg"
-                >
-                  Find My {option.title}
-                  <ExternalLink className="ml-2 w-4 h-4" />
-                </Button>
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button
+                      onClick={() => handleLookupClick(option)}
+                      className="w-full"
+                      size="lg"
+                    >
+                      Find My {option.title}
+                      <ExternalLink className="ml-2 w-4 h-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center">
+                        <AlertTriangle className="mr-2 w-5 h-5 text-yellow-500" />
+                        Leaving This Site
+                      </DialogTitle>
+                      <DialogDescription className="text-left">
+                        This link is taking you to an official government website:
+                        <br />
+                        <strong>{selectedOption?.url}</strong>
+                        <br /><br />
+                        This is an official government website maintained by the respective 
+                        office. Your information will be handled securely according to their 
+                        privacy policies.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button onClick={handleProceed}>
+                        Continue to External Site
+                        <ExternalLink className="ml-2 w-4 h-4" />
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
             ))}
           </div>
