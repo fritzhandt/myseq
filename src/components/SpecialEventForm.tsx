@@ -24,7 +24,21 @@ interface SpecialEventDay {
   date: string;
   title?: string;
   description?: string;
-  eventIds: string[];
+  events: EventData[];
+}
+
+interface EventData {
+  title: string;
+  description: string;
+  location: string;
+  event_time: string;
+  age_group: string;
+  elected_officials: string[];
+  tags: string[];
+  cover_photo_url: string | null;
+  additional_images: string[];
+  cover_photo_file: File | null;
+  additional_image_files: File[];
 }
 
 interface SpecialEventFormProps {
@@ -59,7 +73,7 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
   useEffect(() => {
     // Initialize days when type or dates change
     if (type === 'single_day' && startDate) {
-      setDays([{ date: startDate, eventIds: [] }]);
+      setDays([{ date: startDate, events: [] }]);
     } else if (type === 'multi_day' && startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
@@ -68,7 +82,7 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
       for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
         newDays.push({
           date: format(d, 'yyyy-MM-dd'),
-          eventIds: []
+          events: []
         });
       }
       setDays(newDays);
@@ -77,6 +91,22 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
 
   const handleUpdateDays = (updatedDays: SpecialEventDay[]) => {
     setDays(updatedDays);
+  };
+
+  const uploadFile = async (file: File, path: string): Promise<string> => {
+    const { error } = await supabase.storage
+      .from('event-images')
+      .upload(path, file);
+
+    if (error) {
+      throw error;
+    }
+
+    const { data } = supabase.storage
+      .from('event-images')
+      .getPublicUrl(path);
+
+    return data.publicUrl;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -152,14 +182,77 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
           dayId = dayData.id;
         }
 
-        // Create assignments for this day
-        for (const eventId of day.eventIds) {
+        // Create events for this day
+        for (const eventData of day.events) {
+          if (!eventData.title || !eventData.description || !eventData.location || !eventData.event_time || !eventData.age_group) {
+            continue; // Skip incomplete events
+          }
+
+          // Upload files and get URLs
+          let cover_photo_url = null;
+          const additional_images: string[] = [];
+
+          if (eventData.cover_photo_file) {
+            const fileExt = eventData.cover_photo_file.name.split('.').pop();
+            const fileName = `${Date.now()}-${Math.random()}.${fileExt}`;
+            const filePath = `event-images/${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+              .from('event-images')
+              .upload(filePath, eventData.cover_photo_file);
+
+            if (!uploadError) {
+              const { data: urlData } = supabase.storage
+                .from('event-images')
+                .getPublicUrl(filePath);
+              cover_photo_url = urlData.publicUrl;
+            }
+          }
+
+          for (const file of eventData.additional_image_files) {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}-${Math.random()}.${fileExt}`;
+            const filePath = `event-images/${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+              .from('event-images')
+              .upload(filePath, file);
+
+            if (!uploadError) {
+              const { data: urlData } = supabase.storage
+                .from('event-images')
+                .getPublicUrl(filePath);
+              additional_images.push(urlData.publicUrl);
+            }
+          }
+
+          // Create the event
+          const { data: createdEvent, error: eventError } = await supabase
+            .from('events')
+            .insert({
+              title: eventData.title,
+              description: eventData.description,
+              location: eventData.location,
+              event_date: day.date,
+              event_time: eventData.event_time,
+              age_group: eventData.age_group,
+              elected_officials: eventData.elected_officials,
+              tags: eventData.tags,
+              cover_photo_url,
+              additional_images,
+            })
+            .select()
+            .single();
+
+          if (eventError) throw eventError;
+
+          // Create assignment
           const { error: assignmentError } = await supabase
             .from('special_event_assignments')
             .insert({
               special_event_id: specialEventId,
               special_event_day_id: dayId,
-              event_id: eventId,
+              event_id: createdEvent.id,
             });
 
           if (assignmentError) throw assignmentError;
