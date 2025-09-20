@@ -1,7 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, Tag, Calendar } from 'lucide-react';
+import { Search, Tag, Calendar, Filter, ChevronDown, ChevronUp } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Event {
@@ -23,15 +29,25 @@ interface TagSuggestion {
 
 interface SearchBarProps {
   onEventClick: (eventId: string) => void;
-  onSearch: (query: string, selectedTags: string[]) => void;
+  onSearch: (query: string, selectedTags: string[], filters: SearchFilters) => void;
+}
+
+interface SearchFilters {
+  sortBy: 'date-asc' | 'date-desc';
+  dateFrom?: Date;
+  dateTo?: Date;
 }
 
 const SearchBar = ({ onEventClick, onSearch }: SearchBarProps) => {
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [tagSuggestions, setTagSuggestions] = useState<TagSuggestion[]>([]);
   const [eventSuggestions, setEventSuggestions] = useState<Event[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState<'date-asc' | 'date-desc'>('date-asc');
+  const [dateFrom, setDateFrom] = useState<Date | undefined>();
+  const [dateTo, setDateTo] = useState<Date | undefined>();
   const searchRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -57,8 +73,18 @@ const SearchBar = ({ onEventClick, onSearch }: SearchBarProps) => {
   }, [query]);
 
   useEffect(() => {
-    onSearch(query, selectedTags);
-  }, [query, selectedTags, onSearch]);
+    // Don't trigger automatic search - only when user hits submit
+  }, [query, selectedTags]);
+
+  const handleSubmit = () => {
+    const filters: SearchFilters = {
+      sortBy,
+      dateFrom,
+      dateTo
+    };
+    onSearch(query, selectedTags, filters);
+    setIsOpen(false);
+  };
 
   const searchSuggestions = async () => {
     try {
@@ -127,7 +153,7 @@ const SearchBar = ({ onEventClick, onSearch }: SearchBarProps) => {
   };
 
   return (
-    <div ref={searchRef} className="relative w-full max-w-2xl mx-auto">
+    <div ref={searchRef} className="relative w-full max-w-4xl mx-auto">
       {/* Selected Tags */}
       {selectedTags.length > 0 && (
         <div className="mb-3 flex flex-wrap gap-1 sm:gap-2">
@@ -146,16 +172,133 @@ const SearchBar = ({ onEventClick, onSearch }: SearchBarProps) => {
         </div>
       )}
 
-      {/* Search Input */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-        <Input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search events by name or tag..."
-          className="pl-10 pr-4 py-2 sm:py-3 text-base sm:text-lg"
-          onFocus={() => query && setIsOpen(true)}
-        />
+      {/* Search Input and Controls */}
+      <div className="bg-card border rounded-lg p-4 shadow-sm">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search events by name or tag (leave blank to search all events)..."
+              className="pl-10 pr-4 py-2 sm:py-3 text-base"
+              onFocus={() => query && setIsOpen(true)}
+            />
+          </div>
+          
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              className="whitespace-nowrap"
+            >
+              <Filter className="w-4 h-4 mr-2" />
+              Advanced
+              {showAdvanced ? <ChevronUp className="w-4 h-4 ml-2" /> : <ChevronDown className="w-4 h-4 ml-2" />}
+            </Button>
+            
+            <Button onClick={handleSubmit} className="whitespace-nowrap">
+              Search
+            </Button>
+          </div>
+        </div>
+
+        {/* Advanced Filters */}
+        {showAdvanced && (
+          <div className="mt-4 pt-4 border-t space-y-4">
+            <div className="text-sm text-muted-foreground mb-3">
+              <p>Advanced filters will work with your search terms above. Leave search blank to filter all events.</p>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {/* Sort By */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Sort by Date</label>
+                <Select value={sortBy} onValueChange={(value: 'date-asc' | 'date-desc') => setSortBy(value)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="date-asc">Soonest to Latest</SelectItem>
+                    <SelectItem value="date-desc">Latest to Soonest</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Date From */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">From Date</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !dateFrom && "text-muted-foreground"
+                      )}
+                    >
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {dateFrom ? format(dateFrom, "MMM dd, yyyy") : "Select date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={dateFrom}
+                      onSelect={setDateFrom}
+                      initialFocus
+                      className="p-3 pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* Date To */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">To Date</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !dateTo && "text-muted-foreground"
+                      )}
+                    >
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {dateTo ? format(dateTo, "MMM dd, yyyy") : "Select date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={dateTo}
+                      onSelect={setDateTo}
+                      initialFocus
+                      className="p-3 pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+
+            {/* Clear Filters */}
+            <div className="flex justify-end">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSortBy('date-asc');
+                  setDateFrom(undefined);
+                  setDateTo(undefined);
+                }}
+              >
+                Clear Advanced Filters
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Suggestions Dropdown */}

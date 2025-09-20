@@ -24,12 +24,23 @@ interface Event {
   tags: string[];
 }
 
+interface SearchFilters {
+  sortBy: 'date-asc' | 'date-desc';
+  dateFrom?: Date;
+  dateTo?: Date;
+}
+
 const Home = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchTags, setSearchTags] = useState<string[]>([]);
+  const [searchFilters, setSearchFilters] = useState<SearchFilters>({
+    sortBy: 'date-asc',
+    dateFrom: undefined,
+    dateTo: undefined
+  });
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const { toast } = useToast();
@@ -80,8 +91,37 @@ const Home = () => {
       });
     }
 
+    // Apply date range filters
+    if (searchFilters.dateFrom || searchFilters.dateTo) {
+      filtered = filtered.filter(event => {
+        const eventDate = new Date(event.event_date);
+        
+        if (searchFilters.dateFrom && eventDate < searchFilters.dateFrom) {
+          return false;
+        }
+        
+        if (searchFilters.dateTo && eventDate > searchFilters.dateTo) {
+          return false;
+        }
+        
+        return true;
+      });
+    }
+
+    // Apply sorting
+    filtered.sort((a, b) => {
+      const dateA = new Date(a.event_date);
+      const dateB = new Date(b.event_date);
+      
+      if (searchFilters.sortBy === 'date-desc') {
+        return dateB.getTime() - dateA.getTime();
+      } else {
+        return dateA.getTime() - dateB.getTime();
+      }
+    });
+
     setFilteredEvents(filtered);
-  }, [events, selectedFilter, searchQuery, searchTags]);
+  }, [events, selectedFilter, searchQuery, searchTags, searchFilters]);
 
   useEffect(() => {
     filterEvents();
@@ -101,9 +141,10 @@ const Home = () => {
     setSelectedFilter(ageGroup);
   };
 
-  const handleSearch = useCallback((query: string, tags: string[]) => {
+  const handleSearch = useCallback((query: string, tags: string[], filters: SearchFilters) => {
     setSearchQuery(query);
     setSearchTags(tags);
+    setSearchFilters(filters);
   }, []);
 
   const handleEventClick = (eventId: string) => {
@@ -167,12 +208,17 @@ const Home = () => {
                     : 'All Events'
                   }
                 </h2>
-                {(selectedFilter || searchQuery || searchTags.length > 0) && (
+                {(selectedFilter || searchQuery || searchTags.length > 0 || searchFilters.dateFrom || searchFilters.dateTo) && (
                   <Button
                     onClick={() => {
                       handleFilterChange(null);
                       setSearchQuery('');
                       setSearchTags([]);
+                      setSearchFilters({
+                        sortBy: 'date-asc',
+                        dateFrom: undefined,
+                        dateTo: undefined
+                      });
                     }}
                     variant="outline"
                     size="sm"
@@ -221,8 +267,8 @@ const Home = () => {
               <Calendar className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
               <h3 className="text-xl font-semibold mb-2">No events found</h3>
               <p className="text-muted-foreground">
-                {searchQuery || searchTags.length > 0
-                  ? 'No events match your search criteria. Try different keywords or tags.'
+                {searchQuery || searchTags.length > 0 || searchFilters.dateFrom || searchFilters.dateTo
+                  ? 'No events match your search criteria. Try different keywords, tags, or date ranges.'
                   : selectedFilter 
                   ? `No events available for ${selectedFilter} age group.`
                   : 'No events have been created yet.'
