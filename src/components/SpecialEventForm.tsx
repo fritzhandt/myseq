@@ -8,8 +8,9 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { X, Plus, Trash2 } from 'lucide-react';
+import { X } from 'lucide-react';
 import { format } from 'date-fns';
+import { EventAssignmentSection } from './EventAssignmentSection';
 
 interface Event {
   id: string;
@@ -40,13 +41,10 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
   const [endDate, setEndDate] = useState('');
   const [isActive, setIsActive] = useState(false);
   const [days, setDays] = useState<SpecialEventDay[]>([]);
-  const [availableEvents, setAvailableEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchAvailableEvents();
-    
     if (specialEvent) {
       setTitle(specialEvent.title || '');
       setDescription(specialEvent.description || '');
@@ -77,43 +75,8 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
     }
   }, [type, startDate, endDate]);
 
-  const fetchAvailableEvents = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('events')
-        .select('id, title, event_date, event_time, location')
-        .order('event_date', { ascending: true });
-
-      if (error) throw error;
-      setAvailableEvents(data || []);
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: "Failed to fetch events",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const updateDayEvents = (dayIndex: number, eventId: string, checked: boolean) => {
-    setDays(prev => prev.map((day, index) => {
-      if (index === dayIndex) {
-        const eventIds = checked 
-          ? [...day.eventIds, eventId]
-          : day.eventIds.filter(id => id !== eventId);
-        return { ...day, eventIds };
-      }
-      return day;
-    }));
-  };
-
-  const updateDayDetails = (dayIndex: number, field: 'title' | 'description', value: string) => {
-    setDays(prev => prev.map((day, index) => {
-      if (index === dayIndex) {
-        return { ...day, [field]: value };
-      }
-      return day;
-    }));
+  const handleUpdateDays = (updatedDays: SpecialEventDay[]) => {
+    setDays(updatedDays);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -312,57 +275,14 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
         {days.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle>Assign Events</CardTitle>
+              <CardTitle>Assign Events & Add Event Details</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              {days.map((day, dayIndex) => (
-                <div key={dayIndex} className="border rounded-lg p-4 space-y-4">
-                  <h4 className="font-semibold">
-                    {format(new Date(day.date), 'EEEE, MMMM d, yyyy')}
-                  </h4>
-
-                  {type === 'multi_day' && (
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor={`day_title_${dayIndex}`}>Day Title</Label>
-                        <Input
-                          id={`day_title_${dayIndex}`}
-                          value={day.title || ''}
-                          onChange={(e) => updateDayDetails(dayIndex, 'title', e.target.value)}
-                          placeholder="Optional day title"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor={`day_description_${dayIndex}`}>Day Description</Label>
-                        <Input
-                          id={`day_description_${dayIndex}`}
-                          value={day.description || ''}
-                          onChange={(e) => updateDayDetails(dayIndex, 'description', e.target.value)}
-                          placeholder="Optional day description"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  <div>
-                    <Label>Events for this day:</Label>
-                    <div className="mt-2 space-y-2 max-h-48 overflow-y-auto">
-                      {availableEvents.map((event) => (
-                        <div key={event.id} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={`event_${dayIndex}_${event.id}`}
-                            checked={day.eventIds.includes(event.id)}
-                            onCheckedChange={(checked) => updateDayEvents(dayIndex, event.id, checked as boolean)}
-                          />
-                          <Label htmlFor={`event_${dayIndex}_${event.id}`} className="text-sm">
-                            {event.title} - {format(new Date(event.event_date), 'MMM d')} at {event.event_time}
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <CardContent>
+              <EventAssignmentSection 
+                days={days}
+                onUpdateDays={handleUpdateDays}
+                type={type}
+              />
             </CardContent>
           </Card>
         )}
