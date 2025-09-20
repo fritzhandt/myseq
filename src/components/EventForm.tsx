@@ -5,6 +5,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { BookOpen, GraduationCap, Briefcase, Crown, ChevronDown } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
@@ -37,6 +39,12 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
   const { toast } = useToast();
 
   const ageGroups = ['Grade School', 'Young Adult', 'Adult', 'Senior'];
+  const ageGroupIcons = {
+    'Grade School': BookOpen,
+    'Young Adult': GraduationCap,
+    'Adult': Briefcase,
+    'Senior': Crown
+  };
 
   const handleInputChange = (field: string, value: string | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -207,23 +215,44 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
 
               <div className="space-y-2">
                 <Label>Age Groups *</Label>
-                <div className="space-y-3 p-4 border rounded-lg bg-background">
-                  {ageGroups.map((group) => (
-                    <div key={group} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`age-group-${group}`}
-                        checked={Array.isArray(formData.age_group) ? formData.age_group.includes(group) : formData.age_group === group}
-                        onCheckedChange={(checked) => handleAgeGroupChange(group, checked as boolean)}
-                      />
-                      <Label 
-                        htmlFor={`age-group-${group}`}
-                        className="text-sm font-normal cursor-pointer"
-                      >
-                        {group}
-                      </Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-between"
+                      type="button"
+                    >
+                      {Array.isArray(formData.age_group) && formData.age_group.length > 0
+                        ? `${formData.age_group.length} group${formData.age_group.length > 1 ? 's' : ''} selected`
+                        : 'Select age groups'
+                      }
+                      <ChevronDown className="h-4 w-4 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-4">
+                    <div className="space-y-3">
+                      {ageGroups.map((group) => {
+                        const IconComponent = ageGroupIcons[group as keyof typeof ageGroupIcons];
+                        return (
+                          <div key={group} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`age-group-${group}`}
+                              checked={Array.isArray(formData.age_group) ? formData.age_group.includes(group) : formData.age_group === group}
+                              onCheckedChange={(checked) => handleAgeGroupChange(group, checked as boolean)}
+                            />
+                            <Label 
+                              htmlFor={`age-group-${group}`}
+                              className="text-sm font-normal cursor-pointer flex items-center"
+                            >
+                              <IconComponent className="w-4 h-4 mr-2" />
+                              {group}
+                            </Label>
+                          </div>
+                        );
+                      })}
                     </div>
-                  ))}
-                </div>
+                  </PopoverContent>
+                </Popover>
                 <p className="text-sm text-muted-foreground">
                   Select one or more age groups for this event
                 </p>

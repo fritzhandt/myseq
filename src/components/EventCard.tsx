@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, MapPin, Clock, Users, Download, Mail, ExternalLink } from 'lucide-react';
+import { Calendar, MapPin, Clock, Users, Download, Mail, ExternalLink, BookOpen, GraduationCap, Briefcase, Crown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface Event {
@@ -20,6 +20,13 @@ interface Event {
 interface EventCardProps {
   event: Event;
 }
+
+const ageGroupIcons = {
+  'Grade School': BookOpen,
+  'Young Adult': GraduationCap,
+  'Adult': Briefcase,
+  'Senior': Crown
+};
 
 export const EventCard = ({ event }: EventCardProps) => {
   const navigate = useNavigate();
@@ -113,13 +120,15 @@ export const EventCard = ({ event }: EventCardProps) => {
             alt={event.title}
             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
           />
-          <div className="absolute top-2 sm:top-3 right-2 sm:right-3 flex flex-wrap gap-1">
-            {event.age_group.map((group, index) => (
-              <Badge key={index} className="bg-primary/90 backdrop-blur-sm text-xs">
-                <Users className="w-3 h-3 mr-1" />
-                {group}
-              </Badge>
-            ))}
+          <div className="absolute top-2 sm:top-3 right-2 sm:right-3 flex gap-1">
+            {event.age_group.map((group, index) => {
+              const IconComponent = ageGroupIcons[group as keyof typeof ageGroupIcons];
+              return (
+                <div key={index} className="bg-primary/90 backdrop-blur-sm rounded-full p-1.5">
+                  <IconComponent className="w-3 h-3 text-white" />
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -128,13 +137,15 @@ export const EventCard = ({ event }: EventCardProps) => {
         <div className="flex justify-between items-start gap-2">
           <CardTitle className="text-lg sm:text-xl leading-tight">{event.title}</CardTitle>
           {!event.cover_photo_url && (
-            <div className="flex flex-wrap gap-1">
-              {event.age_group.map((group, index) => (
-                <Badge key={index} variant="secondary" className="text-xs">
-                  <Users className="w-3 h-3 mr-1" />
-                  {group}
-                </Badge>
-              ))}
+            <div className="flex gap-1 mt-2">
+              {event.age_group.map((group, index) => {
+                const IconComponent = ageGroupIcons[group as keyof typeof ageGroupIcons];
+                return (
+                  <div key={index} className="bg-secondary/80 rounded-full p-1.5">
+                    <IconComponent className="w-3 h-3 text-secondary-foreground" />
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

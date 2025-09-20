@@ -7,6 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { BookOpen, GraduationCap, Briefcase, Crown, ChevronDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Calendar, MapPin, Clock, Users, Plus, X, Upload, Tag, Trash2 } from 'lucide-react';
@@ -38,6 +40,14 @@ interface EventAssignmentSectionProps {
   onUpdateDays: (days: SpecialEventDay[]) => void;
   type: 'single_day' | 'multi_day';
 }
+
+const ageGroups = ['Grade School', 'Young Adult', 'Adult', 'Senior'];
+const ageGroupIcons = {
+  'Grade School': BookOpen,
+  'Young Adult': GraduationCap,
+  'Adult': Briefcase,
+  'Senior': Crown
+};
 
 export const EventAssignmentSection = ({ days, onUpdateDays, type }: EventAssignmentSectionProps) => {
   const { toast } = useToast();
@@ -262,30 +272,51 @@ export const EventAssignmentSection = ({ days, onUpdateDays, type }: EventAssign
 
                       <div>
                         <Label>Age Groups *</Label>
-                        <div className="space-y-2 p-3 border rounded-lg bg-background">
-                          {['Grade School', 'Young Adult', 'Adult', 'Senior'].map((group) => (
-                            <div key={group} className="flex items-center space-x-2">
-                              <Checkbox
-                                id={`age-group-${dayIndex}-${eventIndex}-${group}`}
-                                checked={event.age_group.includes(group)}
-                                onCheckedChange={(checked) => {
-                                  const currentAgeGroups = [...event.age_group];
-                                  if (checked) {
-                                    updateEventInDay(dayIndex, eventIndex, 'age_group', [...currentAgeGroups, group]);
-                                  } else {
-                                    updateEventInDay(dayIndex, eventIndex, 'age_group', currentAgeGroups.filter(g => g !== group));
-                                  }
-                                }}
-                              />
-                              <Label 
-                                htmlFor={`age-group-${dayIndex}-${eventIndex}-${group}`}
-                                className="text-sm font-normal cursor-pointer"
-                              >
-                                {group}
-                              </Label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className="w-full justify-between"
+                              type="button"
+                            >
+                              {event.age_group.length > 0
+                                ? `${event.age_group.length} group${event.age_group.length > 1 ? 's' : ''} selected`
+                                : 'Select age groups'
+                              }
+                              <ChevronDown className="h-4 w-4 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-full p-4">
+                            <div className="space-y-3">
+                              {ageGroups.map((group) => {
+                                const IconComponent = ageGroupIcons[group as keyof typeof ageGroupIcons];
+                                return (
+                                  <div key={group} className="flex items-center space-x-2">
+                                    <Checkbox
+                                      id={`age-group-${dayIndex}-${eventIndex}-${group}`}
+                                      checked={event.age_group.includes(group)}
+                                      onCheckedChange={(checked) => {
+                                        const currentAgeGroups = [...event.age_group];
+                                        if (checked) {
+                                          updateEventInDay(dayIndex, eventIndex, 'age_group', [...currentAgeGroups, group]);
+                                        } else {
+                                          updateEventInDay(dayIndex, eventIndex, 'age_group', currentAgeGroups.filter(g => g !== group));
+                                        }
+                                      }}
+                                    />
+                                    <Label 
+                                      htmlFor={`age-group-${dayIndex}-${eventIndex}-${group}`}
+                                      className="text-sm font-normal cursor-pointer flex items-center"
+                                    >
+                                      <IconComponent className="w-4 h-4 mr-2" />
+                                      {group}
+                                    </Label>
+                                  </div>
+                                );
+                              })}
                             </div>
-                          ))}
-                        </div>
+                          </PopoverContent>
+                        </Popover>
                       </div>
 
                       {/* Tags */}
