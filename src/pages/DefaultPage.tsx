@@ -4,8 +4,15 @@ import { supabase } from '@/integrations/supabase/client';
 import SpecialEventPage from '@/components/SpecialEventPage';
 import Home from './Home';
 
+interface SpecialEvent {
+  id: string;
+  title: string;
+  description: string | null;
+}
+
 const DefaultPage = () => {
-  const [hasActiveSpecialEvent, setHasActiveSpecialEvent] = useState<boolean | null>(null);
+  const [activeSpecialEvent, setActiveSpecialEvent] = useState<SpecialEvent | null>(null);
+  const [hasExitedSpecialEvent, setHasExitedSpecialEvent] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -17,26 +24,30 @@ const DefaultPage = () => {
     try {
       const { data, error } = await supabase
         .from('special_events')
-        .select('id')
+        .select('id, title, description')
         .eq('is_active', true)
         .maybeSingle();
 
       if (error) {
         console.error('Error checking for active special event:', error);
-        setHasActiveSpecialEvent(false);
+        setActiveSpecialEvent(null);
       } else {
-        setHasActiveSpecialEvent(!!data);
+        setActiveSpecialEvent(data);
       }
     } catch (error) {
       console.error('Error checking for active special event:', error);
-      setHasActiveSpecialEvent(false);
+      setActiveSpecialEvent(null);
     } finally {
       setLoading(false);
     }
   };
 
   const handleExitSpecialEvent = () => {
-    setHasActiveSpecialEvent(false);
+    setHasExitedSpecialEvent(true);
+  };
+
+  const handleGoToSpecialEvent = () => {
+    setHasExitedSpecialEvent(false);
   };
 
   if (loading) {
@@ -50,11 +61,16 @@ const DefaultPage = () => {
     );
   }
 
-  if (hasActiveSpecialEvent) {
+  if (activeSpecialEvent && !hasExitedSpecialEvent) {
     return <SpecialEventPage onExit={handleExitSpecialEvent} />;
   }
 
-  return <Home />;
+  return (
+    <Home 
+      activeSpecialEvent={activeSpecialEvent} 
+      onGoToSpecialEvent={handleGoToSpecialEvent}
+    />
+  );
 };
 
 export default DefaultPage;

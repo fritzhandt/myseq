@@ -31,7 +31,16 @@ interface SearchFilters {
   dateTo?: Date;
 }
 
-const Home = () => {
+interface HomeProps {
+  activeSpecialEvent?: {
+    id: string;
+    title: string;
+    description: string | null;
+  } | null;
+  onGoToSpecialEvent?: () => void;
+}
+
+const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
   const [events, setEvents] = useState<Event[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
@@ -217,6 +226,20 @@ const Home = () => {
               );
             })}
           </div>
+          {/* Special Event Button */}
+          {activeSpecialEvent && (
+            <div className="mb-6">
+              <Button
+                onClick={onGoToSpecialEvent}
+                className="bg-yellow-400/20 border-yellow-300/60 text-white hover:bg-yellow-400/30 hover:border-yellow-300/80 backdrop-blur-sm shadow-lg ring-2 ring-yellow-300/40 text-base sm:text-lg px-6 py-3 transition-all duration-200"
+                variant="outline"
+              >
+                <Crown className="mr-2 h-5 w-5" />
+                Go to {activeSpecialEvent.title}
+              </Button>
+            </div>
+          )}
+
           <Link
             to="#events"
             onClick={() => handleFilterChange(null)}
