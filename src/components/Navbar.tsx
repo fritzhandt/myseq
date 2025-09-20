@@ -31,6 +31,9 @@ const Navbar = () => {
                 <Link to="/elected-officials" className="text-base sm:text-lg font-medium hover:text-primary transition-colors py-2" onClick={closeMenu}>
                   Elected Officials
                 </Link>
+                <Link to="/contact-elected" className="text-base sm:text-lg font-medium hover:text-primary transition-colors py-2" onClick={closeMenu}>
+                  Contact Your Elected
+                </Link>
                 <Link to="/my-elected-lookup" className="text-base sm:text-lg font-medium hover:text-primary transition-colors py-2" onClick={closeMenu}>
                   My Elected Lookup
                 </Link>
