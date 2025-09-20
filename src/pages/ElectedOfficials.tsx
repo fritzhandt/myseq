@@ -1,4 +1,10 @@
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
+import Navbar from '@/components/Navbar';
+
 const ElectedOfficials = () => {
+  const navigate = useNavigate();
   const officials = [
     {
       name: "Sample Assembly Member",
@@ -24,10 +30,20 @@ const ElectedOfficials = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background py-16">
-      <div className="container mx-auto px-4">
-        <div className="max-w-6xl mx-auto">
-          <h1 className="text-4xl font-bold mb-8 text-center">Your Elected Officials</h1>
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <div className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/')}
+              className="mb-6"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Home
+            </Button>
+            <h1 className="text-4xl font-bold mb-8 text-center">Your Elected Officials</h1>
           <p className="text-lg text-muted-foreground text-center mb-12 max-w-3xl mx-auto">
             Meet the representatives who serve your community. These officials work to address 
             local concerns and represent your interests at different levels of government.
@@ -62,6 +78,7 @@ const ElectedOfficials = () => {
                 for your specific district representatives.
               </p>
             </div>
+          </div>
           </div>
         </div>
       </div>

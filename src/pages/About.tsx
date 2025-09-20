@@ -1,9 +1,26 @@
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
+import Navbar from '@/components/Navbar';
+
 const About = () => {
+  const navigate = useNavigate();
+
   return (
-    <div className="min-h-screen bg-background py-16">
-      <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold mb-8 text-center">About NYC Community Events</h1>
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <div className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/')}
+              className="mb-6"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Home
+            </Button>
+            <h1 className="text-4xl font-bold mb-8 text-center">About NYC Community Events</h1>
           
           <div className="prose prose-lg max-w-none">
             <p className="text-lg mb-6 text-muted-foreground">
@@ -44,6 +61,7 @@ const About = () => {
                 voice heard in the democratic process.
               </p>
             </div>
+          </div>
           </div>
         </div>
       </div>

@@ -1,7 +1,10 @@
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Search } from 'lucide-react';
+import { ExternalLink, Search, ArrowLeft } from 'lucide-react';
+import Navbar from '@/components/Navbar';
 
 const MyElectedLookup = () => {
+  const navigate = useNavigate();
   const lookupOptions = [
     {
       title: "Assemblymember",
@@ -28,10 +31,20 @@ const MyElectedLookup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background py-16">
-      <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold mb-8 text-center">My Elected Lookup</h1>
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <div className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/')}
+              className="mb-6"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Home
+            </Button>
+            <h1 className="text-4xl font-bold mb-8 text-center">My Elected Lookup</h1>
           <p className="text-lg text-muted-foreground text-center mb-12">
             Use these tools to find and contact your elected representatives at different 
             levels of government. Each tool will take you to the official website where 
@@ -72,6 +85,7 @@ const MyElectedLookup = () => {
               These external sites are maintained by the respective government offices 
               and contain the most up-to-date information about your representatives.
             </p>
+          </div>
           </div>
         </div>
       </div>

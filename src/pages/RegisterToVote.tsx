@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -9,9 +10,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { ExternalLink, Vote, Shield, AlertTriangle } from 'lucide-react';
+import { ExternalLink, Vote, Shield, AlertTriangle, ArrowLeft } from 'lucide-react';
+import Navbar from '@/components/Navbar';
 
 const RegisterToVote = () => {
+  const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleRegisterClick = () => {
@@ -24,10 +27,20 @@ const RegisterToVote = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background py-16">
-      <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <div className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/')}
+              className="mb-6"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Home
+            </Button>
+            <div className="text-center mb-12">
             <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
               <Vote className="w-10 h-10 text-primary" />
             </div>
@@ -116,6 +129,7 @@ const RegisterToVote = () => {
                 and find your polling place on the same NY.gov website.
               </p>
             </div>
+          </div>
           </div>
         </div>
       </div>
