@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Navigate, useNavigate } from 'react-router-dom';
+import { useParams, Navigate, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { 
@@ -123,9 +123,19 @@ const CommunityAlert = () => {
         </div>
 
         {/* Long Description */}
-        <div className="prose prose-lg max-w-none">
+        <div className="prose prose-lg max-w-none mb-8">
           <div className="whitespace-pre-wrap text-foreground leading-relaxed">
             {alert.long_description}
+          </div>
+        </div>
+
+        {/* Contact Information */}
+        <div className="border-t pt-8">
+          <div className="bg-muted/30 p-6 rounded-lg">
+            <p className="text-center text-muted-foreground">
+              For information and updates, <Link to="/contact-elected" className="text-primary hover:underline font-medium">contact your local elected official</Link>. 
+              If you are unsure of who your local elected is, <Link to="/my-elected-lookup" className="text-primary hover:underline font-medium">you can find out here</Link>.
+            </p>
           </div>
         </div>
       </div>
