@@ -11,6 +11,7 @@ import Auth from "./pages/Auth";
 import ElectedOfficials from "./pages/ElectedOfficials";
 import MyElectedLookup from "./pages/MyElectedLookup";
 import RegisterToVote from "./pages/RegisterToVote";
+import SpecialEvent from "./pages/SpecialEvent";
 import NotFound from "./pages/NotFound";
 import "./index.css";
 
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/elected-officials" element={<ElectedOfficials />} />
           <Route path="/my-elected-lookup" element={<MyElectedLookup />} />
           <Route path="/register-to-vote" element={<RegisterToVote />} />
+          <Route path="/special-event" element={<SpecialEvent />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />
