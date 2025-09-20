@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { EventCard } from '@/components/EventCard';
+import { EventCalendar } from '@/components/EventCalendar';
+import SearchBar from '@/components/SearchBar';
 import Navbar from '@/components/Navbar';
 import { supabase } from '@/integrations/supabase/client';
-import { Calendar } from 'lucide-react';
+import { Calendar, Grid, CalendarDays, BookOpen, GraduationCap, Briefcase, Crown, Users } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface EventType {
@@ -18,6 +21,7 @@ interface EventType {
   cover_photo_url: string | null;
   additional_images: string[];
   elected_officials: string[];
+  tags?: string[];
 }
 
 interface SpecialEventDay {
@@ -38,17 +42,97 @@ interface SpecialEvent {
   days: SpecialEventDay[];
 }
 
+interface SearchFilters {
+  sortBy: 'date-asc' | 'date-desc';
+  dateFrom?: Date;
+  dateTo?: Date;
+}
+
 interface SpecialEventPageProps {
   onExit: () => void;
 }
 
 const SpecialEventPage = ({ onExit }: SpecialEventPageProps) => {
   const [specialEvent, setSpecialEvent] = useState<SpecialEvent | null>(null);
+  const [allEvents, setAllEvents] = useState<EventType[]>([]);
+  const [filteredEvents, setFilteredEvents] = useState<EventType[]>([]);
+  const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchTags, setSearchTags] = useState<string[]>([]);
+  const [searchFilters, setSearchFilters] = useState<SearchFilters>({
+    sortBy: 'date-asc',
+    dateFrom: undefined,
+    dateTo: undefined
+  });
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [loading, setLoading] = useState(true);
+
+  const ageGroups = ['Grade School', 'Young Adult', 'Adult', 'Senior'];
+  const ageGroupIcons = {
+    'Grade School': BookOpen,
+    'Young Adult': GraduationCap,
+    'Adult': Briefcase,
+    'Senior': Crown
+  };
 
   useEffect(() => {
     fetchActiveSpecialEvent();
   }, []);
+
+  useEffect(() => {
+    filterEvents();
+  }, [allEvents, selectedFilter, searchQuery, searchTags, searchFilters]);
+
+  const filterEvents = useCallback(() => {
+    let filtered = allEvents;
+
+    // Apply age group filter
+    if (selectedFilter) {
+      filtered = filtered.filter(event => 
+        Array.isArray(event.age_group) ? event.age_group.includes(selectedFilter) : event.age_group === selectedFilter
+      );
+    }
+
+    // Apply search filters
+    if (searchQuery.trim() || searchTags.length > 0) {
+      filtered = filtered.filter(event => {
+        const matchesQuery = !searchQuery.trim() || 
+          event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          event.description.toLowerCase().includes(searchQuery.toLowerCase());
+        
+        const matchesTags = searchTags.length === 0 || 
+          (event.tags && searchTags.some(tag => event.tags.includes(tag)));
+        
+        return matchesQuery && matchesTags;
+      });
+    }
+
+    // Apply date range filters
+    if (searchFilters.dateFrom || searchFilters.dateTo) {
+      filtered = filtered.filter(event => {
+        const eventDate = new Date(event.event_date);
+        
+        if (searchFilters.dateFrom && eventDate < searchFilters.dateFrom) {
+          return false;
+        }
+        
+        if (searchFilters.dateTo && eventDate > searchFilters.dateTo) {
+          return false;
+        }
+        
+        return true;
+      });
+    }
+
+    // Sort events
+    if (searchFilters.sortBy === 'date-asc') {
+      filtered.sort((a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime());
+    } else {
+      filtered.sort((a, b) => new Date(b.event_date).getTime() - new Date(a.event_date).getTime());
+    }
+
+    setFilteredEvents(filtered);
+  }, [allEvents, selectedFilter, searchQuery, searchTags, searchFilters]);
 
   const fetchActiveSpecialEvent = async () => {
     try {
@@ -137,6 +221,13 @@ const SpecialEventPage = ({ onExit }: SpecialEventPageProps) => {
         });
       }
 
+      // Collect all events for filtering
+      const allSpecialEvents: EventType[] = [];
+      days.forEach(day => {
+        allSpecialEvents.push(...day.events);
+      });
+      setAllEvents(allSpecialEvents);
+
       setSpecialEvent({
         ...specialEventData,
         type: specialEventData.type as 'single_day' | 'multi_day',
@@ -147,6 +238,20 @@ const SpecialEventPage = ({ onExit }: SpecialEventPageProps) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleFilterChange = (filter: string | null) => {
+    setSelectedFilter(filter === selectedFilter ? null : filter);
+  };
+
+  const handleSearch = (query: string, tags: string[], filters: SearchFilters) => {
+    setSearchQuery(query);
+    setSearchTags(tags);
+    setSearchFilters(filters);
+  };
+
+  const handleEventClick = (eventId: string) => {
+    // Navigate to event detail if needed
   };
 
   if (loading) {
@@ -190,6 +295,53 @@ const SpecialEventPage = ({ onExit }: SpecialEventPageProps) => {
                 </p>
               )}
             </div>
+
+            {/* Age Group Filters - Mobile Dropdown */}
+            <div className="sm:hidden w-full max-w-xs">
+              <Select value={selectedFilter || ""} onValueChange={(value) => handleFilterChange(value || null)}>
+                <SelectTrigger className="w-full border-white/20 text-white bg-white/10 backdrop-blur-sm">
+                  <SelectValue placeholder="Filter by Age Group" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All Age Groups</SelectItem>
+                  {ageGroups.map((ageGroup) => {
+                    const IconComponent = ageGroupIcons[ageGroup as keyof typeof ageGroupIcons];
+                    return (
+                      <SelectItem key={ageGroup} value={ageGroup}>
+                        <div className="flex items-center">
+                          <IconComponent className="mr-2 h-4 w-4" />
+                          {ageGroup}
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Desktop/Tablet Buttons */}
+            <div className="hidden sm:flex flex-wrap justify-center gap-2 sm:gap-4 mb-8">
+              {ageGroups.map((ageGroup) => {
+                const IconComponent = ageGroupIcons[ageGroup as keyof typeof ageGroupIcons];
+                return (
+                  <Button
+                    key={ageGroup}
+                    onClick={() => handleFilterChange(ageGroup)}
+                    variant={selectedFilter === ageGroup ? "secondary" : "outline"}
+                    size="sm"
+                    className={`border-white/20 text-white hover:bg-white/20 backdrop-blur-sm text-sm sm:text-base w-40 sm:w-44 text-center transition-all duration-200 ${
+                      selectedFilter === ageGroup 
+                        ? 'bg-yellow-400/20 border-yellow-300/60 shadow-lg ring-2 ring-yellow-300/40' 
+                        : 'bg-white/10 hover:border-white/40'
+                    }`}
+                  >
+                    <IconComponent className={`mr-1 sm:mr-2 ${ageGroup === 'Young Adult' ? 'h-7 w-7' : 'h-4 w-4'}`} />
+                    {ageGroup}
+                  </Button>
+                );
+              })}
+            </div>
+
             <Button 
               onClick={onExit}
               variant="outline"
@@ -203,45 +355,110 @@ const SpecialEventPage = ({ onExit }: SpecialEventPageProps) => {
         </div>
       </div>
 
-      {/* Events by Day */}
-      <div className="container mx-auto px-4 py-6 sm:py-8">
-        <div className="space-y-8 sm:space-y-12">
-          {specialEvent.days.map((day) => (
-            <div key={day.id} className="space-y-4 sm:space-y-6">
-              {/* Day Header */}
-              <div className="text-center">
-                <h2 className="text-2xl sm:text-3xl font-bold mb-2">
-                  {day.title || format(new Date(day.date), 'EEEE, MMMM d, yyyy')}
-                </h2>
-                {day.description && (
-                  <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto">
-                    {day.description}
-                  </p>
-                )}
-              </div>
-
-              {/* Events Grid */}
-              {day.events.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                  {day.events.map((event) => (
-                    <EventCard
-                      key={event.id}
-                      event={event}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <Card>
-                  <CardContent className="pt-6">
-                    <p className="text-center text-muted-foreground">
-                      No events scheduled for this day.
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          ))}
+      {/* Search Section */}
+      <section className="py-6 md:py-8 px-4 bg-muted/30">
+        <div className="container mx-auto">
+          <SearchBar onEventClick={handleEventClick} onSearch={handleSearch} />
         </div>
+      </section>
+
+      {/* View Mode Controls */}
+      <section className="py-6 px-4">
+        <div className="container mx-auto">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold">Events</h2>
+            <div className="flex gap-2">
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('list')}
+                className="flex items-center gap-2"
+              >
+                <Grid className="h-4 w-4" />
+                <span className="hidden sm:inline">List</span>
+              </Button>
+              <Button
+                variant={viewMode === 'calendar' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('calendar')}
+                className="flex items-center gap-2"
+              >
+                <CalendarDays className="h-4 w-4" />
+                <span className="hidden sm:inline">Calendar</span>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Events Display */}
+      <div className="container mx-auto px-4 pb-8">
+        {viewMode === 'calendar' ? (
+          <EventCalendar events={filteredEvents.map(event => ({ ...event, tags: event.tags || [] }))} />
+        ) : (
+          <div className="space-y-8 sm:space-y-12">
+            {/* Show filtered events organized by day */}
+            {(() => {
+              // Group filtered events by date
+              const eventsByDate: { [key: string]: EventType[] } = {};
+              filteredEvents.forEach(event => {
+                const dateKey = event.event_date;
+                if (!eventsByDate[dateKey]) {
+                  eventsByDate[dateKey] = [];
+                }
+                eventsByDate[dateKey].push(event);
+              });
+
+              // Sort dates
+              const sortedDates = Object.keys(eventsByDate).sort((a, b) => 
+                new Date(a).getTime() - new Date(b).getTime()
+              );
+
+              if (sortedDates.length === 0) {
+                return (
+                  <Card>
+                    <CardContent className="pt-6">
+                      <p className="text-center text-muted-foreground">
+                        No events match your current filters.
+                      </p>
+                    </CardContent>
+                  </Card>
+                );
+              }
+
+              return sortedDates.map(date => {
+                const dayEvents = eventsByDate[date];
+                const dayInfo = specialEvent.days.find(day => day.date === date);
+                
+                return (
+                  <div key={date} className="space-y-4 sm:space-y-6">
+                    {/* Day Header */}
+                    <div className="text-center">
+                      <h2 className="text-2xl sm:text-3xl font-bold mb-2">
+                        {dayInfo?.title || format(new Date(date), 'EEEE, MMMM d, yyyy')}
+                      </h2>
+                      {dayInfo?.description && (
+                        <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto">
+                          {dayInfo.description}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Events Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                      {dayEvents.map((event) => (
+                        <EventCard
+                          key={event.id}
+                          event={event}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                );
+              });
+            })()}
+          </div>
+        )}
       </div>
     </div>
   );
