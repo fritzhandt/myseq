@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import Navbar from '@/components/Navbar';
@@ -20,45 +20,37 @@ const About = () => {
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Home
             </Button>
-            <h1 className="text-4xl font-bold mb-8 text-center">About NYC Community Events</h1>
+            <h1 className="text-4xl font-bold mb-8 text-center">About Southeast Queens Community Events</h1>
           
           <div className="prose prose-lg max-w-none">
             <p className="text-lg mb-6 text-muted-foreground">
-              NYC Community Events is your go-to platform for discovering and participating in 
-              community activities across New York City. We believe in the power of bringing 
-              people together to build stronger, more connected neighborhoods.
+              Southeast Queens Community Events is your one-stop shop for discovering and participating in all the happenings across Southeast Queens. From family-friendly activities to cultural celebrations, this platform makes it easy to stay connected, informed, and engaged.
             </p>
             
-            <div className="grid md:grid-cols-2 gap-8 mb-8">
-              <div className="bg-card p-6 rounded-lg border">
-                <h2 className="text-2xl font-semibold mb-4">Our Mission</h2>
-                <p className="text-muted-foreground">
-                  To connect New Yorkers with meaningful community events and foster civic 
-                  engagement through accessible, age-appropriate programming that brings 
-                  residents and their elected officials together.
-                </p>
-              </div>
-              
-              <div className="bg-card p-6 rounded-lg border">
-                <h2 className="text-2xl font-semibold mb-4">What We Do</h2>
-                <p className="text-muted-foreground">
-                  We organize and promote community events for all age groups, from grade 
-                  school activities to senior programs, ensuring every New Yorker has 
-                  opportunities to engage with their community and local government.
-                </p>
-              </div>
+            <div className="w-full h-px bg-border my-8"></div>
+            
+            <div className="bg-card p-6 rounded-lg border mb-8">
+              <h2 className="text-2xl font-semibold mb-4">Our Mission</h2>
+              <p className="text-muted-foreground">
+                To serve as the central hub for Southeast Queens residents by connecting neighbors with local events, fostering civic engagement, and strengthening community pride.
+              </p>
             </div>
+            
+            <div className="w-full h-px bg-border my-8"></div>
+            
+            <div className="bg-card p-6 rounded-lg border mb-8">
+              <h2 className="text-2xl font-semibold mb-4">What We Do</h2>
+              <p className="text-muted-foreground">
+                Built and managed by your <Link to="/elected-officials" className="text-primary hover:text-primary/80 underline underline-offset-4">local elected officials</Link>, Southeast Queens Community Events brings together everything you need to know about what's happening in your neighborhood. We highlight events for all ages—youth programs, senior activities, cultural festivals, and more—so everyone has a chance to get involved and make lasting connections.
+              </p>
+            </div>
+            
+            <div className="w-full h-px bg-border my-8"></div>
             
             <div className="bg-muted p-8 rounded-lg">
               <h2 className="text-2xl font-semibold mb-4">Get Involved</h2>
-              <p className="text-muted-foreground mb-4">
-                Join us in building stronger communities! Whether you're looking to attend events, 
-                volunteer, or learn more about your elected officials, there's a place for you 
-                in our community.
-              </p>
               <p className="text-muted-foreground">
-                Stay connected with your neighbors, meet your representatives, and make your 
-                voice heard in the democratic process.
+                Explore events, meet your neighbors, and engage with your representatives right here in Southeast Queens. Whether you're attending your first community gathering or looking for ways to volunteer, this site is designed to keep you informed and involved in shaping the future of our community.
               </p>
             </div>
           </div>
