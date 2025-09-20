@@ -176,14 +176,14 @@ const SpecialEventPage = ({ onExit }: SpecialEventPageProps) => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-gradient-to-r from-primary to-primary-glow">
-        <div className="container mx-auto px-4 pt-8 pb-16">
-          <div className="flex justify-between items-start mb-6">
+        <div className="container mx-auto px-4 pt-6 sm:pt-8 pb-12 sm:pb-16">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 sm:gap-6 mb-6">
             <div className="text-white">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
                 {specialEvent.title}
               </h1>
               {specialEvent.description && (
-                <p className="text-lg opacity-90 max-w-2xl">
+                <p className="text-base sm:text-lg opacity-90 max-w-2xl">
                   {specialEvent.description}
                 </p>
               )}
@@ -191,28 +191,29 @@ const SpecialEventPage = ({ onExit }: SpecialEventPageProps) => {
             <Button 
               onClick={onExit}
               variant="secondary"
-              size="lg"
-              className="bg-white/10 hover:bg-white/20 text-white border-white/20"
+              size="sm"
+              className="bg-white/10 hover:bg-white/20 text-white border-white/20 self-start sm:self-auto"
             >
               <X className="h-4 w-4 mr-2" />
-              Exit Special Event
+              <span className="hidden sm:inline">Exit Special Event</span>
+              <span className="sm:hidden">Exit</span>
             </Button>
           </div>
         </div>
       </div>
 
       {/* Events by Day */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="space-y-12">
+      <div className="container mx-auto px-4 py-6 sm:py-8">
+        <div className="space-y-8 sm:space-y-12">
           {specialEvent.days.map((day) => (
-            <div key={day.id} className="space-y-6">
+            <div key={day.id} className="space-y-4 sm:space-y-6">
               {/* Day Header */}
               <div className="text-center">
-                <h2 className="text-3xl font-bold mb-2">
+                <h2 className="text-2xl sm:text-3xl font-bold mb-2">
                   {day.title || format(new Date(day.date), 'EEEE, MMMM d, yyyy')}
                 </h2>
                 {day.description && (
-                  <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                  <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto">
                     {day.description}
                   </p>
                 )}
@@ -220,7 +221,7 @@ const SpecialEventPage = ({ onExit }: SpecialEventPageProps) => {
 
               {/* Events Grid */}
               {day.events.length > 0 ? (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {day.events.map((event) => (
                     <EventCard
                       key={event.id}

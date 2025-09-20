@@ -130,16 +130,16 @@ const SearchBar = ({ onEventClick, onSearch }: SearchBarProps) => {
     <div ref={searchRef} className="relative w-full max-w-2xl mx-auto">
       {/* Selected Tags */}
       {selectedTags.length > 0 && (
-        <div className="mb-3 flex flex-wrap gap-2">
+        <div className="mb-3 flex flex-wrap gap-1 sm:gap-2">
           {selectedTags.map((tag) => (
             <Badge
               key={tag}
               variant="secondary"
-              className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground"
+              className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground text-xs sm:text-sm"
               onClick={() => removeTag(tag)}
             >
               <Tag className="w-3 h-3 mr-1" />
-              {tag}
+              <span className="truncate max-w-[100px] sm:max-w-none">{tag}</span>
               <span className="ml-1 text-xs">×</span>
             </Badge>
           ))}
@@ -153,14 +153,14 @@ const SearchBar = ({ onEventClick, onSearch }: SearchBarProps) => {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search events by name or tag..."
-          className="pl-10 pr-4 py-3 text-lg"
+          className="pl-10 pr-4 py-2 sm:py-3 text-base sm:text-lg"
           onFocus={() => query && setIsOpen(true)}
         />
       </div>
 
       {/* Suggestions Dropdown */}
       {isOpen && (query.length > 0 || selectedTags.length > 0) && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-background border rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-background border rounded-lg shadow-lg z-50 max-h-[70vh] sm:max-h-96 overflow-y-auto">
           {/* Tag Suggestions */}
           {tagSuggestions.length > 0 && (
             <div className="p-3 border-b">
@@ -175,11 +175,11 @@ const SearchBar = ({ onEventClick, onSearch }: SearchBarProps) => {
                     onClick={() => handleTagClick(suggestion.tag)}
                     className="w-full text-left px-3 py-2 rounded-md hover:bg-muted text-sm flex items-center justify-between"
                   >
-                    <span className="flex items-center">
-                      <Tag className="w-3 h-3 mr-2 text-muted-foreground" />
-                      {suggestion.tag}
+                    <span className="flex items-center min-w-0">
+                      <Tag className="w-3 h-3 mr-2 text-muted-foreground flex-shrink-0" />
+                      <span className="truncate">{suggestion.tag}</span>
                     </span>
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="outline" className="text-xs ml-2 flex-shrink-0">
                       {suggestion.count} event{suggestion.count !== 1 ? 's' : ''}
                     </Badge>
                   </button>
@@ -202,14 +202,14 @@ const SearchBar = ({ onEventClick, onSearch }: SearchBarProps) => {
                     onClick={() => handleEventClick(event.id)}
                     className="w-full text-left px-3 py-2 rounded-md hover:bg-muted text-sm"
                   >
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="font-medium">{event.title}</p>
-                        <p className="text-xs text-muted-foreground">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium truncate">{event.title}</p>
+                        <p className="text-xs text-muted-foreground truncate">
                           {formatDate(event.event_date)} • {event.location}
                         </p>
                       </div>
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="outline" className="text-xs flex-shrink-0">
                         {event.age_group}
                       </Badge>
                     </div>
@@ -223,7 +223,7 @@ const SearchBar = ({ onEventClick, onSearch }: SearchBarProps) => {
           {query && tagSuggestions.length === 0 && eventSuggestions.length === 0 && (
             <div className="p-6 text-center text-muted-foreground">
               <Search className="w-8 h-8 mx-auto mb-2 opacity-50" />
-              <p>No results found for "{query}"</p>
+              <p className="text-sm">No results found for "{query}"</p>
             </div>
           )}
         </div>

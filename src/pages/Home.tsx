@@ -102,21 +102,21 @@ const Home = () => {
       <Navbar />
       <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <div className="gradient-hero text-primary-foreground py-20 px-4">
+      <div className="gradient-hero text-primary-foreground py-16 md:py-20 px-4">
         <div className="container mx-auto text-center">
-          <h1 className="text-5xl font-bold mb-6 drop-shadow-lg">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 drop-shadow-lg">
             Which events are you looking for?
           </h1>
-          <div className="flex flex-wrap justify-center gap-4 mb-8">
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-8">
             {ageGroups.map((ageGroup) => (
               <Button
                 key={ageGroup}
                 onClick={() => handleFilterChange(ageGroup)}
                 variant={selectedFilter === ageGroup ? "secondary" : "outline"}
-                size="lg"
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm"
+                size="sm"
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm text-sm sm:text-base"
               >
-                <Users className="mr-2 h-5 w-5" />
+                <Users className="mr-1 sm:mr-2 h-4 w-4" />
                 {ageGroup}
               </Button>
             ))}
@@ -124,28 +124,28 @@ const Home = () => {
           <Link
             to="#events"
             onClick={() => handleFilterChange(null)}
-            className="inline-flex items-center text-lg font-medium hover:underline text-white/90 hover:text-white transition-colors"
+            className="inline-flex items-center text-base sm:text-lg font-medium hover:underline text-white/90 hover:text-white transition-colors"
           >
-            <Calendar className="mr-2 h-5 w-5" />
+            <Calendar className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
             All Events
           </Link>
         </div>
       </div>
 
       {/* Search Section */}
-      <section className="py-8 px-4 bg-muted/30">
+      <section className="py-6 md:py-8 px-4 bg-muted/30">
         <div className="container mx-auto">
           <SearchBar onEventClick={handleEventClick} onSearch={handleSearch} />
         </div>
       </section>
 
       {/* Events Section */}
-      <section id="events" className="py-16 px-4">
+      <section id="events" className="py-12 md:py-16 px-4">
         <div className="container mx-auto">
           <div className="mb-8">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex flex-col gap-4">
               <div>
-                <h2 className="text-3xl font-bold">
+                <h2 className="text-2xl md:text-3xl font-bold">
                   {selectedFilter && searchTags.length === 0 && !searchQuery
                     ? `${selectedFilter} Events`
                     : searchQuery || searchTags.length > 0
@@ -169,23 +169,30 @@ const Home = () => {
                 )}
               </div>
               
-              <div className="flex items-center gap-2">
-                <Button
-                  variant={viewMode === 'list' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setViewMode('list')}
-                >
-                  <Grid className="w-4 h-4 mr-2" />
-                  List View
-                </Button>
-                <Button
-                  variant={viewMode === 'calendar' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setViewMode('calendar')}
-                >
-                  <CalendarDays className="w-4 h-4 mr-2" />
-                  Calendar View
-                </Button>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                <span className="text-sm text-muted-foreground">View:</span>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={viewMode === 'list' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setViewMode('list')}
+                    className="text-sm"
+                  >
+                    <Grid className="w-4 h-4 mr-1 sm:mr-2" />
+                    <span className="hidden sm:inline">List View</span>
+                    <span className="sm:hidden">List</span>
+                  </Button>
+                  <Button
+                    variant={viewMode === 'calendar' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setViewMode('calendar')}
+                    className="text-sm"
+                  >
+                    <CalendarDays className="w-4 h-4 mr-1 sm:mr-2" />
+                    <span className="hidden sm:inline">Calendar View</span>
+                    <span className="sm:hidden">Calendar</span>
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -211,7 +218,7 @@ const Home = () => {
           ) : viewMode === 'calendar' ? (
             <EventCalendar events={filteredEvents} />
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {filteredEvents.map((event) => (
                 <EventCard key={event.id} event={event} />
               ))}

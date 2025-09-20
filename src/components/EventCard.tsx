@@ -107,24 +107,24 @@ export const EventCard = ({ event }: EventCardProps) => {
   return (
     <Card className="shadow-card hover:shadow-elegant transition-all duration-300 overflow-hidden">
       {event.cover_photo_url && (
-        <div className="relative h-48 overflow-hidden">
+        <div className="relative h-40 sm:h-48 overflow-hidden">
           <img
             src={event.cover_photo_url}
             alt={event.title}
             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
           />
-          <Badge className="absolute top-3 right-3 bg-primary/90 backdrop-blur-sm">
+          <Badge className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-primary/90 backdrop-blur-sm text-xs sm:text-sm">
             <Users className="w-3 h-3 mr-1" />
             {event.age_group}
           </Badge>
         </div>
       )}
       
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-3 px-4 sm:px-6">
         <div className="flex justify-between items-start gap-2">
-          <CardTitle className="text-xl leading-tight">{event.title}</CardTitle>
+          <CardTitle className="text-lg sm:text-xl leading-tight">{event.title}</CardTitle>
           {!event.cover_photo_url && (
-            <Badge variant="secondary">
+            <Badge variant="secondary" className="text-xs sm:text-sm">
               <Users className="w-3 h-3 mr-1" />
               {event.age_group}
             </Badge>
@@ -132,19 +132,19 @@ export const EventCard = ({ event }: EventCardProps) => {
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 px-4 sm:px-6">
         <div className="grid grid-cols-1 gap-3">
           <div className="flex items-center text-sm text-muted-foreground">
-            <Calendar className="w-4 h-4 mr-2 text-primary" />
-            {formatDate(event.event_date)}
+            <Calendar className="w-4 h-4 mr-2 text-primary flex-shrink-0" />
+            <span className="truncate">{formatDate(event.event_date)}</span>
           </div>
           <div className="flex items-center text-sm text-muted-foreground">
-            <Clock className="w-4 h-4 mr-2 text-primary" />
+            <Clock className="w-4 h-4 mr-2 text-primary flex-shrink-0" />
             {formatTime(event.event_time)}
           </div>
           <div className="flex items-center text-sm text-muted-foreground">
-            <MapPin className="w-4 h-4 mr-2 text-primary" />
-            {event.location}
+            <MapPin className="w-4 h-4 mr-2 text-primary flex-shrink-0" />
+            <span className="truncate">{event.location}</span>
           </div>
         </div>
 
@@ -176,12 +176,12 @@ export const EventCard = ({ event }: EventCardProps) => {
           </Button>
         )}
 
-        <div className="flex gap-2 pt-2">
+        <div className="flex flex-col sm:flex-row gap-2 pt-2">
           <Button
             onClick={generateCalendarFile}
             variant="outline"
             size="sm"
-            className="flex-1"
+            className="flex-1 text-xs sm:text-sm"
           >
             <Download className="w-4 h-4 mr-1" />
             Add to Calendar
@@ -190,7 +190,7 @@ export const EventCard = ({ event }: EventCardProps) => {
             onClick={emailCalendarInvite}
             variant="outline"
             size="sm"
-            className="flex-1"
+            className="flex-1 text-xs sm:text-sm"
           >
             <Mail className="w-4 h-4 mr-1" />
             Email Invite
