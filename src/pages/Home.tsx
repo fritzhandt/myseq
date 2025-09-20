@@ -106,7 +106,7 @@ const Home = () => {
       {/* Hero Section */}
       <div className="gradient-hero text-primary-foreground py-16 md:py-20 px-4">
         <div className="container mx-auto text-center">
-          <p className="text-lg md:text-xl mb-4 text-primary-foreground/90">Welcome</p>
+          <p className="text-lg md:text-xl mb-4 text-white font-bold bg-blue-600 rounded-lg px-4 py-2 inline-block">Welcome</p>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 drop-shadow-lg">
             Which events are you looking for?
           </h1>
