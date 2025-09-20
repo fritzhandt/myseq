@@ -52,19 +52,18 @@ const CommunityAlertBanner = () => {
   if (!alert) return null;
 
   return (
-    <Alert className="rounded-none border-0 border-b bg-destructive text-destructive-foreground">
-      <AlertDescription className="w-full text-center">
-        <div className="font-medium mb-2">
-          COMMUNITY ALERT: {alert.short_description}
-        </div>
-        <Link 
-          to={`/community-alert/${alert.id}`}
-          className="underline hover:no-underline font-medium block"
-        >
-          Click here for more information
-        </Link>
-      </AlertDescription>
-    </Alert>
+    <Link to={`/community-alert/${alert.id}`} className="block">
+      <Alert className="rounded-none border-0 border-b bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors cursor-pointer">
+        <AlertDescription className="w-full text-center">
+          <div className="font-bold mb-2">
+            COMMUNITY ALERT: {alert.short_description}
+          </div>
+          <div className="font-bold">
+            Click here for more information
+          </div>
+        </AlertDescription>
+      </Alert>
+    </Link>
   );
 };
 
