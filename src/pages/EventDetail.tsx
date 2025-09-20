@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
-import { Calendar, Clock, MapPin, Users, ArrowLeft, Tag, Download, Mail, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, ArrowLeft, Tag, Download, Mail, ChevronLeft, ChevronRight, X, BookOpen, GraduationCap, Briefcase, Crown } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 
 interface Event {
@@ -20,6 +20,13 @@ interface Event {
   additional_images: string[];
   tags: string[];
 }
+
+const ageGroupIcons = {
+  'Grade School': BookOpen,
+  'Young Adult': GraduationCap,
+  'Adult': Briefcase,
+  'Senior': Crown
+};
 
 const EventDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -251,12 +258,15 @@ const EventDetail = () => {
                 <div>
                   <h1 className="text-3xl md:text-4xl font-bold mb-2">{event.title}</h1>
                   <div className="flex flex-wrap gap-2">
-                    {event.age_group.map((group, index) => (
-                      <Badge key={index} variant="secondary">
-                        <Users className="w-4 h-4 mr-1" />
-                        {group}
-                      </Badge>
-                    ))}
+                    {event.age_group.map((group, index) => {
+                      const IconComponent = ageGroupIcons[group as keyof typeof ageGroupIcons];
+                      return (
+                        <Badge key={index} variant="secondary">
+                          <IconComponent className="w-4 h-4 mr-1" />
+                          {group}
+                        </Badge>
+                      );
+                    })}
                   </div>
                 </div>
                 <Button onClick={generateCalendarFile} size="lg">
