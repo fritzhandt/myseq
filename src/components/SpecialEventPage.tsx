@@ -175,24 +175,24 @@ const SpecialEventPage = ({ onExit }: SpecialEventPageProps) => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary to-primary-glow">
-        <div className="container mx-auto px-4 pt-6 sm:pt-8 pb-12 sm:pb-16">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 sm:gap-6 mb-6">
+      <div className="gradient-hero text-primary-foreground py-16 md:py-20 px-4 shadow-urban">
+        <div className="container mx-auto text-center">
+          <div className="flex flex-col items-center justify-center gap-6">
             <div className="text-white">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 drop-shadow-lg">
                 {specialEvent.title}
               </h1>
               {specialEvent.description && (
-                <p className="text-base sm:text-lg opacity-90 max-w-2xl">
+                <p className="text-base sm:text-lg opacity-90 max-w-2xl mx-auto">
                   {specialEvent.description}
                 </p>
               )}
             </div>
             <Button 
               onClick={onExit}
-              variant="secondary"
+              variant="outline"
               size="sm"
-              className="bg-white/10 hover:bg-white/20 text-white border-white/20 self-start sm:self-auto"
+              className="border-white/20 text-white hover:bg-white/20 backdrop-blur-sm bg-white/10 hover:border-white/40"
             >
               <X className="h-4 w-4 mr-2" />
               <span className="hidden sm:inline">Exit Special Event</span>
