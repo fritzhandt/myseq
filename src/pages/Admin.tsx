@@ -4,12 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EventForm } from '@/components/EventForm';
 import { EventList } from '@/components/EventList';
-import EventAssignmentGrid from '@/components/EventAssignmentGrid';
 import SpecialEventForm from '@/components/SpecialEventForm';
 import SpecialEventsList from '@/components/SpecialEventsList';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Calendar, LogOut, Star, Grid } from 'lucide-react';
+import { Plus, Calendar, LogOut, Star } from 'lucide-react';
 
 const Admin = () => {
   const [showForm, setShowForm] = useState(false);
@@ -125,15 +124,11 @@ const Admin = () => {
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="event-grid" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
+        <Tabs defaultValue="events" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-8">
             <TabsTrigger value="events" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              Event List
-            </TabsTrigger>
-            <TabsTrigger value="event-grid" className="flex items-center gap-2">
-              <Grid className="h-4 w-4" />
-              Event Management
+              Regular Events
             </TabsTrigger>
             <TabsTrigger value="special-events" className="flex items-center gap-2">
               <Star className="h-4 w-4" />
@@ -151,10 +146,7 @@ const Admin = () => {
             ) : (
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
-                  <div>
-                    <h2 className="text-3xl font-bold">Event List View</h2>
-                    <p className="text-muted-foreground mt-2">Manage events in a compact list format</p>
-                  </div>
+                  <h2 className="text-3xl font-bold">Manage Events</h2>
                   <Button onClick={handleCreateEvent} size="lg">
                     <Plus className="h-5 w-5 mr-2" />
                     Create New Event
@@ -163,19 +155,6 @@ const Admin = () => {
                 <EventList onEditEvent={handleEditEvent} />
               </div>
             )}
-          </TabsContent>
-
-          <TabsContent value="event-grid">
-            <div className="space-y-6">
-              <div className="text-center">
-                <h2 className="text-3xl font-bold mb-2">Event Management Grid</h2>
-                <p className="text-muted-foreground">
-                  Visual event management with the same layout as the main events page. 
-                  All events created here automatically appear on the public events page.
-                </p>
-              </div>
-              <EventAssignmentGrid />
-            </div>
           </TabsContent>
 
           <TabsContent value="special-events">
@@ -188,10 +167,7 @@ const Admin = () => {
             ) : (
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
-                  <div>
-                    <h2 className="text-3xl font-bold">Special Events</h2>
-                    <p className="text-muted-foreground mt-2">Create and manage special event campaigns</p>
-                  </div>
+                  <h2 className="text-3xl font-bold">Manage Special Events</h2>
                   <Button onClick={handleCreateSpecialEvent} size="lg">
                     <Plus className="h-5 w-5 mr-2" />
                     Create Special Event
