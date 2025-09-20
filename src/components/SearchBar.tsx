@@ -17,7 +17,7 @@ interface Event {
   location: string;
   event_date: string;
   event_time: string;
-  age_group: string;
+  age_group: string[];
   tags: string[];
   cover_photo_url: string | null;
 }

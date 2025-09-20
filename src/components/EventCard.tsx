@@ -11,7 +11,7 @@ interface Event {
   location: string;
   event_date: string;
   event_time: string;
-  age_group: string;
+  age_group: string[];
   elected_officials: string[];
   cover_photo_url: string | null;
   additional_images: string[];
@@ -113,10 +113,14 @@ export const EventCard = ({ event }: EventCardProps) => {
             alt={event.title}
             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
           />
-          <Badge className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-primary/90 backdrop-blur-sm text-xs sm:text-sm">
-            <Users className="w-3 h-3 mr-1" />
-            {event.age_group}
-          </Badge>
+          <div className="absolute top-2 sm:top-3 right-2 sm:right-3 flex flex-wrap gap-1">
+            {event.age_group.map((group, index) => (
+              <Badge key={index} className="bg-primary/90 backdrop-blur-sm text-xs">
+                <Users className="w-3 h-3 mr-1" />
+                {group}
+              </Badge>
+            ))}
+          </div>
         </div>
       )}
       
@@ -124,10 +128,14 @@ export const EventCard = ({ event }: EventCardProps) => {
         <div className="flex justify-between items-start gap-2">
           <CardTitle className="text-lg sm:text-xl leading-tight">{event.title}</CardTitle>
           {!event.cover_photo_url && (
-            <Badge variant="secondary" className="text-xs sm:text-sm">
-              <Users className="w-3 h-3 mr-1" />
-              {event.age_group}
-            </Badge>
+            <div className="flex flex-wrap gap-1">
+              {event.age_group.map((group, index) => (
+                <Badge key={index} variant="secondary" className="text-xs">
+                  <Users className="w-3 h-3 mr-1" />
+                  {group}
+                </Badge>
+              ))}
+            </div>
           )}
         </div>
       </CardHeader>

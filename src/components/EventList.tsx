@@ -13,7 +13,7 @@ interface Event {
   location: string;
   event_date: string;
   event_time: string;
-  age_group: string;
+  age_group: string[];
   elected_officials: string[];
   cover_photo_url: string | null;
 }
@@ -126,10 +126,14 @@ export const EventList = ({ onEditEvent }: EventListProps) => {
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <CardTitle className="text-xl">{event.title}</CardTitle>
-                  <Badge variant="secondary">
-                    <Users className="w-3 h-3 mr-1" />
-                    {event.age_group}
-                  </Badge>
+                  <div className="flex flex-wrap gap-1">
+                    {event.age_group.map((group, index) => (
+                      <Badge key={index} variant="secondary">
+                        <Users className="w-3 h-3 mr-1" />
+                        {group}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-muted-foreground">
                   <div className="flex items-center">

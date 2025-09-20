@@ -13,7 +13,7 @@ interface EventType {
   event_date: string;
   event_time: string;
   location: string;
-  age_group: string;
+  age_group: string[];
   cover_photo_url: string | null;
   additional_images: string[];
   elected_officials: string[];

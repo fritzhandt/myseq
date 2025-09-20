@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Calendar, MapPin, Clock, Users, Plus, X, Upload, Tag, Trash2 } from 'lucide-react';
@@ -16,7 +17,7 @@ interface EventData {
   description: string;
   location: string;
   event_time: string;
-  age_group: string;
+  age_group: string[];
   elected_officials: string[];
   tags: string[];
   cover_photo_url: string | null;
@@ -46,7 +47,7 @@ export const EventAssignmentSection = ({ days, onUpdateDays, type }: EventAssign
     description: '',
     location: '',
     event_time: '',
-    age_group: '',
+    age_group: [],
     elected_officials: [],
     tags: [],
     cover_photo_url: null,
@@ -260,22 +261,31 @@ export const EventAssignmentSection = ({ days, onUpdateDays, type }: EventAssign
                       </div>
 
                       <div>
-                        <Label>Age Group *</Label>
-                        <Select 
-                          value={event.age_group} 
-                          onValueChange={(value) => updateEventInDay(dayIndex, eventIndex, 'age_group', value)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select age group" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="All Ages">All Ages</SelectItem>
-                            <SelectItem value="Kids (0-12)">Kids (0-12)</SelectItem>
-                            <SelectItem value="Teens (13-17)">Teens (13-17)</SelectItem>
-                            <SelectItem value="Adults (18+)">Adults (18+)</SelectItem>
-                            <SelectItem value="Seniors (65+)">Seniors (65+)</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <Label>Age Groups *</Label>
+                        <div className="space-y-2 p-3 border rounded-lg bg-background">
+                          {['Grade School', 'Young Adult', 'Adult', 'Senior'].map((group) => (
+                            <div key={group} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`age-group-${dayIndex}-${eventIndex}-${group}`}
+                                checked={event.age_group.includes(group)}
+                                onCheckedChange={(checked) => {
+                                  const currentAgeGroups = [...event.age_group];
+                                  if (checked) {
+                                    updateEventInDay(dayIndex, eventIndex, 'age_group', [...currentAgeGroups, group]);
+                                  } else {
+                                    updateEventInDay(dayIndex, eventIndex, 'age_group', currentAgeGroups.filter(g => g !== group));
+                                  }
+                                }}
+                              />
+                              <Label 
+                                htmlFor={`age-group-${dayIndex}-${eventIndex}-${group}`}
+                                className="text-sm font-normal cursor-pointer"
+                              >
+                                {group}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
                       </div>
 
                       {/* Tags */}

@@ -50,7 +50,7 @@ export type Database = {
       events: {
         Row: {
           additional_images: string[] | null
-          age_group: string
+          age_group: string[] | null
           cover_photo_url: string | null
           created_at: string
           description: string
@@ -65,7 +65,7 @@ export type Database = {
         }
         Insert: {
           additional_images?: string[] | null
-          age_group: string
+          age_group?: string[] | null
           cover_photo_url?: string | null
           created_at?: string
           description: string
@@ -80,7 +80,7 @@ export type Database = {
         }
         Update: {
           additional_images?: string[] | null
-          age_group?: string
+          age_group?: string[] | null
           cover_photo_url?: string | null
           created_at?: string
           description?: string

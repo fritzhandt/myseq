@@ -14,7 +14,7 @@ interface Event {
   location: string;
   event_date: string;
   event_time: string;
-  age_group: string;
+  age_group: string[];
   elected_officials: string[];
   cover_photo_url: string | null;
   additional_images: string[];
@@ -250,10 +250,14 @@ const EventDetail = () => {
               <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
                 <div>
                   <h1 className="text-3xl md:text-4xl font-bold mb-2">{event.title}</h1>
-                  <Badge variant="secondary" className="w-fit">
-                    <Users className="w-4 h-4 mr-1" />
-                    {event.age_group}
-                  </Badge>
+                  <div className="flex flex-wrap gap-2">
+                    {event.age_group.map((group, index) => (
+                      <Badge key={index} variant="secondary">
+                        <Users className="w-4 h-4 mr-1" />
+                        {group}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
                 <Button onClick={generateCalendarFile} size="lg">
                   <Calendar className="w-4 h-4 mr-2" />

@@ -18,7 +18,7 @@ interface Event {
   location: string;
   event_date: string;
   event_time: string;
-  age_group: string;
+  age_group: string[];
   elected_officials: string[];
   cover_photo_url: string | null;
   additional_images: string[];
@@ -81,7 +81,9 @@ const Home = () => {
 
     // Apply age group filter
     if (selectedFilter) {
-      filtered = filtered.filter(event => event.age_group === selectedFilter);
+      filtered = filtered.filter(event => 
+        Array.isArray(event.age_group) ? event.age_group.includes(selectedFilter) : event.age_group === selectedFilter
+      );
     }
 
     // Apply search filters

@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,7 +24,7 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
     location: event?.location || '',
     event_date: event?.event_date || '',
     event_time: event?.event_time || '',
-    age_group: event?.age_group || '',
+    age_group: event?.age_group || [],
     elected_officials: event?.elected_officials?.join(', ') || '',
     tags: event?.tags || [],
   });
@@ -39,6 +40,17 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
 
   const handleInputChange = (field: string, value: string | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleAgeGroupChange = (ageGroup: string, checked: boolean) => {
+    setFormData(prev => {
+      const currentAgeGroups = Array.isArray(prev.age_group) ? prev.age_group : [];
+      if (checked) {
+        return { ...prev, age_group: [...currentAgeGroups, ageGroup] };
+      } else {
+        return { ...prev, age_group: currentAgeGroups.filter(group => group !== ageGroup) };
+      }
+    });
   };
 
   const addTag = () => {
@@ -194,23 +206,27 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="age_group">Age Group *</Label>
-                <Select
-                  value={formData.age_group}
-                  onValueChange={(value) => handleInputChange('age_group', value)}
-                  required
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select age group" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ageGroups.map((group) => (
-                      <SelectItem key={group} value={group}>
+                <Label>Age Groups *</Label>
+                <div className="space-y-3 p-4 border rounded-lg bg-background">
+                  {ageGroups.map((group) => (
+                    <div key={group} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`age-group-${group}`}
+                        checked={Array.isArray(formData.age_group) ? formData.age_group.includes(group) : formData.age_group === group}
+                        onCheckedChange={(checked) => handleAgeGroupChange(group, checked as boolean)}
+                      />
+                      <Label 
+                        htmlFor={`age-group-${group}`}
+                        className="text-sm font-normal cursor-pointer"
+                      >
                         {group}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Select one or more age groups for this event
+                </p>
               </div>
 
               <div className="space-y-2">

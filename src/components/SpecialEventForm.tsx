@@ -32,7 +32,7 @@ interface EventData {
   description: string;
   location: string;
   event_time: string;
-  age_group: string;
+  age_group: string[];
   elected_officials: string[];
   tags: string[];
   cover_photo_url: string | null;
