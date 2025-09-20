@@ -58,7 +58,7 @@ const CommunityAlertBanner = () => {
           <div className="font-bold mb-2">
             COMMUNITY ALERT: {alert.short_description}
           </div>
-          <div className="font-bold">
+          <div className="font-normal underline">
             Click here for more information
           </div>
         </AlertDescription>
