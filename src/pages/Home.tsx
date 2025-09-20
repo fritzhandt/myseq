@@ -9,7 +9,7 @@ import CommunityAlertBanner from '@/components/CommunityAlertBanner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Calendar, MapPin, Users, Grid, CalendarDays, BookOpen, GraduationCap, Briefcase, Crown } from 'lucide-react';
+import { Calendar, MapPin, Users, Grid, CalendarDays, BookOpen, GraduationCap, Briefcase, Crown, Zap } from 'lucide-react';
 
 interface Event {
   id: string;
@@ -234,7 +234,7 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
                 className="bg-yellow-400/20 border-yellow-300/60 text-white hover:bg-yellow-400/30 hover:border-yellow-300/80 backdrop-blur-sm shadow-lg ring-2 ring-yellow-300/40 text-base sm:text-lg px-6 py-3 transition-all duration-200"
                 variant="outline"
               >
-                <Crown className="mr-2 h-5 w-5" />
+                <Zap className="mr-2 h-5 w-5" />
                 Go to {activeSpecialEvent.title}
               </Button>
             </div>
