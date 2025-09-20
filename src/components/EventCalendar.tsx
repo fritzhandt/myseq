@@ -90,6 +90,12 @@ export const EventCalendar = ({ events }: EventCalendarProps) => {
 
   return (
     <div className="bg-background rounded-lg border">
+      {/* Mobile Tip */}
+      <div className="md:hidden bg-muted/50 p-3 border-b">
+        <p className="text-sm text-muted-foreground text-center">
+          💡 Tip: For the best view of the calendar on mobile, rotate your phone to landscape mode.
+        </p>
+      </div>
       {/* Calendar Header */}
       <div className="flex items-center justify-between p-4 border-b">
         <Button
