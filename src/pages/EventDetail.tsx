@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
-import { Calendar, Clock, MapPin, Users, ArrowLeft, Tag, Download, Mail } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, ArrowLeft, Tag, Download, Mail, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 
 interface Event {
@@ -25,6 +26,50 @@ const EventDetail = () => {
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+
+  const openGallery = (index: number) => {
+    setSelectedImageIndex(index);
+    setIsGalleryOpen(true);
+  };
+
+  const closeGallery = () => {
+    setIsGalleryOpen(false);
+    setSelectedImageIndex(null);
+  };
+
+  const navigateImage = (direction: 'prev' | 'next') => {
+    if (!event || !event.additional_images || selectedImageIndex === null) return;
+    
+    const totalImages = event.additional_images.length;
+    let newIndex;
+    
+    if (direction === 'prev') {
+      newIndex = selectedImageIndex === 0 ? totalImages - 1 : selectedImageIndex - 1;
+    } else {
+      newIndex = selectedImageIndex === totalImages - 1 ? 0 : selectedImageIndex + 1;
+    }
+    
+    setSelectedImageIndex(newIndex);
+  };
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (!isGalleryOpen) return;
+    
+    if (e.key === 'Escape') {
+      closeGallery();
+    } else if (e.key === 'ArrowLeft') {
+      navigateImage('prev');
+    } else if (e.key === 'ArrowRight') {
+      navigateImage('next');
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isGalleryOpen, selectedImageIndex]);
 
   useEffect(() => {
     if (id) {
@@ -287,12 +332,62 @@ const EventDetail = () => {
                         key={index}
                         src={image}
                         alt={`${event.title} - Image ${index + 1}`}
-                        className="w-full h-32 object-cover rounded-lg bg-muted"
+                        className="w-full h-32 object-cover rounded-lg bg-muted cursor-pointer hover:opacity-80 transition-opacity duration-200 hover-scale"
+                        onClick={() => openGallery(index)}
                       />
                     ))}
                   </div>
                 </div>
               )}
+
+              {/* Image Gallery Modal */}
+              <Dialog open={isGalleryOpen} onOpenChange={setIsGalleryOpen}>
+                <DialogContent className="max-w-4xl w-full h-[80vh] p-0 overflow-hidden">
+                  <div className="relative w-full h-full bg-black/90 flex items-center justify-center">
+                    {/* Close Button */}
+                    <button
+                      onClick={closeGallery}
+                      className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+                    >
+                      <X className="w-6 h-6" />
+                    </button>
+
+                    {/* Navigation Buttons */}
+                    {event && event.additional_images && event.additional_images.length > 1 && (
+                      <>
+                        <button
+                          onClick={() => navigateImage('prev')}
+                          className="absolute left-4 z-10 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+                        >
+                          <ChevronLeft className="w-6 h-6" />
+                        </button>
+                        <button
+                          onClick={() => navigateImage('next')}
+                          className="absolute right-4 z-10 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+                        >
+                          <ChevronRight className="w-6 h-6" />
+                        </button>
+                      </>
+                    )}
+
+                    {/* Image */}
+                    {event && event.additional_images && selectedImageIndex !== null && (
+                      <div className="relative w-full h-full flex items-center justify-center p-8">
+                        <img
+                          src={event.additional_images[selectedImageIndex]}
+                          alt={`${event.title} - Image ${selectedImageIndex + 1}`}
+                          className="max-w-full max-h-full object-contain animate-scale-in"
+                        />
+                        
+                        {/* Image Counter */}
+                        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-black/50 text-white text-sm rounded-full">
+                          {selectedImageIndex + 1} / {event.additional_images.length}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
 
               {/* Action Buttons */}
               <div className="flex gap-4 pt-6 border-t">
