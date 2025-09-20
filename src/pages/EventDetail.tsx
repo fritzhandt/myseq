@@ -390,11 +390,11 @@ const EventDetail = () => {
               </Dialog>
 
               {/* Action Buttons */}
-              <div className="flex gap-4 pt-6 border-t">
+              <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t">
                 <Button
                   onClick={generateCalendarFile}
                   variant="outline"
-                  className="flex-1"
+                  className="flex-1 h-12 sm:h-10"
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Add to Calendar
@@ -402,7 +402,7 @@ const EventDetail = () => {
                 <Button
                   onClick={emailCalendarInvite}
                   variant="outline"
-                  className="flex-1"
+                  className="flex-1 h-12 sm:h-10"
                 >
                   <Mail className="w-4 h-4 mr-2" />
                   Email Invite
