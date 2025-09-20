@@ -311,6 +311,14 @@ const EventDetail = () => {
                 </div>
               )}
 
+              {/* Description */}
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold mb-3">About This Event</h3>
+                <div className="prose prose-lg max-w-none">
+                  <p className="text-muted-foreground whitespace-pre-wrap">{event.description}</p>
+                </div>
+              </div>
+
               {/* Tags */}
               {event.tags && event.tags.length > 0 && (
                 <div className="mb-8">
@@ -327,14 +335,6 @@ const EventDetail = () => {
                   </div>
                 </div>
               )}
-
-              {/* Description */}
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold mb-3">About This Event</h3>
-                <div className="prose prose-lg max-w-none">
-                  <p className="text-muted-foreground whitespace-pre-wrap">{event.description}</p>
-                </div>
-              </div>
 
               {/* Additional Images */}
               {event.additional_images && event.additional_images.length > 0 && (
