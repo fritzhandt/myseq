@@ -203,10 +203,10 @@ const Home = () => {
                   onClick={() => handleFilterChange(ageGroup)}
                   variant={selectedFilter === ageGroup ? "secondary" : "outline"}
                   size="sm"
-                  className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm text-sm sm:text-base w-40 sm:w-44 relative flex items-center justify-center"
+                  className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm text-sm sm:text-base w-40 sm:w-44 text-center"
                 >
-                  <IconComponent className="absolute left-3 h-4 w-4" />
-                  <span className="text-center w-full">{ageGroup}</span>
+                  <IconComponent className="mr-1 sm:mr-2 h-4 w-4" />
+                  {ageGroup}
                 </Button>
               );
             })}
