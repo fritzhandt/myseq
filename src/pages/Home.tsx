@@ -104,9 +104,9 @@ const Home = () => {
       <CommunityAlertBanner />
       <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <div className="gradient-hero text-primary-foreground py-16 md:py-20 px-4">
+      <div className="gradient-hero text-primary-foreground py-16 md:py-20 px-4 shadow-urban">
         <div className="container mx-auto text-center">
-          <p className="text-lg md:text-xl mb-4 text-primary-foreground/90 font-bold italic">Welcome</p>
+          <p className="text-lg md:text-xl mb-4 text-yellow-300 font-bold italic tracking-wide">Welcome</p>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 drop-shadow-lg">
             Which events are you looking for?
           </h1>
