@@ -25,7 +25,11 @@ export const EventCard = ({ event }: EventCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    // Parse date string as local date to avoid timezone conversion issues
+    const [year, month, day] = dateString.split('-').map(Number);
+    const localDate = new Date(year, month - 1, day); // month is 0-indexed
+    
+    return localDate.toLocaleDateString('en-US', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
