@@ -2,9 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { EventCard } from '@/components/EventCard';
+import { EventCalendar } from '@/components/EventCalendar';
 import SearchBar from '@/components/SearchBar';
 import { supabase } from '@/integrations/supabase/client';
-import { Calendar, MapPin, Users } from 'lucide-react';
+import { Calendar, MapPin, Users, Grid, CalendarDays } from 'lucide-react';
 
 interface Event {
   id: string;
@@ -27,6 +28,7 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchTags, setSearchTags] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const navigate = useNavigate();
 
   const ageGroups = ['Grade School', 'Young Adult', 'Adult', 'Senior'];
@@ -137,27 +139,52 @@ const Home = () => {
       {/* Events Section */}
       <section id="events" className="py-16 px-4">
         <div className="container mx-auto">
-          <div className="mb-8 text-center">
-            <h2 className="text-3xl font-bold mb-4">
-              {selectedFilter && searchTags.length === 0 && !searchQuery
-                ? `${selectedFilter} Events`
-                : searchQuery || searchTags.length > 0
-                ? 'Search Results'
-                : 'All Events'
-              }
-            </h2>
-            {(selectedFilter || searchQuery || searchTags.length > 0) && (
-              <Button
-                onClick={() => {
-                  handleFilterChange(null);
-                  setSearchQuery('');
-                  setSearchTags([]);
-                }}
-                variant="outline"
-              >
-                Clear All Filters
-              </Button>
-            )}
+          <div className="mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h2 className="text-3xl font-bold">
+                  {selectedFilter && searchTags.length === 0 && !searchQuery
+                    ? `${selectedFilter} Events`
+                    : searchQuery || searchTags.length > 0
+                    ? 'Search Results'
+                    : 'All Events'
+                  }
+                </h2>
+                {(selectedFilter || searchQuery || searchTags.length > 0) && (
+                  <Button
+                    onClick={() => {
+                      handleFilterChange(null);
+                      setSearchQuery('');
+                      setSearchTags([]);
+                    }}
+                    variant="outline"
+                    size="sm"
+                    className="mt-2"
+                  >
+                    Clear All Filters
+                  </Button>
+                )}
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Button
+                  variant={viewMode === 'list' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setViewMode('list')}
+                >
+                  <Grid className="w-4 h-4 mr-2" />
+                  List View
+                </Button>
+                <Button
+                  variant={viewMode === 'calendar' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setViewMode('calendar')}
+                >
+                  <CalendarDays className="w-4 h-4 mr-2" />
+                  Calendar View
+                </Button>
+              </div>
+            </div>
           </div>
 
           {loading ? (
@@ -178,6 +205,8 @@ const Home = () => {
                 }
               </p>
             </div>
+          ) : viewMode === 'calendar' ? (
+            <EventCalendar events={filteredEvents} />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredEvents.map((event) => (
