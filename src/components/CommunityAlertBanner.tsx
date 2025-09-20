@@ -52,7 +52,7 @@ const CommunityAlertBanner = () => {
   if (!alert) return null;
 
   return (
-    <Link to={`/community-alert/${alert.id}`} className="block">
+    <Link to={`/community-alert/${alert.id}`} className="block animate-pulse">
       <Alert className="rounded-none border-0 border-b bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors cursor-pointer">
         <AlertDescription className="w-full text-center">
           <div className="font-bold mb-2">
