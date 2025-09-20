@@ -58,10 +58,16 @@ const SpecialEventPage = ({ onExit }: SpecialEventPageProps) => {
         .from('special_events')
         .select('*')
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
 
       if (specialEventError) {
-        console.error('No active special event:', specialEventError);
+        console.error('Error fetching active special event:', specialEventError);
+        setLoading(false);
+        return;
+      }
+
+      if (!specialEventData) {
+        console.log('No active special event found');
         setLoading(false);
         return;
       }

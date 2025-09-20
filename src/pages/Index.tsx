@@ -19,13 +19,14 @@ const Index = () => {
         .from('special_events')
         .select('*')
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
 
       if (data && !error) {
         setActiveSpecialEvent(data);
         setShowSpecialEvent(true);
       }
     } catch (error) {
+      console.error('Error checking for active special event:', error);
       // No active special event, show regular homepage
     } finally {
       setLoading(false);
