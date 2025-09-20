@@ -9,7 +9,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Shield, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -42,32 +41,16 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (error) throw error;
-        
-        toast({
-          title: "Success",
-          description: "Successfully signed in!",
-        });
-      } else {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/admin`
-          }
-        });
-        if (error) throw error;
-        
-        toast({
-          title: "Success",
-          description: "Account created! Please check your email for verification.",
-        });
-      }
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
+      
+      toast({
+        title: "Success",
+        description: "Successfully signed in!",
+      });
     } catch (error: any) {
       toast({
         title: "Error",
@@ -87,13 +70,10 @@ const Auth = () => {
             <Shield className="h-6 w-6 text-primary" />
           </div>
           <CardTitle className="text-2xl font-bold">
-            Admin {isLogin ? 'Sign In' : 'Sign Up'}
+            Admin Sign In
           </CardTitle>
           <CardDescription>
-            {isLogin 
-              ? 'Access the event management dashboard'
-              : 'Create an admin account to manage events'
-            }
+            Access the event management dashboard
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -148,25 +128,9 @@ const Auth = () => {
               className="w-full" 
               disabled={loading}
             >
-              {loading 
-                ? (isLogin ? 'Signing In...' : 'Creating Account...') 
-                : (isLogin ? 'Sign In' : 'Create Account')
-              }
+              {loading ? 'Signing In...' : 'Sign In'}
             </Button>
           </form>
-
-          <div className="mt-6 text-center">
-            <Button
-              variant="link"
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-sm"
-            >
-              {isLogin 
-                ? "Don't have an account? Sign up"
-                : "Already have an account? Sign in"
-              }
-            </Button>
-          </div>
         </CardContent>
       </Card>
     </div>
