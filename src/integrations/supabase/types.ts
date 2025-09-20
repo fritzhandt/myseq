@@ -14,7 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      events: {
+        Row: {
+          additional_images: string[] | null
+          age_group: string
+          cover_photo_url: string | null
+          created_at: string
+          description: string
+          elected_officials: string[] | null
+          event_date: string
+          event_time: string
+          id: string
+          location: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          additional_images?: string[] | null
+          age_group: string
+          cover_photo_url?: string | null
+          created_at?: string
+          description: string
+          elected_officials?: string[] | null
+          event_date: string
+          event_time: string
+          id?: string
+          location: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          additional_images?: string[] | null
+          age_group?: string
+          cover_photo_url?: string | null
+          created_at?: string
+          description?: string
+          elected_officials?: string[] | null
+          event_date?: string
+          event_time?: string
+          id?: string
+          location?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -1,0 +1,141 @@
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { EventCard } from '@/components/EventCard';
+import { supabase } from '@/integrations/supabase/client';
+import { Calendar, MapPin, Users } from 'lucide-react';
+
+interface Event {
+  id: string;
+  title: string;
+  description: string;
+  location: string;
+  event_date: string;
+  event_time: string;
+  age_group: string;
+  elected_officials: string[];
+  cover_photo_url: string | null;
+  additional_images: string[];
+}
+
+const Home = () => {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
+  const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const ageGroups = ['Grade School', 'Young Adult', 'Adult', 'Senior'];
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const fetchEvents = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .order('event_date', { ascending: true });
+
+      if (error) throw error;
+      setEvents(data || []);
+      setFilteredEvents(data || []);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFilterChange = (ageGroup: string | null) => {
+    setSelectedFilter(ageGroup);
+    if (ageGroup) {
+      setFilteredEvents(events.filter(event => event.age_group === ageGroup));
+    } else {
+      setFilteredEvents(events);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Hero Section */}
+      <div className="gradient-hero text-primary-foreground py-20 px-4">
+        <div className="container mx-auto text-center">
+          <h1 className="text-5xl font-bold mb-6 drop-shadow-lg">
+            Which events are you looking for?
+          </h1>
+          <div className="flex flex-wrap justify-center gap-4 mb-8">
+            {ageGroups.map((ageGroup) => (
+              <Button
+                key={ageGroup}
+                onClick={() => handleFilterChange(ageGroup)}
+                variant={selectedFilter === ageGroup ? "secondary" : "outline"}
+                size="lg"
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm"
+              >
+                <Users className="mr-2 h-5 w-5" />
+                {ageGroup}
+              </Button>
+            ))}
+          </div>
+          <Link
+            to="#events"
+            onClick={() => handleFilterChange(null)}
+            className="inline-flex items-center text-lg font-medium hover:underline text-white/90 hover:text-white transition-colors"
+          >
+            <Calendar className="mr-2 h-5 w-5" />
+            All Events
+          </Link>
+        </div>
+      </div>
+
+      {/* Events Section */}
+      <section id="events" className="py-16 px-4">
+        <div className="container mx-auto">
+          <div className="mb-8 text-center">
+            <h2 className="text-3xl font-bold mb-4">
+              {selectedFilter 
+                ? `${selectedFilter} Events` 
+                : 'All Events'
+              }
+            </h2>
+            {selectedFilter && (
+              <Button
+                onClick={() => handleFilterChange(null)}
+                variant="outline"
+              >
+                Show All Events
+              </Button>
+            )}
+          </div>
+
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <p className="mt-4 text-muted-foreground">Loading events...</p>
+            </div>
+          ) : filteredEvents.length === 0 ? (
+            <div className="text-center py-12">
+              <Calendar className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
+              <h3 className="text-xl font-semibold mb-2">No events found</h3>
+              <p className="text-muted-foreground">
+                {selectedFilter 
+                  ? `No events available for ${selectedFilter} age group.`
+                  : 'No events have been created yet.'
+                }
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredEvents.map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Home;
