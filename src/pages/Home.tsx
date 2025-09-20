@@ -183,13 +183,17 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
           </h1>
           {/* Mobile Dropdown */}
           <div className="block sm:hidden mb-8">
-            <Select value={selectedFilter || 'all'} onValueChange={(value) => handleFilterChange(value === 'all' ? null : value)}>
+            <Select 
+              key="home-age-filter"
+              value={selectedFilter || 'all'} 
+              onValueChange={(value) => handleFilterChange(value === 'all' ? null : value)}
+            >
               <SelectTrigger className="w-full bg-white/10 border-white/20 text-white backdrop-blur-sm">
                 <SelectValue placeholder="Select age group" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Events</SelectItem>
-                {ageGroups.map((ageGroup) => {
+                {ageGroups.filter(Boolean).map((ageGroup) => {
                   const IconComponent = ageGroupIcons[ageGroup as keyof typeof ageGroupIcons];
                   return (
                     <SelectItem key={ageGroup} value={ageGroup}>
