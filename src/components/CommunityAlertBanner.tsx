@@ -53,14 +53,14 @@ const CommunityAlertBanner = () => {
 
   return (
     <Alert className="rounded-none border-0 border-b bg-destructive text-destructive-foreground">
-      <AlertTriangle className="h-4 w-4" />
-      <AlertDescription className="flex items-center justify-between w-full">
-        <span className="font-medium">
+      <AlertTriangle className="h-4 w-4 text-white" />
+      <AlertDescription className="w-full text-center">
+        <div className="font-medium mb-2">
           COMMUNITY ALERT: {alert.short_description}
-        </span>
+        </div>
         <Link 
           to={`/community-alert/${alert.id}`}
-          className="underline hover:no-underline font-medium"
+          className="underline hover:no-underline font-medium block"
         >
           Click here for more information
         </Link>
