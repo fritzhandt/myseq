@@ -7,7 +7,7 @@ import { EventCalendar } from '@/components/EventCalendar';
 import SearchBar from '@/components/SearchBar';
 import Navbar from '@/components/Navbar';
 import { supabase } from '@/integrations/supabase/client';
-import { Calendar, Grid, CalendarDays, BookOpen, GraduationCap, Briefcase, Crown, Users } from 'lucide-react';
+import { Calendar, Grid, CalendarDays } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface EventType {
@@ -56,7 +56,6 @@ const SpecialEventPage = ({ onExit }: SpecialEventPageProps) => {
   const [specialEvent, setSpecialEvent] = useState<SpecialEvent | null>(null);
   const [allEvents, setAllEvents] = useState<EventType[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<EventType[]>([]);
-  const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchTags, setSearchTags] = useState<string[]>([]);
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
@@ -67,31 +66,16 @@ const SpecialEventPage = ({ onExit }: SpecialEventPageProps) => {
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [loading, setLoading] = useState(true);
 
-  const ageGroups = ['Grade School', 'Young Adult', 'Adult', 'Senior'];
-  const ageGroupIcons = {
-    'Grade School': BookOpen,
-    'Young Adult': GraduationCap,
-    'Adult': Briefcase,
-    'Senior': Crown
-  };
-
   useEffect(() => {
     fetchActiveSpecialEvent();
   }, []);
 
   useEffect(() => {
     filterEvents();
-  }, [allEvents, selectedFilter, searchQuery, searchTags, searchFilters]);
+  }, [allEvents, searchQuery, searchTags, searchFilters]);
 
   const filterEvents = useCallback(() => {
     let filtered = allEvents;
-
-    // Apply age group filter
-    if (selectedFilter) {
-      filtered = filtered.filter(event => 
-        Array.isArray(event.age_group) ? event.age_group.includes(selectedFilter) : event.age_group === selectedFilter
-      );
-    }
 
     // Apply search filters
     if (searchQuery.trim() || searchTags.length > 0) {
@@ -132,7 +116,7 @@ const SpecialEventPage = ({ onExit }: SpecialEventPageProps) => {
     }
 
     setFilteredEvents(filtered);
-  }, [allEvents, selectedFilter, searchQuery, searchTags, searchFilters]);
+  }, [allEvents, searchQuery, searchTags, searchFilters]);
 
   const fetchActiveSpecialEvent = async () => {
     try {
@@ -240,10 +224,6 @@ const SpecialEventPage = ({ onExit }: SpecialEventPageProps) => {
     }
   };
 
-  const handleFilterChange = (filter: string | null) => {
-    setSelectedFilter(filter === selectedFilter ? null : filter);
-  };
-
   const handleSearch = (query: string, tags: string[], filters: SearchFilters) => {
     setSearchQuery(query);
     setSearchTags(tags);
@@ -294,56 +274,6 @@ const SpecialEventPage = ({ onExit }: SpecialEventPageProps) => {
                   {specialEvent.description}
                 </p>
               )}
-            </div>
-
-            {/* Age Group Filters - Mobile Dropdown */}
-            <div className="sm:hidden w-full max-w-xs">
-              <Select 
-                key="special-event-age-filter"
-                value={selectedFilter || "all"} 
-                onValueChange={(value) => handleFilterChange(value === "all" ? null : value)}
-              >
-                <SelectTrigger className="w-full border-white/20 text-white bg-white/10 backdrop-blur-sm">
-                  <SelectValue placeholder="Filter by Age Group" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Age Groups</SelectItem>
-                  {ageGroups.filter(Boolean).map((ageGroup) => {
-                    const IconComponent = ageGroupIcons[ageGroup as keyof typeof ageGroupIcons];
-                    return (
-                      <SelectItem key={ageGroup} value={ageGroup}>
-                        <div className="flex items-center">
-                          <IconComponent className="mr-2 h-4 w-4" />
-                          {ageGroup}
-                        </div>
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Desktop/Tablet Buttons */}
-            <div className="hidden sm:flex flex-wrap justify-center gap-2 sm:gap-4 mb-8">
-              {ageGroups.map((ageGroup) => {
-                const IconComponent = ageGroupIcons[ageGroup as keyof typeof ageGroupIcons];
-                return (
-                  <Button
-                    key={ageGroup}
-                    onClick={() => handleFilterChange(ageGroup)}
-                    variant={selectedFilter === ageGroup ? "secondary" : "outline"}
-                    size="sm"
-                    className={`border-white/20 text-white hover:bg-white/20 backdrop-blur-sm text-sm sm:text-base w-40 sm:w-44 text-center transition-all duration-200 ${
-                      selectedFilter === ageGroup 
-                        ? 'bg-yellow-400/20 border-yellow-300/60 shadow-lg ring-2 ring-yellow-300/40' 
-                        : 'bg-white/10 hover:border-white/40'
-                    }`}
-                  >
-                    <IconComponent className={`mr-1 sm:mr-2 ${ageGroup === 'Young Adult' ? 'h-7 w-7' : 'h-4 w-4'}`} />
-                    {ageGroup}
-                  </Button>
-                );
-              })}
             </div>
 
             <Button 
