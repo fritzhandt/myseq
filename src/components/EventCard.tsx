@@ -177,22 +177,22 @@ export const EventCard = ({ event }: EventCardProps) => {
           </Button>
         )}
 
-        <div className="flex flex-col sm:flex-row gap-2 pt-2 w-full">
+        <div className="flex flex-col gap-2 pt-2 w-full">
           <Button
             onClick={generateCalendarFile}
             variant="outline"
-            className="flex-1 text-xs sm:text-sm h-12 sm:h-9 min-w-0"
+            className="w-full text-xs sm:text-sm h-12 sm:h-10"
           >
             <Download className="w-4 h-4 mr-1 flex-shrink-0" />
-            <span className="truncate">Add to Calendar</span>
+            Add to Calendar
           </Button>
           <Button
             onClick={emailCalendarInvite}
             variant="outline"
-            className="flex-1 text-xs sm:text-sm h-12 sm:h-9 min-w-0"
+            className="w-full text-xs sm:text-sm h-12 sm:h-10"
           >
             <Mail className="w-4 h-4 mr-1 flex-shrink-0" />
-            <span className="truncate">Email Invite</span>
+            Email Invite
           </Button>
         </div>
       </CardContent>
