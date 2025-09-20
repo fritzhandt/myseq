@@ -114,6 +114,8 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
     setLoading(true);
 
     try {
+      console.log('Submitting special event form with days:', days);
+      
       // First, create or update the special event
       const specialEventData = {
         title,
@@ -184,7 +186,16 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
 
         // Create events for this day
         for (const eventData of day.events) {
-          if (!eventData.title || !eventData.description || !eventData.location || !eventData.event_time || !eventData.age_group) {
+          console.log('Processing event:', eventData);
+          
+          if (!eventData.title || !eventData.description || !eventData.location || !eventData.event_time || !eventData.age_group || eventData.age_group.length === 0) {
+            console.log('Skipping incomplete event:', {
+              title: eventData.title,
+              description: eventData.description,
+              location: eventData.location,
+              event_time: eventData.event_time,
+              age_group: eventData.age_group
+            });
             continue; // Skip incomplete events
           }
 
@@ -245,6 +256,8 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
             .single();
 
           if (eventError) throw eventError;
+          
+          console.log('Created event successfully:', createdEvent);
 
           // Create assignment
           const { error: assignmentError } = await supabase
@@ -256,8 +269,12 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
             });
 
           if (assignmentError) throw assignmentError;
+          
+          console.log('Created assignment successfully');
         }
       }
+
+      console.log('All events and assignments created successfully');
 
       toast({
         title: "Success",
