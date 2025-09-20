@@ -23,6 +23,8 @@ interface EventCardProps {
 
 export const EventCard = ({ event }: EventCardProps) => {
   const navigate = useNavigate();
+  
+  // Format date for display
 
   const formatDate = (dateString: string) => {
     // Parse date string as local date to avoid timezone conversion issues
