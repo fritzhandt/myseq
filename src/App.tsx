@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
-import Index from "./pages/Index";
+import DefaultPage from "./pages/DefaultPage";
 import Home from "./pages/Home";
 import EventDetail from "./pages/EventDetail";
 import Admin from "./pages/Admin";
@@ -29,7 +29,7 @@ const App = () => (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<DefaultPage />} />
           <Route path="/home" element={<Home />} />
           <Route path="/event/:id" element={<EventDetail />} />
           <Route path="/admin" element={<Admin />} />
