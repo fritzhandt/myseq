@@ -81,9 +81,19 @@ const EventDetail = () => {
     const startDate = new Date(`${event.event_date}T${event.event_time}`);
     const endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000); // Add 2 hours
     
+    const formatLocalDate = (date: Date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      return `${year}${month}${day}T${hours}${minutes}${seconds}`;
+    };
+    
     const details = {
       text: event.title,
-      dates: `${startDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z/${endDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
+      dates: `${formatLocalDate(startDate)}/${formatLocalDate(endDate)}`,
       details: event.description,
       location: event.location
     };
