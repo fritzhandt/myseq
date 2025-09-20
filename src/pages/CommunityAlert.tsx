@@ -84,7 +84,7 @@ const CommunityAlert = () => {
         {alert.photos && alert.photos.length > 0 && (
           <div className="mb-8">
             {alert.photos.length === 1 ? (
-              <div className="w-full md:w-2/3 lg:w-2/3">
+              <div className="w-full md:w-4/5 lg:w-4/5">
                 <img
                   src={alert.photos[0]}
                   alt={alert.title}
@@ -92,7 +92,7 @@ const CommunityAlert = () => {
                 />
               </div>
             ) : (
-              <Carousel className="w-full md:w-2/3 lg:w-2/3">
+              <Carousel className="w-full md:w-4/5 lg:w-4/5">
                 <CarouselContent>
                   {alert.photos.map((photo, index) => (
                     <CarouselItem key={index}>
