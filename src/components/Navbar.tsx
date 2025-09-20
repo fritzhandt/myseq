@@ -11,7 +11,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Logo/Site Name */}
           <Link to="/" className="text-lg sm:text-xl font-bold text-primary">
-            <span className="hidden sm:inline">Southeast Queens Events</span>
+            <span className="hidden sm:inline font-oswald text-black font-semibold">Southeast Queens Events</span>
             <span className="sm:hidden">SEQ Events</span>
           </Link>
 
