@@ -5,6 +5,7 @@ import { EventCard } from '@/components/EventCard';
 import { EventCalendar } from '@/components/EventCalendar';
 import SearchBar from '@/components/SearchBar';
 import Navbar from '@/components/Navbar';
+import CommunityAlertBanner from '@/components/CommunityAlertBanner';
 import { supabase } from '@/integrations/supabase/client';
 import { Calendar, MapPin, Users, Grid, CalendarDays } from 'lucide-react';
 
@@ -100,6 +101,7 @@ const Home = () => {
   return (
     <>
       <Navbar />
+      <CommunityAlertBanner />
       <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <div className="gradient-hero text-primary-foreground py-16 md:py-20 px-4">

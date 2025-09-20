@@ -13,6 +13,7 @@ import ContactElected from "./pages/ContactElected";
 import MyElectedLookup from "./pages/MyElectedLookup";
 import RegisterToVote from "./pages/RegisterToVote";
 import SpecialEvent from "./pages/SpecialEvent";
+import CommunityAlert from "./pages/CommunityAlert";
 import NotFound from "./pages/NotFound";
 import "./index.css";
 
@@ -41,6 +42,7 @@ const App = () => (
           <Route path="/my-elected-lookup" element={<MyElectedLookup />} />
           <Route path="/register-to-vote" element={<RegisterToVote />} />
           <Route path="/special-event" element={<SpecialEvent />} />
+          <Route path="/community-alert/:id" element={<CommunityAlert />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />

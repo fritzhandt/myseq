@@ -2,6 +2,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import CommunityAlertBanner from '@/components/CommunityAlertBanner';
 
 const About = () => {
   const navigate = useNavigate();
@@ -9,6 +10,7 @@ const About = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
+      <CommunityAlertBanner />
       <div className="py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">

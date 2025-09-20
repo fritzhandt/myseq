@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import CommunityAlertBanner from '@/components/CommunityAlertBanner';
 
 const ElectedOfficials = () => {
   const navigate = useNavigate();
@@ -32,6 +33,7 @@ const ElectedOfficials = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
+      <CommunityAlertBanner />
       <div className="py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">

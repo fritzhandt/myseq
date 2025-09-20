@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      community_alerts: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          long_description: string
+          photos: string[] | null
+          short_description: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          long_description: string
+          photos?: string[] | null
+          short_description: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          long_description?: string
+          photos?: string[] | null
+          short_description?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           additional_images: string[] | null
