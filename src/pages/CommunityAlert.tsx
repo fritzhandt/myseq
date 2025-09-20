@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useParams, Navigate } from 'react-router-dom';
+import { useParams, Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
 import { 
   Carousel, 
   CarouselContent, 
@@ -9,6 +10,7 @@ import {
   CarouselPrevious 
 } from '@/components/ui/carousel';
 import { Card, CardContent } from '@/components/ui/card';
+import { ArrowLeft } from 'lucide-react';
 
 interface CommunityAlert {
   id: string;
@@ -21,6 +23,7 @@ interface CommunityAlert {
 
 const CommunityAlert = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [alert, setAlert] = useState<CommunityAlert | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -62,6 +65,16 @@ const CommunityAlert = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Back Button */}
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/')}
+          className="mb-6"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Home
+        </Button>
+
         {/* Title */}
         <h1 className="text-3xl md:text-4xl font-bold mb-6 text-center">
           {alert.title}
@@ -71,15 +84,15 @@ const CommunityAlert = () => {
         {alert.photos && alert.photos.length > 0 && (
           <div className="mb-8">
             {alert.photos.length === 1 ? (
-              <div className="flex justify-center">
+              <div className="w-full md:w-2/3 lg:w-1/2">
                 <img
                   src={alert.photos[0]}
                   alt={alert.title}
-                  className="max-w-full h-auto rounded-lg shadow-lg"
+                  className="w-full h-auto rounded-lg shadow-lg"
                 />
               </div>
             ) : (
-              <Carousel className="w-full max-w-3xl mx-auto">
+              <Carousel className="w-full md:w-2/3 lg:w-1/2">
                 <CarouselContent>
                   {alert.photos.map((photo, index) => (
                     <CarouselItem key={index}>
