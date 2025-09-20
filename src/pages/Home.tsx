@@ -205,7 +205,7 @@ const Home = () => {
                   size="sm"
                   className={`border-white/20 text-white hover:bg-white/20 backdrop-blur-sm text-sm sm:text-base w-40 sm:w-44 text-center transition-all duration-200 ${
                     selectedFilter === ageGroup 
-                      ? 'bg-white/20 border-white shadow-lg ring-2 ring-white/30' 
+                      ? 'bg-yellow-400/20 border-yellow-300/60 shadow-lg ring-2 ring-yellow-300/40' 
                       : 'bg-white/10 hover:border-white/40'
                   }`}
                 >
