@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EventCard } from '@/components/EventCard';
+import Navbar from '@/components/Navbar';
 import { supabase } from '@/integrations/supabase/client';
 import { X } from 'lucide-react';
 import { format } from 'date-fns';
@@ -174,6 +175,7 @@ const SpecialEventPage = ({ onExit }: SpecialEventPageProps) => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Navbar />
       {/* Header */}
       <div className="gradient-hero text-primary-foreground py-16 md:py-20 px-4 shadow-urban">
         <div className="container mx-auto text-center">
