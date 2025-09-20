@@ -276,7 +276,7 @@ const EventDetail = () => {
               </div>
 
               {/* Event Info */}
-              <div className="flex flex-wrap gap-8 md:gap-12 mb-8 justify-start md:justify-center">
+              <div className="flex flex-wrap gap-8 md:gap-12 mb-8">
                 <div className="flex items-center text-muted-foreground">
                   <Calendar className="w-5 h-5 mr-3 text-primary flex-shrink-0" />
                   <div>
@@ -289,8 +289,8 @@ const EventDetail = () => {
                     <p className="font-medium text-foreground">{formatTime(event.event_time)}</p>
                   </div>
                 </div>
-                <div className="flex items-start text-muted-foreground max-w-xs">
-                  <MapPin className="w-5 h-5 mr-3 text-primary flex-shrink-0 mt-0.5" />
+                <div className="flex items-center text-muted-foreground max-w-xs">
+                  <MapPin className="w-5 h-5 mr-3 text-primary flex-shrink-0" />
                   <div>
                     <p className="font-medium text-foreground leading-relaxed">{event.location}</p>
                   </div>
