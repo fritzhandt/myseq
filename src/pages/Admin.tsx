@@ -1,15 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EventForm } from '@/components/EventForm';
 import { EventList } from '@/components/EventList';
+import SpecialEventForm from '@/components/SpecialEventForm';
+import SpecialEventsList from '@/components/SpecialEventsList';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Calendar, LogOut } from 'lucide-react';
+import { Plus, Calendar, LogOut, Star } from 'lucide-react';
 
 const Admin = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
+  const [showSpecialEventForm, setShowSpecialEventForm] = useState(false);
+  const [editingSpecialEvent, setEditingSpecialEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -68,6 +73,21 @@ const Admin = () => {
     setEditingEvent(null);
   };
 
+  const handleCreateSpecialEvent = () => {
+    setEditingSpecialEvent(null);
+    setShowSpecialEventForm(true);
+  };
+
+  const handleEditSpecialEvent = (specialEvent: any) => {
+    setEditingSpecialEvent(specialEvent);
+    setShowSpecialEventForm(true);
+  };
+
+  const handleSpecialEventFormClose = () => {
+    setShowSpecialEventForm(false);
+    setEditingSpecialEvent(null);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -104,24 +124,60 @@ const Admin = () => {
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        {showForm ? (
-          <EventForm
-            event={editingEvent}
-            onClose={handleFormClose}
-            onSave={handleFormClose}
-          />
-        ) : (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-3xl font-bold">Manage Events</h2>
-              <Button onClick={handleCreateEvent} size="lg">
-                <Plus className="h-5 w-5 mr-2" />
-                Create New Event
-              </Button>
-            </div>
-            <EventList onEditEvent={handleEditEvent} />
-          </div>
-        )}
+        <Tabs defaultValue="events" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-8">
+            <TabsTrigger value="events" className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Regular Events
+            </TabsTrigger>
+            <TabsTrigger value="special-events" className="flex items-center gap-2">
+              <Star className="h-4 w-4" />
+              Special Events
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="events">
+            {showForm ? (
+              <EventForm
+                event={editingEvent}
+                onClose={handleFormClose}
+                onSave={handleFormClose}
+              />
+            ) : (
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-3xl font-bold">Manage Events</h2>
+                  <Button onClick={handleCreateEvent} size="lg">
+                    <Plus className="h-5 w-5 mr-2" />
+                    Create New Event
+                  </Button>
+                </div>
+                <EventList onEditEvent={handleEditEvent} />
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="special-events">
+            {showSpecialEventForm ? (
+              <SpecialEventForm
+                specialEvent={editingSpecialEvent}
+                onClose={handleSpecialEventFormClose}
+                onSave={handleSpecialEventFormClose}
+              />
+            ) : (
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-3xl font-bold">Manage Special Events</h2>
+                  <Button onClick={handleCreateSpecialEvent} size="lg">
+                    <Plus className="h-5 w-5 mr-2" />
+                    Create Special Event
+                  </Button>
+                </div>
+                <SpecialEventsList onEditSpecialEvent={handleEditSpecialEvent} />
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

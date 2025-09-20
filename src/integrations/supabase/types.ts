@@ -62,6 +62,126 @@ export type Database = {
         }
         Relationships: []
       }
+      special_event_assignments: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          special_event_day_id: string | null
+          special_event_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          special_event_day_id?: string | null
+          special_event_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          special_event_day_id?: string | null
+          special_event_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "special_event_assignments_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "special_event_assignments_special_event_day_id_fkey"
+            columns: ["special_event_day_id"]
+            isOneToOne: false
+            referencedRelation: "special_event_days"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "special_event_assignments_special_event_id_fkey"
+            columns: ["special_event_id"]
+            isOneToOne: false
+            referencedRelation: "special_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      special_event_days: {
+        Row: {
+          created_at: string
+          date: string
+          description: string | null
+          id: string
+          special_event_id: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          description?: string | null
+          id?: string
+          special_event_id: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: string
+          special_event_id?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "special_event_days_special_event_id_fkey"
+            columns: ["special_event_id"]
+            isOneToOne: false
+            referencedRelation: "special_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      special_events: {
+        Row: {
+          created_at: string
+          description: string | null
+          end_date: string | null
+          id: string
+          is_active: boolean
+          start_date: string
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          start_date: string
+          title: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          start_date?: string
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
