@@ -6,6 +6,7 @@ import { EventCalendar } from '@/components/EventCalendar';
 import SearchBar from '@/components/SearchBar';
 import Navbar from '@/components/Navbar';
 import CommunityAlertBanner from '@/components/CommunityAlertBanner';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Calendar, MapPin, Users, Grid, CalendarDays, GraduationCap, Zap, Briefcase, Crown } from 'lucide-react';
@@ -169,7 +170,31 @@ const Home = () => {
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 drop-shadow-lg">
             Which events are you looking for?
           </h1>
-          <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-8">
+          {/* Mobile Dropdown */}
+          <div className="block sm:hidden mb-8">
+            <Select value={selectedFilter || 'all'} onValueChange={(value) => handleFilterChange(value === 'all' ? null : value)}>
+              <SelectTrigger className="w-full bg-white/10 border-white/20 text-white backdrop-blur-sm">
+                <SelectValue placeholder="Select age group" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Events</SelectItem>
+                {ageGroups.map((ageGroup) => {
+                  const IconComponent = ageGroupIcons[ageGroup as keyof typeof ageGroupIcons];
+                  return (
+                    <SelectItem key={ageGroup} value={ageGroup}>
+                      <div className="flex items-center">
+                        <IconComponent className="mr-2 h-4 w-4" />
+                        {ageGroup}
+                      </div>
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Desktop/Tablet Buttons */}
+          <div className="hidden sm:flex flex-wrap justify-center gap-2 sm:gap-4 mb-8">
             {ageGroups.map((ageGroup) => {
               const IconComponent = ageGroupIcons[ageGroup as keyof typeof ageGroupIcons];
               return (
