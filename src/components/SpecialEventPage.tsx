@@ -298,12 +298,12 @@ const SpecialEventPage = ({ onExit }: SpecialEventPageProps) => {
 
             {/* Age Group Filters - Mobile Dropdown */}
             <div className="sm:hidden w-full max-w-xs">
-              <Select value={selectedFilter || ""} onValueChange={(value) => handleFilterChange(value || null)}>
+              <Select value={selectedFilter || "all"} onValueChange={(value) => handleFilterChange(value === "all" ? null : value)}>
                 <SelectTrigger className="w-full border-white/20 text-white bg-white/10 backdrop-blur-sm">
                   <SelectValue placeholder="Filter by Age Group" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Age Groups</SelectItem>
+                  <SelectItem value="all">All Age Groups</SelectItem>
                   {ageGroups.map((ageGroup) => {
                     const IconComponent = ageGroupIcons[ageGroup as keyof typeof ageGroupIcons];
                     return (
