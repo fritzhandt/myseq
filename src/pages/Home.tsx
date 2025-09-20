@@ -7,6 +7,7 @@ import SearchBar from '@/components/SearchBar';
 import Navbar from '@/components/Navbar';
 import CommunityAlertBanner from '@/components/CommunityAlertBanner';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import { Calendar, MapPin, Users, Grid, CalendarDays } from 'lucide-react';
 
 interface Event {
@@ -31,6 +32,7 @@ const Home = () => {
   const [searchTags, setSearchTags] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+  const { toast } = useToast();
   const navigate = useNavigate();
 
   const ageGroups = ['Grade School', 'Young Adult', 'Adult', 'Senior'];
@@ -86,6 +88,16 @@ const Home = () => {
   }, [filterEvents]);
 
   const handleFilterChange = (ageGroup: string | null) => {
+    // Check if we're already on this filter
+    if (selectedFilter === ageGroup) {
+      const filterType = ageGroup || 'All Events';
+      toast({
+        description: `You are already viewing ${filterType}`,
+        duration: 2000,
+      });
+      return;
+    }
+    
     setSelectedFilter(ageGroup);
   };
 
