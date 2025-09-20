@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Home from './Home';
-import SpecialEventPage from '@/components/SpecialEventPage';
+// import SpecialEventPage from '@/components/SpecialEventPage';
 import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const [activeSpecialEvent, setActiveSpecialEvent] = useState(null);
-  const [showSpecialEvent, setShowSpecialEvent] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showSpecialEvent, setShowSpecialEvent] = useState(false);
 
   useEffect(() => {
     checkForActiveSpecialEvent();
@@ -15,19 +15,29 @@ const Index = () => {
 
   const checkForActiveSpecialEvent = async () => {
     try {
+      setLoading(true);
+      
       const { data, error } = await supabase
         .from('special_events')
         .select('*')
         .eq('is_active', true)
         .maybeSingle();
 
-      if (data && !error) {
+      if (error) {
+        console.error('Error fetching special event:', error);
+        setActiveSpecialEvent(null);
+        setShowSpecialEvent(false);
+      } else if (data) {
         setActiveSpecialEvent(data);
         setShowSpecialEvent(true);
+      } else {
+        setActiveSpecialEvent(null);
+        setShowSpecialEvent(false);
       }
     } catch (error) {
-      console.error('Error checking for active special event:', error);
-      // No active special event, show regular homepage
+      console.error('Error in checkForActiveSpecialEvent:', error);
+      setActiveSpecialEvent(null);
+      setShowSpecialEvent(false);
     } finally {
       setLoading(false);
     }
@@ -48,13 +58,25 @@ const Index = () => {
     );
   }
 
+  // Temporarily always show Home to isolate TooltipProvider issue
   return (
     <>
       <Navbar />
-      {showSpecialEvent && activeSpecialEvent ? (
-        <SpecialEventPage onExit={handleExitSpecialEvent} />
-      ) : (
-        <Home />
+      <Home />
+      {showSpecialEvent && activeSpecialEvent && (
+        <div className="fixed top-4 right-4 z-50">
+          <div className="bg-card border rounded-lg p-4 shadow-lg">
+            <p className="text-sm text-muted-foreground mb-2">
+              Special Event Available: {activeSpecialEvent.title}
+            </p>
+            <button 
+              onClick={handleExitSpecialEvent}
+              className="text-xs text-primary hover:underline"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
       )}
     </>
   );
