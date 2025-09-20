@@ -76,7 +76,7 @@ const CommunityAlert = () => {
         </Button>
 
         {/* Title */}
-        <h1 className="text-3xl md:text-4xl font-bold mb-6 text-center">
+        <h1 className="text-3xl md:text-4xl font-bold mb-6">
           {alert.title}
         </h1>
 
