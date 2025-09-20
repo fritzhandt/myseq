@@ -194,11 +194,10 @@ const SpecialEventPage = ({ onExit }: SpecialEventPageProps) => {
               onClick={onExit}
               variant="outline"
               size="sm"
-              className="border-white/20 text-white hover:bg-white/20 backdrop-blur-sm bg-white/10 hover:border-white/40"
+              className="border-white/20 text-white hover:bg-white/20 backdrop-blur-sm bg-white/10 hover:border-white/40 px-4 py-2"
             >
               <X className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Exit Special Event</span>
-              <span className="sm:hidden">Exit</span>
+              All Events
             </Button>
           </div>
         </div>
