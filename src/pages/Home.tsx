@@ -8,7 +8,7 @@ import Navbar from '@/components/Navbar';
 import CommunityAlertBanner from '@/components/CommunityAlertBanner';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Calendar, MapPin, Users, Grid, CalendarDays } from 'lucide-react';
+import { Calendar, MapPin, Users, Grid, CalendarDays, GraduationCap, Zap, Briefcase, Crown } from 'lucide-react';
 
 interface Event {
   id: string;
@@ -47,6 +47,12 @@ const Home = () => {
   const navigate = useNavigate();
 
   const ageGroups = ['Grade School', 'Young Adult', 'Adult', 'Senior'];
+  const ageGroupIcons = {
+    'Grade School': GraduationCap,
+    'Young Adult': Zap,
+    'Adult': Briefcase,
+    'Senior': Crown
+  };
 
   useEffect(() => {
     fetchEvents();
@@ -164,17 +170,21 @@ const Home = () => {
             Which events are you looking for?
           </h1>
           <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-8">
-            {ageGroups.map((ageGroup) => (
-              <Button
-                key={ageGroup}
-                onClick={() => handleFilterChange(ageGroup)}
-                variant={selectedFilter === ageGroup ? "secondary" : "outline"}
-                size="sm"
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm text-sm sm:text-base w-32 sm:w-36 text-center"
-              >
-                {ageGroup}
-              </Button>
-            ))}
+            {ageGroups.map((ageGroup) => {
+              const IconComponent = ageGroupIcons[ageGroup as keyof typeof ageGroupIcons];
+              return (
+                <Button
+                  key={ageGroup}
+                  onClick={() => handleFilterChange(ageGroup)}
+                  variant={selectedFilter === ageGroup ? "secondary" : "outline"}
+                  size="sm"
+                  className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm text-sm sm:text-base w-32 sm:w-36 text-center"
+                >
+                  <IconComponent className="mr-1 sm:mr-2 h-4 w-4" />
+                  {ageGroup}
+                </Button>
+              );
+            })}
           </div>
           <Link
             to="#events"
