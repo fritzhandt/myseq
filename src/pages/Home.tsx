@@ -9,7 +9,7 @@ import CommunityAlertBanner from '@/components/CommunityAlertBanner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Calendar, MapPin, Users, Grid, CalendarDays, GraduationCap, Zap, Briefcase, Crown } from 'lucide-react';
+import { Calendar, MapPin, Users, Grid, CalendarDays, BookOpen, GraduationCap, Briefcase, Crown } from 'lucide-react';
 
 interface Event {
   id: string;
@@ -49,8 +49,8 @@ const Home = () => {
 
   const ageGroups = ['Grade School', 'Young Adult', 'Adult', 'Senior'];
   const ageGroupIcons = {
-    'Grade School': GraduationCap,
-    'Young Adult': Zap,
+    'Grade School': BookOpen,
+    'Young Adult': GraduationCap,
     'Adult': Briefcase,
     'Senior': Crown
   };
