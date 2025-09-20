@@ -180,8 +180,7 @@ export const EventCard = ({ event }: EventCardProps) => {
           <Button
             onClick={generateCalendarFile}
             variant="outline"
-            size="sm"
-            className="flex-1 text-xs sm:text-sm"
+            className="flex-1 text-xs sm:text-sm h-12 sm:h-9"
           >
             <Download className="w-4 h-4 mr-1" />
             Add to Calendar
@@ -189,8 +188,7 @@ export const EventCard = ({ event }: EventCardProps) => {
           <Button
             onClick={emailCalendarInvite}
             variant="outline"
-            size="sm"
-            className="flex-1 text-xs sm:text-sm"
+            className="flex-1 text-xs sm:text-sm h-12 sm:h-9"
           >
             <Mail className="w-4 h-4 mr-1" />
             Email Invite
