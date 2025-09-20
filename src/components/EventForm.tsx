@@ -5,9 +5,10 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Upload, X, Save } from 'lucide-react';
+import { ArrowLeft, Upload, X, Save, Tag, Plus } from 'lucide-react';
 
 interface EventFormProps {
   event?: any;
@@ -24,7 +25,10 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
     event_time: event?.event_time || '',
     age_group: event?.age_group || '',
     elected_officials: event?.elected_officials?.join(', ') || '',
+    tags: event?.tags || [],
   });
+  
+  const [newTag, setNewTag] = useState('');
   
   const [coverPhoto, setCoverPhoto] = useState<File | null>(null);
   const [additionalImages, setAdditionalImages] = useState<File[]>([]);
@@ -33,8 +37,33 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
 
   const ageGroups = ['Grade School', 'Young Adult', 'Adult', 'Senior'];
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const addTag = () => {
+    const trimmedTag = newTag.trim();
+    if (trimmedTag && !formData.tags.includes(trimmedTag)) {
+      setFormData(prev => ({
+        ...prev,
+        tags: [...prev.tags, trimmedTag]
+      }));
+      setNewTag('');
+    }
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setFormData(prev => ({
+      ...prev,
+      tags: prev.tags.filter(tag => tag !== tagToRemove)
+    }));
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addTag();
+    }
   };
 
   const uploadFile = async (file: File, path: string) => {
@@ -89,6 +118,7 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
           .split(',')
           .map(official => official.trim())
           .filter(official => official.length > 0),
+        tags: formData.tags,
         cover_photo_url: coverPhotoUrl,
         additional_images: additionalImageUrls,
       };
@@ -224,6 +254,45 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
                   onChange={(e) => handleInputChange('elected_officials', e.target.value)}
                   placeholder="e.g. John Smith, Jane Doe, Mike Johnson"
                 />
+              </div>
+
+              <div className="md:col-span-2 space-y-2">
+                <Label htmlFor="tags">Tags</Label>
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <Input
+                      id="tags"
+                      value={newTag}
+                      onChange={(e) => setNewTag(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder="Add a tag (e.g. Job Fair, Networking)"
+                      className="flex-1"
+                    />
+                    <Button type="button" onClick={addTag} variant="outline" size="default">
+                      <Plus className="h-4 w-4 mr-1" />
+                      Add
+                    </Button>
+                  </div>
+                  {formData.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {formData.tags.map((tag, index) => (
+                        <Badge
+                          key={index}
+                          variant="secondary"
+                          className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground"
+                          onClick={() => removeTag(tag)}
+                        >
+                          <Tag className="w-3 h-3 mr-1" />
+                          {tag}
+                          <X className="w-3 h-3 ml-1" />
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-sm text-muted-foreground">
+                    Click on a tag to remove it. Tags help users find events more easily.
+                  </p>
+                </div>
               </div>
 
               <div className="md:col-span-2 space-y-2">

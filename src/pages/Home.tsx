@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { EventCard } from '@/components/EventCard';
+import SearchBar from '@/components/SearchBar';
 import { supabase } from '@/integrations/supabase/client';
 import { Calendar, MapPin, Users } from 'lucide-react';
 
@@ -16,13 +17,17 @@ interface Event {
   elected_officials: string[];
   cover_photo_url: string | null;
   additional_images: string[];
+  tags: string[];
 }
 
 const Home = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchTags, setSearchTags] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const ageGroups = ['Grade School', 'Young Adult', 'Adult', 'Senior'];
 
@@ -47,13 +52,46 @@ const Home = () => {
     }
   };
 
+  const filterEvents = useCallback(() => {
+    let filtered = events;
+
+    // Apply age group filter
+    if (selectedFilter) {
+      filtered = filtered.filter(event => event.age_group === selectedFilter);
+    }
+
+    // Apply search filters
+    if (searchQuery.trim() || searchTags.length > 0) {
+      filtered = filtered.filter(event => {
+        const matchesQuery = !searchQuery.trim() || 
+          event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          event.description.toLowerCase().includes(searchQuery.toLowerCase());
+        
+        const matchesTags = searchTags.length === 0 || 
+          searchTags.some(tag => event.tags?.includes(tag));
+        
+        return matchesQuery && matchesTags;
+      });
+    }
+
+    setFilteredEvents(filtered);
+  }, [events, selectedFilter, searchQuery, searchTags]);
+
+  useEffect(() => {
+    filterEvents();
+  }, [filterEvents]);
+
   const handleFilterChange = (ageGroup: string | null) => {
     setSelectedFilter(ageGroup);
-    if (ageGroup) {
-      setFilteredEvents(events.filter(event => event.age_group === ageGroup));
-    } else {
-      setFilteredEvents(events);
-    }
+  };
+
+  const handleSearch = useCallback((query: string, tags: string[]) => {
+    setSearchQuery(query);
+    setSearchTags(tags);
+  }, []);
+
+  const handleEventClick = (eventId: string) => {
+    navigate(`/event/${eventId}`);
   };
 
   return (
@@ -89,22 +127,35 @@ const Home = () => {
         </div>
       </div>
 
+      {/* Search Section */}
+      <section className="py-8 px-4 bg-muted/30">
+        <div className="container mx-auto">
+          <SearchBar onEventClick={handleEventClick} onSearch={handleSearch} />
+        </div>
+      </section>
+
       {/* Events Section */}
       <section id="events" className="py-16 px-4">
         <div className="container mx-auto">
           <div className="mb-8 text-center">
             <h2 className="text-3xl font-bold mb-4">
-              {selectedFilter 
-                ? `${selectedFilter} Events` 
+              {selectedFilter && searchTags.length === 0 && !searchQuery
+                ? `${selectedFilter} Events`
+                : searchQuery || searchTags.length > 0
+                ? 'Search Results'
                 : 'All Events'
               }
             </h2>
-            {selectedFilter && (
+            {(selectedFilter || searchQuery || searchTags.length > 0) && (
               <Button
-                onClick={() => handleFilterChange(null)}
+                onClick={() => {
+                  handleFilterChange(null);
+                  setSearchQuery('');
+                  setSearchTags([]);
+                }}
                 variant="outline"
               >
-                Show All Events
+                Clear All Filters
               </Button>
             )}
           </div>
@@ -119,7 +170,9 @@ const Home = () => {
               <Calendar className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
               <h3 className="text-xl font-semibold mb-2">No events found</h3>
               <p className="text-muted-foreground">
-                {selectedFilter 
+                {searchQuery || searchTags.length > 0
+                  ? 'No events match your search criteria. Try different keywords or tags.'
+                  : selectedFilter 
                   ? `No events available for ${selectedFilter} age group.`
                   : 'No events have been created yet.'
                 }
