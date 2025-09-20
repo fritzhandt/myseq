@@ -27,25 +27,21 @@ const About = () => {
               Southeast Queens Community Events is your one-stop shop for discovering and participating in all the happenings across Southeast Queens. From family-friendly activities to cultural celebrations, this platform makes it easy to stay connected, informed, and engaged.
             </p>
             
-            <div className="w-full h-px bg-border my-8"></div>
-            
-            <div className="bg-card p-6 rounded-lg border mb-8">
-              <h2 className="text-2xl font-semibold mb-4">Our Mission</h2>
-              <p className="text-muted-foreground">
-                To serve as the central hub for Southeast Queens residents by connecting neighbors with local events, fostering civic engagement, and strengthening community pride.
-              </p>
+            <div className="grid md:grid-cols-2 gap-8 mb-8">
+              <div className="bg-card p-6 rounded-lg border">
+                <h2 className="text-2xl font-semibold mb-4">Our Mission</h2>
+                <p className="text-muted-foreground">
+                  To serve as the central hub for Southeast Queens residents by connecting neighbors with local events, fostering civic engagement, and strengthening community pride.
+                </p>
+              </div>
+              
+              <div className="bg-card p-6 rounded-lg border">
+                <h2 className="text-2xl font-semibold mb-4">What We Do</h2>
+                <p className="text-muted-foreground">
+                  Built and managed by your <Link to="/elected-officials" className="text-primary hover:text-primary/80 underline underline-offset-4">local elected officials</Link>, Southeast Queens Community Events brings together everything you need to know about what's happening in your neighborhood. We highlight events for all ages—youth programs, senior activities, cultural festivals, and more—so everyone has a chance to get involved and make lasting connections.
+                </p>
+              </div>
             </div>
-            
-            <div className="w-full h-px bg-border my-8"></div>
-            
-            <div className="bg-card p-6 rounded-lg border mb-8">
-              <h2 className="text-2xl font-semibold mb-4">What We Do</h2>
-              <p className="text-muted-foreground">
-                Built and managed by your <Link to="/elected-officials" className="text-primary hover:text-primary/80 underline underline-offset-4">local elected officials</Link>, Southeast Queens Community Events brings together everything you need to know about what's happening in your neighborhood. We highlight events for all ages—youth programs, senior activities, cultural festivals, and more—so everyone has a chance to get involved and make lasting connections.
-              </p>
-            </div>
-            
-            <div className="w-full h-px bg-border my-8"></div>
             
             <div className="bg-muted p-8 rounded-lg">
               <h2 className="text-2xl font-semibold mb-4">Get Involved</h2>
