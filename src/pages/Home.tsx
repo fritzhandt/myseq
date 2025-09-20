@@ -183,7 +183,7 @@ const Home = () => {
                   return (
                     <SelectItem key={ageGroup} value={ageGroup}>
                       <div className="flex items-center">
-                        <IconComponent className={`mr-2 ${ageGroup === 'Young Adult' ? 'h-5 w-5' : 'h-4 w-4'}`} />
+                        <IconComponent className={`mr-2 ${ageGroup === 'Young Adult' ? 'h-7 w-7' : 'h-4 w-4'}`} />
                         {ageGroup}
                       </div>
                     </SelectItem>
@@ -205,7 +205,7 @@ const Home = () => {
                   size="sm"
                   className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm text-sm sm:text-base w-40 sm:w-44 text-center"
                 >
-                  <IconComponent className={`mr-1 sm:mr-2 ${ageGroup === 'Young Adult' ? 'h-5 w-5' : 'h-4 w-4'}`} />
+                  <IconComponent className={`mr-1 sm:mr-2 ${ageGroup === 'Young Adult' ? 'h-7 w-7' : 'h-4 w-4'}`} />
                   {ageGroup}
                 </Button>
               );
