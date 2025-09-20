@@ -1,8 +1,8 @@
-import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, MapPin, Clock, Users, Download, Mail, ChevronDown, ChevronUp } from 'lucide-react';
+import { Calendar, MapPin, Clock, Users, Download, Mail, ExternalLink } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface Event {
   id: string;
@@ -22,7 +22,7 @@ interface EventCardProps {
 }
 
 export const EventCard = ({ event }: EventCardProps) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const navigate = useNavigate();
 
   const formatDate = (dateString: string) => {
     // Parse date string as local date to avoid timezone conversion issues
@@ -147,7 +147,7 @@ export const EventCard = ({ event }: EventCardProps) => {
         </div>
 
         <p className="text-sm">
-          {isExpanded ? event.description : truncateDescription(event.description)}
+          {truncateDescription(event.description)}
         </p>
 
         {event.elected_officials.length > 0 && (
@@ -167,18 +167,10 @@ export const EventCard = ({ event }: EventCardProps) => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setIsExpanded(!isExpanded)}
+            onClick={() => navigate(`/event/${event.id}`)}
             className="w-full justify-center"
           >
-            {isExpanded ? (
-              <>
-                Show Less <ChevronUp className="w-4 h-4 ml-1" />
-              </>
-            ) : (
-              <>
-                Read More <ChevronDown className="w-4 h-4 ml-1" />
-              </>
-            )}
+            Learn More <ExternalLink className="w-4 h-4 ml-1" />
           </Button>
         )}
 
