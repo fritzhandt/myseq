@@ -300,7 +300,7 @@ const EventDetail = () => {
               {/* Elected Officials */}
               {event.elected_officials && event.elected_officials.length > 0 && (
                 <div className="mb-8">
-                  <h3 className="text-lg font-semibold mb-3">Participating Officials</h3>
+                  <h3 className="text-lg font-semibold mb-3">Sponsoring Elected Officials</h3>
                   <div className="flex flex-wrap gap-2">
                     {event.elected_officials.map((official, index) => (
                       <Badge key={index} variant="secondary">
