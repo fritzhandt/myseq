@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EventCard } from '@/components/EventCard';
 import Navbar from '@/components/Navbar';
 import { supabase } from '@/integrations/supabase/client';
-import { X } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface EventType {
@@ -196,7 +196,7 @@ const SpecialEventPage = ({ onExit }: SpecialEventPageProps) => {
               size="sm"
               className="border-white/20 text-white hover:bg-white/20 backdrop-blur-sm bg-white/10 hover:border-white/40 px-4 py-2"
             >
-              <X className="h-4 w-4 mr-2" />
+              <Calendar className="h-4 w-4 mr-2" />
               All Events
             </Button>
           </div>
