@@ -170,28 +170,29 @@ export const EventCard = ({ event }: EventCardProps) => {
             variant="ghost"
             size="sm"
             onClick={() => navigate(`/event/${event.id}`)}
-            className="w-full justify-center"
+            className="w-full justify-center px-2"
           >
-            Learn More <ExternalLink className="w-4 h-4 ml-1" />
+            <span className="truncate">Learn More</span>
+            <ExternalLink className="w-4 h-4 ml-1 flex-shrink-0" />
           </Button>
         )}
 
-        <div className="flex flex-col sm:flex-row gap-2 pt-2">
+        <div className="flex flex-col sm:flex-row gap-2 pt-2 w-full">
           <Button
             onClick={generateCalendarFile}
             variant="outline"
-            className="flex-1 text-xs sm:text-sm h-12 sm:h-9"
+            className="flex-1 text-xs sm:text-sm h-12 sm:h-9 min-w-0"
           >
-            <Download className="w-4 h-4 mr-1" />
-            Add to Calendar
+            <Download className="w-4 h-4 mr-1 flex-shrink-0" />
+            <span className="truncate">Add to Calendar</span>
           </Button>
           <Button
             onClick={emailCalendarInvite}
             variant="outline"
-            className="flex-1 text-xs sm:text-sm h-12 sm:h-9"
+            className="flex-1 text-xs sm:text-sm h-12 sm:h-9 min-w-0"
           >
-            <Mail className="w-4 h-4 mr-1" />
-            Email Invite
+            <Mail className="w-4 h-4 mr-1 flex-shrink-0" />
+            <span className="truncate">Email Invite</span>
           </Button>
         </div>
       </CardContent>
