@@ -37,6 +37,7 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
   });
   
   const [newTag, setNewTag] = useState('');
+  const [noRegistrationNeeded, setNoRegistrationNeeded] = useState(false);
   
   const [coverPhoto, setCoverPhoto] = useState<File | null>(null);
   const [additionalImages, setAdditionalImages] = useState<File[]>([]);
@@ -366,72 +367,92 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
               <div className="md:col-span-2 space-y-4 border-t pt-6">
                 <div className="space-y-2">
                   <Label className="text-lg font-semibold">Registration Information</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Provide registration contact information. At least one contact method is required if registration link is not provided.
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="registration_link">Registration Form Link (Optional)</Label>
-                  <Input
-                    id="registration_link"
-                    type="url"
-                    value={formData.registration_link}
-                    onChange={(e) => handleInputChange('registration_link', e.target.value)}
-                    placeholder="https://example.com/register"
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    If provided, this will show as a "Registration Form" button on the event
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="registration_phone">Registration Phone</Label>
-                    <Input
-                      id="registration_phone"
-                      type="tel"
-                      value={formData.registration_phone}
-                      onChange={(e) => handleInputChange('registration_phone', e.target.value)}
-                      placeholder="(555) 123-4567"
-                    />
+                  <div className="flex items-center gap-3 mb-4">
+                    <Button
+                      type="button"
+                      variant={noRegistrationNeeded ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setNoRegistrationNeeded(!noRegistrationNeeded)}
+                    >
+                      No registration needed
+                    </Button>
                   </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="registration_email">Registration Email</Label>
-                    <Input
-                      id="registration_email"
-                      type="email"
-                      value={formData.registration_email}
-                      onChange={(e) => handleInputChange('registration_email', e.target.value)}
-                      placeholder="events@city.gov"
-                    />
-                  </div>
+                  {noRegistrationNeeded ? (
+                    <p className="text-sm text-green-600 font-medium">
+                      No registration needed!
+                    </p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      Provide registration contact information. At least one contact method is required if registration link is not provided.
+                    </p>
+                  )}
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="office_address">Office Address</Label>
-                  <Input
-                    id="office_address"
-                    value={formData.office_address}
-                    onChange={(e) => handleInputChange('office_address', e.target.value)}
-                    placeholder="123 Main Street, City, State 12345"
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    Address where people can register in person
-                  </p>
-                </div>
+                {!noRegistrationNeeded && (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="registration_link">Registration Form Link (Optional)</Label>
+                      <Input
+                        id="registration_link"
+                        type="url"
+                        value={formData.registration_link}
+                        onChange={(e) => handleInputChange('registration_link', e.target.value)}
+                        placeholder="https://example.com/register"
+                      />
+                      <p className="text-sm text-muted-foreground">
+                        If provided, this will show as a "Registration Form" button on the event
+                      </p>
+                    </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="registration_notes">Additional Registration Notes (Optional)</Label>
-                  <Textarea
-                    id="registration_notes"
-                    value={formData.registration_notes}
-                    onChange={(e) => handleInputChange('registration_notes', e.target.value)}
-                    placeholder="Additional instructions or requirements for registration"
-                    rows={2}
-                  />
-                </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="registration_phone">Registration Phone</Label>
+                        <Input
+                          id="registration_phone"
+                          type="tel"
+                          value={formData.registration_phone}
+                          onChange={(e) => handleInputChange('registration_phone', e.target.value)}
+                          placeholder="(555) 123-4567"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="registration_email">Registration Email</Label>
+                        <Input
+                          id="registration_email"
+                          type="email"
+                          value={formData.registration_email}
+                          onChange={(e) => handleInputChange('registration_email', e.target.value)}
+                          placeholder="events@city.gov"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="office_address">Office Address</Label>
+                      <Input
+                        id="office_address"
+                        value={formData.office_address}
+                        onChange={(e) => handleInputChange('office_address', e.target.value)}
+                        placeholder="123 Main Street, City, State 12345"
+                      />
+                      <p className="text-sm text-muted-foreground">
+                        Address where people can register in person
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="registration_notes">Additional Registration Notes (Optional)</Label>
+                      <Textarea
+                        id="registration_notes"
+                        value={formData.registration_notes}
+                        onChange={(e) => handleInputChange('registration_notes', e.target.value)}
+                        placeholder="Additional instructions or requirements for registration"
+                        rows={2}
+                      />
+                    </div>
+                  </>
+                )}
               </div>
 
               <div className="space-y-2">
