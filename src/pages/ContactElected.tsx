@@ -98,7 +98,11 @@ const ContactElected = () => {
             </div>
 
             {/* Mobile Layout - Collapsible Cards */}
-            <div className="md:hidden space-y-4">
+            <div className="md:hidden">
+              <p className="text-sm text-muted-foreground text-center mb-4">
+                Click an Elected's Name to See Their Contact Information
+              </p>
+              <div className="space-y-4">
               {electedOfficials.map((official, index) => (
                 <Collapsible
                   key={index}
@@ -173,6 +177,7 @@ const ContactElected = () => {
                   </Card>
                 </Collapsible>
               ))}
+              </div>
             </div>
 
             {/* Desktop/Tablet Layout - Grid Cards */}
