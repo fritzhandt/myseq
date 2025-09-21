@@ -61,8 +61,10 @@ export type Database = {
           id: string
           location: string
           office_address: string | null
-          registration_instructions: string
+          registration_email: string | null
           registration_link: string | null
+          registration_notes: string
+          registration_phone: string | null
           tags: string[] | null
           title: string
           updated_at: string
@@ -80,8 +82,10 @@ export type Database = {
           id?: string
           location: string
           office_address?: string | null
-          registration_instructions?: string
+          registration_email?: string | null
           registration_link?: string | null
+          registration_notes?: string
+          registration_phone?: string | null
           tags?: string[] | null
           title: string
           updated_at?: string
@@ -99,8 +103,10 @@ export type Database = {
           id?: string
           location?: string
           office_address?: string | null
-          registration_instructions?: string
+          registration_email?: string | null
           registration_link?: string | null
+          registration_notes?: string
+          registration_phone?: string | null
           tags?: string[] | null
           title?: string
           updated_at?: string

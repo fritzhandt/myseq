@@ -30,8 +30,10 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
     elected_officials: event?.elected_officials?.join(', ') || '',
     tags: event?.tags || [],
     registration_link: event?.registration_link || '',
-    registration_instructions: event?.registration_instructions || '',
+    registration_phone: event?.registration_phone || '',
+    registration_email: event?.registration_email || '',
     office_address: event?.office_address || '',
+    registration_notes: event?.registration_notes || '',
   });
   
   const [newTag, setNewTag] = useState('');
@@ -145,8 +147,10 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
         cover_photo_url: coverPhotoUrl,
         additional_images: additionalImageUrls,
         registration_link: formData.registration_link || null,
-        registration_instructions: formData.registration_instructions,
+        registration_phone: formData.registration_phone || null,
+        registration_email: formData.registration_email || null,
         office_address: formData.office_address || null,
+        registration_notes: formData.registration_notes || null,
       };
 
       if (event) {
@@ -363,7 +367,7 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
                 <div className="space-y-2">
                   <Label className="text-lg font-semibold">Registration Information</Label>
                   <p className="text-sm text-muted-foreground">
-                    Provide registration instructions for attendees. A registration link is optional, but alternative instructions are required.
+                    Provide registration contact information. At least one contact method is required if registration link is not provided.
                   </p>
                 </div>
 
@@ -381,23 +385,32 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
                   </p>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="registration_instructions">Alternative Registration Instructions *</Label>
-                  <Textarea
-                    id="registration_instructions"
-                    value={formData.registration_instructions}
-                    onChange={(e) => handleInputChange('registration_instructions', e.target.value)}
-                    placeholder="To register, please call (555) 123-4567, email events@city.gov, or visit our office at 123 Main Street, City, State 12345"
-                    rows={3}
-                    required
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    Provide phone number, email, and/or office visit instructions. Include office address if applicable.
-                  </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="registration_phone">Registration Phone</Label>
+                    <Input
+                      id="registration_phone"
+                      type="tel"
+                      value={formData.registration_phone}
+                      onChange={(e) => handleInputChange('registration_phone', e.target.value)}
+                      placeholder="(555) 123-4567"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="registration_email">Registration Email</Label>
+                    <Input
+                      id="registration_email"
+                      type="email"
+                      value={formData.registration_email}
+                      onChange={(e) => handleInputChange('registration_email', e.target.value)}
+                      placeholder="events@city.gov"
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="office_address">Office Address (Optional)</Label>
+                  <Label htmlFor="office_address">Office Address</Label>
                   <Input
                     id="office_address"
                     value={formData.office_address}
@@ -405,8 +418,19 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
                     placeholder="123 Main Street, City, State 12345"
                   />
                   <p className="text-sm text-muted-foreground">
-                    Include if registration instructions mention visiting an office
+                    Address where people can register in person
                   </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="registration_notes">Additional Registration Notes (Optional)</Label>
+                  <Textarea
+                    id="registration_notes"
+                    value={formData.registration_notes}
+                    onChange={(e) => handleInputChange('registration_notes', e.target.value)}
+                    placeholder="Additional instructions or requirements for registration"
+                    rows={2}
+                  />
                 </div>
               </div>
 

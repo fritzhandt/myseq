@@ -16,8 +16,10 @@ interface Event {
   cover_photo_url: string | null;
   additional_images: string[];
   registration_link?: string | null;
-  registration_instructions?: string;
+  registration_phone?: string | null;
+  registration_email?: string | null;
   office_address?: string | null;
+  registration_notes?: string | null;
 }
 
 interface EventCardProps {
@@ -191,7 +193,7 @@ export const EventCard = ({ event }: EventCardProps) => {
         </div>
 
         {/* Registration Section */}
-        {(event.registration_link || event.registration_instructions) && (
+        {(event.registration_link || event.registration_phone || event.registration_email || event.office_address) && (
           <div className="space-y-3 pt-2 border-t">
             <p className="font-medium text-sm">Registration:</p>
             {event.registration_link && (
@@ -204,12 +206,20 @@ export const EventCard = ({ event }: EventCardProps) => {
                 Registration Form
               </Button>
             )}
-            {event.registration_instructions && (
-              <div className="text-xs text-muted-foreground">
-                <p className="font-medium mb-1">Alternative registration:</p>
-                <p>{event.registration_instructions}</p>
+            {(event.registration_phone || event.registration_email || event.office_address) && (
+              <div className="text-xs text-muted-foreground space-y-1">
+                <p className="font-medium">Contact for registration:</p>
+                {event.registration_phone && (
+                  <p>📞 {event.registration_phone}</p>
+                )}
+                {event.registration_email && (
+                  <p>📧 {event.registration_email}</p>
+                )}
                 {event.office_address && (
-                  <p className="mt-1 font-medium">Office: {event.office_address}</p>
+                  <p>🏢 {event.office_address}</p>
+                )}
+                {event.registration_notes && (
+                  <p className="mt-2 text-xs italic">{event.registration_notes}</p>
                 )}
               </div>
             )}
