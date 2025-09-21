@@ -229,8 +229,28 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
 
   useEffect(() => {
     // Only initialize days if we're not editing an existing special event
-    // or if assignments have been loaded (to avoid overwriting loaded assignments)
-    if (!specialEvent || assignmentsLoaded) {
+    // or if assignments have been loaded and no days were found
+    if (!specialEvent) {
+      // New special event - initialize based on dates
+      if (type === 'single_day' && startDate) {
+        setDays([{ date: startDate, events: [] }]);
+      } else if (type === 'multi_day' && startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const newDays: SpecialEventDay[] = [];
+        
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+          newDays.push({
+            date: format(d, 'yyyy-MM-dd'),
+            events: []
+          });
+        }
+        setDays(newDays);
+      }
+    } else if (assignmentsLoaded && days.length === 0) {
+      // Editing existing special event, assignments loaded but no days found
+      // This might happen if the special event has no days/events yet
+      console.log('No existing data found, initializing empty days based on dates');
       if (type === 'single_day' && startDate) {
         setDays([{ date: startDate, events: [] }]);
       } else if (type === 'multi_day' && startDate && endDate) {
@@ -247,7 +267,9 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
         setDays(newDays);
       }
     }
-  }, [type, startDate, endDate, specialEvent, assignmentsLoaded]);
+    // If we're editing and assignments are loaded with days, don't do anything
+    // The loadExistingAssignments function will have already set the days
+  }, [type, startDate, endDate, specialEvent, assignmentsLoaded, days.length]);
 
   const handleUpdateDays = (updatedDays: SpecialEventDay[]) => {
     setDays(updatedDays);
