@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu } from 'lucide-react';
+import { Menu, Info, Users, Mail, Search, Vote } from 'lucide-react';
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const closeMenu = () => setIsOpen(false);
@@ -25,19 +25,24 @@ const Navbar = () => {
             </SheetTrigger>
             <SheetContent className="w-[300px] sm:w-[400px]">
               <div className="flex flex-col space-y-4 mt-8">
-                <Link to="/about" className="text-base sm:text-lg font-medium hover:text-primary transition-colors py-2" onClick={closeMenu}>
+                <Link to="/about" className="text-base sm:text-lg font-medium hover:text-primary transition-colors py-2 flex items-center gap-3" onClick={closeMenu}>
+                  <Info className="w-5 h-5" />
                   About
                 </Link>
-                <Link to="/elected-officials" className="text-base sm:text-lg font-medium hover:text-primary transition-colors py-2" onClick={closeMenu}>
+                <Link to="/elected-officials" className="text-base sm:text-lg font-medium hover:text-primary transition-colors py-2 flex items-center gap-3" onClick={closeMenu}>
+                  <Users className="w-5 h-5" />
                   Elected Officials
                 </Link>
-                <Link to="/contact-elected" className="text-base sm:text-lg font-medium hover:text-primary transition-colors py-2" onClick={closeMenu}>
+                <Link to="/contact-elected" className="text-base sm:text-lg font-medium hover:text-primary transition-colors py-2 flex items-center gap-3" onClick={closeMenu}>
+                  <Mail className="w-5 h-5" />
                   Contact Your Elected
                 </Link>
-                <Link to="/my-elected-lookup" className="text-base sm:text-lg font-medium hover:text-primary transition-colors py-2" onClick={closeMenu}>
+                <Link to="/my-elected-lookup" className="text-base sm:text-lg font-medium hover:text-primary transition-colors py-2 flex items-center gap-3" onClick={closeMenu}>
+                  <Search className="w-5 h-5" />
                   My Elected Lookup
                 </Link>
-                <Link to="/register-to-vote" className="text-base sm:text-lg font-medium hover:text-primary transition-colors py-2" onClick={closeMenu}>
+                <Link to="/register-to-vote" className="text-base sm:text-lg font-medium hover:text-primary transition-colors py-2 flex items-center gap-3" onClick={closeMenu}>
+                  <Vote className="w-5 h-5" />
                   Register to Vote
                 </Link>
               </div>
