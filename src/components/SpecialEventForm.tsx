@@ -21,6 +21,7 @@ interface Event {
 }
 
 interface SpecialEventDay {
+  id?: string; // Add optional ID for updates
   date: string;
   title?: string;
   description?: string;
@@ -28,6 +29,7 @@ interface SpecialEventDay {
 }
 
 interface EventData {
+  id?: string; // Add optional ID for updates
   title: string;
   description: string;
   location: string;
@@ -108,6 +110,7 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
                 .select(`
                   event_id,
                   events (
+                    id,
                     title,
                     description,
                     location,
@@ -137,6 +140,7 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
               const events = assignments?.map(assignment => {
                 const event = assignment.events;
                 return {
+                  id: event?.id, // Include the event ID for updates
                   title: event?.title || '',
                   description: event?.description || '',
                   location: event?.location || '',
@@ -152,6 +156,7 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
               }) || [];
 
               return {
+                id: day.id, // Include the day ID for updates
                 date: day.date,
                 title: day.title || '',
                 description: day.description || '',
@@ -172,6 +177,7 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
           .select(`
             event_id,
             events (
+              id,
               title,
               description,
               location,
@@ -195,6 +201,7 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
         const events = assignments?.map(assignment => {
           const event = assignment.events;
           return {
+            id: event?.id, // Include the event ID for updates
             title: event?.title || '',
             description: event?.description || '',
             location: event?.location || '',
@@ -331,42 +338,60 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
         specialEventId = data.id;
       }
 
-      // Clear existing assignments
-      await supabase
-        .from('special_event_assignments')
-        .delete()
-        .eq('special_event_id', specialEventId);
-
-      // Clear existing days if multi-day
-      if (type === 'multi_day') {
+      // Don't clear existing assignments and days - we'll update them instead
+      // Only clear if this is a new special event
+      if (!specialEvent?.id) {
+        // Clear existing assignments (only for new events)
         await supabase
-          .from('special_event_days')
+          .from('special_event_assignments')
           .delete()
           .eq('special_event_id', specialEventId);
+
+        // Clear existing days if multi-day (only for new events)
+        if (type === 'multi_day') {
+          await supabase
+            .from('special_event_days')
+            .delete()
+            .eq('special_event_id', specialEventId);
+        }
       }
 
-      // Create days and assignments
+      // Process days and assignments
       for (const day of days) {
         let dayId: string | null = null;
 
         if (type === 'multi_day') {
-          // Create special event day
-          const { data: dayData, error: dayError } = await supabase
-            .from('special_event_days')
-            .insert({
-              special_event_id: specialEventId,
-              date: day.date,
-              title: day.title || null,
-              description: day.description || null,
-            })
-            .select()
-            .single();
+          if (day.id) {
+            // Update existing day
+            const { error: dayError } = await supabase
+              .from('special_event_days')
+              .update({
+                title: day.title || null,
+                description: day.description || null,
+              })
+              .eq('id', day.id);
 
-          if (dayError) throw dayError;
-          dayId = dayData.id;
+            if (dayError) throw dayError;
+            dayId = day.id;
+          } else {
+            // Create new special event day
+            const { data: dayData, error: dayError } = await supabase
+              .from('special_event_days')
+              .insert({
+                special_event_id: specialEventId,
+                date: day.date,
+                title: day.title || null,
+                description: day.description || null,
+              })
+              .select()
+              .single();
+
+            if (dayError) throw dayError;
+            dayId = dayData.id;
+          }
         }
 
-        // Create events for this day
+        // Process events for this day
         for (const eventData of day.events) {
           console.log('Processing event:', eventData);
           
@@ -381,14 +406,14 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
             continue; // Skip incomplete events
           }
 
-          // Upload files and get URLs
-          let cover_photo_url = null;
-          const additional_images: string[] = [];
+          // Handle file uploads
+          let cover_photo_url = eventData.cover_photo_url; // Keep existing URL
+          const additional_images: string[] = [...(eventData.additional_images || [])]; // Keep existing images
 
           if (eventData.cover_photo_file) {
             const fileExt = eventData.cover_photo_file.name.split('.').pop();
             const fileName = `${Date.now()}-${Math.random()}.${fileExt}`;
-            const filePath = `event-images/${fileName}`;
+            const filePath = `${fileName}`; // Fix: Remove duplicate 'event-images/' prefix
 
             const { error: uploadError } = await supabase.storage
               .from('event-images')
@@ -399,13 +424,16 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
                 .from('event-images')
                 .getPublicUrl(filePath);
               cover_photo_url = urlData.publicUrl;
+              console.log('Uploaded cover photo:', cover_photo_url);
+            } else {
+              console.error('Error uploading cover photo:', uploadError);
             }
           }
 
           for (const file of eventData.additional_image_files) {
             const fileExt = file.name.split('.').pop();
             const fileName = `${Date.now()}-${Math.random()}.${fileExt}`;
-            const filePath = `event-images/${fileName}`;
+            const filePath = `${fileName}`; // Fix: Remove duplicate 'event-images/' prefix
 
             const { error: uploadError } = await supabase.storage
               .from('event-images')
@@ -416,43 +444,61 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
                 .from('event-images')
                 .getPublicUrl(filePath);
               additional_images.push(urlData.publicUrl);
+              console.log('Uploaded additional image:', urlData.publicUrl);
+            } else {
+              console.error('Error uploading additional image:', uploadError);
             }
           }
 
-          // Create the event
-          const { data: createdEvent, error: eventError } = await supabase
-            .from('events')
-            .insert({
-              title: eventData.title,
-              description: eventData.description,
-              location: eventData.location,
-              event_date: day.date,
-              event_time: eventData.event_time,
-              age_group: eventData.age_group,
-              elected_officials: eventData.elected_officials,
-              tags: eventData.tags,
-              cover_photo_url,
-              additional_images,
-            })
-            .select()
-            .single();
+          const eventPayload = {
+            title: eventData.title,
+            description: eventData.description,
+            location: eventData.location,
+            event_date: day.date,
+            event_time: eventData.event_time,
+            age_group: eventData.age_group,
+            elected_officials: eventData.elected_officials,
+            tags: eventData.tags,
+            cover_photo_url,
+            additional_images,
+          };
 
-          if (eventError) throw eventError;
-          
-          console.log('Created event successfully:', createdEvent);
+          let eventId: string;
 
-          // Create assignment
-          const { error: assignmentError } = await supabase
-            .from('special_event_assignments')
-            .insert({
-              special_event_id: specialEventId,
-              special_event_day_id: dayId,
-              event_id: createdEvent.id,
-            });
+          if (eventData.id) {
+            // Update existing event
+            const { error: eventError } = await supabase
+              .from('events')
+              .update(eventPayload)
+              .eq('id', eventData.id);
 
-          if (assignmentError) throw assignmentError;
-          
-          console.log('Created assignment successfully');
+            if (eventError) throw eventError;
+            eventId = eventData.id;
+            console.log('Updated event successfully:', eventId);
+          } else {
+            // Create new event
+            const { data: createdEvent, error: eventError } = await supabase
+              .from('events')
+              .insert(eventPayload)
+              .select()
+              .single();
+
+            if (eventError) throw eventError;
+            eventId = createdEvent.id;
+            console.log('Created event successfully:', createdEvent);
+
+            // Create assignment for new events
+            const { error: assignmentError } = await supabase
+              .from('special_event_assignments')
+              .insert({
+                special_event_id: specialEventId,
+                special_event_day_id: dayId,
+                event_id: eventId,
+              });
+
+            if (assignmentError) throw assignmentError;
+            console.log('Created assignment successfully');
+          }
         }
       }
 

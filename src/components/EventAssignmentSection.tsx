@@ -15,6 +15,7 @@ import { Calendar, MapPin, Clock, Users, Plus, X, Upload, Tag, Trash2 } from 'lu
 import { format } from 'date-fns';
 
 interface EventData {
+  id?: string; // Add optional ID for updates
   title: string;
   description: string;
   location: string;
@@ -29,6 +30,7 @@ interface EventData {
 }
 
 interface SpecialEventDay {
+  id?: string; // Add optional ID for updates
   date: string;
   title?: string;
   description?: string;
