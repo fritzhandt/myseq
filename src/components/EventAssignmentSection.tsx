@@ -69,7 +69,7 @@ export const EventAssignmentSection = ({ days, onUpdateDays, type }: EventAssign
   const addEventToDay = (dayIndex: number) => {
     const updatedDays = days.map((day, index) => {
       if (index === dayIndex) {
-        return { ...day, events: [...day.events, createEmptyEvent()] };
+        return { ...day, events: [...(day.events || []), createEmptyEvent()] };
       }
       return day;
     });
@@ -79,7 +79,7 @@ export const EventAssignmentSection = ({ days, onUpdateDays, type }: EventAssign
   const removeEventFromDay = (dayIndex: number, eventIndex: number) => {
     const updatedDays = days.map((day, index) => {
       if (index === dayIndex) {
-        return { ...day, events: day.events.filter((_, i) => i !== eventIndex) };
+        return { ...day, events: (day.events || []).filter((_, i) => i !== eventIndex) };
       }
       return day;
     });
@@ -89,7 +89,7 @@ export const EventAssignmentSection = ({ days, onUpdateDays, type }: EventAssign
   const updateEventInDay = (dayIndex: number, eventIndex: number, field: keyof EventData, value: any) => {
     const updatedDays = days.map((day, index) => {
       if (index === dayIndex) {
-        const updatedEvents = day.events.map((event, i) => {
+        const updatedEvents = (day.events || []).map((event, i) => {
           if (i === eventIndex) {
             return { ...event, [field]: value };
           }
@@ -114,38 +114,44 @@ export const EventAssignmentSection = ({ days, onUpdateDays, type }: EventAssign
 
   const addTag = (dayIndex: number, eventIndex: number, tag: string) => {
     if (tag.trim()) {
-      const currentEvent = days[dayIndex].events[eventIndex];
-      if (!currentEvent.tags.includes(tag.trim())) {
+      const currentEvent = days[dayIndex]?.events?.[eventIndex];
+      if (currentEvent && !currentEvent.tags.includes(tag.trim())) {
         updateEventInDay(dayIndex, eventIndex, 'tags', [...currentEvent.tags, tag.trim()]);
       }
     }
   };
 
   const removeTag = (dayIndex: number, eventIndex: number, tagToRemove: string) => {
-    const currentEvent = days[dayIndex].events[eventIndex];
-    updateEventInDay(dayIndex, eventIndex, 'tags', currentEvent.tags.filter(tag => tag !== tagToRemove));
+    const currentEvent = days[dayIndex]?.events?.[eventIndex];
+    if (currentEvent) {
+      updateEventInDay(dayIndex, eventIndex, 'tags', currentEvent.tags.filter(tag => tag !== tagToRemove));
+    }
   };
 
   const addElectedOfficial = (dayIndex: number, eventIndex: number, official: string) => {
     if (official.trim()) {
-      const currentEvent = days[dayIndex].events[eventIndex];
-      if (!currentEvent.elected_officials.includes(official.trim())) {
+      const currentEvent = days[dayIndex]?.events?.[eventIndex];
+      if (currentEvent && !currentEvent.elected_officials.includes(official.trim())) {
         updateEventInDay(dayIndex, eventIndex, 'elected_officials', [...currentEvent.elected_officials, official.trim()]);
       }
     }
   };
 
   const removeElectedOfficial = (dayIndex: number, eventIndex: number, officialToRemove: string) => {
-    const currentEvent = days[dayIndex].events[eventIndex];
-    updateEventInDay(dayIndex, eventIndex, 'elected_officials', currentEvent.elected_officials.filter(official => official !== officialToRemove));
+    const currentEvent = days[dayIndex]?.events?.[eventIndex];
+    if (currentEvent) {
+      updateEventInDay(dayIndex, eventIndex, 'elected_officials', currentEvent.elected_officials.filter(official => official !== officialToRemove));
+    }
   };
 
   const handleFileUpload = (dayIndex: number, eventIndex: number, file: File, type: 'cover' | 'additional') => {
     if (type === 'cover') {
       updateEventInDay(dayIndex, eventIndex, 'cover_photo_file', file);
     } else {
-      const currentEvent = days[dayIndex].events[eventIndex];
-      updateEventInDay(dayIndex, eventIndex, 'additional_image_files', [...currentEvent.additional_image_files, file]);
+      const currentEvent = days[dayIndex]?.events?.[eventIndex];
+      if (currentEvent) {
+        updateEventInDay(dayIndex, eventIndex, 'additional_image_files', [...currentEvent.additional_image_files, file]);
+      }
     }
   };
 
@@ -196,11 +202,11 @@ export const EventAssignmentSection = ({ days, onUpdateDays, type }: EventAssign
               <div className="flex justify-between items-center">
                 <Label className="text-base font-semibold">Events for this day:</Label>
                 <span className="text-sm text-muted-foreground">
-                  {day.events.length} event{day.events.length !== 1 ? 's' : ''}
+                  {(day.events || []).length} event{(day.events || []).length !== 1 ? 's' : ''}
                 </span>
               </div>
               
-              {day.events.length === 0 ? (
+              {(day.events || []).length === 0 ? (
                 <Card>
                   <CardContent className="text-center py-8">
                     <Calendar className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
@@ -215,7 +221,7 @@ export const EventAssignmentSection = ({ days, onUpdateDays, type }: EventAssign
                   </CardContent>
                 </Card>
               ) : (
-                day.events.map((event, eventIndex) => (
+                (day.events || []).map((event, eventIndex) => (
                   <Card key={eventIndex} className="border-l-4 border-l-primary">
                     <CardHeader className="pb-4">
                       <div className="flex justify-between items-start">
