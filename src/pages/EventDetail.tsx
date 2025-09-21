@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
-import { Calendar, Clock, MapPin, Users, ArrowLeft, Tag, Download, Mail, ChevronLeft, ChevronRight, X, BookOpen, GraduationCap, Briefcase, Crown } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, ArrowLeft, Tag, Download, Mail, ChevronLeft, ChevronRight, X, BookOpen, GraduationCap, Briefcase, Crown, UserPlus, Phone, AtSign, Building } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 
 interface Event {
@@ -19,6 +19,11 @@ interface Event {
   cover_photo_url: string | null;
   additional_images: string[];
   tags: string[];
+  registration_link?: string | null;
+  registration_phone?: string | null;
+  registration_email?: string | null;
+  office_address?: string | null;
+  registration_notes?: string | null;
 }
 
 const ageGroupIcons = {
@@ -318,6 +323,66 @@ const EventDetail = () => {
                   <p className="text-muted-foreground whitespace-pre-wrap">{event.description}</p>
                 </div>
               </div>
+
+              {/* Registration Section */}
+              {(event.registration_link || event.registration_phone || event.registration_email || event.office_address) && (
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold mb-4">Registration</h3>
+                  <div className="space-y-4">
+                    {event.registration_link && (
+                      <div>
+                        <Button
+                          onClick={() => window.open(event.registration_link!, '_blank')}
+                          className="w-full sm:w-auto"
+                        >
+                          <UserPlus className="w-4 h-4 mr-2" />
+                          Registration Form
+                        </Button>
+                      </div>
+                    )}
+                    
+                    {(event.registration_phone || event.registration_email || event.office_address) && (
+                      <div className="bg-muted/50 rounded-lg p-4">
+                        <p className="font-medium mb-3">Alternative Registration Methods:</p>
+                        <div className="space-y-2">
+                          {event.registration_phone && (
+                            <div className="flex items-center text-sm">
+                              <Phone className="w-4 h-4 mr-2 text-primary flex-shrink-0" />
+                              <span className="font-medium mr-2">Phone:</span>
+                              <a href={`tel:${event.registration_phone}`} className="text-primary hover:underline">
+                                {event.registration_phone}
+                              </a>
+                            </div>
+                          )}
+                          {event.registration_email && (
+                            <div className="flex items-center text-sm">
+                              <AtSign className="w-4 h-4 mr-2 text-primary flex-shrink-0" />
+                              <span className="font-medium mr-2">Email:</span>
+                              <a href={`mailto:${event.registration_email}`} className="text-primary hover:underline">
+                                {event.registration_email}
+                              </a>
+                            </div>
+                          )}
+                          {event.office_address && (
+                            <div className="flex items-start text-sm">
+                              <Building className="w-4 h-4 mr-2 text-primary flex-shrink-0 mt-0.5" />
+                              <div>
+                                <span className="font-medium">Office Address:</span>
+                                <p className="text-muted-foreground mt-1">{event.office_address}</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        {event.registration_notes && (
+                          <div className="mt-3 pt-3 border-t">
+                            <p className="text-sm text-muted-foreground italic">{event.registration_notes}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Tags */}
               {event.tags && event.tags.length > 0 && (
