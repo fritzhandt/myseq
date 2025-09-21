@@ -325,7 +325,7 @@ const EventDetail = () => {
               </div>
 
               {/* Registration Section */}
-              {(event.registration_link || event.registration_phone || event.registration_email || event.office_address) && (
+              {(event.registration_link || event.registration_phone || event.registration_email || event.office_address) ? (
                 <div className="mb-8">
                   <h3 className="text-lg font-semibold mb-4">Registration</h3>
                   <div className="space-y-4">
@@ -380,6 +380,15 @@ const EventDetail = () => {
                         )}
                       </div>
                     )}
+                  </div>
+                </div>
+              ) : (
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold mb-4">Registration</h3>
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <p className="text-green-700 font-medium text-center">
+                      No registration needed!
+                    </p>
                   </div>
                 </div>
               )}

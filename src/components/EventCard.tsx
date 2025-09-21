@@ -200,7 +200,7 @@ export const EventCard = ({ event }: EventCardProps) => {
         </div>
 
         {/* Registration Section */}
-        {(event.registration_link || event.registration_phone || event.registration_email || event.office_address) && (
+        {(event.registration_link || event.registration_phone || event.registration_email || event.office_address) ? (
           <div className="space-y-3 pt-6 mt-4 border-t">
             <p className="font-medium text-sm">Registration:</p>
             {event.registration_link && (
@@ -218,6 +218,12 @@ export const EventCard = ({ event }: EventCardProps) => {
                 <p>Click "Learn More" for alternative methods of registration</p>
               </div>
             )}
+          </div>
+        ) : (
+          <div className="pt-6 mt-4 border-t">
+            <p className="text-sm text-green-600 font-medium text-center">
+              No registration needed!
+            </p>
           </div>
         )}
 
