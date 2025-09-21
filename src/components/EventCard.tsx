@@ -207,20 +207,8 @@ export const EventCard = ({ event }: EventCardProps) => {
               </Button>
             )}
             {(event.registration_phone || event.registration_email || event.office_address) && (
-              <div className="text-xs text-muted-foreground space-y-1">
-                <p className="font-medium">Contact for registration:</p>
-                {event.registration_phone && (
-                  <p>📞 {event.registration_phone}</p>
-                )}
-                {event.registration_email && (
-                  <p>📧 {event.registration_email}</p>
-                )}
-                {event.office_address && (
-                  <p>🏢 {event.office_address}</p>
-                )}
-                {event.registration_notes && (
-                  <p className="mt-2 text-xs italic">{event.registration_notes}</p>
-                )}
+              <div className="text-xs text-muted-foreground">
+                <p>Click "Learn More" for alternative methods of registration</p>
               </div>
             )}
           </div>
