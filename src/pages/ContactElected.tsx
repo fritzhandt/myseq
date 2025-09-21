@@ -1,11 +1,21 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Phone, Mail, MapPin, User } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ArrowLeft, Phone, Mail, MapPin, User, ChevronDown, ChevronUp } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 
 const ContactElected = () => {
   const navigate = useNavigate();
+  const [expandedOfficials, setExpandedOfficials] = useState<{ [key: number]: boolean }>({});
+
+  const toggleOfficial = (index: number) => {
+    setExpandedOfficials(prev => ({
+      ...prev,
+      [index]: !prev[index]
+    }));
+  };
 
   const electedOfficials = [
     {
@@ -87,7 +97,86 @@ const ContactElected = () => {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Mobile Layout - Collapsible Cards */}
+            <div className="md:hidden space-y-4">
+              {electedOfficials.map((official, index) => (
+                <Collapsible
+                  key={index}
+                  open={expandedOfficials[index]}
+                  onOpenChange={() => toggleOfficial(index)}
+                >
+                  <Card>
+                    <CollapsibleTrigger asChild>
+                      <CardHeader className="pb-4 cursor-pointer hover:bg-muted/30 transition-colors">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                              <User className="w-6 h-6 text-primary" />
+                            </div>
+                            <div className="text-left">
+                              <CardTitle className="text-lg">{official.name}</CardTitle>
+                              <p className="text-sm text-muted-foreground">{official.office}</p>
+                              <div className="mt-1">
+                                <p className="text-sm font-medium">{official.title}</p>
+                                <p className="text-xs text-muted-foreground">{official.district}</p>
+                              </div>
+                            </div>
+                          </div>
+                          {expandedOfficials[index] ? (
+                            <ChevronUp className="w-5 h-5 text-muted-foreground" />
+                          ) : (
+                            <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                          )}
+                        </div>
+                      </CardHeader>
+                    </CollapsibleTrigger>
+                    
+                    <CollapsibleContent>
+                      <CardContent className="space-y-4 pt-0">
+                        <div className="flex items-start space-x-3">
+                          <Phone className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
+                          <div>
+                            <p className="text-sm font-medium">Phone</p>
+                            <a 
+                              href={`tel:${official.phone}`}
+                              className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                            >
+                              {official.phone}
+                            </a>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-start space-x-3">
+                          <Mail className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
+                          <div>
+                            <p className="text-sm font-medium">Email</p>
+                            <a 
+                              href={`mailto:${official.email}`}
+                              className="text-sm text-muted-foreground hover:text-primary transition-colors break-all"
+                            >
+                              {official.email}
+                            </a>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-start space-x-3">
+                          <MapPin className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
+                          <div>
+                            <p className="text-sm font-medium">Office Address</p>
+                            <p className="text-sm text-muted-foreground">
+                              {official.address}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </CollapsibleContent>
+                  </Card>
+                </Collapsible>
+              ))}
+            </div>
+
+            {/* Desktop/Tablet Layout - Grid Cards */}
+            <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {electedOfficials.map((official, index) => (
                 <Card key={index} className="h-full">
                   <CardHeader className="pb-4">
