@@ -60,6 +60,9 @@ export type Database = {
           event_time: string
           id: string
           location: string
+          office_address: string | null
+          registration_instructions: string
+          registration_link: string | null
           tags: string[] | null
           title: string
           updated_at: string
@@ -76,6 +79,9 @@ export type Database = {
           event_time: string
           id?: string
           location: string
+          office_address?: string | null
+          registration_instructions?: string
+          registration_link?: string | null
           tags?: string[] | null
           title: string
           updated_at?: string
@@ -92,6 +98,9 @@ export type Database = {
           event_time?: string
           id?: string
           location?: string
+          office_address?: string | null
+          registration_instructions?: string
+          registration_link?: string | null
           tags?: string[] | null
           title?: string
           updated_at?: string

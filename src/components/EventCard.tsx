@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, MapPin, Clock, Users, Download, Mail, ExternalLink, BookOpen, GraduationCap, Briefcase, Crown } from 'lucide-react';
+import { Calendar, MapPin, Clock, Users, Download, Mail, ExternalLink, BookOpen, GraduationCap, Briefcase, Crown, UserPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface Event {
@@ -15,6 +15,9 @@ interface Event {
   elected_officials: string[];
   cover_photo_url: string | null;
   additional_images: string[];
+  registration_link?: string | null;
+  registration_instructions?: string;
+  office_address?: string | null;
 }
 
 interface EventCardProps {
@@ -186,6 +189,32 @@ export const EventCard = ({ event }: EventCardProps) => {
             </div>
           )}
         </div>
+
+        {/* Registration Section */}
+        {(event.registration_link || event.registration_instructions) && (
+          <div className="space-y-3 pt-2 border-t">
+            <p className="font-medium text-sm">Registration:</p>
+            {event.registration_link && (
+              <Button
+                onClick={() => window.open(event.registration_link!, '_blank')}
+                variant="default"
+                className="w-full text-xs sm:text-sm h-12 sm:h-10"
+              >
+                <UserPlus className="w-4 h-4 mr-1 flex-shrink-0" />
+                Registration Form
+              </Button>
+            )}
+            {event.registration_instructions && (
+              <div className="text-xs text-muted-foreground">
+                <p className="font-medium mb-1">Alternative registration:</p>
+                <p>{event.registration_instructions}</p>
+                {event.office_address && (
+                  <p className="mt-1 font-medium">Office: {event.office_address}</p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Fixed bottom button area */}
         <div className="flex flex-col gap-2 pt-4 w-full">

@@ -29,6 +29,9 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
     age_group: event?.age_group || [],
     elected_officials: event?.elected_officials?.join(', ') || '',
     tags: event?.tags || [],
+    registration_link: event?.registration_link || '',
+    registration_instructions: event?.registration_instructions || '',
+    office_address: event?.office_address || '',
   });
   
   const [newTag, setNewTag] = useState('');
@@ -141,6 +144,9 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
         tags: formData.tags,
         cover_photo_url: coverPhotoUrl,
         additional_images: additionalImageUrls,
+        registration_link: formData.registration_link || null,
+        registration_instructions: formData.registration_instructions,
+        office_address: formData.office_address || null,
       };
 
       if (event) {
@@ -340,7 +346,7 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
                 </div>
               </div>
 
-              <div className="md:col-span-2 space-y-2">
+               <div className="md:col-span-2 space-y-2">
                 <Label htmlFor="description">Description *</Label>
                 <Textarea
                   id="description"
@@ -350,6 +356,58 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
                   rows={4}
                   required
                 />
+              </div>
+
+              {/* Registration Section */}
+              <div className="md:col-span-2 space-y-4 border-t pt-6">
+                <div className="space-y-2">
+                  <Label className="text-lg font-semibold">Registration Information</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Provide registration instructions for attendees. A registration link is optional, but alternative instructions are required.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="registration_link">Registration Form Link (Optional)</Label>
+                  <Input
+                    id="registration_link"
+                    type="url"
+                    value={formData.registration_link}
+                    onChange={(e) => handleInputChange('registration_link', e.target.value)}
+                    placeholder="https://example.com/register"
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    If provided, this will show as a "Registration Form" button on the event
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="registration_instructions">Alternative Registration Instructions *</Label>
+                  <Textarea
+                    id="registration_instructions"
+                    value={formData.registration_instructions}
+                    onChange={(e) => handleInputChange('registration_instructions', e.target.value)}
+                    placeholder="To register, please call (555) 123-4567, email events@city.gov, or visit our office at 123 Main Street, City, State 12345"
+                    rows={3}
+                    required
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    Provide phone number, email, and/or office visit instructions. Include office address if applicable.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="office_address">Office Address (Optional)</Label>
+                  <Input
+                    id="office_address"
+                    value={formData.office_address}
+                    onChange={(e) => handleInputChange('office_address', e.target.value)}
+                    placeholder="123 Main Street, City, State 12345"
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    Include if registration instructions mention visiting an office
+                  </p>
+                </div>
               </div>
 
               <div className="space-y-2">
