@@ -195,7 +195,6 @@ export const EventCard = ({ event }: EventCardProps) => {
         {/* Registration Section */}
         {(event.registration_link || event.registration_phone || event.registration_email || event.office_address) && (
           <div className="space-y-3 pt-2 border-t">
-            <p className="font-medium text-sm">Registration:</p>
             {event.registration_link && (
               <Button
                 onClick={() => window.open(event.registration_link!, '_blank')}
