@@ -41,9 +41,6 @@ const RegisterToVote = () => {
               Back to Home
             </Button>
             <div className="text-center mb-12">
-            <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Vote className="w-10 h-10 text-primary" />
-            </div>
             <h1 className="text-4xl font-bold mb-6">Register to Vote</h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
               Your vote is your voice in democracy. Register to vote in New York State 
