@@ -50,6 +50,8 @@ const ageGroupIcons = {
 };
 
 export const EventAssignmentSection = ({ days, onUpdateDays, type }: EventAssignmentSectionProps) => {
+  const [newTag, setNewTag] = useState<{[key: string]: string}>({});
+  const [newOfficial, setNewOfficial] = useState<{[key: string]: string}>({});
   const { toast } = useToast();
 
   const createEmptyEvent = (): EventData => ({
@@ -87,11 +89,14 @@ export const EventAssignmentSection = ({ days, onUpdateDays, type }: EventAssign
   };
 
   const updateEventInDay = (dayIndex: number, eventIndex: number, field: keyof EventData, value: any) => {
+    console.log('Updating event field:', field, 'with value:', value, 'for day:', dayIndex, 'event:', eventIndex);
     const updatedDays = days.map((day, index) => {
       if (index === dayIndex) {
         const updatedEvents = (day.events || []).map((event, i) => {
           if (i === eventIndex) {
-            return { ...event, [field]: value };
+            const updatedEvent = { ...event, [field]: value };
+            console.log('Updated event:', updatedEvent);
+            return updatedEvent;
           }
           return event;
         });
@@ -99,6 +104,7 @@ export const EventAssignmentSection = ({ days, onUpdateDays, type }: EventAssign
       }
       return day;
     });
+    console.log('Calling onUpdateDays with:', updatedDays);
     onUpdateDays(updatedDays);
   };
 
@@ -115,8 +121,13 @@ export const EventAssignmentSection = ({ days, onUpdateDays, type }: EventAssign
   const addTag = (dayIndex: number, eventIndex: number, tag: string) => {
     if (tag.trim()) {
       const currentEvent = days[dayIndex]?.events?.[eventIndex];
+      console.log('Adding tag:', tag, 'to event:', currentEvent);
       if (currentEvent && !currentEvent.tags.includes(tag.trim())) {
-        updateEventInDay(dayIndex, eventIndex, 'tags', [...currentEvent.tags, tag.trim()]);
+        const newTags = [...currentEvent.tags, tag.trim()];
+        console.log('New tags array:', newTags);
+        updateEventInDay(dayIndex, eventIndex, 'tags', newTags);
+      } else {
+        console.log('Tag already exists or event not found');
       }
     }
   };
@@ -131,8 +142,13 @@ export const EventAssignmentSection = ({ days, onUpdateDays, type }: EventAssign
   const addElectedOfficial = (dayIndex: number, eventIndex: number, official: string) => {
     if (official.trim()) {
       const currentEvent = days[dayIndex]?.events?.[eventIndex];
+      console.log('Adding elected official:', official, 'to event:', currentEvent);
       if (currentEvent && !currentEvent.elected_officials.includes(official.trim())) {
-        updateEventInDay(dayIndex, eventIndex, 'elected_officials', [...currentEvent.elected_officials, official.trim()]);
+        const newOfficials = [...currentEvent.elected_officials, official.trim()];
+        console.log('New elected officials array:', newOfficials);
+        updateEventInDay(dayIndex, eventIndex, 'elected_officials', newOfficials);
+      } else {
+        console.log('Official already exists or event not found');
       }
     }
   };
@@ -340,18 +356,37 @@ export const EventAssignmentSection = ({ days, onUpdateDays, type }: EventAssign
                             </Badge>
                           ))}
                         </div>
-                        <div className="flex gap-2">
-                          <Input
-                            placeholder="Add a tag"
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                e.preventDefault();
-                                addTag(dayIndex, eventIndex, e.currentTarget.value);
-                                e.currentTarget.value = '';
-                              }
-                            }}
-                          />
-                        </div>
+                         <div className="flex gap-2">
+                           <Input
+                             placeholder="Add a tag"
+                             value={newTag[`${dayIndex}-${eventIndex}`] || ''}
+                             onChange={(e) => setNewTag(prev => ({...prev, [`${dayIndex}-${eventIndex}`]: e.target.value}))}
+                             onKeyDown={(e) => {
+                               if (e.key === 'Enter') {
+                                 e.preventDefault();
+                                 const tagValue = newTag[`${dayIndex}-${eventIndex}`] || '';
+                                 if (tagValue.trim()) {
+                                   addTag(dayIndex, eventIndex, tagValue);
+                                   setNewTag(prev => ({...prev, [`${dayIndex}-${eventIndex}`]: ''}));
+                                 }
+                               }
+                             }}
+                           />
+                           <Button 
+                             type="button"
+                             variant="outline" 
+                             size="sm"
+                             onClick={() => {
+                               const tagValue = newTag[`${dayIndex}-${eventIndex}`] || '';
+                               if (tagValue.trim()) {
+                                 addTag(dayIndex, eventIndex, tagValue);
+                                 setNewTag(prev => ({...prev, [`${dayIndex}-${eventIndex}`]: ''}));
+                               }
+                             }}
+                           >
+                             <Plus className="w-4 h-4" />
+                           </Button>
+                         </div>
                       </div>
 
                       {/* Elected Officials */}
@@ -369,18 +404,37 @@ export const EventAssignmentSection = ({ days, onUpdateDays, type }: EventAssign
                             </Badge>
                           ))}
                         </div>
-                        <div className="flex gap-2">
-                          <Input
-                            placeholder="Add elected official"
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                e.preventDefault();
-                                addElectedOfficial(dayIndex, eventIndex, e.currentTarget.value);
-                                e.currentTarget.value = '';
-                              }
-                            }}
-                          />
-                        </div>
+                         <div className="flex gap-2">
+                           <Input
+                             placeholder="Add elected official"
+                             value={newOfficial[`${dayIndex}-${eventIndex}`] || ''}
+                             onChange={(e) => setNewOfficial(prev => ({...prev, [`${dayIndex}-${eventIndex}`]: e.target.value}))}
+                             onKeyDown={(e) => {
+                               if (e.key === 'Enter') {
+                                 e.preventDefault();
+                                 const officialValue = newOfficial[`${dayIndex}-${eventIndex}`] || '';
+                                 if (officialValue.trim()) {
+                                   addElectedOfficial(dayIndex, eventIndex, officialValue);
+                                   setNewOfficial(prev => ({...prev, [`${dayIndex}-${eventIndex}`]: ''}));
+                                 }
+                               }
+                             }}
+                           />
+                           <Button 
+                             type="button"
+                             variant="outline" 
+                             size="sm"
+                             onClick={() => {
+                               const officialValue = newOfficial[`${dayIndex}-${eventIndex}`] || '';
+                               if (officialValue.trim()) {
+                                 addElectedOfficial(dayIndex, eventIndex, officialValue);
+                                 setNewOfficial(prev => ({...prev, [`${dayIndex}-${eventIndex}`]: ''}));
+                               }
+                             }}
+                           >
+                             <Plus className="w-4 h-4" />
+                           </Button>
+                         </div>
                       </div>
 
                       {/* Cover Photo */}
