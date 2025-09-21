@@ -51,6 +51,7 @@ export type Database = {
         Row: {
           additional_images: string[] | null
           age_group: string[] | null
+          archived: boolean
           cover_photo_url: string | null
           created_at: string
           description: string
@@ -66,6 +67,7 @@ export type Database = {
         Insert: {
           additional_images?: string[] | null
           age_group?: string[] | null
+          archived?: boolean
           cover_photo_url?: string | null
           created_at?: string
           description: string
@@ -81,6 +83,7 @@ export type Database = {
         Update: {
           additional_images?: string[] | null
           age_group?: string[] | null
+          archived?: boolean
           cover_photo_url?: string | null
           created_at?: string
           description?: string
@@ -220,7 +223,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      archive_expired_events: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
