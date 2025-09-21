@@ -63,7 +63,7 @@ export type Database = {
           office_address: string | null
           registration_email: string | null
           registration_link: string | null
-          registration_notes: string
+          registration_notes: string | null
           registration_phone: string | null
           tags: string[] | null
           title: string
@@ -84,7 +84,7 @@ export type Database = {
           office_address?: string | null
           registration_email?: string | null
           registration_link?: string | null
-          registration_notes?: string
+          registration_notes?: string | null
           registration_phone?: string | null
           tags?: string[] | null
           title: string
@@ -105,7 +105,7 @@ export type Database = {
           office_address?: string | null
           registration_email?: string | null
           registration_link?: string | null
-          registration_notes?: string
+          registration_notes?: string | null
           registration_phone?: string | null
           tags?: string[] | null
           title?: string
