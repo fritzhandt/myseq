@@ -45,10 +45,47 @@ const RegisterToVote = () => {
               <Vote className="w-10 h-10 text-primary" />
             </div>
             <h1 className="text-4xl font-bold mb-6">Register to Vote</h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
               Your vote is your voice in democracy. Register to vote in New York State 
               and make sure you're ready to participate in upcoming elections.
             </p>
+            
+            {/* Mobile button - shows under subheader on mobile only */}
+            <div className="md:hidden mb-8">
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button size="lg" className="text-lg px-8 py-3" onClick={handleRegisterClick}>
+                    Register to Vote Online
+                    <ExternalLink className="ml-2 w-5 h-5" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>
+                      Leaving This Site
+                    </DialogTitle>
+                    <DialogDescription className="text-left">
+                      This link is taking you to an official New York State website:
+                      <br />
+                      <strong>nyovr.elections.ny.gov</strong>
+                      <br /><br />
+                      This is the official New York State online voter registration system 
+                      maintained by the New York State Board of Elections. Your information 
+                      will be handled securely according to state privacy policies.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button onClick={handleProceed}>
+                      Continue to NY.gov
+                      <ExternalLink className="ml-2 w-4 h-4" />
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 mb-12">
@@ -76,7 +113,7 @@ const RegisterToVote = () => {
             </div>
           </div>
 
-          <div className="text-center">
+          <div className="text-center hidden md:block">
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button size="lg" className="text-lg px-8 py-3" onClick={handleRegisterClick}>
