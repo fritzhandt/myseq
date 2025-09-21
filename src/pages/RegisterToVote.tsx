@@ -87,8 +87,7 @@ const RegisterToVote = () => {
 
           <div className="grid md:grid-cols-2 gap-8 mb-12">
             <div className="bg-card p-6 rounded-lg border">
-              <h2 className="text-xl font-semibold mb-4 flex items-center">
-                <Shield className="mr-2 w-5 h-5 text-primary" />
+              <h2 className="text-xl font-semibold mb-4">
                 Why Register?
               </h2>
               <ul className="space-y-2 text-muted-foreground">
