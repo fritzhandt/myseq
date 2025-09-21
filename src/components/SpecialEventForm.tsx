@@ -80,76 +80,136 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
     if (!specialEvent?.id) return;
 
     try {
+      console.log('Loading existing assignments for special event:', specialEvent.id);
+      
       // First fetch special event days if multi-day
       if (specialEvent.type === 'multi_day') {
-        const { data: daysData } = await supabase
+        const { data: daysData, error: daysError } = await supabase
           .from('special_event_days')
           .select('*')
           .eq('special_event_id', specialEvent.id)
           .order('date');
 
+        if (daysError) {
+          console.error('Error fetching days:', daysError);
+          return;
+        }
+
+        console.log('Found days data:', daysData);
+
         if (daysData) {
           // Create days array with assignments
           const daysWithEvents = await Promise.all(
             daysData.map(async (day) => {
-              const { data: assignments } = await supabase
+              console.log('Loading events for day:', day.id);
+              
+              const { data: assignments, error: assignmentsError } = await supabase
                 .from('special_event_assignments')
                 .select(`
-                  *,
-                  events (*)
+                  event_id,
+                  events (
+                    title,
+                    description,
+                    location,
+                    event_time,
+                    age_group,
+                    elected_officials,
+                    cover_photo_url,
+                    additional_images,
+                    tags
+                  )
                 `)
                 .eq('special_event_id', specialEvent.id)
                 .eq('special_event_day_id', day.id);
 
-              const events = assignments?.map(assignment => ({
-                title: assignment.events.title,
-                description: assignment.events.description,
-                location: assignment.events.location,
-                event_time: assignment.events.event_time,
-                age_group: assignment.events.age_group,
-                elected_officials: assignment.events.elected_officials,
-                cover_photo_url: assignment.events.cover_photo_url,
-                additional_images: assignment.events.additional_images,
-                tags: assignment.events.tags,
-                cover_photo_file: null,
-                additional_image_files: []
-              })) || [];
+              if (assignmentsError) {
+                console.error('Error fetching assignments for day:', day.id, assignmentsError);
+                return {
+                  date: day.date,
+                  title: day.title || '',
+                  description: day.description || '',
+                  events: []
+                };
+              }
+
+              console.log('Assignments for day:', day.id, assignments);
+
+              const events = assignments?.map(assignment => {
+                const event = assignment.events;
+                return {
+                  title: event?.title || '',
+                  description: event?.description || '',
+                  location: event?.location || '',
+                  event_time: event?.event_time || '',
+                  age_group: event?.age_group || [],
+                  elected_officials: event?.elected_officials || [],
+                  cover_photo_url: event?.cover_photo_url || null,
+                  additional_images: event?.additional_images || [],
+                  tags: event?.tags || [],
+                  cover_photo_file: null,
+                  additional_image_files: []
+                };
+              }) || [];
 
               return {
-                id: day.id,
                 date: day.date,
-                title: day.title,
-                description: day.description,
+                title: day.title || '',
+                description: day.description || '',
                 events
               };
             })
           );
+          
+          console.log('Setting days with events:', daysWithEvents);
           setDays(daysWithEvents);
         }
       } else {
         // Single day event - load assignments directly
-        const { data: assignments } = await supabase
+        console.log('Loading single day event assignments');
+        
+        const { data: assignments, error: assignmentsError } = await supabase
           .from('special_event_assignments')
           .select(`
-            *,
-            events (*)
+            event_id,
+            events (
+              title,
+              description,
+              location,
+              event_time,
+              age_group,
+              elected_officials,
+              cover_photo_url,
+              additional_images,
+              tags
+            )
           `)
           .eq('special_event_id', specialEvent.id);
 
-        const events = assignments?.map(assignment => ({
-          title: assignment.events.title,
-          description: assignment.events.description,
-          location: assignment.events.location,
-          event_time: assignment.events.event_time,
-          age_group: assignment.events.age_group,
-          elected_officials: assignment.events.elected_officials,
-          cover_photo_url: assignment.events.cover_photo_url,
-          additional_images: assignment.events.additional_images,
-          tags: assignment.events.tags,
-          cover_photo_file: null,
-          additional_image_files: []
-        })) || [];
+        if (assignmentsError) {
+          console.error('Error fetching single day assignments:', assignmentsError);
+          return;
+        }
 
+        console.log('Single day assignments:', assignments);
+
+        const events = assignments?.map(assignment => {
+          const event = assignment.events;
+          return {
+            title: event?.title || '',
+            description: event?.description || '',
+            location: event?.location || '',
+            event_time: event?.event_time || '',
+            age_group: event?.age_group || [],
+            elected_officials: event?.elected_officials || [],
+            cover_photo_url: event?.cover_photo_url || null,
+            additional_images: event?.additional_images || [],
+            tags: event?.tags || [],
+            cover_photo_file: null,
+            additional_image_files: []
+          };
+        }) || [];
+
+        console.log('Setting single day events:', events);
         setDays([{
           date: specialEvent.start_date,
           events
@@ -157,6 +217,11 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
       }
     } catch (error) {
       console.error('Error loading existing assignments:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load existing events",
+        variant: "destructive",
+      });
     } finally {
       setAssignmentsLoaded(true);
     }
