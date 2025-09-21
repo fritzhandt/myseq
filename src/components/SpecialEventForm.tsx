@@ -56,6 +56,7 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
   const [isActive, setIsActive] = useState(false);
   const [days, setDays] = useState<SpecialEventDay[]>([]);
   const [loading, setLoading] = useState(false);
+  const [assignmentsLoaded, setAssignmentsLoaded] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -66,28 +67,122 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
       setStartDate(specialEvent.start_date || '');
       setEndDate(specialEvent.end_date || '');
       setIsActive(specialEvent.is_active || false);
-      // TODO: Load existing days and assignments
+      
+      // Load existing days and assignments
+      setAssignmentsLoaded(false);
+      loadExistingAssignments();
+    } else {
+      setAssignmentsLoaded(true);
     }
   }, [specialEvent]);
 
-  useEffect(() => {
-    // Initialize days when type or dates change
-    if (type === 'single_day' && startDate) {
-      setDays([{ date: startDate, events: [] }]);
-    } else if (type === 'multi_day' && startDate && endDate) {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      const newDays: SpecialEventDay[] = [];
-      
-      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-        newDays.push({
-          date: format(d, 'yyyy-MM-dd'),
-          events: []
-        });
+  const loadExistingAssignments = async () => {
+    if (!specialEvent?.id) return;
+
+    try {
+      // First fetch special event days if multi-day
+      if (specialEvent.type === 'multi_day') {
+        const { data: daysData } = await supabase
+          .from('special_event_days')
+          .select('*')
+          .eq('special_event_id', specialEvent.id)
+          .order('date');
+
+        if (daysData) {
+          // Create days array with assignments
+          const daysWithEvents = await Promise.all(
+            daysData.map(async (day) => {
+              const { data: assignments } = await supabase
+                .from('special_event_assignments')
+                .select(`
+                  *,
+                  events (*)
+                `)
+                .eq('special_event_id', specialEvent.id)
+                .eq('special_event_day_id', day.id);
+
+              const events = assignments?.map(assignment => ({
+                title: assignment.events.title,
+                description: assignment.events.description,
+                location: assignment.events.location,
+                event_time: assignment.events.event_time,
+                age_group: assignment.events.age_group,
+                elected_officials: assignment.events.elected_officials,
+                cover_photo_url: assignment.events.cover_photo_url,
+                additional_images: assignment.events.additional_images,
+                tags: assignment.events.tags,
+                cover_photo_file: null,
+                additional_image_files: []
+              })) || [];
+
+              return {
+                id: day.id,
+                date: day.date,
+                title: day.title,
+                description: day.description,
+                events
+              };
+            })
+          );
+          setDays(daysWithEvents);
+        }
+      } else {
+        // Single day event - load assignments directly
+        const { data: assignments } = await supabase
+          .from('special_event_assignments')
+          .select(`
+            *,
+            events (*)
+          `)
+          .eq('special_event_id', specialEvent.id);
+
+        const events = assignments?.map(assignment => ({
+          title: assignment.events.title,
+          description: assignment.events.description,
+          location: assignment.events.location,
+          event_time: assignment.events.event_time,
+          age_group: assignment.events.age_group,
+          elected_officials: assignment.events.elected_officials,
+          cover_photo_url: assignment.events.cover_photo_url,
+          additional_images: assignment.events.additional_images,
+          tags: assignment.events.tags,
+          cover_photo_file: null,
+          additional_image_files: []
+        })) || [];
+
+        setDays([{
+          date: specialEvent.start_date,
+          events
+        }]);
       }
-      setDays(newDays);
+    } catch (error) {
+      console.error('Error loading existing assignments:', error);
+    } finally {
+      setAssignmentsLoaded(true);
     }
-  }, [type, startDate, endDate]);
+  };
+
+  useEffect(() => {
+    // Only initialize days if we're not editing an existing special event
+    // or if assignments have been loaded (to avoid overwriting loaded assignments)
+    if (!specialEvent || assignmentsLoaded) {
+      if (type === 'single_day' && startDate) {
+        setDays([{ date: startDate, events: [] }]);
+      } else if (type === 'multi_day' && startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const newDays: SpecialEventDay[] = [];
+        
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+          newDays.push({
+            date: format(d, 'yyyy-MM-dd'),
+            events: []
+          });
+        }
+        setDays(newDays);
+      }
+    }
+  }, [type, startDate, endDate, specialEvent, assignmentsLoaded]);
 
   const handleUpdateDays = (updatedDays: SpecialEventDay[]) => {
     setDays(updatedDays);
