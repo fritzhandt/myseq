@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { ExternalLink, Vote, Shield, AlertTriangle, ArrowLeft } from 'lucide-react';
+import { ExternalLink, Vote, Shield, ArrowLeft } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 
 const RegisterToVote = () => {
@@ -86,8 +86,7 @@ const RegisterToVote = () => {
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle className="flex items-center">
-                    <AlertTriangle className="mr-2 w-5 h-5 text-yellow-500" />
+                  <DialogTitle>
                     Leaving This Site
                   </DialogTitle>
                   <DialogDescription className="text-left">

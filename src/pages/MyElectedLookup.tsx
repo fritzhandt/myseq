@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { ExternalLink, Search, ArrowLeft, AlertTriangle } from 'lucide-react';
+import { ExternalLink, Search, ArrowLeft } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 
 const MyElectedLookup = () => {
@@ -97,8 +97,7 @@ const MyElectedLookup = () => {
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle className="flex items-center">
-                        <AlertTriangle className="mr-2 w-5 h-5 text-yellow-500" />
+                      <DialogTitle>
                         Leaving This Site
                       </DialogTitle>
                       <DialogDescription className="text-left">
