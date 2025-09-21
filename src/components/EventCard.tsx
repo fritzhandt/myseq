@@ -151,52 +151,56 @@ export const EventCard = ({ event }: EventCardProps) => {
         </div>
       </CardHeader>
 
-      <CardContent className="flex-1 flex flex-col space-y-4 px-4 sm:px-6">
-        <div className="grid grid-cols-1 gap-3">
-          <div className="flex items-center text-sm text-muted-foreground">
-            <Calendar className="w-4 h-4 mr-2 text-primary flex-shrink-0" />
-            <span className="truncate">{formatDate(event.event_date)}</span>
-          </div>
-          <div className="flex items-center text-sm text-muted-foreground">
-            <Clock className="w-4 h-4 mr-2 text-primary flex-shrink-0" />
-            {formatTime(event.event_time)}
-          </div>
-          <div className="flex items-center text-sm text-muted-foreground">
-            <MapPin className="w-4 h-4 mr-2 text-primary flex-shrink-0" />
-            <span className="truncate">{event.location}</span>
-          </div>
-        </div>
-
-        <p className="text-sm">
-          {truncateDescription(event.description)}
-        </p>
-
-        {event.elected_officials.length > 0 && (
-          <div className="space-y-2">
-            <p className="font-medium text-sm">Sponsored by:</p>
-            <div className="flex flex-wrap gap-1">
-              {event.elected_officials.map((official, index) => (
-                <Badge key={index} variant="outline" className="text-xs">
-                  {official}
-                </Badge>
-              ))}
+      <CardContent className="flex-1 flex flex-col px-4 sm:px-6">
+        {/* Main content area that grows */}
+        <div className="flex-1 space-y-4">
+          <div className="grid grid-cols-1 gap-3">
+            <div className="flex items-center text-sm text-muted-foreground">
+              <Calendar className="w-4 h-4 mr-2 text-primary flex-shrink-0" />
+              <span className="truncate">{formatDate(event.event_date)}</span>
+            </div>
+            <div className="flex items-center text-sm text-muted-foreground">
+              <Clock className="w-4 h-4 mr-2 text-primary flex-shrink-0" />
+              {formatTime(event.event_time)}
+            </div>
+            <div className="flex items-center text-sm text-muted-foreground">
+              <MapPin className="w-4 h-4 mr-2 text-primary flex-shrink-0" />
+              <span className="truncate">{event.location}</span>
             </div>
           </div>
-        )}
 
-        {event.description.length > 150 && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate(`/event/${event.id}`)}
-            className="w-full justify-center px-2"
-          >
-            <span className="truncate">Learn More</span>
-            <ExternalLink className="w-4 h-4 ml-1 flex-shrink-0" />
-          </Button>
-        )}
+          <p className="text-sm">
+            {truncateDescription(event.description)}
+          </p>
 
-        <div className="flex flex-col gap-2 pt-2 w-full mt-auto">
+          {event.elected_officials.length > 0 && (
+            <div className="space-y-2">
+              <p className="font-medium text-sm">Sponsored by:</p>
+              <div className="flex flex-wrap gap-1">
+                {event.elected_officials.map((official, index) => (
+                  <Badge key={index} variant="outline" className="text-xs">
+                    {official}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {event.description.length > 150 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate(`/event/${event.id}`)}
+              className="w-full justify-center px-2"
+            >
+              <span className="truncate">Learn More</span>
+              <ExternalLink className="w-4 h-4 ml-1 flex-shrink-0" />
+            </Button>
+          )}
+        </div>
+
+        {/* Fixed bottom button area */}
+        <div className="flex flex-col gap-2 pt-4 w-full">
           <Button
             onClick={generateCalendarFile}
             variant="outline"
