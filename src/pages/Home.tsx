@@ -198,7 +198,7 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
                   return (
                     <SelectItem key={ageGroup} value={ageGroup}>
                       <div className="flex items-center">
-                        <IconComponent className={`mr-2 ${ageGroup === 'Young Adult' ? 'h-7 w-7' : 'h-4 w-4'}`} />
+                        <IconComponent className={`mr-2 ${ageGroup === 'Young Adult' ? 'h-5 w-5' : 'h-4 w-4'}`} />
                         {ageGroup}
                       </div>
                     </SelectItem>
