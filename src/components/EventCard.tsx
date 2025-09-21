@@ -185,22 +185,21 @@ export const EventCard = ({ event }: EventCardProps) => {
               </div>
             </div>
           )}
+        </div>
 
+        {/* Fixed bottom button area */}
+        <div className="flex flex-col gap-2 pt-4 w-full">
           {event.description.length > 150 && (
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigate(`/event/${event.id}`)}
-              className="w-full justify-center px-2"
+              className="w-full justify-center px-2 text-xs sm:text-sm h-12 sm:h-10"
             >
               <span className="truncate">Learn More</span>
               <ExternalLink className="w-4 h-4 ml-1 flex-shrink-0" />
             </Button>
           )}
-        </div>
-
-        {/* Fixed bottom button area */}
-        <div className="flex flex-col gap-2 pt-4 w-full">
           <Button
             onClick={generateCalendarFile}
             variant="outline"
