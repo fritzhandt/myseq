@@ -182,11 +182,18 @@ export const EventCard = ({ event }: EventCardProps) => {
             <div className="space-y-2">
               <p className="font-medium text-sm">Sponsored by:</p>
               <div className="flex flex-wrap gap-1">
-                {event.elected_officials.map((official, index) => (
+                {event.elected_officials.slice(0, 3).map((official, index) => (
                   <Badge key={index} variant="outline" className="text-xs">
                     {official}
                   </Badge>
                 ))}
+                {event.elected_officials.length > 3 && (
+                  <div className="bg-muted rounded-full w-6 h-6 flex items-center justify-center">
+                    <span className="text-xs font-medium text-muted-foreground">
+                      +{event.elected_officials.length - 3}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -194,7 +201,7 @@ export const EventCard = ({ event }: EventCardProps) => {
 
         {/* Registration Section */}
         {(event.registration_link || event.registration_phone || event.registration_email || event.office_address) && (
-          <div className="space-y-3 pt-2 border-t">
+          <div className="space-y-3 pt-6 mt-4 border-t">
             <p className="font-medium text-sm">Registration:</p>
             {event.registration_link && (
               <Button
