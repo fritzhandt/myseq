@@ -76,14 +76,21 @@ const SearchBar = ({ onEventClick, onSearch }: SearchBarProps) => {
     // Don't trigger automatic search - only when user hits submit
   }, [query, selectedTags]);
 
-  const handleSubmit = () => {
+  const handleSubmit = (e?: React.MouseEvent | React.FormEvent) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+    
     const filters: SearchFilters = {
       sortBy,
       dateFrom,
       dateTo
     };
-    onSearch(query, selectedTags, filters);
+    
+    // Always close dropdown first
     setIsOpen(false);
+    
+    // Call the search with current query (even if empty) and selected filters
+    onSearch(query, selectedTags, filters);
   };
 
   const searchSuggestions = async () => {
@@ -183,6 +190,12 @@ const SearchBar = ({ onEventClick, onSearch }: SearchBarProps) => {
               placeholder="Search events by name or tag..."
               className="pl-10 pr-4 py-2 sm:py-3 text-base"
               onFocus={() => query && setIsOpen(true)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleSubmit(e);
+                }
+              }}
             />
           </div>
           
@@ -198,7 +211,11 @@ const SearchBar = ({ onEventClick, onSearch }: SearchBarProps) => {
               {showAdvanced ? <ChevronUp className="w-4 h-4 ml-2" /> : <ChevronDown className="w-4 h-4 ml-2" />}
             </Button>
             
-            <Button onClick={handleSubmit} className="whitespace-nowrap">
+            <Button 
+              onClick={handleSubmit} 
+              className="whitespace-nowrap"
+              type="button"
+            >
               Search
             </Button>
           </div>
