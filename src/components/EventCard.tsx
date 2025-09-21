@@ -112,7 +112,7 @@ export const EventCard = ({ event }: EventCardProps) => {
   };
 
   return (
-    <Card className="shadow-card hover:shadow-elegant transition-all duration-300 overflow-hidden">
+    <Card className="shadow-card hover:shadow-elegant transition-all duration-300 overflow-hidden flex flex-col h-full">
       {event.cover_photo_url && (
         <div className="relative h-40 sm:h-48 overflow-hidden">
           <img
@@ -135,7 +135,7 @@ export const EventCard = ({ event }: EventCardProps) => {
       
       <CardHeader className="pb-3 px-4 sm:px-6">
         <div className="flex justify-between items-start gap-2">
-          <CardTitle className="text-lg sm:text-xl leading-tight">{event.title}</CardTitle>
+          <CardTitle className="text-lg sm:text-xl leading-tight line-clamp-2">{event.title}</CardTitle>
           {!event.cover_photo_url && (
             <div className="flex gap-1 mt-2">
               {event.age_group.map((group, index) => {
@@ -151,7 +151,7 @@ export const EventCard = ({ event }: EventCardProps) => {
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4 px-4 sm:px-6">
+      <CardContent className="flex-1 flex flex-col space-y-4 px-4 sm:px-6">
         <div className="grid grid-cols-1 gap-3">
           <div className="flex items-center text-sm text-muted-foreground">
             <Calendar className="w-4 h-4 mr-2 text-primary flex-shrink-0" />
@@ -196,7 +196,7 @@ export const EventCard = ({ event }: EventCardProps) => {
           </Button>
         )}
 
-        <div className="flex flex-col gap-2 pt-2 w-full">
+        <div className="flex flex-col gap-2 pt-2 w-full mt-auto">
           <Button
             onClick={generateCalendarFile}
             variant="outline"
