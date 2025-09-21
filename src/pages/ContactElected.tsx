@@ -100,7 +100,7 @@ const ContactElected = () => {
             {/* Mobile Layout - Collapsible Cards */}
             <div className="md:hidden">
               <p className="text-sm text-muted-foreground text-center mb-4">
-                Click an Elected's Name to See Their Contact Information
+                Click a name to view their contact information
               </p>
               <div className="space-y-4">
               {electedOfficials.map((official, index) => (
