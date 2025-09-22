@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, ArrowLeft } from "lucide-react";
+import { Search, ArrowLeft, Plus } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import ResourceCard from "@/components/ResourceCard";
+import ResourceForm from "@/components/ResourceForm";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -34,6 +35,8 @@ export default function Resources() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  const [user, setUser] = useState<any>(null);
 
   const fetchResources = async () => {
     try {
@@ -92,6 +95,22 @@ export default function Resources() {
     setSearchQuery(e.target.value);
   };
 
+  // Check authentication status
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    
+    getUser();
+    
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user || null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   useEffect(() => {
     fetchResources();
   }, []);
@@ -99,6 +118,10 @@ export default function Resources() {
   useEffect(() => {
     filterResources();
   }, [resources, searchQuery, selectedCategories]);
+
+  const handleFormSave = () => {
+    fetchResources(); // Refresh the resources list
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -121,10 +144,31 @@ export default function Resources() {
       
       <main className="container mx-auto px-4 py-8">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-4">Community Resources</h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Discover local organizations and services available in your community
-          </p>
+          <div className="flex justify-between items-start mb-6">
+            <div className="flex-1">
+              <h1 className="text-4xl font-bold mb-4">Community Resources</h1>
+              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                Discover local organizations and services available in your community
+              </p>
+            </div>
+            {user && (
+              <Button 
+                onClick={() => setShowForm(true)}
+                className="flex items-center gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Add Resource
+              </Button>
+            )}
+          </div>
+          
+          {!user && (
+            <div className="bg-muted/50 rounded-lg p-4 mb-6 max-w-2xl mx-auto">
+              <p className="text-sm text-muted-foreground">
+                <a href="/auth" className="text-primary hover:underline">Sign in</a> to add new community resources
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Category Filter Buttons */}
@@ -191,6 +235,14 @@ export default function Resources() {
           </div>
         )}
       </main>
+
+      {/* Resource Form Modal */}
+      {showForm && (
+        <ResourceForm
+          onClose={() => setShowForm(false)}
+          onSave={handleFormSave}
+        />
+      )}
     </div>
   );
 }
