@@ -27,8 +27,6 @@ export default function DefaultPage() {
           <Card className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/20">
             <CardHeader className="pb-6">
               <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-primary/10 rounded-lg">
-                </div>
                 <ArrowRight className="h-6 w-6 text-muted-foreground group-hover:text-primary transition-colors" />
               </div>
               <CardTitle className="text-2xl mb-2">Community Events</CardTitle>
