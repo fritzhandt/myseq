@@ -43,6 +43,7 @@ export default function ResourceForm({ resource, onClose, onSave }: ResourceForm
   const [removingBackground, setRemovingBackground] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(resource?.logo_url || null);
+  const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [formData, setFormData] = useState<Resource>({
@@ -73,27 +74,51 @@ export default function ResourceForm({ resource, onClose, onSave }: ResourceForm
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (!file.type.startsWith('image/')) {
-        toast({
-          title: "Error",
-          description: "Please select an image file",
-          variant: "destructive",
-        });
-        return;
-      }
+      processFile(file);
+    }
+  };
 
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        toast({
-          title: "Error",
-          description: "Image must be smaller than 5MB",
-          variant: "destructive",
-        });
-        return;
-      }
+  const processFile = (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Error",
+        description: "Please select an image file",
+        variant: "destructive",
+      });
+      return;
+    }
 
-      setSelectedFile(file);
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      toast({
+        title: "Error",
+        description: "Image must be smaller than 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSelectedFile(file);
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      processFile(files[0]);
     }
   };
 
@@ -355,30 +380,63 @@ export default function ResourceForm({ resource, onClose, onSave }: ResourceForm
                   </div>
                 )}
 
-                {/* Upload Controls */}
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
+                {/* Drag and Drop Zone */}
+                {!previewUrl && (
+                  <div
+                    className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
+                      isDragOver 
+                        ? "border-primary bg-primary/5" 
+                        : "border-muted-foreground/25 hover:border-muted-foreground/50"
+                    }`}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
                     onClick={() => fileInputRef.current?.click()}
-                    disabled={uploadingImage}
                   >
-                    <Upload className="h-4 w-4 mr-2" />
-                    {previewUrl ? "Change Image" : "Upload Image"}
-                  </Button>
-
-                  {selectedFile && (
+                    <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                    <p className="text-lg font-medium mb-2">
+                      {isDragOver ? "Drop image here" : "Drag and drop an image"}
+                    </p>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      or click to browse files
+                    </p>
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={handleRemoveBackground}
-                      disabled={removingBackground}
+                      size="sm"
+                      disabled={uploadingImage}
                     >
-                      <Wand2 className="h-4 w-4 mr-2" />
-                      {removingBackground ? "Processing..." : "Remove Background"}
+                      Choose File
                     </Button>
-                  )}
-                </div>
+                  </div>
+                )}
+
+                {/* Upload Controls for existing image */}
+                {previewUrl && (
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadingImage}
+                    >
+                      <Upload className="h-4 w-4 mr-2" />
+                      Change Image
+                    </Button>
+
+                    {selectedFile && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleRemoveBackground}
+                        disabled={removingBackground}
+                      >
+                        <Wand2 className="h-4 w-4 mr-2" />
+                        {removingBackground ? "Processing..." : "Remove Background"}
+                      </Button>
+                    )}
+                  </div>
+                )}
 
                 <input
                   ref={fileInputRef}
