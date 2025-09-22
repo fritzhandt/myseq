@@ -13,7 +13,9 @@ interface Resource {
   id?: string;
   organization_name: string;
   description: string;
-  contact_info?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
   website?: string;
   logo_url?: string;
   categories: string[];
@@ -39,7 +41,9 @@ export default function ResourceForm({ resource, onClose, onSave }: ResourceForm
   const [formData, setFormData] = useState<Resource>({
     organization_name: resource?.organization_name || "",
     description: resource?.description || "",
-    contact_info: resource?.contact_info || "",
+    phone: resource?.phone || "",
+    email: resource?.email || "",
+    address: resource?.address || "",
     website: resource?.website || "",
     logo_url: resource?.logo_url || "",
     categories: resource?.categories || [],
@@ -167,14 +171,40 @@ export default function ResourceForm({ resource, onClose, onSave }: ResourceForm
             </div>
 
             <div>
-              <Label htmlFor="contact_info">Contact Information</Label>
-              <Textarea
-                id="contact_info"
-                value={formData.contact_info}
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                type="tel"
+                value={formData.phone}
                 onChange={(e) =>
-                  setFormData(prev => ({ ...prev, contact_info: e.target.value }))
+                  setFormData(prev => ({ ...prev, phone: e.target.value }))
                 }
-                placeholder="Phone, email, address, etc."
+                placeholder="(555) 123-4567"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="email">Email Address</Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData(prev => ({ ...prev, email: e.target.value }))
+                }
+                placeholder="contact@organization.com"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="address">Address</Label>
+              <Textarea
+                id="address"
+                value={formData.address}
+                onChange={(e) =>
+                  setFormData(prev => ({ ...prev, address: e.target.value }))
+                }
+                placeholder="123 Main St, City, State 12345"
                 rows={2}
               />
             </div>

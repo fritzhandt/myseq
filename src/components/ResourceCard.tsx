@@ -7,7 +7,9 @@ interface Resource {
   id: string;
   organization_name: string;
   description: string;
-  contact_info?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
   website?: string;
   logo_url?: string;
   categories: string[];
@@ -46,15 +48,31 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
           {resource.description}
         </p>
         
-        {resource.contact_info && (
-          <div className="mb-4">
-            <div className="flex items-center text-sm text-muted-foreground mb-1">
-              <Phone className="h-4 w-4 mr-2" />
-              Contact Info
-            </div>
-            <p className="text-sm text-muted-foreground whitespace-pre-line line-clamp-2">
-              {resource.contact_info}
-            </p>
+        {/* Contact Information */}
+        {(resource.phone || resource.email || resource.address) && (
+          <div className="mb-4 space-y-1">
+            {resource.phone && (
+              <div className="flex items-center text-sm text-muted-foreground">
+                <Phone className="h-3 w-3 mr-2" />
+                <a href={`tel:${resource.phone}`} className="hover:text-primary truncate">
+                  {resource.phone}
+                </a>
+              </div>
+            )}
+            {resource.email && (
+              <div className="flex items-center text-sm text-muted-foreground">
+                <span className="h-3 w-3 mr-2">✉️</span>
+                <a href={`mailto:${resource.email}`} className="hover:text-primary truncate">
+                  {resource.email}
+                </a>
+              </div>
+            )}
+            {resource.address && (
+              <div className="flex items-start text-sm text-muted-foreground">
+                <span className="h-3 w-3 mr-2 mt-0.5">📍</span>
+                <span className="line-clamp-2">{resource.address}</span>
+              </div>
+            )}
           </div>
         )}
 

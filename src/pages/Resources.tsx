@@ -11,7 +11,9 @@ interface Resource {
   id: string;
   organization_name: string;
   description: string;
-  contact_info?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
   website?: string;
   logo_url?: string;
   categories: string[];

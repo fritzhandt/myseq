@@ -10,7 +10,9 @@ interface Resource {
   id: string;
   organization_name: string;
   description: string;
-  contact_info?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
   website?: string;
   logo_url?: string;
   categories: string[];
@@ -117,15 +119,37 @@ export default function ResourcesList({ onEdit }: ResourcesListProps) {
             <CardContent>
               <p className="text-muted-foreground mb-4">{resource.description}</p>
               
-              {resource.contact_info && (
+              {/* Contact Information */}
+              {(resource.phone || resource.email || resource.address) && (
                 <div className="mb-4">
                   <h4 className="font-medium mb-2 flex items-center">
                     <Phone className="h-4 w-4 mr-2" />
                     Contact Information
                   </h4>
-                  <p className="text-sm text-muted-foreground whitespace-pre-line">
-                    {resource.contact_info}
-                  </p>
+                  <div className="space-y-1 text-sm text-muted-foreground">
+                    {resource.phone && (
+                      <div className="flex items-center">
+                        <Phone className="h-3 w-3 mr-2" />
+                        <a href={`tel:${resource.phone}`} className="hover:text-primary">
+                          {resource.phone}
+                        </a>
+                      </div>
+                    )}
+                    {resource.email && (
+                      <div className="flex items-center">
+                        <Mail className="h-3 w-3 mr-2" />
+                        <a href={`mailto:${resource.email}`} className="hover:text-primary">
+                          {resource.email}
+                        </a>
+                      </div>
+                    )}
+                    {resource.address && (
+                      <div className="flex items-start">
+                        <span className="h-3 w-3 mr-2 mt-0.5 text-muted-foreground">📍</span>
+                        <span>{resource.address}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 

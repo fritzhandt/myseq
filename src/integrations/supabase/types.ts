@@ -115,35 +115,41 @@ export type Database = {
       }
       resources: {
         Row: {
+          address: string | null
           categories: string[]
-          contact_info: string | null
           created_at: string
           description: string
+          email: string | null
           id: string
           logo_url: string | null
           organization_name: string
+          phone: string | null
           updated_at: string
           website: string | null
         }
         Insert: {
+          address?: string | null
           categories?: string[]
-          contact_info?: string | null
           created_at?: string
           description: string
+          email?: string | null
           id?: string
           logo_url?: string | null
           organization_name: string
+          phone?: string | null
           updated_at?: string
           website?: string | null
         }
         Update: {
+          address?: string | null
           categories?: string[]
-          contact_info?: string | null
           created_at?: string
           description?: string
+          email?: string | null
           id?: string
           logo_url?: string | null
           organization_name?: string
+          phone?: string | null
           updated_at?: string
           website?: string | null
         }
