@@ -28,7 +28,6 @@ export default function DefaultPage() {
             <CardHeader className="pb-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="p-3 bg-primary/10 rounded-lg">
-                  <Calendar className="h-8 w-8 text-primary" />
                 </div>
                 <ArrowRight className="h-6 w-6 text-muted-foreground group-hover:text-primary transition-colors" />
               </div>
