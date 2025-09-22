@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,7 +7,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { X } from "lucide-react";
+import { X, Upload, Trash2, Wand2 } from "lucide-react";
+import { removeBackground, loadImage } from "@/utils/backgroundRemoval";
 
 interface Resource {
   id?: string;
@@ -38,6 +39,12 @@ const CATEGORIES = [
 export default function ResourceForm({ resource, onClose, onSave }: ResourceFormProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [removingBackground, setRemovingBackground] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(resource?.logo_url || null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
   const [formData, setFormData] = useState<Resource>({
     organization_name: resource?.organization_name || "",
     description: resource?.description || "",
@@ -60,6 +67,95 @@ export default function ResourceForm({ resource, onClose, onSave }: ResourceForm
         ...prev,
         categories: prev.categories.filter(c => c !== category)
       }));
+    }
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Error",
+          description: "Please select an image file",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast({
+          title: "Error",
+          description: "Image must be smaller than 5MB",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setSelectedFile(file);
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    }
+  };
+
+  const uploadImage = async (file: File): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const filePath = `resource-logos/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('event-images')
+      .upload(filePath, file);
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data } = supabase.storage
+      .from('event-images')
+      .getPublicUrl(filePath);
+
+    return data.publicUrl;
+  };
+
+  const handleRemoveBackground = async () => {
+    if (!selectedFile) return;
+
+    setRemovingBackground(true);
+    try {
+      const imageElement = await loadImage(selectedFile);
+      const processedBlob = await removeBackground(imageElement);
+      
+      // Create a new file from the processed blob
+      const processedFile = new File([processedBlob], selectedFile.name, {
+        type: 'image/png'
+      });
+      
+      setSelectedFile(processedFile);
+      const url = URL.createObjectURL(processedBlob);
+      setPreviewUrl(url);
+      
+      toast({
+        title: "Success",
+        description: "Background removed successfully",
+      });
+    } catch (error) {
+      console.error('Error removing background:', error);
+      toast({
+        title: "Error",
+        description: "Failed to remove background. You can still use the original image.",
+        variant: "destructive",
+      });
+    } finally {
+      setRemovingBackground(false);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setFormData(prev => ({ ...prev, logo_url: "" }));
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -87,11 +183,24 @@ export default function ResourceForm({ resource, onClose, onSave }: ResourceForm
     setLoading(true);
 
     try {
+      let logoUrl = formData.logo_url;
+
+      // Upload image if a new file is selected
+      if (selectedFile) {
+        setUploadingImage(true);
+        logoUrl = await uploadImage(selectedFile);
+      }
+
+      const dataToSave = {
+        ...formData,
+        logo_url: logoUrl
+      };
+
       if (resource?.id) {
         // Update existing resource
         const { error } = await supabase
           .from("resources")
-          .update(formData)
+          .update(dataToSave)
           .eq("id", resource.id);
 
         if (error) throw error;
@@ -104,7 +213,7 @@ export default function ResourceForm({ resource, onClose, onSave }: ResourceForm
         // Create new resource
         const { error } = await supabase
           .from("resources")
-          .insert([formData]);
+          .insert([dataToSave]);
 
         if (error) throw error;
 
@@ -125,6 +234,7 @@ export default function ResourceForm({ resource, onClose, onSave }: ResourceForm
       });
     } finally {
       setLoading(false);
+      setUploadingImage(false);
     }
   };
 
@@ -223,16 +333,65 @@ export default function ResourceForm({ resource, onClose, onSave }: ResourceForm
             </div>
 
             <div>
-              <Label htmlFor="logo_url">Logo/Cover Image URL</Label>
-              <Input
-                id="logo_url"
-                type="url"
-                value={formData.logo_url}
-                onChange={(e) =>
-                  setFormData(prev => ({ ...prev, logo_url: e.target.value }))
-                }
-                placeholder="https://example.com/logo.jpg"
-              />
+              <Label>Logo/Cover Image</Label>
+              <div className="space-y-4">
+                {/* Image Preview */}
+                {previewUrl && (
+                  <div className="relative">
+                    <img
+                      src={previewUrl}
+                      alt="Logo preview"
+                      className="w-32 h-32 object-cover rounded-lg border"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="absolute -top-2 -right-2"
+                      onClick={handleRemoveImage}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+
+                {/* Upload Controls */}
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingImage}
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    {previewUrl ? "Change Image" : "Upload Image"}
+                  </Button>
+
+                  {selectedFile && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleRemoveBackground}
+                      disabled={removingBackground}
+                    >
+                      <Wand2 className="h-4 w-4 mr-2" />
+                      {removingBackground ? "Processing..." : "Remove Background"}
+                    </Button>
+                  )}
+                </div>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+
+                <p className="text-xs text-muted-foreground">
+                  Upload an image file (max 5MB). Supported formats: JPG, PNG, WEBP
+                </p>
+              </div>
             </div>
 
             <div>
@@ -256,10 +415,15 @@ export default function ResourceForm({ resource, onClose, onSave }: ResourceForm
             </div>
 
             <div className="flex gap-2 pt-4">
-              <Button type="submit" disabled={loading}>
-                {loading ? "Saving..." : resource ? "Update Resource" : "Create Resource"}
+              <Button type="submit" disabled={loading || uploadingImage || removingBackground}>
+                {loading || uploadingImage 
+                  ? "Saving..." 
+                  : resource 
+                    ? "Update Resource" 
+                    : "Create Resource"
+                }
               </Button>
-              <Button type="button" variant="outline" onClick={onClose}>
+              <Button type="button" variant="outline" onClick={onClose} disabled={loading || uploadingImage || removingBackground}>
                 Cancel
               </Button>
             </div>
