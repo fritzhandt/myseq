@@ -9,7 +9,7 @@ import CommunityAlertBanner from '@/components/CommunityAlertBanner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Calendar, MapPin, Users, Grid, CalendarDays, BookOpen, GraduationCap, Briefcase, Crown, Zap } from 'lucide-react';
+import { Calendar, MapPin, Users, Grid, CalendarDays, BookOpen, GraduationCap, Briefcase, Crown, Zap, ArrowLeft } from 'lucide-react';
 
 interface Event {
   id: string;
@@ -174,6 +174,21 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
       <Navbar />
       <CommunityAlertBanner />
       <div className="min-h-screen bg-background">
+        
+        {/* Back to Home Button */}
+        <div className="bg-muted/50 border-b">
+          <div className="container mx-auto px-4 py-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => window.location.href = '/'}
+              className="flex items-center text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Main Menu
+            </Button>
+          </div>
+        </div>
       {/* Hero Section */}
       <div className="gradient-hero text-primary-foreground py-16 md:py-20 px-4 shadow-urban">
         <div className="container mx-auto text-center">

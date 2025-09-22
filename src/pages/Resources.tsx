@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, ArrowLeft } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import ResourceCard from "@/components/ResourceCard";
 import { supabase } from "@/integrations/supabase/client";
@@ -101,6 +101,21 @@ export default function Resources() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
+      
+      {/* Back to Home Button */}
+      <div className="bg-muted/50 border-b">
+        <div className="container mx-auto px-4 py-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => window.location.href = '/'}
+            className="flex items-center text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Main Menu
+          </Button>
+        </div>
+      </div>
       
       <main className="container mx-auto px-4 py-8">
         <div className="text-center mb-8">
