@@ -113,6 +113,42 @@ export type Database = {
         }
         Relationships: []
       }
+      resources: {
+        Row: {
+          categories: string[]
+          contact_info: string | null
+          created_at: string
+          description: string
+          id: string
+          logo_url: string | null
+          organization_name: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          categories?: string[]
+          contact_info?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          logo_url?: string | null
+          organization_name: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          categories?: string[]
+          contact_info?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          logo_url?: string | null
+          organization_name?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       special_event_assignments: {
         Row: {
           created_at: string

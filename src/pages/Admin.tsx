@@ -8,9 +8,11 @@ import SpecialEventForm from '@/components/SpecialEventForm';
 import SpecialEventsList from '@/components/SpecialEventsList';
 import CommunityAlertForm from '@/components/CommunityAlertForm';
 import CommunityAlertsList from '@/components/CommunityAlertsList';
+import ResourceForm from '@/components/ResourceForm';
+import ResourcesList from '@/components/ResourcesList';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Calendar, LogOut, Star, AlertTriangle } from 'lucide-react';
+import { Plus, Calendar, LogOut, Star, AlertTriangle, Users } from 'lucide-react';
 
 const Admin = () => {
   const [showForm, setShowForm] = useState(false);
@@ -19,6 +21,8 @@ const Admin = () => {
   const [editingSpecialEvent, setEditingSpecialEvent] = useState(null);
   const [showCommunityAlertForm, setShowCommunityAlertForm] = useState(false);
   const [editingCommunityAlert, setEditingCommunityAlert] = useState(null);
+  const [showResourceForm, setShowResourceForm] = useState(false);
+  const [editingResource, setEditingResource] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -107,6 +111,21 @@ const Admin = () => {
     setEditingCommunityAlert(null);
   };
 
+  const handleCreateResource = () => {
+    setEditingResource(null);
+    setShowResourceForm(true);
+  };
+
+  const handleEditResource = (resource: any) => {
+    setEditingResource(resource);
+    setShowResourceForm(true);
+  };
+
+  const handleResourceFormClose = () => {
+    setShowResourceForm(false);
+    setEditingResource(null);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -144,7 +163,7 @@ const Admin = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="events" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
+          <TabsList className="grid w-full grid-cols-4 mb-8">
             <TabsTrigger value="events" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
               Regular Events
@@ -156,6 +175,10 @@ const Admin = () => {
             <TabsTrigger value="community-alerts" className="flex items-center gap-2">
               <AlertTriangle className="h-4 w-4" />
               Community Alerts
+            </TabsTrigger>
+            <TabsTrigger value="resources" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Resources
             </TabsTrigger>
           </TabsList>
 
@@ -218,6 +241,27 @@ const Admin = () => {
                   </Button>
                 </div>
                 <CommunityAlertsList onEditAlert={handleEditCommunityAlert} />
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="resources">
+            {showResourceForm ? (
+              <ResourceForm
+                resource={editingResource}
+                onClose={handleResourceFormClose}
+                onSave={handleResourceFormClose}
+              />
+            ) : (
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-3xl font-bold">Manage Community Resources</h2>
+                  <Button onClick={handleCreateResource} size="lg">
+                    <Plus className="h-5 w-5 mr-2" />
+                    Create New Resource
+                  </Button>
+                </div>
+                <ResourcesList onEdit={handleEditResource} />
               </div>
             )}
           </TabsContent>

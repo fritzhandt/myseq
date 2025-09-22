@@ -1,76 +1,82 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import SpecialEventPage from '@/components/SpecialEventPage';
-import Home from './Home';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import Navbar from "@/components/Navbar";
+import CommunityAlertBanner from "@/components/CommunityAlertBanner";
+import { Calendar, Users, MapPin, Clock, ArrowRight } from "lucide-react";
 
-interface SpecialEvent {
-  id: string;
-  title: string;
-  description: string | null;
-}
-
-const DefaultPage = () => {
-  const [activeSpecialEvent, setActiveSpecialEvent] = useState<SpecialEvent | null>(null);
-  const [hasExitedSpecialEvent, setHasExitedSpecialEvent] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    checkForActiveSpecialEvent();
-  }, []);
-
-  const checkForActiveSpecialEvent = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('special_events')
-        .select('id, title, description')
-        .eq('is_active', true)
-        .maybeSingle();
-
-      if (error) {
-        console.error('Error checking for active special event:', error);
-        setActiveSpecialEvent(null);
-      } else {
-        setActiveSpecialEvent(data);
-      }
-    } catch (error) {
-      console.error('Error checking for active special event:', error);
-      setActiveSpecialEvent(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleExitSpecialEvent = () => {
-    setHasExitedSpecialEvent(true);
-  };
-
-  const handleGoToSpecialEvent = () => {
-    setHasExitedSpecialEvent(false);
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (activeSpecialEvent && !hasExitedSpecialEvent) {
-    return <SpecialEventPage onExit={handleExitSpecialEvent} />;
-  }
-
+export default function DefaultPage() {
   return (
-    <Home 
-      activeSpecialEvent={activeSpecialEvent} 
-      onGoToSpecialEvent={handleGoToSpecialEvent}
-    />
-  );
-};
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <CommunityAlertBanner />
+      
+      <main className="container mx-auto px-4 py-8">
+        {/* Hero Section */}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">
+            Welcome to Your <span className="text-primary">Civic Hub</span>
+          </h1>
+          <p className="text-muted-foreground text-lg md:text-xl max-w-3xl mx-auto mb-12">
+            Discover community events, connect with local resources, and stay informed about what's happening in your area.
+          </p>
+        </div>
 
-export default DefaultPage;
+        {/* Main Sections */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+          {/* Events Section */}
+          <Card className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/20">
+            <CardHeader className="pb-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-primary/10 rounded-lg">
+                  <Calendar className="h-8 w-8 text-primary" />
+                </div>
+                <ArrowRight className="h-6 w-6 text-muted-foreground group-hover:text-primary transition-colors" />
+              </div>
+              <CardTitle className="text-2xl mb-2">Community Events</CardTitle>
+              <CardDescription className="text-base">
+                Find local events, meetings, and activities happening in your community
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                size="lg" 
+                className="w-full"
+                onClick={() => window.location.href = '/home'}
+              >
+                Explore Events
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Resources Section */}
+          <Card className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-secondary/20">
+            <CardHeader className="pb-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-secondary/10 rounded-lg">
+                  <Users className="h-8 w-8 text-secondary" />
+                </div>
+                <ArrowRight className="h-6 w-6 text-muted-foreground group-hover:text-secondary transition-colors" />
+              </div>
+              <CardTitle className="text-2xl mb-2">Community Resources</CardTitle>
+              <CardDescription className="text-base">
+                Discover local organizations, services, and support available in your community
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                size="lg" 
+                variant="secondary"
+                className="w-full"
+                onClick={() => window.location.href = '/resources'}
+              >
+                Browse Resources
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    </div>
+  );
+}
