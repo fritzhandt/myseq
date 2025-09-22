@@ -10,6 +10,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Calendar, MapPin, Users, Grid, CalendarDays, BookOpen, GraduationCap, Briefcase, Crown, Zap, ArrowLeft } from 'lucide-react';
+import AgeGroupButton3D from '@/components/3d/AgeGroupButton3D';
+import EventCard3D from '@/components/3d/EventCard3D';
+import HeroBackground3D from '@/components/3d/HeroBackground3D';
+import LoadingSpinner3D from '@/components/3d/LoadingSpinner3D';
 
 interface Event {
   id: string;
@@ -190,8 +194,9 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
           </div>
         </div>
       {/* Hero Section */}
-      <div className="gradient-hero text-primary-foreground py-16 md:py-20 px-4 shadow-urban">
-        <div className="container mx-auto text-center">
+      <div className="gradient-hero text-primary-foreground py-16 md:py-20 px-4 shadow-urban relative overflow-hidden">
+        <HeroBackground3D />
+        <div className="container mx-auto text-center relative z-10">
           <p className="text-lg md:text-xl mb-4 text-yellow-300 font-bold font-oswald tracking-wide uppercase">Welcome</p>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 drop-shadow-lg">
             Which events are you looking for?
@@ -228,20 +233,18 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
             {ageGroups.map((ageGroup) => {
               const IconComponent = ageGroupIcons[ageGroup as keyof typeof ageGroupIcons];
               return (
-                <Button
+                <AgeGroupButton3D
                   key={ageGroup}
+                  ageGroup={ageGroup}
+                  Icon={IconComponent}
+                  isSelected={selectedFilter === ageGroup}
                   onClick={() => handleFilterChange(ageGroup)}
-                  variant={selectedFilter === ageGroup ? "secondary" : "outline"}
-                  size="sm"
                   className={`border-white/20 text-white hover:bg-white/20 backdrop-blur-sm text-sm sm:text-base w-40 sm:w-44 text-center transition-all duration-200 ${
                     selectedFilter === ageGroup 
                       ? 'bg-yellow-400/20 border-yellow-300/60 shadow-lg ring-2 ring-yellow-300/40' 
                       : 'bg-white/10 hover:border-white/40'
                   }`}
-                >
-                  <IconComponent className={`mr-1 sm:mr-2 ${ageGroup === 'Young Adult' ? 'h-7 w-7' : 'h-4 w-4'}`} />
-                  {ageGroup}
-                </Button>
+                />
               );
             })}
           </div>
@@ -342,7 +345,7 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
 
           {loading ? (
             <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <LoadingSpinner3D />
               <p className="mt-4 text-muted-foreground">Loading events...</p>
             </div>
           ) : filteredEvents.length === 0 ? (
@@ -363,7 +366,9 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {filteredEvents.map((event) => (
-                <EventCard key={event.id} event={event} />
+                <EventCard3D key={event.id}>
+                  <EventCard event={event} />
+                </EventCard3D>
               ))}
             </div>
           )}
