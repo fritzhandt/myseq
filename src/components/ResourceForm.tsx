@@ -359,7 +359,7 @@ export default function ResourceForm({ resource, onClose, onSave }: ResourceForm
             </div>
 
             <div>
-              <Label>Logo/Cover Image</Label>
+              <Label>Organization Logo</Label>
               <div className="space-y-4">
                 {/* Image Preview */}
                 {previewUrl && (
