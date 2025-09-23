@@ -145,14 +145,6 @@ export default function JobCard({ job }: JobCardProps) {
                 <span>{formatDate(job.created_at)}</span>
               </div>
             </div>
-            
-            {job.description && (
-              <div className="p-3 bg-muted/30 rounded-lg border-l-2 border-l-primary/30">
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {job.description}
-                </p>
-              </div>
-            )}
           </div>
 
           <DialogFooter className="flex-col gap-2 sm:flex-row">
