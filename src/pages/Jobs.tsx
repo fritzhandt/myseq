@@ -26,8 +26,8 @@ export default function Jobs() {
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [locationFilter, setLocationFilter] = useState('');
-  const [employerFilter, setEmployerFilter] = useState('');
+  const [locationFilter, setLocationFilter] = useState('all');
+  const [employerFilter, setEmployerFilter] = useState('all');
   const [minSalary, setMinSalary] = useState('');
   const [maxSalary, setMaxSalary] = useState('');
 
@@ -66,14 +66,14 @@ export default function Jobs() {
     }
 
     // Filter by location
-    if (locationFilter) {
+    if (locationFilter && locationFilter !== 'all') {
       filtered = filtered.filter(job =>
         job.location.toLowerCase().includes(locationFilter.toLowerCase())
       );
     }
 
     // Filter by employer
-    if (employerFilter) {
+    if (employerFilter && employerFilter !== 'all') {
       filtered = filtered.filter(job =>
         job.employer.toLowerCase().includes(employerFilter.toLowerCase())
       );
@@ -99,8 +99,8 @@ export default function Jobs() {
 
   const clearFilters = () => {
     setSearchQuery('');
-    setLocationFilter('');
-    setEmployerFilter('');
+    setLocationFilter('all');
+    setEmployerFilter('all');
     setMinSalary('');
     setMaxSalary('');
   };
@@ -152,7 +152,7 @@ export default function Jobs() {
                     <SelectValue placeholder="All locations" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All locations</SelectItem>
+                    <SelectItem value="all">All locations</SelectItem>
                     {uniqueLocations.map(location => (
                       <SelectItem key={location} value={location}>{location}</SelectItem>
                     ))}
@@ -171,7 +171,7 @@ export default function Jobs() {
                     <SelectValue placeholder="All employers" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All employers</SelectItem>
+                    <SelectItem value="all">All employers</SelectItem>
                     {uniqueEmployers.map(employer => (
                       <SelectItem key={employer} value={employer}>{employer}</SelectItem>
                     ))}
