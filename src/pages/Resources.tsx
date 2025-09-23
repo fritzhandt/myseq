@@ -33,7 +33,7 @@ export default function Resources() {
   const [filteredResources, setFilteredResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
 
   const fetchResources = async () => {
     try {
@@ -60,10 +60,10 @@ export default function Resources() {
   const filterResources = () => {
     let filtered = resources;
 
-    // Filter by categories
-    if (selectedCategories.length > 0) {
+    // Filter by category
+    if (selectedCategory) {
       filtered = filtered.filter(resource =>
-        resource.categories.some(category => selectedCategories.includes(category))
+        resource.categories.includes(selectedCategory)
       );
     }
 
@@ -80,12 +80,8 @@ export default function Resources() {
     setFilteredResources(filtered);
   };
 
-  const handleCategoryToggle = (category: string) => {
-    setSelectedCategories(prev =>
-      prev.includes(category)
-        ? prev.filter(c => c !== category)
-        : [...prev, category]
-    );
+  const handleCategorySelect = (category: string) => {
+    setSelectedCategory(selectedCategory === category ? "" : category);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,7 +94,7 @@ export default function Resources() {
 
   useEffect(() => {
     filterResources();
-  }, [resources, searchQuery, selectedCategories]);
+  }, [resources, searchQuery, selectedCategory]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -132,18 +128,18 @@ export default function Resources() {
         {/* Category Filter Buttons */}
         <div className="flex flex-wrap justify-center gap-2 mb-6">
           <Button
-            variant={selectedCategories.length === 0 ? "default" : "outline"}
+            variant={!selectedCategory ? "default" : "outline"}
             size="sm"
-            onClick={() => setSelectedCategories([])}
+            onClick={() => setSelectedCategory("")}
           >
             All Categories
           </Button>
           {CATEGORIES.map((category) => (
             <Button
               key={category}
-              variant={selectedCategories.includes(category) ? "default" : "outline"}
+              variant={selectedCategory === category ? "default" : "outline"}
               size="sm"
-              onClick={() => handleCategoryToggle(category)}
+              onClick={() => handleCategorySelect(category)}
               className="capitalize"
             >
               {category}
@@ -172,12 +168,12 @@ export default function Resources() {
         ) : filteredResources.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground text-lg">No resources found.</p>
-            {(searchQuery || selectedCategories.length > 0) && (
+            {(searchQuery || selectedCategory) && (
               <Button
                 variant="outline"
                 onClick={() => {
                   setSearchQuery("");
-                  setSelectedCategories([]);
+                  setSelectedCategory("");
                 }}
                 className="mt-4"
               >
