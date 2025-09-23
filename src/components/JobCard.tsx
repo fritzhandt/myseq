@@ -96,9 +96,14 @@ export default function JobCard({ job }: JobCardProps) {
       <Dialog open={showExternalDialog} onOpenChange={setShowExternalDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Leaving Site</DialogTitle>
-            <DialogDescription>
-              You are about to visit an external website. This will open in a new tab.
+            <DialogTitle>Leaving This Site</DialogTitle>
+            <DialogDescription className="text-left">
+              This link is taking you to an external website:
+              <br />
+              <strong>{job.apply_info}</strong>
+              <br /><br />
+              This is a third-party website not operated by us. Your information will be 
+              handled according to their privacy policies and terms of service.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -106,7 +111,8 @@ export default function JobCard({ job }: JobCardProps) {
               Cancel
             </Button>
             <Button onClick={handleExternalConfirm}>
-              Continue
+              Continue to External Site
+              <ExternalLink className="ml-2 w-4 h-4" />
             </Button>
           </DialogFooter>
         </DialogContent>
