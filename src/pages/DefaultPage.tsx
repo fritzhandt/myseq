@@ -71,13 +71,13 @@ export default function DefaultPage() {
               </Card>
 
               {/* Resources Card */}
-              <Card className="group relative overflow-hidden border-2 hover:border-secondary/20 transition-all duration-500 hover:shadow-2xl hover:scale-105 bg-gradient-to-br from-background to-secondary/5 flex flex-col h-full">
-                <div className="absolute inset-0 bg-gradient-to-br from-secondary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <Card className="group relative overflow-hidden border-2 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:scale-105 bg-gradient-to-br from-background to-primary/5 flex flex-col h-full">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <CardHeader className="relative z-10 pb-6">
                   <div className="w-16 h-16 bg-gradient-to-br from-gray-500 to-gray-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                     <Users className="h-8 w-8 text-white" />
                   </div>
-                  <CardTitle className="text-2xl mb-2 group-hover:text-secondary transition-colors duration-300">
+                  <CardTitle className="text-2xl mb-2 group-hover:text-primary transition-colors duration-300">
                     Community Resources
                   </CardTitle>
                   <CardDescription className="text-base leading-relaxed">
@@ -86,7 +86,7 @@ export default function DefaultPage() {
                 </CardHeader>
                 <CardContent className="relative z-10 mt-auto">
                   <Button 
-                    className="w-full group-hover:bg-secondary group-hover:text-white transition-all duration-300" 
+                    className="w-full group-hover:bg-primary group-hover:text-white transition-all duration-300" 
                     variant="outline"
                     onClick={() => window.location.href = '/resources'}
                   >
