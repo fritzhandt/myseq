@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
-import { Briefcase, MapPin, DollarSign, Building } from 'lucide-react';
+import { Briefcase, MapPin, DollarSign, Building, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface Job {
   id: string;
@@ -30,6 +30,7 @@ export default function Jobs() {
   const [employerFilter, setEmployerFilter] = useState('all');
   const [minSalary, setMinSalary] = useState('');
   const [maxSalary, setMaxSalary] = useState('');
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
 
   useEffect(() => {
     fetchJobs();
@@ -127,8 +128,8 @@ export default function Jobs() {
         {/* Search and Filters */}
         <Card className="mb-8">
           <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-              {/* Job Title Search */}
+            {/* Always visible: Job Title Search */}
+            <div className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium flex items-center gap-2">
                   <Briefcase className="h-4 w-4" />
@@ -141,70 +142,91 @@ export default function Jobs() {
                 />
               </div>
 
-              {/* Location Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <MapPin className="h-4 w-4" />
-                  Location
-                </label>
-                <Select value={locationFilter} onValueChange={setLocationFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All locations" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All locations</SelectItem>
-                    {uniqueLocations.map(location => (
-                      <SelectItem key={location} value={location}>{location}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              {/* Advanced Search Toggle Button - only visible on mobile */}
+              <div className="md:hidden">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
+                  className="w-full flex items-center justify-center gap-2"
+                >
+                  Advanced Search
+                  {showAdvancedSearch ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </Button>
               </div>
 
-              {/* Employer Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <Building className="h-4 w-4" />
-                  Employer
-                </label>
-                <Select value={employerFilter} onValueChange={setEmployerFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All employers" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All employers</SelectItem>
-                    {uniqueEmployers.map(employer => (
-                      <SelectItem key={employer} value={employer}>{employer}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              {/* Advanced Filters - always visible on desktop, toggleable on mobile */}
+              <div className={`${showAdvancedSearch ? 'block' : 'hidden'} md:block`}>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Location Filter */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium flex items-center gap-2">
+                      <MapPin className="h-4 w-4" />
+                      Location
+                    </label>
+                    <Select value={locationFilter} onValueChange={setLocationFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="All locations" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All locations</SelectItem>
+                        {uniqueLocations.map(location => (
+                          <SelectItem key={location} value={location}>{location}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-              {/* Salary Range */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <DollarSign className="h-4 w-4" />
-                  Min Salary
-                </label>
-                <Input
-                  type="number"
-                  placeholder="Min $"
-                  value={minSalary}
-                  onChange={(e) => setMinSalary(e.target.value)}
-                />
-              </div>
+                  {/* Employer Filter */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium flex items-center gap-2">
+                      <Building className="h-4 w-4" />
+                      Employer
+                    </label>
+                    <Select value={employerFilter} onValueChange={setEmployerFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="All employers" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All employers</SelectItem>
+                        {uniqueEmployers.map(employer => (
+                          <SelectItem key={employer} value={employer}>{employer}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Max Salary</label>
-                <div className="flex gap-2">
-                  <Input
-                    type="number"
-                    placeholder="Max $"
-                    value={maxSalary}
-                    onChange={(e) => setMaxSalary(e.target.value)}
-                  />
-                  <Button variant="outline" onClick={clearFilters} className="shrink-0">
-                    Clear
-                  </Button>
+                  {/* Salary Range */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium flex items-center gap-2">
+                      <DollarSign className="h-4 w-4" />
+                      Min Salary
+                    </label>
+                    <Input
+                      type="number"
+                      placeholder="Min $"
+                      value={minSalary}
+                      onChange={(e) => setMinSalary(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Max Salary</label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="number"
+                        placeholder="Max $"
+                        value={maxSalary}
+                        onChange={(e) => setMaxSalary(e.target.value)}
+                      />
+                      <Button variant="outline" onClick={clearFilters} className="shrink-0">
+                        Clear
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
