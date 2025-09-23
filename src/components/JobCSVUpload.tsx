@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Upload, FileText, Trash2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import * as XLSX from 'xlsx';
 
 interface Job {
   company: string;
@@ -20,6 +21,38 @@ export default function JobCSVUpload() {
   const [previewJobs, setPreviewJobs] = useState<Job[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  const parseXLSX = (arrayBuffer: ArrayBuffer): Job[] => {
+    try {
+      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+      
+      // Convert sheet to JSON, treating first row as headers
+      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as string[][];
+      
+      if (jsonData.length < 2) return [];
+      
+      // Skip header row and parse data
+      const jobs: Job[] = [];
+      for (let i = 1; i < jsonData.length; i++) {
+        const row = jsonData[i];
+        if (row && row.length >= 5 && row[0] && row[2]) { // Ensure we have company and position at minimum
+          jobs.push({
+            company: String(row[0] || '').trim(),
+            location: String(row[1] || '').trim(),
+            position: String(row[2] || '').trim(),
+            type: String(row[3] || '').trim(),
+            applyLink: String(row[4] || '').trim()
+          });
+        }
+      }
+      return jobs;
+    } catch (error) {
+      console.error('Error parsing XLSX:', error);
+      return [];
+    }
+  };
 
   const parseCSV = (text: string): Job[] => {
     const lines = text.split('\n').filter(line => line.trim());
@@ -55,10 +88,13 @@ export default function JobCSVUpload() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (!file.name.endsWith('.csv')) {
+    const isCSV = file.name.endsWith('.csv');
+    const isXLSX = file.name.endsWith('.xlsx') || file.name.endsWith('.xls');
+
+    if (!isCSV && !isXLSX) {
       toast({
         title: "Invalid file type",
-        description: "Please upload a CSV file.",
+        description: "Please upload a CSV or XLSX file.",
         variant: "destructive",
       });
       return;
@@ -66,13 +102,20 @@ export default function JobCSVUpload() {
 
     setUploading(true);
     try {
-      const text = await file.text();
-      const parsedJobs = parseCSV(text);
+      let parsedJobs: Job[] = [];
+
+      if (isCSV) {
+        const text = await file.text();
+        parsedJobs = parseCSV(text);
+      } else if (isXLSX) {
+        const arrayBuffer = await file.arrayBuffer();
+        parsedJobs = parseXLSX(arrayBuffer);
+      }
       
       if (parsedJobs.length === 0) {
         toast({
           title: "No valid jobs found",
-          description: "Please check your CSV format and try again.",
+          description: "Please check your file format and try again.",
           variant: "destructive",
         });
         return;
@@ -80,13 +123,14 @@ export default function JobCSVUpload() {
 
       setPreviewJobs(parsedJobs);
       toast({
-        title: "CSV loaded successfully",
+        title: "File loaded successfully",
         description: `Found ${parsedJobs.length} jobs. Review and import.`,
       });
     } catch (error) {
+      console.error('File parsing error:', error);
       toast({
         title: "Error reading file",
-        description: "Please check your CSV format and try again.",
+        description: "Please check your file format and try again.",
         variant: "destructive",
       });
     } finally {
@@ -149,10 +193,10 @@ export default function JobCSVUpload() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5" />
-            Import Jobs from CSV
+            Import Jobs from CSV/XLSX
           </CardTitle>
           <CardDescription>
-            Upload a CSV file with job listings. The format should include: Company/Organization, Location, Position, Type, Link to Apply
+            Upload a CSV or Excel file with job listings. The format should include: Company/Organization, Location, Position, Type, Link to Apply
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -160,7 +204,7 @@ export default function JobCSVUpload() {
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                <strong>CSV Format:</strong> Column A: Company/Organization, Column B: Location, Column C: Position, Column D: Type, Column E: Link to Apply.
+                <strong>File Format:</strong> CSV or Excel (.xlsx) files are supported. Column A: Company/Organization, Column B: Location, Column C: Position, Column D: Type, Column E: Link to Apply.
                 The Link to Apply can be a URL (will show "Apply Now" button) or application instructions.
               </AlertDescription>
             </Alert>
@@ -169,7 +213,7 @@ export default function JobCSVUpload() {
               <Input
                 ref={fileInputRef}
                 type="file"
-                accept=".csv"
+                accept=".csv,.xlsx,.xls"
                 onChange={handleFileUpload}
                 disabled={uploading}
                 className="flex-1"
