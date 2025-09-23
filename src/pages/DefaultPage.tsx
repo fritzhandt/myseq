@@ -155,30 +155,6 @@ export default function DefaultPage() {
           </div>
         </section>
 
-        {/* Community Stats Section */}
-        <section className="py-16 px-4 bg-gradient-to-r from-primary/10 via-background to-secondary/10">
-          <div className="container mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              <div className="space-y-2">
-                <div className="text-3xl md:text-4xl font-bold text-primary font-oswald">50+</div>
-                <div className="text-sm md:text-base text-muted-foreground">Community Events</div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-3xl md:text-4xl font-bold text-secondary font-oswald">100+</div>
-                <div className="text-sm md:text-base text-muted-foreground">Local Resources</div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-3xl md:text-4xl font-bold text-accent font-oswald">25+</div>
-                <div className="text-sm md:text-base text-muted-foreground">Job Opportunities</div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-3xl md:text-4xl font-bold text-primary font-oswald">1000+</div>
-                <div className="text-sm md:text-base text-muted-foreground">Community Members</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* Call to Action */}
         <section className="py-20 px-4 text-center">
           <div className="container mx-auto max-w-4xl">
