@@ -94,17 +94,6 @@ const Navbar = () => {
                       </Link>
                   
                       <Link 
-                        to="/elected-officials" 
-                        className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
-                        onClick={closeMenu}
-                      >
-                        <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
-                          <Users className="w-4 h-4" />
-                        </div>
-                        <span>Elected Officials</span>
-                      </Link>
-                      
-                      <Link 
                         to="/contact-elected" 
                         className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
                         onClick={closeMenu}

@@ -47,6 +47,63 @@ export type Database = {
         }
         Relationships: []
       }
+      elected_officials: {
+        Row: {
+          bio: string | null
+          category: string
+          created_at: string
+          district: string | null
+          email: string | null
+          id: string
+          level: string
+          name: string
+          office: string
+          office_address: string | null
+          party: string | null
+          phone: string | null
+          photo_url: string | null
+          title: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          bio?: string | null
+          category: string
+          created_at?: string
+          district?: string | null
+          email?: string | null
+          id?: string
+          level: string
+          name: string
+          office: string
+          office_address?: string | null
+          party?: string | null
+          phone?: string | null
+          photo_url?: string | null
+          title: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          bio?: string | null
+          category?: string
+          created_at?: string
+          district?: string | null
+          email?: string | null
+          id?: string
+          level?: string
+          name?: string
+          office?: string
+          office_address?: string | null
+          party?: string | null
+          phone?: string | null
+          photo_url?: string | null
+          title?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           additional_images: string[] | null
