@@ -3,6 +3,7 @@ import Navbar from '@/components/Navbar';
 import CommunityAlertBanner from '@/components/CommunityAlertBanner';
 import JobList from '@/components/JobList';
 import UserPagination from '@/components/UserPagination';
+import SearchableEmployerDropdown from '@/components/SearchableEmployerDropdown';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -207,17 +208,12 @@ export default function Jobs() {
                       <Building className="h-4 w-4" />
                       Employer
                     </label>
-                    <Select value={employerFilter} onValueChange={setEmployerFilter}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="All employers" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All employers</SelectItem>
-                        {uniqueEmployers.map(employer => (
-                          <SelectItem key={employer} value={employer}>{employer}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <SearchableEmployerDropdown
+                      employers={uniqueEmployers}
+                      value={employerFilter}
+                      onChange={setEmployerFilter}
+                      placeholder="All employers"
+                    />
                   </div>
 
                   {/* Salary Range */}
