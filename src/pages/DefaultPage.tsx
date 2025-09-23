@@ -75,7 +75,7 @@ export default function DefaultPage() {
 
             <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
               {/* Events Card */}
-              <Card className="group relative overflow-hidden border-2 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:scale-105 bg-gradient-to-br from-background to-primary/5">
+              <Card className="group relative overflow-hidden border-2 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:scale-105 bg-gradient-to-br from-background to-primary/5 flex flex-col h-full">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <CardHeader className="relative z-10 pb-6">
                   <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/70 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
@@ -88,7 +88,7 @@ export default function DefaultPage() {
                     Stay connected with local happenings, town halls, festivals, and community gatherings that bring Southeast Queens together
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="relative z-10">
+                <CardContent className="relative z-10 mt-auto">
                   <Button 
                     className="w-full group-hover:bg-primary group-hover:text-white transition-all duration-300" 
                     variant="outline"
@@ -101,7 +101,7 @@ export default function DefaultPage() {
               </Card>
 
               {/* Resources Card */}
-              <Card className="group relative overflow-hidden border-2 hover:border-secondary/20 transition-all duration-500 hover:shadow-2xl hover:scale-105 bg-gradient-to-br from-background to-secondary/5">
+              <Card className="group relative overflow-hidden border-2 hover:border-secondary/20 transition-all duration-500 hover:shadow-2xl hover:scale-105 bg-gradient-to-br from-background to-secondary/5 flex flex-col h-full">
                 <div className="absolute inset-0 bg-gradient-to-br from-secondary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <CardHeader className="relative z-10 pb-6">
                   <div className="w-16 h-16 bg-gradient-to-br from-secondary to-secondary/70 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
@@ -114,7 +114,7 @@ export default function DefaultPage() {
                     Access vital community services, local organizations, support networks, and resources that make a difference in our neighborhoods
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="relative z-10">
+                <CardContent className="relative z-10 mt-auto">
                   <Button 
                     className="w-full group-hover:bg-secondary group-hover:text-white transition-all duration-300" 
                     variant="outline"
@@ -127,7 +127,7 @@ export default function DefaultPage() {
               </Card>
 
               {/* Jobs Card */}
-              <Card className="group relative overflow-hidden border-2 hover:border-accent/20 transition-all duration-500 hover:shadow-2xl hover:scale-105 bg-gradient-to-br from-background to-accent/5">
+              <Card className="group relative overflow-hidden border-2 hover:border-accent/20 transition-all duration-500 hover:shadow-2xl hover:scale-105 bg-gradient-to-br from-background to-accent/5 flex flex-col h-full">
                 <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <CardHeader className="relative z-10 pb-6">
                   <div className="w-16 h-16 bg-gradient-to-br from-accent to-accent/70 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
@@ -140,7 +140,7 @@ export default function DefaultPage() {
                     Find meaningful employment opportunities, local business openings, and career development resources within our community
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="relative z-10">
+                <CardContent className="relative z-10 mt-auto">
                   <Button 
                     className="w-full group-hover:bg-accent group-hover:text-white transition-all duration-300" 
                     variant="outline"
