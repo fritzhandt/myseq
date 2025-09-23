@@ -17,6 +17,7 @@ interface Resource {
   address?: string;
   website?: string;
   logo_url?: string;
+  cover_photo_url?: string;
   categories: string[];
 }
 

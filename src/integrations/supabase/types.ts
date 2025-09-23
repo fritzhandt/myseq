@@ -213,6 +213,7 @@ export type Database = {
         Row: {
           address: string | null
           categories: string[]
+          cover_photo_url: string | null
           created_at: string
           description: string
           email: string | null
@@ -226,6 +227,7 @@ export type Database = {
         Insert: {
           address?: string | null
           categories?: string[]
+          cover_photo_url?: string | null
           created_at?: string
           description: string
           email?: string | null
@@ -239,6 +241,7 @@ export type Database = {
         Update: {
           address?: string | null
           categories?: string[]
+          cover_photo_url?: string | null
           created_at?: string
           description?: string
           email?: string | null
