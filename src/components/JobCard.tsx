@@ -2,7 +2,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Building, MapPin, DollarSign, ExternalLink, Info } from 'lucide-react';
+import JobReportModal from '@/components/JobReportModal';
+import { Building, MapPin, DollarSign, ExternalLink, Info, Flag } from 'lucide-react';
 import { useState } from 'react';
 
 interface Job {
@@ -23,6 +24,7 @@ interface JobCardProps {
 
 export default function JobCard({ job }: JobCardProps) {
   const [showExternalDialog, setShowExternalDialog] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
 
   const formatSalary = (salary: string) => {
     return salary.replace(/(\d+)/g, '$$$1');
@@ -62,19 +64,30 @@ export default function JobCard({ job }: JobCardProps) {
               <DollarSign className="h-3 w-3 mr-1" />
               {formatSalary(job.salary)}
             </Badge>
-            <Button onClick={handleApplyClick} size="sm" className="text-xs">
-              {job.is_apply_link ? (
-                <>
-                  <ExternalLink className="h-3 w-3 mr-1" />
-                  Apply
-                </>
-              ) : (
-                <>
-                  <Info className="h-3 w-3 mr-1" />
-                  Info
-                </>
-              )}
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setShowReportModal(true)}
+                className="text-xs"
+              >
+                <Flag className="h-3 w-3 mr-1" />
+                Report
+              </Button>
+              <Button onClick={handleApplyClick} size="sm" className="text-xs">
+                {job.is_apply_link ? (
+                  <>
+                    <ExternalLink className="h-3 w-3 mr-1" />
+                    Apply
+                  </>
+                ) : (
+                  <>
+                    <Info className="h-3 w-3 mr-1" />
+                    Info
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       </Card>
@@ -97,6 +110,13 @@ export default function JobCard({ job }: JobCardProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <JobReportModal
+        jobId={job.id}
+        jobTitle={job.title}
+        isOpen={showReportModal}
+        onClose={() => setShowReportModal(false)}
+      />
     </>
   );
 }

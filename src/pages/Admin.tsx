@@ -11,6 +11,7 @@ import CommunityAlertsList from '@/components/CommunityAlertsList';
 import ResourceForm from '@/components/ResourceForm';
 import ResourcesList from '@/components/ResourcesList';
 import JobCSVUpload from '@/components/JobCSVUpload';
+import JobReportsList from '@/components/JobReportsList';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Calendar, LogOut, Star, AlertTriangle, Users, MapPin } from 'lucide-react';
@@ -276,6 +277,7 @@ const Admin = () => {
                 <h2 className="text-3xl font-bold">Manage Jobs</h2>
               </div>
               <JobCSVUpload />
+              <JobReportsList />
             </div>
           </TabsContent>
         </Tabs>
