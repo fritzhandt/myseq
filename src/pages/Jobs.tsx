@@ -132,18 +132,22 @@ export default function Jobs() {
       <Navbar />
       <CommunityAlertBanner />
       
-      <main className="container mx-auto px-4 py-8">
-        {/* Back to Main Menu */}
-        <div className="mb-8">
+      {/* Back to Main Menu */}
+      <div className="bg-muted/50 border-b">
+        <div className="container mx-auto px-4 py-3">
           <Button
-            variant="outline"
+            variant="ghost"
+            size="sm"
             onClick={() => window.location.href = '/'}
-            className="flex items-center gap-2 hover:bg-primary hover:text-white transition-all duration-300"
+            className="flex items-center text-muted-foreground hover:text-foreground"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Main Menu
           </Button>
         </div>
+      </div>
+      
+      <main className="container mx-auto px-4 py-8">
 
         {/* Header */}
         <div className="text-center mb-12">
