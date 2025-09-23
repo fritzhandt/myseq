@@ -33,7 +33,7 @@ export default function DefaultPage() {
                 <span className="text-primary">Starts Here</span>
               </h1>
               
-              <p className="text-xl md:text-2xl text-muted-foreground mb-2 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-xl md:text-2xl text-muted-foreground mb-0 max-w-2xl mx-auto leading-relaxed">
                 Discover events, connect with neighbors, find opportunities, and build stronger communities in Southeast Queens
               </p>
             </div>
@@ -41,7 +41,7 @@ export default function DefaultPage() {
         </section>
 
         {/* Features Section */}
-        <section className="pb-20 px-4">
+        <section className="pt-8 pb-20 px-4">
           <div className="container mx-auto">
             <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
               {/* Events Card */}
@@ -55,7 +55,7 @@ export default function DefaultPage() {
                     Community Events
                   </CardTitle>
                   <CardDescription className="text-base leading-relaxed">
-                    Stay connected with local happenings, town halls, festivals, and community gatherings that bring Southeast Queens together
+                    Local happenings, town halls, and community gatherings in Southeast Queens
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="relative z-10 mt-auto">
@@ -81,7 +81,7 @@ export default function DefaultPage() {
                     Community Resources
                   </CardTitle>
                   <CardDescription className="text-base leading-relaxed">
-                    Access vital community services, local organizations, support networks, and resources that make a difference in our neighborhoods
+                    Local organizations, services, and support networks for our community
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="relative z-10 mt-auto">
@@ -107,7 +107,7 @@ export default function DefaultPage() {
                     Career Opportunities
                   </CardTitle>
                   <CardDescription className="text-base leading-relaxed">
-                    Find meaningful employment opportunities, local business openings, and career development resources within our community
+                    Employment opportunities and career development resources locally
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="relative z-10 mt-auto">
