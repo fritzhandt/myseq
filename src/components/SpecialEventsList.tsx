@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Pencil, Trash2, Calendar, Eye, EyeOff } from 'lucide-react';
 import { format } from 'date-fns';
+import AdminPagination from './AdminPagination';
 
 interface SpecialEvent {
   id: string;
@@ -25,6 +26,8 @@ interface SpecialEventsListProps {
 const SpecialEventsList = ({ onEditSpecialEvent }: SpecialEventsListProps) => {
   const [specialEvents, setSpecialEvents] = useState<SpecialEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const { toast } = useToast();
 
   useEffect(() => {
@@ -54,6 +57,11 @@ const SpecialEventsList = ({ onEditSpecialEvent }: SpecialEventsListProps) => {
       setLoading(false);
     }
   };
+
+  // Paginate special events
+  const totalPages = Math.ceil(specialEvents.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedSpecialEvents = specialEvents.slice(startIndex, startIndex + itemsPerPage);
 
   const handleToggleActive = async (specialEvent: SpecialEvent) => {
     try {
@@ -130,63 +138,74 @@ const SpecialEventsList = ({ onEditSpecialEvent }: SpecialEventsListProps) => {
           </CardContent>
         </Card>
       ) : (
-        specialEvents.map((specialEvent) => (
-          <Card key={specialEvent.id} className={specialEvent.is_active ? 'ring-2 ring-primary' : ''}>
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <CardTitle>{specialEvent.title}</CardTitle>
-                    {specialEvent.is_active && (
-                      <Badge variant="default">Active</Badge>
+        <>
+          {paginatedSpecialEvents.map((specialEvent) => (
+            <Card key={specialEvent.id} className={specialEvent.is_active ? 'ring-2 ring-primary' : ''}>
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <CardTitle>{specialEvent.title}</CardTitle>
+                      {specialEvent.is_active && (
+                        <Badge variant="default">Active</Badge>
+                      )}
+                      <Badge variant="outline">
+                        {specialEvent.type === 'single_day' ? 'Single Day' : 'Multi Day'}
+                      </Badge>
+                    </div>
+                    {specialEvent.description && (
+                      <p className="text-muted-foreground">{specialEvent.description}</p>
                     )}
-                    <Badge variant="outline">
-                      {specialEvent.type === 'single_day' ? 'Single Day' : 'Multi Day'}
-                    </Badge>
+                    <div className="text-sm text-muted-foreground">
+                      {specialEvent.type === 'single_day' 
+                        ? format(new Date(specialEvent.start_date), 'MMMM d, yyyy')
+                        : `${format(new Date(specialEvent.start_date), 'MMM d')} - ${format(new Date(specialEvent.end_date!), 'MMM d, yyyy')}`
+                      }
+                    </div>
                   </div>
-                  {specialEvent.description && (
-                    <p className="text-muted-foreground">{specialEvent.description}</p>
-                  )}
-                  <div className="text-sm text-muted-foreground">
-                    {specialEvent.type === 'single_day' 
-                      ? format(new Date(specialEvent.start_date), 'MMMM d, yyyy')
-                      : `${format(new Date(specialEvent.start_date), 'MMM d')} - ${format(new Date(specialEvent.end_date!), 'MMM d, yyyy')}`
-                    }
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => handleToggleActive(specialEvent)}
+                      variant="outline"
+                      size="sm"
+                      title={specialEvent.is_active ? 'Deactivate' : 'Activate'}
+                    >
+                      {specialEvent.is_active ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                    <Button
+                      onClick={() => onEditSpecialEvent(specialEvent)}
+                      variant="outline"
+                      size="sm"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      onClick={() => handleDelete(specialEvent)}
+                      variant="outline"
+                      size="sm"
+                      disabled={specialEvent.is_active}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() => handleToggleActive(specialEvent)}
-                    variant="outline"
-                    size="sm"
-                    title={specialEvent.is_active ? 'Deactivate' : 'Activate'}
-                  >
-                    {specialEvent.is_active ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                  <Button
-                    onClick={() => onEditSpecialEvent(specialEvent)}
-                    variant="outline"
-                    size="sm"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    onClick={() => handleDelete(specialEvent)}
-                    variant="outline"
-                    size="sm"
-                    disabled={specialEvent.is_active}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-          </Card>
-        ))
+              </CardHeader>
+            </Card>
+          ))}
+          
+          {/* Pagination */}
+          <AdminPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={specialEvents.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+          />
+        </>
       )}
     </div>
   );

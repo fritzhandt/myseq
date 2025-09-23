@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Edit, Trash2, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import AdminPagination from './AdminPagination';
 
 interface CommunityAlert {
   id: string;
@@ -24,6 +25,8 @@ interface CommunityAlertsListProps {
 const CommunityAlertsList = ({ onEditAlert }: CommunityAlertsListProps) => {
   const [alerts, setAlerts] = useState<CommunityAlert[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const { toast } = useToast();
 
   const fetchAlerts = async () => {
@@ -43,6 +46,11 @@ const CommunityAlertsList = ({ onEditAlert }: CommunityAlertsListProps) => {
     }
     setLoading(false);
   };
+
+  // Paginate alerts
+  const totalPages = Math.ceil(alerts.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedAlerts = alerts.slice(startIndex, startIndex + itemsPerPage);
 
   useEffect(() => {
     fetchAlerts();
@@ -127,7 +135,7 @@ const CommunityAlertsList = ({ onEditAlert }: CommunityAlertsListProps) => {
 
   return (
     <div className="space-y-4">
-      {alerts.map((alert) => (
+      {paginatedAlerts.map((alert) => (
         <Card key={alert.id}>
           <CardHeader>
             <div className="flex items-start justify-between">
@@ -210,6 +218,17 @@ const CommunityAlertsList = ({ onEditAlert }: CommunityAlertsListProps) => {
           </CardContent>
         </Card>
       ))}
+      
+      {/* Pagination */}
+      {alerts.length > 0 && (
+        <AdminPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={alerts.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+        />
+      )}
     </div>
   );
 };

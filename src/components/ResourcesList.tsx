@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2, ExternalLink, Phone, Mail } from "lucide-react";
+import { Edit, Trash2, ExternalLink, Phone, Mail, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import AdminPagination from "./AdminPagination";
 
 interface Resource {
   id: string;
@@ -26,7 +28,11 @@ interface ResourcesListProps {
 export default function ResourcesList({ onEdit }: ResourcesListProps) {
   const { toast } = useToast();
   const [resources, setResources] = useState<Resource[]>([]);
+  const [filteredResources, setFilteredResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const fetchResources = async () => {
     try {
@@ -37,6 +43,7 @@ export default function ResourcesList({ onEdit }: ResourcesListProps) {
 
       if (error) throw error;
       setResources(data || []);
+      setFilteredResources(data || []);
     } catch (error) {
       console.error("Error fetching resources:", error);
       toast({
@@ -48,6 +55,26 @@ export default function ResourcesList({ onEdit }: ResourcesListProps) {
       setLoading(false);
     }
   };
+
+  // Filter resources based on search term
+  useEffect(() => {
+    const filtered = resources.filter((resource) =>
+      resource.organization_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      resource.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      resource.categories.some(category => 
+        category.toLowerCase().includes(searchTerm.toLowerCase())
+      ) ||
+      (resource.email && resource.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (resource.phone && resource.phone.includes(searchTerm))
+    );
+    setFilteredResources(filtered);
+    setCurrentPage(1); // Reset to first page when searching
+  }, [searchTerm, resources]);
+
+  // Paginate filtered resources
+  const totalPages = Math.ceil(filteredResources.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedResources = filteredResources.slice(startIndex, startIndex + itemsPerPage);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this resource?")) return;
@@ -90,12 +117,38 @@ export default function ResourcesList({ onEdit }: ResourcesListProps) {
 
   return (
     <div className="space-y-4">
-      {resources.length === 0 ? (
+      {/* Search Bar */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+        <Input
+          placeholder="Search resources by name, description, category, email, or phone..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-10"
+        />
+      </div>
+
+      {/* Results Summary */}
+      {searchTerm && (
+        <div className="text-sm text-muted-foreground">
+          {filteredResources.length === 0 
+            ? `No resources found for "${searchTerm}"`
+            : `Found ${filteredResources.length} resource${filteredResources.length === 1 ? '' : 's'} for "${searchTerm}"`
+          }
+        </div>
+      )}
+      
+      {filteredResources.length === 0 && !searchTerm ? (
         <div className="text-center py-8 text-muted-foreground">
           No resources found. Create your first resource to get started.
         </div>
+      ) : filteredResources.length === 0 && searchTerm ? (
+        <div className="text-center py-8 text-muted-foreground">
+          No resources match your search criteria.
+        </div>
       ) : (
-        resources.map((resource) => (
+        <>
+          {paginatedResources.map((resource) => (
           <Card key={resource.id}>
             <CardHeader className="flex flex-row items-start justify-between space-y-0">
               <div className="flex-1">
@@ -187,7 +240,18 @@ export default function ResourcesList({ onEdit }: ResourcesListProps) {
               </div>
             </CardContent>
           </Card>
-        ))
+          ))
+        }
+        
+        {/* Pagination */}
+        <AdminPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={filteredResources.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+        />
+      </>
       )}
     </div>
   );

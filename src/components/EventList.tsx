@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Calendar, MapPin, Clock, Edit, Trash2, Users } from 'lucide-react';
+import AdminPagination from './AdminPagination';
 
 interface Event {
   id: string;
@@ -25,6 +26,8 @@ interface EventListProps {
 export const EventList = ({ onEditEvent }: EventListProps) => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
   const { toast } = useToast();
 
   useEffect(() => {
@@ -51,6 +54,11 @@ export const EventList = ({ onEditEvent }: EventListProps) => {
       setLoading(false);
     }
   };
+
+  // Paginate events
+  const totalPages = Math.ceil(events.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedEvents = events.slice(startIndex, startIndex + itemsPerPage);
 
   const handleDelete = async (eventId: string) => {
     if (!confirm('Are you sure you want to delete this event?')) return;
@@ -119,7 +127,7 @@ export const EventList = ({ onEditEvent }: EventListProps) => {
 
   return (
     <div className="space-y-4">
-      {events.map((event) => (
+      {paginatedEvents.map((event) => (
         <Card key={event.id} className="shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="pb-4">
             <div className="flex justify-between items-start">
@@ -199,6 +207,15 @@ export const EventList = ({ onEditEvent }: EventListProps) => {
           </CardContent>
         </Card>
       ))}
+      
+      {/* Pagination */}
+      <AdminPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={events.length}
+        itemsPerPage={itemsPerPage}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 };
