@@ -36,25 +36,6 @@ export default function DefaultPage() {
               <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
                 Discover events, connect with neighbors, find opportunities, and build stronger communities in Southeast Queens
               </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <Button 
-                  size="lg" 
-                  className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-                  onClick={() => window.location.href = '/home'}
-                >
-                  Explore Events
-                </Button>
-                
-                <Button 
-                  variant="outline" 
-                  size="lg"
-                  className="border-2 border-primary/20 hover:border-primary/40 hover:bg-primary/5 px-8 py-6 text-lg font-semibold transition-all duration-300"
-                  onClick={() => window.location.href = '/resources'}
-                >
-                  Find Resources
-                </Button>
-              </div>
             </div>
           </div>
         </section>
@@ -62,15 +43,6 @@ export default function DefaultPage() {
         {/* Features Section */}
         <section className="py-20 px-4">
           <div className="container mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4 font-oswald uppercase tracking-wide">
-                Everything Your Community Needs
-              </h2>
-              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                From local events to job opportunities, we're here to keep Southeast Queens connected and thriving
-              </p>
-            </div>
-
             <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
               {/* Events Card */}
               <Card className="group relative overflow-hidden border-2 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:scale-105 bg-gradient-to-br from-background to-primary/5 flex flex-col h-full">
