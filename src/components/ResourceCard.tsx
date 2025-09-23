@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Phone } from "lucide-react";
+import { ExternalLink, Phone, Mail, MapPin } from "lucide-react";
 
 interface Resource {
   id: string;
@@ -21,28 +21,36 @@ interface ResourceCardProps {
 
 export default function ResourceCard({ resource }: ResourceCardProps) {
   return (
-    <Card className="h-full hover:shadow-lg transition-shadow">
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <CardTitle className="text-lg mb-2">{resource.organization_name}</CardTitle>
-            <div className="flex flex-wrap gap-2">
-              {resource.categories.map((category) => (
-                <Badge key={category} variant="secondary" className="capitalize text-xs">
-                  {category}
-                </Badge>
-              ))}
-            </div>
+    <Card className="h-full hover:shadow-lg transition-shadow overflow-hidden">
+      {/* Featured Image/Logo Section */}
+      {resource.logo_url ? (
+        <div className="relative h-32 w-full bg-gradient-to-br from-primary/5 to-primary/10">
+          <img
+            src={resource.logo_url}
+            alt={`${resource.organization_name} logo`}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/10"></div>
+        </div>
+      ) : (
+        <div className="h-32 w-full bg-gradient-to-br from-primary/10 to-primary/20 flex items-center justify-center">
+          <div className="text-primary/60 text-4xl font-bold">
+            {resource.organization_name.charAt(0)}
           </div>
-          {resource.logo_url && (
-            <img
-              src={resource.logo_url}
-              alt={`${resource.organization_name} logo`}
-              className="w-16 h-16 object-cover rounded-md ml-4"
-            />
-          )}
+        </div>
+      )}
+
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg mb-2">{resource.organization_name}</CardTitle>
+        <div className="flex flex-wrap gap-2">
+          {resource.categories.map((category) => (
+            <Badge key={category} variant="secondary" className="capitalize text-xs">
+              {category}
+            </Badge>
+          ))}
         </div>
       </CardHeader>
+
       <CardContent>
         <p className="text-muted-foreground mb-4 line-clamp-3">
           {resource.description}
@@ -50,10 +58,10 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
         
         {/* Contact Information */}
         {(resource.phone || resource.email || resource.address) && (
-          <div className="mb-4 space-y-1">
+          <div className="mb-4 space-y-2">
             {resource.phone && (
               <div className="flex items-center text-sm text-muted-foreground">
-                <Phone className="h-3 w-3 mr-2" />
+                <Phone className="h-4 w-4 mr-3 text-primary flex-shrink-0" />
                 <a href={`tel:${resource.phone}`} className="hover:text-primary truncate">
                   {resource.phone}
                 </a>
@@ -61,7 +69,7 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
             )}
             {resource.email && (
               <div className="flex items-center text-sm text-muted-foreground">
-                <span className="h-3 w-3 mr-2">✉️</span>
+                <Mail className="h-4 w-4 mr-3 text-primary flex-shrink-0" />
                 <a href={`mailto:${resource.email}`} className="hover:text-primary truncate">
                   {resource.email}
                 </a>
@@ -69,7 +77,7 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
             )}
             {resource.address && (
               <div className="flex items-start text-sm text-muted-foreground">
-                <span className="h-3 w-3 mr-2 mt-0.5">📍</span>
+                <MapPin className="h-4 w-4 mr-3 mt-0.5 text-primary flex-shrink-0" />
                 <span className="line-clamp-2">{resource.address}</span>
               </div>
             )}
