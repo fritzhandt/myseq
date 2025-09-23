@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
-import { Briefcase, MapPin, DollarSign, Building, ChevronDown, ChevronUp } from 'lucide-react';
+import { Briefcase, MapPin, DollarSign, Building, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
 
 interface Job {
   id: string;
@@ -115,6 +115,18 @@ export default function Jobs() {
       <CommunityAlertBanner />
       
       <main className="container mx-auto px-4 py-8">
+        {/* Back to Main Menu */}
+        <div className="mb-8">
+          <Button
+            variant="outline"
+            onClick={() => window.location.href = '/'}
+            className="flex items-center gap-2 hover:bg-primary hover:text-white transition-all duration-300"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Main Menu
+          </Button>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">

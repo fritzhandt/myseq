@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Info, Users, Mail, Search, Vote, Shield } from 'lucide-react';
+import { Menu, Info, Users, Mail, Search, Vote, Shield, Calendar, Briefcase, Home } from 'lucide-react';
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const closeMenu = () => setIsOpen(false);
@@ -35,71 +35,120 @@ const Navbar = () => {
               {/* Menu Items */}
               <div className="px-6 py-6">
                 <nav className="space-y-2">
-                  <Link 
-                    to="/about" 
-                    className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
-                    onClick={closeMenu}
-                  >
-                    <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
-                      <Info className="w-4 h-4" />
+                  {/* Main Sections */}
+                  <div className="mb-6">
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3 px-4">
+                      Main Sections
+                    </h3>
+                    <div className="space-y-1">
+                      <Link 
+                        to="/home" 
+                        className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
+                        onClick={closeMenu}
+                      >
+                        <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
+                          <Calendar className="w-4 h-4" />
+                        </div>
+                        <span>Community Events</span>
+                      </Link>
+                      
+                      <Link 
+                        to="/resources" 
+                        className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
+                        onClick={closeMenu}
+                      >
+                        <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
+                          <Users className="w-4 h-4" />
+                        </div>
+                        <span>Community Resources</span>
+                      </Link>
+                      
+                      <Link 
+                        to="/jobs" 
+                        className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
+                        onClick={closeMenu}
+                      >
+                        <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
+                          <Briefcase className="w-4 h-4" />
+                        </div>
+                        <span>Career Opportunities</span>
+                      </Link>
                     </div>
-                    <span>About</span>
-                  </Link>
+                  </div>
+
+                  {/* Other Pages */}
+                  <div>
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3 px-4">
+                      More Pages
+                    </h3>
+                    <div className="space-y-1">
+                      <Link 
+                        to="/about" 
+                        className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
+                        onClick={closeMenu}
+                      >
+                        <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
+                          <Info className="w-4 h-4" />
+                        </div>
+                        <span>About</span>
+                      </Link>
                   
-                  <Link 
-                    to="/elected-officials" 
-                    className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
-                    onClick={closeMenu}
-                  >
-                    <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
-                      <Users className="w-4 h-4" />
-                    </div>
-                    <span>Elected Officials</span>
-                  </Link>
+                      <Link 
+                        to="/elected-officials" 
+                        className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
+                        onClick={closeMenu}
+                      >
+                        <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
+                          <Users className="w-4 h-4" />
+                        </div>
+                        <span>Elected Officials</span>
+                      </Link>
+                      
+                      <Link 
+                        to="/contact-elected" 
+                        className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
+                        onClick={closeMenu}
+                      >
+                        <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
+                          <Mail className="w-4 h-4" />
+                        </div>
+                        <span>Contact Your Elected</span>
+                      </Link>
+                      
+                      <Link 
+                        to="/my-elected-lookup" 
+                        className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
+                        onClick={closeMenu}
+                      >
+                        <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
+                          <Search className="w-4 h-4" />
+                        </div>
+                        <span>My Elected Lookup</span>
+                      </Link>
+                      
+                      <Link 
+                        to="/register-to-vote" 
+                        className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
+                        onClick={closeMenu}
+                      >
+                        <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
+                          <Vote className="w-4 h-4" />
+                        </div>
+                        <span>Register to Vote</span>
+                      </Link>
                   
-                  <Link 
-                    to="/contact-elected" 
-                    className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
-                    onClick={closeMenu}
-                  >
-                    <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
-                      <Mail className="w-4 h-4" />
+                      <Link 
+                        to="/police-precincts" 
+                        className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
+                        onClick={closeMenu}
+                      >
+                        <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
+                          <Shield className="w-4 h-4" />
+                        </div>
+                        <span>Police Precincts</span>
+                      </Link>
                     </div>
-                    <span>Contact Your Elected</span>
-                  </Link>
-                  
-                  <Link 
-                    to="/my-elected-lookup" 
-                    className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
-                    onClick={closeMenu}
-                  >
-                    <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
-                      <Search className="w-4 h-4" />
-                    </div>
-                    <span>My Elected Lookup</span>
-                  </Link>
-                  
-                  <Link 
-                    to="/register-to-vote" 
-                    className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
-                    onClick={closeMenu}
-                  >
-                    <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
-                      <Vote className="w-4 h-4" />
-                    </div>
-                    <span>Register to Vote</span>
-                  </Link>
-                  
-                  <Link 
-                    to="/police-precincts" 
-                    className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
-                    onClick={closeMenu}
-                  >
-                    <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
-                      <Shield className="w-4 h-4" />
-                    </div>
-                    <span>Police Precincts</span>
-                  </Link>
+                  </div>
                 </nav>
               </div>
             </SheetContent>
