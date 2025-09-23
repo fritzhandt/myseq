@@ -12,7 +12,7 @@ export default function DefaultPage() {
       
       <main className="relative">
         {/* Hero Section */}
-        <section className="relative py-20 px-4 text-center overflow-hidden">
+        <section className="relative py-16 px-4 text-center overflow-hidden">
           {/* Background Pattern */}
           <div className="absolute inset-0 opacity-5">
             <div className="absolute top-20 left-10 w-32 h-32 bg-primary rounded-full blur-3xl"></div>
@@ -41,7 +41,7 @@ export default function DefaultPage() {
         </section>
 
         {/* Features Section */}
-        <section className="pt-8 pb-20 px-4">
+        <section className="pt-4 pb-20 px-4">
           <div className="container mx-auto">
             <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
               {/* Events Card */}
