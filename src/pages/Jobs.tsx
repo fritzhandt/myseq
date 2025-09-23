@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import CommunityAlertBanner from '@/components/CommunityAlertBanner';
 import JobList from '@/components/JobList';
+import UserPagination from '@/components/UserPagination';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -31,6 +32,8 @@ export default function Jobs() {
   const [minSalary, setMinSalary] = useState('');
   const [maxSalary, setMaxSalary] = useState('');
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     fetchJobs();
@@ -96,6 +99,7 @@ export default function Jobs() {
     }
 
     setFilteredJobs(filtered);
+    setCurrentPage(1); // Reset to first page when filters change
   };
 
   const clearFilters = () => {
@@ -108,6 +112,11 @@ export default function Jobs() {
 
   const uniqueLocations = [...new Set(jobs.map(job => job.location))];
   const uniqueEmployers = [...new Set(jobs.map(job => job.employer))];
+
+  // Paginate filtered jobs
+  const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedJobs = filteredJobs.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div className="min-h-screen bg-background">
@@ -253,7 +262,18 @@ export default function Jobs() {
         </div>
 
         {/* Job List */}
-        <JobList jobs={filteredJobs} loading={loading} />
+        <JobList jobs={paginatedJobs} loading={loading} />
+        
+        {/* Pagination */}
+        {filteredJobs.length > 0 && (
+          <UserPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={filteredJobs.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+          />
+        )}
       </main>
     </div>
   );

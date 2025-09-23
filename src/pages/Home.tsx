@@ -6,6 +6,7 @@ import { EventCalendar } from '@/components/EventCalendar';
 import SearchBar from '@/components/SearchBar';
 import Navbar from '@/components/Navbar';
 import CommunityAlertBanner from '@/components/CommunityAlertBanner';
+import UserPagination from '@/components/UserPagination';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -57,6 +58,8 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
   });
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -143,11 +146,17 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
     });
 
     setFilteredEvents(filtered);
+    setCurrentPage(1); // Reset to first page when filters change
   }, [events, selectedFilter, searchQuery, searchTags, searchFilters]);
 
   useEffect(() => {
     filterEvents();
   }, [filterEvents]);
+
+  // Paginate filtered events
+  const totalPages = Math.ceil(filteredEvents.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedEvents = filteredEvents.slice(startIndex, startIndex + itemsPerPage);
 
   const handleFilterChange = (ageGroup: string | null) => {
     // Check if we're already on this filter
@@ -364,13 +373,24 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
           ) : viewMode === 'calendar' ? (
             <EventCalendar events={filteredEvents} />
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-              {filteredEvents.map((event) => (
-                <EventCard3D key={event.id}>
-                  <EventCard event={event} />
-                </EventCard3D>
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                {paginatedEvents.map((event) => (
+                  <EventCard3D key={event.id}>
+                    <EventCard event={event} />
+                  </EventCard3D>
+                ))}
+              </div>
+              
+              {/* Pagination */}
+              <UserPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={filteredEvents.length}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+              />
+            </>
           )}
         </div>
       </section>

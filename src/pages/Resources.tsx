@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Search, ArrowLeft } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import ResourceCard from "@/components/ResourceCard";
+import UserPagination from "@/components/UserPagination";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -34,6 +35,8 @@ export default function Resources() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
 
   const fetchResources = async () => {
     try {
@@ -78,6 +81,7 @@ export default function Resources() {
     }
 
     setFilteredResources(filtered);
+    setCurrentPage(1); // Reset to first page when filters change
   };
 
   const handleCategorySelect = (category: string) => {
@@ -95,6 +99,11 @@ export default function Resources() {
   useEffect(() => {
     filterResources();
   }, [resources, searchQuery, selectedCategory]);
+
+  // Paginate filtered resources
+  const totalPages = Math.ceil(filteredResources.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedResources = filteredResources.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div className="min-h-screen bg-background">
@@ -182,11 +191,22 @@ export default function Resources() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredResources.map((resource) => (
-              <ResourceCard key={resource.id} resource={resource} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {paginatedResources.map((resource) => (
+                <ResourceCard key={resource.id} resource={resource} />
+              ))}
+            </div>
+            
+            {/* Pagination */}
+            <UserPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={filteredResources.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+            />
+          </>
         )}
       </main>
     </div>
