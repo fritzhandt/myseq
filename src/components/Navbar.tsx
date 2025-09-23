@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Info, Users, Mail, Search, Vote } from 'lucide-react';
+import { Menu, Info, Users, Mail, Search, Vote, Shield } from 'lucide-react';
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const closeMenu = () => setIsOpen(false);
@@ -88,6 +88,17 @@ const Navbar = () => {
                       <Vote className="w-4 h-4" />
                     </div>
                     <span>Register to Vote</span>
+                  </Link>
+                  
+                  <Link 
+                    to="/police-precincts" 
+                    className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
+                    onClick={closeMenu}
+                  >
+                    <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
+                      <Shield className="w-4 h-4" />
+                    </div>
+                    <span>Police Precincts</span>
                   </Link>
                 </nav>
               </div>
