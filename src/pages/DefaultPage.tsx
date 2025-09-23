@@ -129,18 +129,18 @@ export default function DefaultPage() {
         <section className="py-20 px-4 text-center">
           <div className="container mx-auto max-w-4xl">
             <h2 className="text-3xl md:text-4xl font-bold mb-6 font-oswald uppercase tracking-wide">
-              Ready to Get Involved?
+              Questions? Contact Us
             </h2>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Join thousands of Southeast Queens residents who are already connected, informed, and engaged with their community
+              Have questions about community events, resources, or opportunities? We're here to help connect you with the information you need.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 size="lg" 
                 className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-                onClick={() => window.location.href = '/home'}
+                onClick={() => window.location.href = '/contact'}
               >
-                Start Exploring
+                Contact Us
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </div>

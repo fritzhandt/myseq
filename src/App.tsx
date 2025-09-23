@@ -17,6 +17,7 @@ import CommunityAlert from "./pages/CommunityAlert";
 import Resources from "./pages/Resources";
 import Jobs from "./pages/Jobs";
 import PolicePrecincts from "./pages/PolicePrecincts";
+import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import "./index.css";
 
@@ -49,6 +50,7 @@ const App = () => (
           <Route path="/resources" element={<Resources />} />
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/police-precincts" element={<PolicePrecincts />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />
