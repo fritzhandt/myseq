@@ -28,7 +28,7 @@ export default function DefaultPage() {
               </div>
               
               <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent font-oswald uppercase tracking-tight">
-                Your Community
+                SOUTHEAST QUEENS
                 <br />
                 <span className="text-primary">Starts Here</span>
               </h1>
