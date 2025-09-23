@@ -33,7 +33,7 @@ export default function DefaultPage() {
                 <span className="text-primary">Starts Here</span>
               </h1>
               
-              <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-xl md:text-2xl text-muted-foreground mb-16 max-w-2xl mx-auto leading-relaxed">
                 Discover events, connect with neighbors, find opportunities, and build stronger communities in Southeast Queens
               </p>
             </div>
@@ -41,7 +41,7 @@ export default function DefaultPage() {
         </section>
 
         {/* Features Section */}
-        <section className="py-20 px-4">
+        <section className="pb-20 px-4">
           <div className="container mx-auto">
             <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
               {/* Events Card */}
