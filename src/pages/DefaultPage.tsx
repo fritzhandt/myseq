@@ -44,7 +44,6 @@ export default function DefaultPage() {
                   onClick={() => window.location.href = '/home'}
                 >
                   Explore Events
-                  <Calendar className="ml-2 h-5 w-5" />
                 </Button>
                 
                 <Button 
@@ -54,7 +53,6 @@ export default function DefaultPage() {
                   onClick={() => window.location.href = '/resources'}
                 >
                   Find Resources
-                  <Heart className="ml-2 h-5 w-5" />
                 </Button>
               </div>
             </div>
