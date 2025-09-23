@@ -22,7 +22,7 @@ export default function DefaultPage() {
         </div>
 
         {/* Main Sections */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
           {/* Events Section */}
           <Card className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/20">
             <CardHeader className="pb-6">
@@ -68,6 +68,33 @@ export default function DefaultPage() {
                 onClick={() => window.location.href = '/resources'}
               >
                 Browse Resources
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Jobs Section */}
+          <Card className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-accent/20">
+            <CardHeader className="pb-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-accent/10 rounded-lg">
+                  <MapPin className="h-8 w-8 text-accent" />
+                </div>
+                <ArrowRight className="h-6 w-6 text-muted-foreground group-hover:text-accent transition-colors" />
+              </div>
+              <CardTitle className="text-2xl mb-2">Find Jobs</CardTitle>
+              <CardDescription className="text-base">
+                Search for job opportunities and career openings in your area
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="w-full border-accent text-accent hover:bg-accent hover:text-accent-foreground"
+                onClick={() => window.location.href = '/jobs'}
+              >
+                Browse Jobs
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </CardContent>

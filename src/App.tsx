@@ -15,6 +15,7 @@ import RegisterToVote from "./pages/RegisterToVote";
 import SpecialEvent from "./pages/SpecialEvent";
 import CommunityAlert from "./pages/CommunityAlert";
 import Resources from "./pages/Resources";
+import Jobs from "./pages/Jobs";
 import NotFound from "./pages/NotFound";
 import "./index.css";
 
@@ -45,6 +46,7 @@ const App = () => (
           <Route path="/special-event" element={<SpecialEvent />} />
           <Route path="/community-alert/:id" element={<CommunityAlert />} />
           <Route path="/resources" element={<Resources />} />
+          <Route path="/jobs" element={<Jobs />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />

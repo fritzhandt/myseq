@@ -113,6 +113,45 @@ export type Database = {
         }
         Relationships: []
       }
+      jobs: {
+        Row: {
+          apply_info: string
+          created_at: string
+          description: string
+          employer: string
+          id: string
+          is_apply_link: boolean
+          location: string
+          salary: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          apply_info: string
+          created_at?: string
+          description: string
+          employer: string
+          id?: string
+          is_apply_link?: boolean
+          location: string
+          salary: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          apply_info?: string
+          created_at?: string
+          description?: string
+          employer?: string
+          id?: string
+          is_apply_link?: boolean
+          location?: string
+          salary?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       resources: {
         Row: {
           address: string | null

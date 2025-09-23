@@ -10,9 +10,10 @@ import CommunityAlertForm from '@/components/CommunityAlertForm';
 import CommunityAlertsList from '@/components/CommunityAlertsList';
 import ResourceForm from '@/components/ResourceForm';
 import ResourcesList from '@/components/ResourcesList';
+import JobCSVUpload from '@/components/JobCSVUpload';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Calendar, LogOut, Star, AlertTriangle, Users } from 'lucide-react';
+import { Plus, Calendar, LogOut, Star, AlertTriangle, Users, MapPin } from 'lucide-react';
 
 const Admin = () => {
   const [showForm, setShowForm] = useState(false);
@@ -163,7 +164,7 @@ const Admin = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="events" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8">
+          <TabsList className="grid w-full grid-cols-5 mb-8">
             <TabsTrigger value="events" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
               Regular Events
@@ -179,6 +180,10 @@ const Admin = () => {
             <TabsTrigger value="resources" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
               Resources
+            </TabsTrigger>
+            <TabsTrigger value="jobs" className="flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              Jobs
             </TabsTrigger>
           </TabsList>
 
@@ -264,6 +269,14 @@ const Admin = () => {
                 <ResourcesList onEdit={handleEditResource} />
               </div>
             )}
+          </TabsContent>
+          <TabsContent value="jobs">
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-3xl font-bold">Manage Jobs</h2>
+              </div>
+              <JobCSVUpload />
+            </div>
           </TabsContent>
         </Tabs>
       </div>
