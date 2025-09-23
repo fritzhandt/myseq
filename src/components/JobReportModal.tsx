@@ -20,6 +20,8 @@ const REPORT_REASONS = [
   'Misleading information',
   'Scam or fraudulent',
   'Duplicate posting',
+  'Incorrect/missing link',
+  'Job unavailable',
   'Other'
 ];
 

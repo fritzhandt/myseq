@@ -10,6 +10,7 @@ interface Job {
   description: string;
   is_apply_link: boolean;
   created_at: string;
+  category: string;
 }
 
 interface JobListProps {

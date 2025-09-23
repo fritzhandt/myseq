@@ -208,6 +208,7 @@ export type Database = {
       jobs: {
         Row: {
           apply_info: string
+          category: string
           created_at: string
           description: string
           employer: string
@@ -220,6 +221,7 @@ export type Database = {
         }
         Insert: {
           apply_info: string
+          category?: string
           created_at?: string
           description: string
           employer: string
@@ -232,6 +234,7 @@ export type Database = {
         }
         Update: {
           apply_info?: string
+          category?: string
           created_at?: string
           description?: string
           employer?: string

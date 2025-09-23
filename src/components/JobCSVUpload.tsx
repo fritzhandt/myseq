@@ -2,6 +2,8 @@ import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Upload, FileText, Trash2, AlertCircle } from 'lucide-react';
@@ -19,6 +21,7 @@ interface Job {
 export default function JobCSVUpload() {
   const [uploading, setUploading] = useState(false);
   const [previewJobs, setPreviewJobs] = useState<Job[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState('city');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -150,7 +153,8 @@ export default function JobCSVUpload() {
         salary: job.type, // Store job type in salary field for now
         apply_info: job.applyLink,
         description: `${job.type} position at ${job.company}`, // Generate basic description
-        is_apply_link: isValidURL(job.applyLink)
+        is_apply_link: isValidURL(job.applyLink),
+        category: selectedCategory
       }));
 
       const { error } = await supabase
@@ -201,6 +205,23 @@ export default function JobCSVUpload() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="category">Job Category</Label>
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select job category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="city">City Jobs</SelectItem>
+                  <SelectItem value="state">State Jobs</SelectItem>
+                  <SelectItem value="both">Both City & State</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-sm text-muted-foreground">
+                Choose whether these jobs should appear in City Jobs, State Jobs, or both tabs.
+              </p>
+            </div>
+            
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>

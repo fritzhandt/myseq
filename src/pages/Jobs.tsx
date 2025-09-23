@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { Briefcase, MapPin, DollarSign, Building, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
 
@@ -21,6 +22,7 @@ interface Job {
   description: string;
   is_apply_link: boolean;
   created_at: string;
+  category: string;
 }
 
 export default function Jobs() {
@@ -34,6 +36,7 @@ export default function Jobs() {
   const [maxSalary, setMaxSalary] = useState('');
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [activeTab, setActiveTab] = useState('city');
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -42,7 +45,7 @@ export default function Jobs() {
 
   useEffect(() => {
     filterJobs();
-  }, [jobs, searchQuery, locationFilter, employerFilter, minSalary, maxSalary]);
+  }, [jobs, searchQuery, locationFilter, employerFilter, minSalary, maxSalary, activeTab]);
 
   const fetchJobs = async () => {
     try {
@@ -62,6 +65,11 @@ export default function Jobs() {
 
   const filterJobs = () => {
     let filtered = [...jobs];
+
+    // Filter by category (city/state)
+    filtered = filtered.filter(job => 
+      job.category === activeTab || job.category === 'both'
+    );
 
     // Search by job title
     if (searchQuery) {
@@ -111,8 +119,8 @@ export default function Jobs() {
     setMaxSalary('');
   };
 
-  const uniqueLocations = [...new Set(jobs.map(job => job.location))];
-  const uniqueEmployers = [...new Set(jobs.map(job => job.employer))];
+  const uniqueLocations = [...new Set(jobs.filter(job => job.category === activeTab || job.category === 'both').map(job => job.location))];
+  const uniqueEmployers = [...new Set(jobs.filter(job => job.category === activeTab || job.category === 'both').map(job => job.employer))];
 
   // Paginate filtered jobs
   const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
@@ -148,107 +156,222 @@ export default function Jobs() {
         </div>
 
         {/* Search and Filters */}
-        <Card className="mb-8">
-          <CardContent className="p-6">
-            {/* Always visible: Job Title Search */}
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <Briefcase className="h-4 w-4" />
-                  Job Title
-                </label>
-                <Input
-                  placeholder="Search jobs..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <div className="flex justify-center mb-6">
+            <TabsList className="grid w-full max-w-md grid-cols-2">
+              <TabsTrigger value="city">City Jobs</TabsTrigger>
+              <TabsTrigger value="state">State Jobs</TabsTrigger>
+            </TabsList>
+          </div>
 
-              {/* Advanced Search Toggle Button - only visible on mobile */}
-              <div className="md:hidden">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
-                  className="w-full flex items-center justify-center gap-2"
-                >
-                  Advanced Search
-                  {showAdvancedSearch ? (
-                    <ChevronUp className="h-4 w-4" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-
-              {/* Advanced Filters - always visible on desktop, toggleable on mobile */}
-              <div className={`${showAdvancedSearch ? 'block' : 'hidden'} md:block`}>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {/* Location Filter */}
+          <TabsContent value="city" className="mt-0">
+            <Card className="mb-8">
+              <CardContent className="p-6">
+                {/* Always visible: Job Title Search */}
+                <div className="space-y-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium flex items-center gap-2">
-                      <MapPin className="h-4 w-4" />
-                      Location
-                    </label>
-                    <Select value={locationFilter} onValueChange={setLocationFilter}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="All locations" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All locations</SelectItem>
-                        {uniqueLocations.map(location => (
-                          <SelectItem key={location} value={location}>{location}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Employer Filter */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium flex items-center gap-2">
-                      <Building className="h-4 w-4" />
-                      Employer
-                    </label>
-                    <SearchableEmployerDropdown
-                      employers={uniqueEmployers}
-                      value={employerFilter}
-                      onChange={setEmployerFilter}
-                      placeholder="All employers"
-                    />
-                  </div>
-
-                  {/* Salary Range */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium flex items-center gap-2">
-                      <DollarSign className="h-4 w-4" />
-                      Min Salary
+                      <Briefcase className="h-4 w-4" />
+                      Job Title
                     </label>
                     <Input
-                      type="number"
-                      placeholder="Min $"
-                      value={minSalary}
-                      onChange={(e) => setMinSalary(e.target.value)}
+                      placeholder="Search city jobs..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Max Salary</label>
-                    <div className="flex gap-2">
-                      <Input
-                        type="number"
-                        placeholder="Max $"
-                        value={maxSalary}
-                        onChange={(e) => setMaxSalary(e.target.value)}
-                      />
-                      <Button variant="outline" onClick={clearFilters} className="shrink-0">
-                        Clear
-                      </Button>
+                  {/* Advanced Search Toggle Button - only visible on mobile */}
+                  <div className="md:hidden">
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
+                      className="w-full flex items-center justify-center gap-2"
+                    >
+                      Advanced Search
+                      {showAdvancedSearch ? (
+                        <ChevronUp className="h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+
+                  {/* Advanced Filters - always visible on desktop, toggleable on mobile */}
+                  <div className={`${showAdvancedSearch ? 'block' : 'hidden'} md:block`}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                      {/* Location Filter */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium flex items-center gap-2">
+                          <MapPin className="h-4 w-4" />
+                          Location
+                        </label>
+                        <Select value={locationFilter} onValueChange={setLocationFilter}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="All locations" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All locations</SelectItem>
+                            {uniqueLocations.map(location => (
+                              <SelectItem key={location} value={location}>{location}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Employer Filter */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium flex items-center gap-2">
+                          <Building className="h-4 w-4" />
+                          Employer
+                        </label>
+                        <SearchableEmployerDropdown
+                          employers={uniqueEmployers}
+                          value={employerFilter}
+                          onChange={setEmployerFilter}
+                          placeholder="All employers"
+                        />
+                      </div>
+
+                      {/* Salary Range */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium flex items-center gap-2">
+                          <DollarSign className="h-4 w-4" />
+                          Min Salary
+                        </label>
+                        <Input
+                          type="number"
+                          placeholder="Min $"
+                          value={minSalary}
+                          onChange={(e) => setMinSalary(e.target.value)}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Max Salary</label>
+                        <div className="flex gap-2">
+                          <Input
+                            type="number"
+                            placeholder="Max $"
+                            value={maxSalary}
+                            onChange={(e) => setMaxSalary(e.target.value)}
+                          />
+                          <Button variant="outline" onClick={clearFilters} className="shrink-0">
+                            Clear
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="state" className="mt-0">
+            <Card className="mb-8">
+              <CardContent className="p-6">
+                {/* Always visible: Job Title Search */}
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium flex items-center gap-2">
+                      <Briefcase className="h-4 w-4" />
+                      Job Title
+                    </label>
+                    <Input
+                      placeholder="Search state jobs..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Advanced Search Toggle Button - only visible on mobile */}
+                  <div className="md:hidden">
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
+                      className="w-full flex items-center justify-center gap-2"
+                    >
+                      Advanced Search
+                      {showAdvancedSearch ? (
+                        <ChevronUp className="h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+
+                  {/* Advanced Filters - always visible on desktop, toggleable on mobile */}
+                  <div className={`${showAdvancedSearch ? 'block' : 'hidden'} md:block`}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                      {/* Location Filter */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium flex items-center gap-2">
+                          <MapPin className="h-4 w-4" />
+                          Location
+                        </label>
+                        <Select value={locationFilter} onValueChange={setLocationFilter}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="All locations" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All locations</SelectItem>
+                            {uniqueLocations.map(location => (
+                              <SelectItem key={location} value={location}>{location}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Employer Filter */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium flex items-center gap-2">
+                          <Building className="h-4 w-4" />
+                          Employer
+                        </label>
+                        <SearchableEmployerDropdown
+                          employers={uniqueEmployers}
+                          value={employerFilter}
+                          onChange={setEmployerFilter}
+                          placeholder="All employers"
+                        />
+                      </div>
+
+                      {/* Salary Range */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium flex items-center gap-2">
+                          <DollarSign className="h-4 w-4" />
+                          Min Salary
+                        </label>
+                        <Input
+                          type="number"
+                          placeholder="Min $"
+                          value={minSalary}
+                          onChange={(e) => setMinSalary(e.target.value)}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Max Salary</label>
+                        <div className="flex gap-2">
+                          <Input
+                            type="number"
+                            placeholder="Max $"
+                            value={maxSalary}
+                            onChange={(e) => setMaxSalary(e.target.value)}
+                          />
+                          <Button variant="outline" onClick={clearFilters} className="shrink-0">
+                            Clear
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
 
         {/* Results Count */}
         <div className="mb-6">

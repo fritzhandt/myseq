@@ -18,6 +18,7 @@ interface JobReport {
     employer: string;
     location: string;
     salary: string;
+    category: string;
   };
 }
 
@@ -42,7 +43,8 @@ export default function JobReportsList() {
             title,
             employer,
             location,
-            salary
+            salary,
+            category
           )
         `)
         .order('created_at', { ascending: false });
