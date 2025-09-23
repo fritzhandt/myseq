@@ -17,10 +17,9 @@ interface Job {
 
 interface JobCardProps {
   job: Job;
-  onSeeMore: () => void;
 }
 
-export default function JobCard({ job, onSeeMore }: JobCardProps) {
+export default function JobCard({ job }: JobCardProps) {
   const formatSalary = (salary: string) => {
     // Add dollar signs to numbers in the salary string
     return salary.replace(/(\d+)/g, '$$$1');
@@ -31,8 +30,8 @@ export default function JobCard({ job, onSeeMore }: JobCardProps) {
       // Open the link in a new tab
       window.open(job.apply_info, '_blank');
     } else {
-      // Show application instructions in the details modal
-      onSeeMore();
+      // For non-link applications, we could show an alert or handle differently
+      alert(`Application Instructions: ${job.apply_info}`);
     }
   };
 
@@ -61,12 +60,7 @@ export default function JobCard({ job, onSeeMore }: JobCardProps) {
       </CardHeader>
       
       <CardContent>
-        <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center">
-          <Button onClick={onSeeMore} variant="outline" size="sm">
-            <Info className="h-4 w-4 mr-2" />
-            See More
-          </Button>
-          
+        <div className="flex justify-end">
           <Button onClick={handleApplyClick} size="sm">
             {job.is_apply_link ? (
               <>

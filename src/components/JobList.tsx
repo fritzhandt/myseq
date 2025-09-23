@@ -1,6 +1,4 @@
-import { useState } from 'react';
 import JobCard from './JobCard';
-import JobDetailsModal from './JobDetailsModal';
 
 interface Job {
   id: string;
@@ -20,7 +18,6 @@ interface JobListProps {
 }
 
 export default function JobList({ jobs, loading }: JobListProps) {
-  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
 
   if (loading) {
     return (
@@ -55,23 +52,13 @@ export default function JobList({ jobs, loading }: JobListProps) {
   }
 
   return (
-    <>
-      <div className="space-y-4">
-        {jobs.map((job) => (
-          <JobCard
-            key={job.id}
-            job={job}
-            onSeeMore={() => setSelectedJob(job)}
-          />
-        ))}
-      </div>
-
-      {selectedJob && (
-        <JobDetailsModal
-          job={selectedJob}
-          onClose={() => setSelectedJob(null)}
+    <div className="space-y-4">
+      {jobs.map((job) => (
+        <JobCard
+          key={job.id}
+          job={job}
         />
-      )}
-    </>
+      ))}
+    </div>
   );
 }
