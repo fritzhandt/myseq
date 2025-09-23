@@ -8,12 +8,11 @@ import { Upload, FileText, Trash2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface Job {
-  employer: string;
-  title: string;
+  company: string;
   location: string;
-  salary: string;
-  apply: string;
-  description: string;
+  position: string;
+  type: string;
+  applyLink: string;
 }
 
 export default function JobCSVUpload() {
@@ -30,14 +29,13 @@ export default function JobCSVUpload() {
     const jobs: Job[] = [];
     for (let i = 1; i < lines.length; i++) {
       const values = lines[i].split(',').map(val => val.trim().replace(/^"|"$/g, ''));
-      if (values.length >= 6) {
+      if (values.length >= 5) {
         jobs.push({
-          employer: values[0],
-          title: values[1],
-          location: values[2],
-          salary: values[3],
-          apply: values[4],
-          description: values[5]
+          company: values[0],
+          location: values[1],
+          position: values[2],
+          type: values[3],
+          applyLink: values[4]
         });
       }
     }
@@ -102,13 +100,13 @@ export default function JobCSVUpload() {
     setUploading(true);
     try {
       const jobsToInsert = previewJobs.map(job => ({
-        employer: job.employer,
-        title: job.title,
+        employer: job.company,
+        title: job.position,
         location: job.location,
-        salary: job.salary,
-        apply_info: job.apply,
-        description: job.description,
-        is_apply_link: isValidURL(job.apply)
+        salary: job.type, // Store job type in salary field for now
+        apply_info: job.applyLink,
+        description: `${job.type} position at ${job.company}`, // Generate basic description
+        is_apply_link: isValidURL(job.applyLink)
       }));
 
       const { error } = await supabase
@@ -154,7 +152,7 @@ export default function JobCSVUpload() {
             Import Jobs from CSV
           </CardTitle>
           <CardDescription>
-            Upload a CSV file with job listings. The format should include: employer, title, location, salary, apply, description
+            Upload a CSV file with job listings. The format should include: Company/Organization, Location, Position, Type, Link to Apply
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -162,8 +160,8 @@ export default function JobCSVUpload() {
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                <strong>CSV Format:</strong> A1: employer, A2: title, A3: location, A4: salary, A5: apply, A6: description.
-                The apply field can be a URL (will show "Apply Now" button) or instructions (will show "Application Info").
+                <strong>CSV Format:</strong> Column A: Company/Organization, Column B: Location, Column C: Position, Column D: Type, Column E: Link to Apply.
+                The Link to Apply can be a URL (will show "Apply Now" button) or application instructions.
               </AlertDescription>
             </Alert>
             
@@ -213,33 +211,42 @@ export default function JobCSVUpload() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4 max-h-96 overflow-y-auto">
-              {previewJobs.slice(0, 5).map((job, index) => (
-                <div key={index} className="p-4 border rounded-lg">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Table Header */}
+              <div className="bg-muted/50 p-3 rounded-lg">
+                <div className="grid grid-cols-5 gap-4 text-sm font-medium">
+                  <div>Company/Organization</div>
+                  <div>Location</div>
+                  <div>Position</div>
+                  <div>Type</div>
+                  <div>Link to Apply</div>
+                </div>
+              </div>
+              
+              {/* Table Rows */}
+              {previewJobs.slice(0, 10).map((job, index) => (
+                <div key={index} className="p-3 border rounded-lg">
+                  <div className="grid grid-cols-5 gap-4 text-sm">
+                    <div className="font-medium">{job.company}</div>
+                    <div>{job.location}</div>
+                    <div>{job.position}</div>
                     <div>
-                      <h4 className="font-medium">{job.title}</h4>
-                      <p className="text-sm text-muted-foreground">{job.employer}</p>
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary/10 text-primary">
+                        {job.type}
+                      </span>
                     </div>
-                    <div>
-                      <p className="text-sm"><strong>Location:</strong> {job.location}</p>
-                      <p className="text-sm"><strong>Salary:</strong> {job.salary}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm">
-                        <strong>Apply:</strong> {isValidURL(job.apply) ? 'Link provided' : 'Instructions provided'}
-                      </p>
+                    <div className="truncate">
+                      {isValidURL(job.applyLink) ? (
+                        <span className="text-blue-600">🔗 Application Link</span>
+                      ) : (
+                        <span className="text-muted-foreground">📝 Instructions</span>
+                      )}
                     </div>
                   </div>
-                  {job.description && (
-                    <p className="text-sm text-muted-foreground mt-2 truncate">
-                      {job.description.substring(0, 100)}...
-                    </p>
-                  )}
                 </div>
               ))}
-              {previewJobs.length > 5 && (
+              {previewJobs.length > 10 && (
                 <p className="text-center text-muted-foreground">
-                  ... and {previewJobs.length - 5} more jobs
+                  ... and {previewJobs.length - 10} more jobs
                 </p>
               )}
             </div>
