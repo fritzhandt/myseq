@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Navbar from "@/components/Navbar";
 import CommunityAlertBanner from "@/components/CommunityAlertBanner";
-import { Calendar, Users, Briefcase, ArrowRight, MapPin, Heart, HelpCircle, Building2 } from "lucide-react";
+import { Calendar, Users, Briefcase, ArrowRight, MapPin, Heart, HelpCircle, Building2, Landmark } from "lucide-react";
 
 export default function DefaultPage() {
   return (
@@ -75,7 +75,7 @@ export default function DefaultPage() {
                 <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <CardHeader className="relative z-10 pb-6">
                   <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                    <Users className="h-8 w-8 text-white" />
+                    <Landmark className="h-8 w-8 text-white" />
                   </div>
                   <CardTitle className="text-2xl mb-2 group-hover:text-green-600 transition-colors duration-300">
                     Civic Organizations
