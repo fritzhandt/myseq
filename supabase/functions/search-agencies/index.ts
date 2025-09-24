@@ -50,7 +50,13 @@ ${pdfContent.content}
 HYPERLINKS AVAILABLE:
 ${pdfContent.hyperlinks ? JSON.stringify(pdfContent.hyperlinks, null, 2) : 'None'}
 
-Use this context to better match user queries with the right agencies.`;
+NYC 311 COMPLAINT MAPPINGS:
+${pdfContent.hyperlinks && pdfContent.hyperlinks.complaint_311_map ? 
+  Object.entries(pdfContent.hyperlinks.complaint_311_map).map(([type, data]) => 
+    `${type}: ${data.url} - ${data.description}`
+  ).join('\n') : 'None'}
+
+Use this context to better match user queries with the right agencies. For NYC 311 matches, use the specific complaint URLs when available.`;
     }
 
     // Get all agencies from database
@@ -223,18 +229,41 @@ Be very precise - only return agencies that truly match the user's issue. If no 
     const matchedAgencies = parsedResults.results.map((result: any) => {
       const agency = agencies[result.agency_index - 1]; // Convert to 0-based index
       
-      // If this is NYC 311 and we have PDF content with specific links, try to find a better URL
+      // If this is NYC 311 and we have PDF content with specific complaint mappings
       let finalWebsite = agency.website;
-      if (agency.name === 'NYC 311' && pdfContent && pdfContent.hyperlinks) {
-        const hyperlinksData = pdfContent.hyperlinks;
-        if (hyperlinksData.urls && Array.isArray(hyperlinksData.urls)) {
-          // Find a 311 portal link that might be more specific
-          const specific311Link = hyperlinksData.urls.find((url: string) => 
-            url.includes('portal.311.nyc.gov') || url.includes('311.nyc.gov')
-          );
-          if (specific311Link) {
-            finalWebsite = specific311Link;
+      if (agency.name === 'NYC 311' && pdfContent && pdfContent.hyperlinks && pdfContent.hyperlinks.complaint_311_map) {
+        const complaint311Map = pdfContent.hyperlinks.complaint_311_map;
+        
+        // Try to match the user's query to a specific complaint type
+        const userQuery = query.toLowerCase();
+        let bestMatch = null;
+        let bestMatchScore = 0;
+        
+        // Look for keyword matches in complaint types
+        for (const [complaintType, data] of Object.entries(complaint311Map)) {
+          const typeWords = complaintType.split(/\s+/);
+          const queryWords = userQuery.split(/\s+/);
+          
+          let matchCount = 0;
+          for (const typeWord of typeWords) {
+            if (queryWords.some(qWord => 
+              qWord.includes(typeWord.toLowerCase()) || 
+              typeWord.toLowerCase().includes(qWord)
+            )) {
+              matchCount++;
+            }
           }
+          
+          const matchScore = matchCount / typeWords.length;
+          if (matchScore > bestMatchScore && matchScore >= 0.3) {
+            bestMatchScore = matchScore;
+            bestMatch = data;
+          }
+        }
+        
+        if (bestMatch) {
+          finalWebsite = bestMatch.url;
+          console.log(`Matched 311 query to specific complaint: ${bestMatch.title} -> ${bestMatch.url}`);
         }
       }
       

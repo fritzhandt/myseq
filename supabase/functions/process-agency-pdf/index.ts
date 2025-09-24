@@ -60,6 +60,28 @@ serve(async (req) => {
       
       console.log('Raw text length:', rawText.length);
       
+      // Enhanced pattern for 311 complaint structure: • Title URL Description
+      const complaint311Pattern = /[•\-*]\s*([^https]+?)\s+(https:\/\/portal\.311\.nyc\.gov[^\s]+)\s+(.+?)(?=\n|$)/gi;
+      const complaint311Matches = [...rawText.matchAll(complaint311Pattern)];
+      
+      console.log('Found 311 complaint patterns:', complaint311Matches.length);
+      
+      // Create a mapping of complaint types to specific URLs
+      const complaint311Map = {};
+      complaint311Matches.forEach(match => {
+        const complaintType = match[1].trim().toLowerCase();
+        const specificUrl = match[2].trim();
+        const description = match[3].trim();
+        
+        complaint311Map[complaintType] = {
+          url: specificUrl,
+          title: match[1].trim(),
+          description: description
+        };
+        
+        console.log(`Found 311 complaint: "${complaintType}" -> ${specificUrl}`);
+      });
+      
       // Extract visible text and URLs from Word document
       // Word documents contain URLs in multiple formats
       const urlRegex = /(https?:\/\/[^\s<>"{}|\\^`[\]()]+)/gi;
@@ -126,6 +148,9 @@ serve(async (req) => {
           context: urlData.context || 'NYC agency service'
         });
       });
+      
+      // Store the 311 complaint mapping separately for easy lookup
+      console.log('Stored 311 complaint mappings:', Object.keys(complaint311Map).length);
 
       // Create a cleaned version of the content for storage
       extractedContent = `Document: ${fileName}\n\nExtracted content from uploaded NYC agencies document:\n\n`;
@@ -172,7 +197,10 @@ serve(async (req) => {
       .insert({
         file_name: fileName,
         content: extractedContent,
-        hyperlinks: hyperlinks
+        hyperlinks: {
+          all_links: hyperlinks,
+          complaint_311_map: complaint311Map || {}
+        }
       });
 
     if (insertError) {
