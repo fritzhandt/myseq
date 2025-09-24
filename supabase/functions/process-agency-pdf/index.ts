@@ -168,45 +168,30 @@ Phone: (718) 722-3131
     console.log('Hyperlinks count:', hyperlinks.length);
 
     // Store the extracted content in the database
-    // First, check if we already have content for this file
-    const { data: existingContent } = await supabase
+    // First, clear any existing content (replace all existing documents)
+    const { error: deleteError } = await supabase
       .from('pdf_content')
-      .select('id')
-      .eq('file_name', fileName)
-      .maybeSingle();
+      .delete()
+      .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all records
 
-    if (existingContent) {
-      // Update existing content
-      const { error: updateError } = await supabase
-        .from('pdf_content')
-        .update({
-          content: extractedContent,
-          hyperlinks: hyperlinks,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', existingContent.id);
-
-      if (updateError) {
-        throw new Error(`Failed to update document content: ${updateError.message}`);
-      }
-
-      console.log('Updated existing document content');
-    } else {
-      // Insert new content
-      const { error: insertError } = await supabase
-        .from('pdf_content')
-        .insert({
-          file_name: fileName,
-          content: extractedContent,
-          hyperlinks: hyperlinks
-        });
-
-      if (insertError) {
-        throw new Error(`Failed to store document content: ${insertError.message}`);
-      }
-
-      console.log('Stored new document content');
+    if (deleteError) {
+      console.warn('Failed to delete existing content:', deleteError.message);
     }
+
+    // Insert new content (always replaces everything)
+    const { error: insertError } = await supabase
+      .from('pdf_content')
+      .insert({
+        file_name: fileName,
+        content: extractedContent,
+        hyperlinks: hyperlinks
+      });
+
+    if (insertError) {
+      throw new Error(`Failed to store document content: ${insertError.message}`);
+    }
+
+    console.log('Replaced all existing document content with new upload');
 
     const response = {
       success: true,
