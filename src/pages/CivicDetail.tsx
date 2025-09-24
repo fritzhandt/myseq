@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from "@/components/Navbar";
-import { ArrowLeft, MapPin, Clock, Phone, Mail, Globe, Users, Calendar, FileText } from "lucide-react";
+import { ArrowLeft, MapPin, Clock, Phone, Mail, Globe, Users, Calendar, FileText, Image } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format, parseISO } from "date-fns";
+import PDFViewer from "@/components/PDFViewer";
 
 interface CivicOrganization {
   id: string;
@@ -24,6 +25,7 @@ interface Announcement {
   id: string;
   title: string;
   content: string;
+  photos?: string[];
   created_at: string;
 }
 
@@ -54,6 +56,7 @@ const CivicDetail = () => {
   const [newsletters, setNewsletters] = useState<Newsletter[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("general");
+  const [selectedPDF, setSelectedPDF] = useState<{url: string; title: string} | null>(null);
 
   useEffect(() => {
     if (orgId) {
@@ -128,6 +131,13 @@ const CivicDetail = () => {
   const getFileUrl = (filePath: string) => {
     const { data } = supabase.storage.from('civic-files').getPublicUrl(filePath);
     return data.publicUrl;
+  };
+
+  const handleViewPDF = (newsletter: Newsletter) => {
+    setSelectedPDF({
+      url: getFileUrl(newsletter.file_path),
+      title: newsletter.title
+    });
   };
 
   if (loading) {
@@ -325,7 +335,7 @@ const CivicDetail = () => {
                           <Button 
                             variant="outline" 
                             size="sm"
-                            onClick={() => window.open(getFileUrl(newsletter.file_path), '_blank')}
+                            onClick={() => handleViewPDF(newsletter)}
                           >
                             <FileText className="mr-2 h-4 w-4" />
                             View PDF
@@ -373,6 +383,28 @@ const CivicDetail = () => {
                               </p>
                             ))}
                           </div>
+                          
+                          {/* Display announcement photos */}
+                          {announcement.photos && announcement.photos.length > 0 && (
+                            <div className="mt-4 space-y-2">
+                              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                                <Image className="h-4 w-4" />
+                                Photos
+                              </div>
+                              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                {announcement.photos.map((photoUrl, index) => (
+                                  <div key={index} className="relative group">
+                                    <img
+                                      src={photoUrl}
+                                      alt={`Announcement photo ${index + 1}`}
+                                      className="w-full h-32 object-cover rounded border cursor-pointer hover:opacity-90 transition-opacity"
+                                      onClick={() => window.open(photoUrl, '_blank')}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -453,6 +485,16 @@ const CivicDetail = () => {
           </Tabs>
         </div>
       </main>
+      
+      {/* PDF Viewer */}
+      {selectedPDF && (
+        <PDFViewer
+          isOpen={!!selectedPDF}
+          onClose={() => setSelectedPDF(null)}
+          pdfUrl={selectedPDF.url}
+          title={selectedPDF.title}
+        />
+      )}
     </div>
   );
 };

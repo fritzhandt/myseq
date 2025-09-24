@@ -187,13 +187,13 @@ const Civics = () => {
                       </div>
                     )}
                     
-                    {/* Learn More Button */}
+                    {/* View Page Button */}
                     <Button 
                       className="w-full mt-4"
                       variant="outline"
                       onClick={() => handleOrgClick(org.id)}
                     >
-                      Learn More
+                      View Page
                     </Button>
                   </CardContent>
                 </Card>

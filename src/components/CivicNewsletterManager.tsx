@@ -7,9 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { FileText, Upload, Trash2, Download, Loader2 } from "lucide-react";
+import { FileText, Upload, Trash2, Eye, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format, parseISO } from "date-fns";
+import PDFViewer from "./PDFViewer";
 
 interface CivicNewsletterManagerProps {
   orgId: string;
@@ -28,6 +29,7 @@ const CivicNewsletterManager = ({ orgId }: CivicNewsletterManagerProps) => {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedPDF, setSelectedPDF] = useState<{url: string; title: string} | null>(null);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -186,6 +188,13 @@ const CivicNewsletterManager = ({ orgId }: CivicNewsletterManagerProps) => {
     return data.publicUrl;
   };
 
+  const handleViewPDF = (newsletter: Newsletter) => {
+    setSelectedPDF({
+      url: getFileUrl(newsletter.file_path),
+      title: newsletter.title
+    });
+  };
+
   const resetForm = () => {
     setFormData({ title: "", file: null });
   };
@@ -318,9 +327,9 @@ const CivicNewsletterManager = ({ orgId }: CivicNewsletterManagerProps) => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => window.open(getFileUrl(newsletter.file_path), '_blank')}
+                    onClick={() => handleViewPDF(newsletter)}
                   >
-                    <Download className="h-4 w-4" />
+                    <Eye className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="ghost"
@@ -336,6 +345,16 @@ const CivicNewsletterManager = ({ orgId }: CivicNewsletterManagerProps) => {
           </div>
         )}
       </CardContent>
+      
+      {/* PDF Viewer */}
+      {selectedPDF && (
+        <PDFViewer
+          isOpen={!!selectedPDF}
+          onClose={() => setSelectedPDF(null)}
+          pdfUrl={selectedPDF.url}
+          title={selectedPDF.title}
+        />
+      )}
     </Card>
   );
 };
