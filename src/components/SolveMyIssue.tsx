@@ -103,9 +103,52 @@ const SolveMyIssue = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Agency Level Selection */}
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Do you know which level of government handles your issue? <span className="text-red-500">*</span></p>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant={agencyLevel === 'city' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setAgencyLevel('city')}
+              >
+                City/Local
+              </Button>
+              <Button
+                variant={agencyLevel === 'state' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setAgencyLevel('state')}
+              >
+                State
+              </Button>
+              <Button
+                variant={agencyLevel === 'federal' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setAgencyLevel('federal')}
+              >
+                Federal
+              </Button>
+              <Button
+                variant={agencyLevel === 'unknown' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setAgencyLevel('unknown')}
+              >
+                I don't know
+              </Button>
+            </div>
+            {agencyLevel && (
+              <p className="text-xs text-muted-foreground">
+                {agencyLevel === 'unknown' 
+                  ? "We'll search all levels to find the right agency for you."
+                  : `Focusing search on ${agencyLevel} level agencies.`
+                }
+              </p>
+            )}
+          </div>
+
           <div className="flex gap-2">
             <Input
-              placeholder="describe your issue as you would to a friend (e.g., my landlord won't fix my heat)."
+              placeholder="Describe your issue as you would to a friend (e.g., my landlord won't fix my heat)."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyPress={handleKeyPress}
@@ -113,7 +156,7 @@ const SolveMyIssue = () => {
             />
             <Button 
               onClick={handleSearch} 
-              disabled={loading || !query.trim()}
+              disabled={loading || !query.trim() || !agencyLevel}
               className="min-w-[100px]"
             >
               {loading ? (
@@ -125,49 +168,6 @@ const SolveMyIssue = () => {
                 </>
               )}
             </Button>
-          </div>
-
-          {/* Agency Level Selection */}
-          <div className="space-y-2">
-            <p className="text-sm font-medium">Do you know which level of government handles your issue?</p>
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant={agencyLevel === 'city' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setAgencyLevel(agencyLevel === 'city' ? null : 'city')}
-              >
-                City/Local
-              </Button>
-              <Button
-                variant={agencyLevel === 'state' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setAgencyLevel(agencyLevel === 'state' ? null : 'state')}
-              >
-                State
-              </Button>
-              <Button
-                variant={agencyLevel === 'federal' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setAgencyLevel(agencyLevel === 'federal' ? null : 'federal')}
-              >
-                Federal
-              </Button>
-              <Button
-                variant={agencyLevel === 'unknown' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setAgencyLevel(agencyLevel === 'unknown' ? null : 'unknown')}
-              >
-                I don't know
-              </Button>
-            </div>
-            {agencyLevel && (
-              <p className="text-xs text-muted-foreground">
-                {agencyLevel === 'unknown' 
-                  ? "We'll search all levels to find the right agency for you."
-                  : `Focusing search on ${agencyLevel} level agencies.`
-                } Click the button again to clear selection.
-              </p>
-            )}
           </div>
 
           <Alert className="bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800">
