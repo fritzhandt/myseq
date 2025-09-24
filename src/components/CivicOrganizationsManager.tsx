@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Eye, EyeOff, Copy, Trash2, Users, Building2 } from 'lucide-react';
+import { Plus, Eye, EyeOff, Copy, Trash2, Users, Building2, RotateCcw } from 'lucide-react';
 import bcrypt from 'bcryptjs';
 
 interface CivicOrganization {
@@ -30,6 +30,7 @@ export default function CivicOrganizationsManager() {
   const [isCreating, setIsCreating] = useState(false);
   const [showPasswords, setShowPasswords] = useState<{[key: string]: boolean}>({});
   const [loading, setLoading] = useState(true);
+  const [resetPasswordDialog, setResetPasswordDialog] = useState<{isOpen: boolean, orgId?: string, orgName?: string, newPassword?: string}>({isOpen: false});
   const { toast } = useToast();
 
   // Form state
@@ -192,6 +193,49 @@ export default function CivicOrganizationsManager() {
       title: "Copied",
       description: `${type} copied to clipboard!`,
     });
+  };
+
+  const resetPassword = async (orgId: string, orgName: string) => {
+    try {
+      // Generate new password
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+      let newPassword = '';
+      for (let i = 0; i < 12; i++) {
+        newPassword += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+
+      // Hash the new password
+      const saltRounds = 12;
+      const password_hash = await bcrypt.hash(newPassword, saltRounds);
+
+      // Update in database
+      const { error } = await supabase
+        .from('civic_organizations')
+        .update({ password_hash })
+        .eq('id', orgId);
+
+      if (error) throw error;
+
+      // Show success dialog with new password
+      setResetPasswordDialog({
+        isOpen: true,
+        orgId,
+        orgName,
+        newPassword
+      });
+
+      toast({
+        title: "Password Reset",
+        description: `New password generated for ${orgName}`,
+      });
+
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to reset password",
+        variant: "destructive",
+      });
+    }
   };
 
   const togglePasswordVisibility = (orgId: string) => {
@@ -416,6 +460,14 @@ export default function CivicOrganizationsManager() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => resetPassword(org.id, org.name)}
+                      title="Reset Password"
+                    >
+                      <RotateCcw className="h-4 w-4" />
+                    </Button>
                     <Switch
                       checked={org.is_active}
                       onCheckedChange={() => toggleActive(org.id, org.is_active)}
@@ -492,6 +544,51 @@ export default function CivicOrganizationsManager() {
           ))
         )}
       </div>
+
+      {/* Reset Password Dialog */}
+      <Dialog open={resetPasswordDialog.isOpen} onOpenChange={(open) => setResetPasswordDialog({isOpen: open})}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>New Password Generated</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              A new password has been generated for <strong>{resetPasswordDialog.orgName}</strong>:
+            </p>
+            
+            <div className="space-y-2">
+              <Label>New Password</Label>
+              <div className="flex items-center gap-2">
+                <code className="bg-muted px-3 py-2 rounded font-mono text-lg flex-1">
+                  {resetPasswordDialog.newPassword}
+                </code>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => copyToClipboard(resetPasswordDialog.newPassword || '', 'New password')}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+              <p className="text-sm text-orange-800">
+                <strong>Important:</strong> Make sure to copy this password now. 
+                You won't be able to see it again once you close this dialog.
+              </p>
+            </div>
+
+            <Button 
+              onClick={() => setResetPasswordDialog({isOpen: false})} 
+              className="w-full"
+            >
+              Done
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
