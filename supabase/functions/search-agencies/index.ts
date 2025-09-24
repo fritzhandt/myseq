@@ -82,7 +82,7 @@ serve(async (req) => {
         },
         signal: controller.signal,
         body: JSON.stringify({
-          model: 'gpt-5.0-nano',
+          model: 'gpt-5-nano-2025-08-07',
           messages: [
             {
               role: 'system',
