@@ -4,8 +4,9 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Search, ExternalLink, AlertCircle, CheckCircle } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/lib/api-client';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { toast } from 'sonner';
 
 interface Agency {
   id: string;
@@ -47,21 +48,14 @@ const SolveMyIssue = () => {
         searchQuery = `${searchQuery} (user doesn't know which government level handles this)`;
       }
 
-      const { data, error: functionError } = await supabase.functions.invoke('search-agencies', {
-        body: { 
-          query: searchQuery,
-          preferredLevel: agencyLevel 
-        }
-      });
-
-      if (functionError) {
-        throw new Error(functionError.message);
-      }
-
+      const data = await apiClient.searchAgencies(searchQuery, agencyLevel);
+      
       setResults(data);
     } catch (err) {
       console.error('Search error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to search agencies');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to search agencies';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

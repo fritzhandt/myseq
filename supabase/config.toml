@@ -54,8 +54,11 @@ enable_sms_confirmations = false
 [functions]
 enabled = true
 
-[functions.search-agencies]
+[functions.api-gateway]
 verify_jwt = false
+
+[functions.search-agencies]
+verify_jwt = true
 
 [functions.process-agency-pdf]
 verify_jwt = true
