@@ -170,6 +170,39 @@ export type Database = {
         }
         Relationships: []
       }
+      government_agencies: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          keywords: string[] | null
+          level: string
+          name: string
+          updated_at: string
+          website: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          keywords?: string[] | null
+          level: string
+          name: string
+          updated_at?: string
+          website: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          keywords?: string[] | null
+          level?: string
+          name?: string
+          updated_at?: string
+          website?: string
+        }
+        Relationships: []
+      }
       job_reports: {
         Row: {
           created_at: string
