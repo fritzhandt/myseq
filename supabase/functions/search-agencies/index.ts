@@ -14,7 +14,7 @@ serve(async (req) => {
   }
 
   try {
-    const { query } = await req.json();
+    const { query, preferredLevel } = await req.json();
     
     if (!query || query.trim().length === 0) {
       return new Response(
@@ -117,7 +117,13 @@ Instructions:
 1. Analyze the user's query and identify which agencies are most relevant
 2. Rank agencies by relevance (1-100 confidence score)
 3. Only include agencies with confidence score >= 80
-4. Return results in JSON format with this structure:
+${preferredLevel === 'city' ? `
+4. SPECIAL NYC 311 PRIORITY RULE: Since the user prefers city-level agencies, ALWAYS check if NYC 311 can handle this issue.
+   - If NYC 311 matches AND other city agencies also match, prioritize NYC 311 as the PRIMARY recommendation
+   - NYC 311 should be listed FIRST when it's relevant, as it's the direct portal for most NYC complaints
+   - Include reasoning that explains NYC 311 is the direct way to report this type of issue to the city
+5. For city-level issues, prefer NYC agencies over state or federal ones when multiple levels could apply` : '4. Focus on agencies that match the user\'s preferred government level when possible'}
+${preferredLevel === 'city' ? '6' : '5'}. Return results in JSON format with this structure:
 {
   "results": [
     {
