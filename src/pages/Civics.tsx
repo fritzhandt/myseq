@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
-import { Users, MapPin, Search, Building2, ExternalLink, Phone } from "lucide-react";
+import { Users, MapPin, Search, Vote, ExternalLink, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface CivicOrganization {
@@ -130,7 +130,7 @@ const Civics = () => {
               ))
             ) : filteredOrgs.length === 0 ? (
               <div className="col-span-full text-center py-12">
-                <Building2 className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                <Vote className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-xl font-semibold mb-2">
                   {searchQuery ? "No organizations found" : "No organizations yet"}
                 </h3>
@@ -211,7 +211,7 @@ const Civics = () => {
               onClick={() => navigate('/civic-auth')}
               className="hover:bg-green-50 hover:border-green-500 hover:text-green-600"
             >
-              <Building2 className="mr-2 h-4 w-4" />
+              <Vote className="mr-2 h-4 w-4" />
               Organization Access
             </Button>
           </div>
