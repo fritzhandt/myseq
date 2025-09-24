@@ -33,6 +33,26 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // Get PDF content to enhance the search
+    const { data: pdfContent } = await supabase
+      .from('pdf_content')
+      .select('content, hyperlinks')
+      .limit(1)
+      .single();
+
+    let contextualInfo = '';
+    if (pdfContent && pdfContent.content) {
+      contextualInfo = `
+
+ADDITIONAL CONTEXT FROM NYC AGENCIES DOCUMENT:
+${pdfContent.content}
+
+HYPERLINKS AVAILABLE:
+${pdfContent.hyperlinks ? JSON.stringify(pdfContent.hyperlinks, null, 2) : 'None'}
+
+Use this context to better match user queries with the right agencies.`;
+    }
+
     // Get all agencies from database
     const { data: agencies, error: dbError } = await supabase
       .from('government_agencies')
@@ -86,10 +106,12 @@ serve(async (req) => {
           messages: [
             {
               role: 'system',
-              content: `You are an expert in government services and agencies. Your task is to analyze a user's issue and match it with the most appropriate government agencies.
+            content: `You are an expert in government services and agencies. Your task is to analyze a user's issue and match it with the most appropriate government agencies.
 
 AGENCIES LIST:
 ${agencyList}
+
+${contextualInfo}
 
 Instructions:
 1. Analyze the user's query and identify which agencies are most relevant

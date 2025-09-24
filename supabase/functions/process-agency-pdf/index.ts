@@ -33,35 +33,26 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Download and process the actual PDF
+    // Download the PDF
     console.log('Downloading PDF from:', fileUrl);
     const pdfResponse = await fetch(fileUrl);
     if (!pdfResponse.ok) {
       throw new Error(`Failed to download PDF: ${pdfResponse.statusText}`);
     }
 
-    const pdfBytes = await pdfResponse.bytes();
-    console.log('PDF downloaded, size:', pdfBytes.length, 'bytes');
+    const pdfBytes = await pdfResponse.arrayBuffer();
+    console.log('PDF downloaded, size:', pdfBytes.byteLength, 'bytes');
 
-    // Use OpenAI to extract text and agency info from the PDF
+    // Use OpenAI to extract text content and hyperlinks from the PDF
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openAIApiKey) {
       throw new Error('OpenAI API key not configured');
     }
 
-    // Convert PDF bytes to base64 in chunks to avoid stack overflow
-    const chunkSize = 1000000; // 1MB chunks
-    let base64String = '';
-    
-    for (let i = 0; i < pdfBytes.length; i += chunkSize) {
-      const chunk = pdfBytes.slice(i, i + chunkSize);
-      const chunkBase64 = btoa(String.fromCharCode.apply(null, Array.from(chunk)));
-      base64String += chunkBase64;
-    }
+    // Convert PDF to base64 for OpenAI
+    const pdfBase64 = btoa(String.fromCharCode(...new Uint8Array(pdfBytes)));
+    console.log('PDF converted to base64');
 
-    console.log('PDF converted to base64, length:', base64String.length);
-
-    // Use OpenAI to analyze the PDF
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -73,41 +64,38 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are an expert at extracting government agency information from PDF documents.
+            content: `You are a PDF text extraction expert. Extract ALL text content and hyperlinks from the provided PDF document.
 
-            Analyze the provided PDF document and extract ALL government agencies mentioned. For each agency, provide:
-            1. Name (exact official name from document)
-            2. Description (what services they provide)
-            3. Level (city, state, or federal - default to city for NYC agencies)
-            4. Website URL (if mentioned in document)
-            5. Keywords (array of services, issues they handle)
-
-            Return results as JSON:
+            Return the results in this JSON format:
             {
-              "agencies": [
+              "content": "Full text content of the PDF with all agency names, descriptions, services, and complaint types preserved exactly as written",
+              "hyperlinks": [
                 {
-                  "name": "Agency Name",
-                  "description": "Services and responsibilities",
-                  "level": "city|state|federal",
-                  "website": "https://website.com or null",
-                  "keywords": ["service1", "service2", "complaint_type"]
+                  "text": "Link text or agency name",
+                  "url": "https://website.com",
+                  "context": "Brief context about what this link is for"
                 }
               ]
             }
 
-            Extract ALL agencies from the document - there should be dozens. Include specific complaint types and services as keywords.`
+            IMPORTANT:
+            - Extract ALL text content - don't summarize or parse it
+            - Preserve exact agency names and service descriptions
+            - Extract all clickable hyperlinks with their URLs
+            - Keep the original formatting and structure as much as possible
+            - This content will be used by AI search to help people find the right agency`
           },
           {
             role: 'user',
             content: [
               {
                 type: "text",
-                text: `Extract all government agencies from this NYC agencies PDF document. Make sure to get every single agency listed and their services.`
+                text: `Extract all text content and hyperlinks from this NYC government agencies PDF document: ${fileName}`
               },
               {
                 type: "image_url",
                 image_url: {
-                  url: `data:application/pdf;base64,${base64String}`
+                  url: `data:application/pdf;base64,${pdfBase64}`
                 }
               }
             ]
@@ -127,10 +115,10 @@ serve(async (req) => {
     const aiResult = await openaiResponse.json();
     const aiContent = aiResult.choices?.[0]?.message?.content;
     
-    console.log('AI Response received, length:', aiContent?.length);
+    console.log('AI Response received, extracting content...');
 
     if (!aiContent) {
-      throw new Error('No response from AI analysis');
+      throw new Error('No response from AI text extraction');
     }
 
     // Parse the AI response
@@ -149,79 +137,60 @@ serve(async (req) => {
       throw new Error('Failed to parse AI response as JSON');
     }
 
-    if (!extractedData.agencies || !Array.isArray(extractedData.agencies)) {
-      throw new Error('Invalid response format from AI - no agencies array found');
+    if (!extractedData.content) {
+      throw new Error('No content extracted from PDF');
     }
 
-    console.log('Extracted agencies from PDF:', extractedData.agencies.length);
+    console.log('Extracted content length:', extractedData.content.length);
+    console.log('Extracted hyperlinks:', extractedData.hyperlinks?.length || 0);
 
-    // Insert/update agencies in the database
-    let processedCount = 0;
-    const errors = [];
+    // Store the extracted content in the database
+    // First, check if we already have content for this file
+    const { data: existingContent } = await supabase
+      .from('pdf_content')
+      .select('id')
+      .eq('file_name', fileName)
+      .maybeSingle();
 
-    for (const agency of extractedData.agencies) {
-      try {
-        console.log(`Processing agency: ${agency.name}`);
-        
-        // Check if agency already exists by name
-        const { data: existingAgency } = await supabase
-          .from('government_agencies')
-          .select('id')
-          .eq('name', agency.name)
-          .maybeSingle();
+    if (existingContent) {
+      // Update existing content
+      const { error: updateError } = await supabase
+        .from('pdf_content')
+        .update({
+          content: extractedData.content,
+          hyperlinks: extractedData.hyperlinks || [],
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', existingContent.id);
 
-        if (existingAgency) {
-          // Update existing agency
-          const { error: updateError } = await supabase
-            .from('government_agencies')
-            .update({
-              description: agency.description,
-              level: agency.level,
-              website: agency.website,
-              keywords: agency.keywords,
-              updated_at: new Date().toISOString()
-            })
-            .eq('id', existingAgency.id);
-
-          if (updateError) {
-            console.error('Error updating agency:', updateError);
-            errors.push(`Failed to update ${agency.name}: ${updateError.message}`);
-          } else {
-            processedCount++;
-            console.log('Updated existing agency:', agency.name);
-          }
-        } else {
-          // Insert new agency
-          const { error: insertError } = await supabase
-            .from('government_agencies')
-            .insert({
-              name: agency.name,
-              description: agency.description,
-              level: agency.level,
-              website: agency.website,
-              keywords: agency.keywords
-            });
-
-          if (insertError) {
-            console.error('Error inserting agency:', insertError);
-            errors.push(`Failed to insert ${agency.name}: ${insertError.message}`);
-          } else {
-            processedCount++;
-            console.log('Inserted new agency:', agency.name);
-          }
-        }
-      } catch (error) {
-        console.error('Error processing agency:', agency.name, error);
-        errors.push(`Failed to process ${agency.name}: ${error.message}`);
+      if (updateError) {
+        throw new Error(`Failed to update PDF content: ${updateError.message}`);
       }
+
+      console.log('Updated existing PDF content');
+    } else {
+      // Insert new content
+      const { error: insertError } = await supabase
+        .from('pdf_content')
+        .insert({
+          file_name: fileName,
+          content: extractedData.content,
+          hyperlinks: extractedData.hyperlinks || []
+        });
+
+      if (insertError) {
+        throw new Error(`Failed to store PDF content: ${insertError.message}`);
+      }
+
+      console.log('Stored new PDF content');
     }
 
     const response = {
       success: true,
-      message: `PDF processed successfully. ${processedCount} agencies processed from NYC agency data.`,
-      agenciesProcessed: processedCount,
-      totalExtracted: extractedData.agencies.length,
-      errors: errors.length > 0 ? errors : undefined
+      message: `PDF content extracted and stored successfully.`,
+      contentLength: extractedData.content.length,
+      hyperlinksFound: extractedData.hyperlinks?.length || 0,
+      fileName: fileName
     };
 
     console.log('Processing complete:', response);

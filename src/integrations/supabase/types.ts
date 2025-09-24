@@ -280,6 +280,33 @@ export type Database = {
         }
         Relationships: []
       }
+      pdf_content: {
+        Row: {
+          content: string
+          created_at: string
+          file_name: string
+          hyperlinks: Json | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          file_name: string
+          hyperlinks?: Json | null
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          file_name?: string
+          hyperlinks?: Json | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       resources: {
         Row: {
           address: string | null
