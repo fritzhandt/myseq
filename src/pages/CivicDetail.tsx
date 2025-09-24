@@ -12,6 +12,7 @@ import { format, parseISO } from "date-fns";
 import PDFViewer from "@/components/PDFViewer";
 import AnnouncementDialog from "@/components/AnnouncementDialog";
 import { EventCard } from "@/components/EventCard";
+import PhotoViewer from "@/components/PhotoViewer";
 
 interface CivicOrganization {
   id: string;
@@ -78,6 +79,8 @@ const CivicDetail = () => {
   const [civicEvents, setCivicEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("general");
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [viewerIndex, setViewerIndex] = useState(0);
   const [selectedPDF, setSelectedPDF] = useState<{url: string; title: string} | null>(null);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
 
@@ -606,31 +609,48 @@ const CivicDetail = () => {
                         Check back later for photo updates from this organization.
                       </p>
                     </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {galleryPhotos.map((photo) => (
-                        <div key={photo.id} className="group relative overflow-hidden rounded-lg border">
-                          <img
-                            src={photo.photo_url}
-                            alt={photo.title || 'Gallery photo'}
-                            className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                          {(photo.title || photo.description) && (
-                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                              <div className="p-4 text-white">
-                                {photo.title && (
-                                  <h4 className="font-semibold text-sm mb-1">{photo.title}</h4>
-                                )}
-                                {photo.description && (
-                                  <p className="text-xs opacity-90">{photo.description}</p>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                   ) : (
+                     <>
+                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                         {galleryPhotos.map((photo, index) => (
+                           <div 
+                             key={photo.id} 
+                             className="group relative overflow-hidden rounded-lg border cursor-pointer"
+                             onClick={() => {
+                               setViewerIndex(index);
+                               setViewerOpen(true);
+                             }}
+                           >
+                             <img
+                               src={photo.photo_url}
+                               alt={photo.title || 'Gallery photo'}
+                               className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                             />
+                             {(photo.title || photo.description) && (
+                               <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                                 <div className="p-4 text-white">
+                                   {photo.title && (
+                                     <h4 className="font-semibold text-sm mb-1">{photo.title}</h4>
+                                   )}
+                                   {photo.description && (
+                                     <p className="text-xs opacity-90">{photo.description}</p>
+                                   )}
+                                 </div>
+                               </div>
+                             )}
+                           </div>
+                         ))}
+                       </div>
+
+                       <PhotoViewer
+                         photos={galleryPhotos}
+                         currentIndex={viewerIndex}
+                         isOpen={viewerOpen}
+                         onClose={() => setViewerOpen(false)}
+                         onIndexChange={setViewerIndex}
+                       />
+                     </>
+                   )}
                 </CardContent>
               </Card>
             </TabsContent>

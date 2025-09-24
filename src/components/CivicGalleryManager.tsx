@@ -7,8 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Images, Upload, Trash2, Edit, Loader2, X, Eye } from "lucide-react";
+import { Images, Upload, Trash2, Edit, Loader2, X, Eye, ImagePlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import PhotoViewer from "./PhotoViewer";
 
 interface CivicGalleryManagerProps {
   orgId: string;
@@ -32,6 +33,8 @@ const CivicGalleryManager = ({ orgId }: CivicGalleryManagerProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [viewerIndex, setViewerIndex] = useState(0);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -267,6 +270,116 @@ const CivicGalleryManager = ({ orgId }: CivicGalleryManagerProps) => {
     setEditingPhoto(null);
   };
 
+  const openViewer = (index: number) => {
+    setViewerIndex(index);
+    setViewerOpen(true);
+  };
+
+  const handleBulkUpload = async (files: File[]) => {
+    if (files.length === 0) return;
+
+    setUploading(true);
+    setUploadProgress(0);
+
+    try {
+      const uploadedPhotos: string[] = [];
+      const totalFiles = files.length;
+      
+      for (let i = 0; i < totalFiles; i++) {
+        const file = files[i];
+        const fileName = `gallery/${orgId}/${Date.now()}-${i}-${file.name}`;
+        
+        const { data, error } = await supabase.storage
+          .from('civic-files')
+          .upload(fileName, file);
+
+        if (error) throw error;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('civic-files')
+          .getPublicUrl(fileName);
+
+        uploadedPhotos.push(publicUrl);
+        setUploadProgress(((i + 1) / totalFiles) * 80);
+      }
+
+      // Insert all photos into database without titles/descriptions
+      const maxOrder = photos.length > 0 ? Math.max(...photos.map(p => p.order_index)) : -1;
+      const photoInserts = uploadedPhotos.map((url, index) => ({
+        civic_org_id: orgId,
+        title: null,
+        description: null,
+        photo_url: url,
+        order_index: maxOrder + index + 1,
+      }));
+
+      const { error: dbError } = await supabase
+        .from('civic_gallery')
+        .insert(photoInserts);
+
+      if (dbError) throw dbError;
+
+      setUploadProgress(100);
+
+      toast({
+        title: "Success",
+        description: `${uploadedPhotos.length} photo(s) uploaded successfully`,
+      });
+
+      fetchPhotos();
+    } catch (error) {
+      console.error('Error bulk uploading photos:', error);
+      toast({
+        title: "Error",
+        description: "Failed to upload photos",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+      setUploadProgress(0);
+    }
+  };
+
+  const handleBulkFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    
+    if (files.length === 0) return;
+
+    // Check file types
+    const invalidFiles = files.filter(file => !file.type.startsWith('image/'));
+    if (invalidFiles.length > 0) {
+      toast({
+        title: "Error",
+        description: "Please select only image files",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check file sizes (5MB limit each)
+    const oversizedFiles = files.filter(file => file.size > 5 * 1024 * 1024);
+    if (oversizedFiles.length > 0) {
+      toast({
+        title: "Error",
+        description: "Images must be under 5MB each",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check total limit
+    if (photos.length + files.length > GALLERY_PHOTO_LIMIT) {
+      toast({
+        title: "Error",
+        description: `Gallery is limited to ${GALLERY_PHOTO_LIMIT} photos. You can add ${GALLERY_PHOTO_LIMIT - photos.length} more.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    handleBulkUpload(files);
+  };
+
   if (loading) {
     return (
       <Card>
@@ -292,16 +405,34 @@ const CivicGalleryManager = ({ orgId }: CivicGalleryManagerProps) => {
             <Images className="h-5 w-5" />
             Gallery ({photos.length}/{GALLERY_PHOTO_LIMIT})
           </CardTitle>
-          <Dialog open={isDialogOpen} onOpenChange={(open) => {
-            setIsDialogOpen(open);
-            if (!open) resetForm();
-          }}>
-            <DialogTrigger asChild>
-              <Button disabled={photos.length >= GALLERY_PHOTO_LIMIT}>
-                <Upload className="mr-2 h-4 w-4" />
-                {photos.length >= GALLERY_PHOTO_LIMIT ? 'Gallery Full' : 'Add Photos'}
-              </Button>
-            </DialogTrigger>
+          <div className="flex gap-2">
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleBulkFileChange}
+              className="hidden"
+              id="bulk-upload"
+              disabled={photos.length >= GALLERY_PHOTO_LIMIT || uploading}
+            />
+            <Button
+              variant="outline"
+              disabled={photos.length >= GALLERY_PHOTO_LIMIT || uploading}
+              onClick={() => document.getElementById('bulk-upload')?.click()}
+            >
+              <ImagePlus className="mr-2 h-4 w-4" />
+              Bulk Upload
+            </Button>
+            <Dialog open={isDialogOpen} onOpenChange={(open) => {
+              setIsDialogOpen(open);
+              if (!open) resetForm();
+            }}>
+              <DialogTrigger asChild>
+                <Button disabled={photos.length >= GALLERY_PHOTO_LIMIT}>
+                  <Upload className="mr-2 h-4 w-4" />
+                  {photos.length >= GALLERY_PHOTO_LIMIT ? 'Gallery Full' : 'Add Photos'}
+                </Button>
+              </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
                 <DialogTitle>
@@ -393,6 +524,7 @@ const CivicGalleryManager = ({ orgId }: CivicGalleryManagerProps) => {
               </div>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
@@ -405,52 +537,80 @@ const CivicGalleryManager = ({ orgId }: CivicGalleryManagerProps) => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {photos.map((photo) => (
-              <div key={photo.id} className="relative group">
-                <img
-                  src={photo.photo_url}
-                  alt={photo.title || "Gallery photo"}
-                  className="w-full h-32 object-cover rounded border"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-200 rounded flex items-center justify-center">
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => window.open(photo.photo_url, '_blank')}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => handleEdit(photo)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDelete(photo)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-                {(photo.title || photo.description) && (
-                  <div className="p-2 bg-white">
-                    {photo.title && (
-                      <p className="text-sm font-medium truncate">{photo.title}</p>
-                    )}
-                    {photo.description && (
-                      <p className="text-xs text-muted-foreground line-clamp-2">{photo.description}</p>
-                    )}
-                  </div>
-                )}
+          <>
+            {uploading && (
+              <div className="mb-4 space-y-2">
+                <Progress value={uploadProgress} />
+                <p className="text-sm text-muted-foreground text-center">
+                  Uploading... {uploadProgress}%
+                </p>
               </div>
-            ))}
-          </div>
+            )}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {photos.map((photo, index) => (
+                <div key={photo.id} className="relative group">
+                  <img
+                    src={photo.photo_url}
+                    alt={photo.title || "Gallery photo"}
+                    className="w-full h-32 object-cover rounded border cursor-pointer"
+                    onClick={() => openViewer(index)}
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-200 rounded flex items-center justify-center">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openViewer(index);
+                        }}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEdit(photo);
+                        }}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(photo);
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  {(photo.title || photo.description) && (
+                    <div className="p-2 bg-white">
+                      {photo.title && (
+                        <p className="text-sm font-medium truncate">{photo.title}</p>
+                      )}
+                      {photo.description && (
+                        <p className="text-xs text-muted-foreground line-clamp-2">{photo.description}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <PhotoViewer
+              photos={photos}
+              currentIndex={viewerIndex}
+              isOpen={viewerOpen}
+              onClose={() => setViewerOpen(false)}
+              onIndexChange={setViewerIndex}
+            />
+          </>
         )}
       </CardContent>
     </Card>
