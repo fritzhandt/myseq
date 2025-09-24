@@ -29,6 +29,7 @@ const SolveMyIssue = () => {
   const [results, setResults] = useState<SearchResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [agencyLevel, setAgencyLevel] = useState<'city' | 'state' | 'federal' | 'unknown' | null>(null);
 
   const handleSearch = async () => {
     if (!query.trim()) return;
@@ -38,8 +39,19 @@ const SolveMyIssue = () => {
     setResults(null);
 
     try {
+      // Build the search query with agency level preference if specified
+      let searchQuery = query.trim();
+      if (agencyLevel && agencyLevel !== 'unknown') {
+        searchQuery = `${searchQuery} (preferably ${agencyLevel} level agency)`;
+      } else if (agencyLevel === 'unknown') {
+        searchQuery = `${searchQuery} (user doesn't know which government level handles this)`;
+      }
+
       const { data, error: functionError } = await supabase.functions.invoke('search-agencies', {
-        body: { query: query.trim() }
+        body: { 
+          query: searchQuery,
+          preferredLevel: agencyLevel 
+        }
       });
 
       if (functionError) {
@@ -113,6 +125,49 @@ const SolveMyIssue = () => {
                 </>
               )}
             </Button>
+          </div>
+
+          {/* Agency Level Selection */}
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Do you know which level of government handles your issue?</p>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant={agencyLevel === 'city' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setAgencyLevel(agencyLevel === 'city' ? null : 'city')}
+              >
+                City/Local
+              </Button>
+              <Button
+                variant={agencyLevel === 'state' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setAgencyLevel(agencyLevel === 'state' ? null : 'state')}
+              >
+                State
+              </Button>
+              <Button
+                variant={agencyLevel === 'federal' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setAgencyLevel(agencyLevel === 'federal' ? null : 'federal')}
+              >
+                Federal
+              </Button>
+              <Button
+                variant={agencyLevel === 'unknown' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setAgencyLevel(agencyLevel === 'unknown' ? null : 'unknown')}
+              >
+                I don't know
+              </Button>
+            </div>
+            {agencyLevel && (
+              <p className="text-xs text-muted-foreground">
+                {agencyLevel === 'unknown' 
+                  ? "We'll search all levels to find the right agency for you."
+                  : `Focusing search on ${agencyLevel} level agencies.`
+                } Click the button again to clear selection.
+              </p>
+            )}
           </div>
 
           <Alert className="bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800">
