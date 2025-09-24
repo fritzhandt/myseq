@@ -76,7 +76,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-5-nano-2025-08-07',
         messages: [
           {
             role: 'system',
@@ -107,8 +107,7 @@ Be very precise - only return agencies that truly match the user's issue. If no 
             content: `User's issue: "${query}"`
           }
         ],
-        temperature: 0.1,
-        max_tokens: 1000
+        max_completion_tokens: 1000
       }),
     });
 
