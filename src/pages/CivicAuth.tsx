@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import Navbar from "@/components/Navbar";
 import { Building2, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import bcrypt from 'bcryptjs';
 
 const CivicAuth = () => {
   const [accessCode, setAccessCode] = useState("");
@@ -50,25 +51,29 @@ const CivicAuth = () => {
     setLoading(true);
 
     try {
-      // Hash the password for comparison (simple example - in production use proper hashing)
-      const encoder = new TextEncoder();
-      const data = encoder.encode(password);
-      const hash = await crypto.subtle.digest('SHA-256', data);
-      const hashArray = Array.from(new Uint8Array(hash));
-      const hashedPassword = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
-      // Find organization with matching access code and password
+      // Find organization with matching access code
       const { data: org, error } = await supabase
         .from('civic_organizations')
         .select('*')
         .eq('access_code', accessCode.trim())
-        .eq('password_hash', hashedPassword)
         .eq('is_active', true)
         .single();
 
       if (error || !org) {
         toast({
           title: "Authentication Failed",
+          description: "Invalid access code or password",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Verify password using bcrypt
+      const isPasswordValid = await bcrypt.compare(password, org.password_hash);
+      
+      if (!isPasswordValid) {
+        toast({
+          title: "Authentication Failed", 
           description: "Invalid access code or password",
           variant: "destructive",
         });
