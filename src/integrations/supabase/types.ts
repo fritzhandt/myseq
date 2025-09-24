@@ -343,6 +343,7 @@ export type Database = {
           additional_images: string[] | null
           age_group: string[] | null
           archived: boolean
+          civic_org_id: string | null
           cover_photo_url: string | null
           created_at: string
           description: string
@@ -350,6 +351,7 @@ export type Database = {
           event_date: string
           event_time: string
           id: string
+          is_public: boolean
           location: string
           office_address: string | null
           registration_email: string | null
@@ -364,6 +366,7 @@ export type Database = {
           additional_images?: string[] | null
           age_group?: string[] | null
           archived?: boolean
+          civic_org_id?: string | null
           cover_photo_url?: string | null
           created_at?: string
           description: string
@@ -371,6 +374,7 @@ export type Database = {
           event_date: string
           event_time: string
           id?: string
+          is_public?: boolean
           location: string
           office_address?: string | null
           registration_email?: string | null
@@ -385,6 +389,7 @@ export type Database = {
           additional_images?: string[] | null
           age_group?: string[] | null
           archived?: boolean
+          civic_org_id?: string | null
           cover_photo_url?: string | null
           created_at?: string
           description?: string
@@ -392,6 +397,7 @@ export type Database = {
           event_date?: string
           event_time?: string
           id?: string
+          is_public?: boolean
           location?: string
           office_address?: string | null
           registration_email?: string | null
@@ -402,7 +408,15 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "events_civic_org_id_fkey"
+            columns: ["civic_org_id"]
+            isOneToOne: false
+            referencedRelation: "civic_organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       government_agencies: {
         Row: {

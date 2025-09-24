@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { format, parseISO } from "date-fns";
 import PDFViewer from "@/components/PDFViewer";
 import AnnouncementDialog from "@/components/AnnouncementDialog";
+import { EventCard } from "@/components/EventCard";
 
 interface CivicOrganization {
   id: string;
@@ -74,6 +75,7 @@ const CivicDetail = () => {
   const [newsletters, setNewsletters] = useState<Newsletter[]>([]);
   const [importantLinks, setImportantLinks] = useState<ImportantLink[]>([]);
   const [galleryPhotos, setGalleryPhotos] = useState<GalleryPhoto[]>([]);
+  const [civicEvents, setCivicEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("general");
   const [selectedPDF, setSelectedPDF] = useState<{url: string; title: string} | null>(null);
@@ -155,6 +157,16 @@ const CivicDetail = () => {
         .order('order_index');
 
       setGalleryPhotos(galleryData || []);
+
+      // Fetch civic events
+      const { data: eventsData } = await supabase
+        .from('events')
+        .select('*')
+        .eq('civic_org_id', orgId)
+        .eq('archived', false)
+        .order('event_date', { ascending: true });
+
+      setCivicEvents(eventsData || []);
 
     } catch (error) {
       console.error('Error:', error);
@@ -243,13 +255,14 @@ const CivicDetail = () => {
 
           {/* Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-6">
+            <TabsList className="grid w-full grid-cols-7">
               <TabsTrigger value="general">General Info</TabsTrigger>
               <TabsTrigger value="newsletters">Newsletter</TabsTrigger>
               <TabsTrigger value="announcements">Announcements</TabsTrigger>
               <TabsTrigger value="leadership">Leadership</TabsTrigger>
               <TabsTrigger value="links">Important Links</TabsTrigger>
               <TabsTrigger value="gallery">Gallery</TabsTrigger>
+              <TabsTrigger value="events">Events</TabsTrigger>
             </TabsList>
 
             {/* General Information */}
@@ -517,6 +530,133 @@ const CivicDetail = () => {
                             </div>
                           )}
                         </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Important Links */}
+            <TabsContent value="links" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Link className="h-5 w-5" />
+                    Important Links
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {importantLinks.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Link className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">No important links yet</h3>
+                      <p className="text-muted-foreground">
+                        Check back later for important links and resources.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="grid gap-4">
+                      {importantLinks.map((link) => (
+                        <div 
+                          key={link.id}
+                          className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <h3 className="font-semibold text-lg mb-1">{link.title}</h3>
+                              {link.description && (
+                                <p className="text-muted-foreground text-sm mb-3">
+                                  {link.description}
+                                </p>
+                              )}
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => window.open(link.url, '_blank')}
+                              className="ml-4"
+                            >
+                              Visit Link
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Gallery */}
+            <TabsContent value="gallery" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Images className="h-5 w-5" />
+                    Photo Gallery
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {galleryPhotos.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Images className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">No photos yet</h3>
+                      <p className="text-muted-foreground">
+                        Check back later for photo updates from this organization.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {galleryPhotos.map((photo) => (
+                        <div key={photo.id} className="group relative overflow-hidden rounded-lg border">
+                          <img
+                            src={photo.photo_url}
+                            alt={photo.title || 'Gallery photo'}
+                            className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                          {(photo.title || photo.description) && (
+                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                              <div className="p-4 text-white">
+                                {photo.title && (
+                                  <h4 className="font-semibold text-sm mb-1">{photo.title}</h4>
+                                )}
+                                {photo.description && (
+                                  <p className="text-xs opacity-90">{photo.description}</p>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Events */}
+            <TabsContent value="events" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Calendar className="h-5 w-5" />
+                    Upcoming Events
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {civicEvents.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Calendar className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">No events scheduled</h3>
+                      <p className="text-muted-foreground">
+                        Check back later for event updates from this organization.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {civicEvents.map((event) => (
+                        <EventCard key={event.id} event={event} />
                       ))}
                     </div>
                   )}
