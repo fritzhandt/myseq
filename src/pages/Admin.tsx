@@ -12,10 +12,10 @@ import ResourceForm from '@/components/ResourceForm';
 import ResourcesList from '@/components/ResourcesList';
 import JobCSVUpload from '@/components/JobCSVUpload';
 import JobReportsList from '@/components/JobReportsList';
-import AgencyPDFUpload from '@/components/AgencyPDFUpload';
+import AgencyDocumentUpload from '@/components/AgencyDocumentUpload';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Calendar, LogOut, Star, AlertTriangle, Users, MapPin } from 'lucide-react';
+import { Plus, Calendar, LogOut, Star, AlertTriangle, Users, MapPin, FileText } from 'lucide-react';
 
 const Admin = () => {
   const [showForm, setShowForm] = useState(false);
@@ -188,8 +188,8 @@ const Admin = () => {
               Jobs
             </TabsTrigger>
             <TabsTrigger value="agencies" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Agency PDFs
+              <FileText className="h-4 w-4" />
+              Agency Docs
             </TabsTrigger>
           </TabsList>
 
@@ -289,12 +289,12 @@ const Admin = () => {
           <TabsContent value="agencies">
             <div className="space-y-6">
               <div className="flex justify-between items-center">
-                <h2 className="text-3xl font-bold">Government Agency PDFs</h2>
+                <h2 className="text-3xl font-bold">Government Agency Documents</h2>
               </div>
               <p className="text-muted-foreground">
-                Upload PDF documents containing government agency information to improve the "Solve My Issue" search functionality.
+                Upload PDF or Word documents containing government agency information to improve the "Solve My Issue" search functionality.
               </p>
-              <AgencyPDFUpload />
+              <AgencyDocumentUpload />
             </div>
           </TabsContent>
         </Tabs>

@@ -26,32 +26,35 @@ serve(async (req) => {
       );
     }
 
-    console.log('Processing PDF:', fileName);
+    console.log('Processing document:', fileName);
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Download the PDF
-    console.log('Downloading PDF from:', fileUrl);
-    const pdfResponse = await fetch(fileUrl);
-    if (!pdfResponse.ok) {
-      throw new Error(`Failed to download PDF: ${pdfResponse.statusText}`);
+    // Download the document
+    console.log('Downloading document from:', fileUrl);
+    const docResponse = await fetch(fileUrl);
+    if (!docResponse.ok) {
+      throw new Error(`Failed to download document: ${docResponse.statusText}`);
     }
 
-    const pdfBytes = await pdfResponse.arrayBuffer();
-    console.log('PDF downloaded, size:', pdfBytes.byteLength, 'bytes');
+    const docBytes = await docResponse.arrayBuffer();
+    console.log('Document downloaded, size:', docBytes.byteLength, 'bytes');
 
-    // Use OpenAI to extract text content and hyperlinks from the PDF
+    // Use OpenAI to extract text content and hyperlinks from the document
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openAIApiKey) {
       throw new Error('OpenAI API key not configured');
     }
 
-    // Convert PDF to base64 for OpenAI
-    const pdfBase64 = btoa(String.fromCharCode(...new Uint8Array(pdfBytes)));
-    console.log('PDF converted to base64');
+    // Convert document to base64 for OpenAI
+    const docBase64 = btoa(String.fromCharCode(...new Uint8Array(docBytes)));
+    console.log('Document converted to base64');
+
+    const fileType = fileName.toLowerCase().includes('.pdf') ? 'PDF' : 'Word';
+    const mimeType = fileName.toLowerCase().includes('.pdf') ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -64,15 +67,15 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are a PDF text extraction expert. Extract ALL text content and hyperlinks from the provided PDF document.
+            content: `You are a document text extraction expert. Extract ALL text content and hyperlinks from the provided ${fileType} document.
 
             Return the results in this JSON format:
             {
-              "content": "Full text content of the PDF with all agency names, descriptions, services, and complaint types preserved exactly as written",
+              "content": "Full text content of the document with all agency names, descriptions, services, and complaint types preserved exactly as written",
               "hyperlinks": [
                 {
                   "text": "Link text or agency name",
-                  "url": "https://website.com",
+                  "url": "https://website.com", 
                   "context": "Brief context about what this link is for"
                 }
               ]
@@ -80,7 +83,7 @@ serve(async (req) => {
 
             IMPORTANT:
             - Extract ALL text content - don't summarize or parse it
-            - Preserve exact agency names and service descriptions
+            - Preserve exact agency names and service descriptions  
             - Extract all clickable hyperlinks with their URLs
             - Keep the original formatting and structure as much as possible
             - This content will be used by AI search to help people find the right agency`
@@ -90,12 +93,12 @@ serve(async (req) => {
             content: [
               {
                 type: "text",
-                text: `Extract all text content and hyperlinks from this NYC government agencies PDF document: ${fileName}`
+                text: `Extract all text content and hyperlinks from this NYC government agencies ${fileType} document: ${fileName}`
               },
               {
                 type: "image_url",
                 image_url: {
-                  url: `data:application/pdf;base64,${pdfBase64}`
+                  url: `data:${mimeType};base64,${docBase64}`
                 }
               }
             ]
@@ -187,7 +190,7 @@ serve(async (req) => {
 
     const response = {
       success: true,
-      message: `PDF content extracted and stored successfully.`,
+      message: `Document content extracted and stored successfully.`,
       contentLength: extractedData.content.length,
       hyperlinksFound: extractedData.hyperlinks?.length || 0,
       fileName: fileName
@@ -203,11 +206,11 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Error processing PDF:', error);
+    console.error('Error processing document:', error);
     return new Response(
       JSON.stringify({ 
         success: false,
-        message: 'Failed to process PDF',
+        message: 'Failed to process document',
         error: error.message 
       }),
       {

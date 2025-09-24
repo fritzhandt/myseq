@@ -15,7 +15,7 @@ interface ProcessingResult {
   error?: string;
 }
 
-const AgencyPDFUpload = () => {
+const AgencyDocumentUpload = () => {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -25,13 +25,17 @@ const AgencyPDFUpload = () => {
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
-    if (selectedFile && selectedFile.type === 'application/pdf') {
+    if (selectedFile && (
+      selectedFile.type === 'application/pdf' || 
+      selectedFile.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+      selectedFile.type === 'application/msword'
+    )) {
       setFile(selectedFile);
       setResult(null);
     } else {
       toast({
         title: "Invalid file type",
-        description: "Please select a PDF file.",
+        description: "Please select a PDF or Word document (.pdf, .doc, .docx).",
         variant: "destructive",
       });
     }
@@ -45,8 +49,8 @@ const AgencyPDFUpload = () => {
     setResult(null);
 
     try {
-      // Upload PDF to Supabase Storage
-      const fileName = `agency-pdf-${Date.now()}.pdf`;
+      // Upload document to Supabase Storage
+      const fileName = `agency-doc-${Date.now()}.${file.name.split('.').pop()}`;
       
       setUploadProgress(25);
       
@@ -68,7 +72,7 @@ const AgencyPDFUpload = () => {
 
       setUploadProgress(75);
 
-      // Call edge function to process the PDF
+      // Call edge function to process the document
       const { data: processData, error: processError } = await supabase.functions.invoke('process-agency-pdf', {
         body: { 
           fileUrl: publicUrl,
@@ -85,7 +89,7 @@ const AgencyPDFUpload = () => {
 
       toast({
         title: "Success!",
-        description: `PDF processed successfully. ${processData.agenciesProcessed || 0} agencies updated.`,
+        description: `Document processed successfully. Content length: ${processData.contentLength} characters.`,
       });
 
       // Clean up the uploaded file after processing
@@ -97,13 +101,13 @@ const AgencyPDFUpload = () => {
       console.error('Upload/processing error:', error);
       setResult({
         success: false,
-        message: 'Failed to process PDF',
+        message: 'Failed to process document',
         error: error instanceof Error ? error.message : 'Unknown error'
       });
       
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : 'Failed to process PDF',
+        description: error instanceof Error ? error.message : 'Failed to process document',
         variant: "destructive",
       });
     } finally {
@@ -130,21 +134,21 @@ const AgencyPDFUpload = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Upload Agency PDF
+            Upload Agency Document
           </CardTitle>
           <CardDescription>
-            Upload a PDF containing government agency information to automatically update the database and improve search results.
+            Upload a PDF or Word document containing government agency information to automatically update the database and improve search results.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="pdf-upload" className="text-sm font-medium">
-              Select PDF File
+              Select Document File (PDF, Word)
             </label>
             <Input
               id="pdf-upload"
               type="file"
-              accept=".pdf"
+              accept=".pdf,.doc,.docx"
               onChange={handleFileSelect}
               disabled={uploading}
               className="cursor-pointer"
@@ -165,7 +169,7 @@ const AgencyPDFUpload = () => {
               <div className="flex items-center justify-between text-sm">
                 <span>
                   {uploading && !processing && "Uploading..."}
-                  {processing && "Processing PDF..."}
+                  {processing && "Processing document..."}
                 </span>
                 <span>{uploadProgress}%</span>
               </div>
@@ -184,7 +188,7 @@ const AgencyPDFUpload = () => {
               ) : (
                 <Upload className="h-4 w-4" />
               )}
-              {uploading ? "Processing..." : "Upload & Process PDF"}
+              {uploading ? "Processing..." : "Upload & Process Document"}
             </Button>
             
             {file && !uploading && (
@@ -230,10 +234,9 @@ const AgencyPDFUpload = () => {
         </CardHeader>
         <CardContent>
           <div className="text-sm space-y-2 text-muted-foreground">
-            <p>• Upload PDF documents containing government agency information</p>
+            <p>• Upload PDF or Word documents (.pdf, .doc, .docx) containing government agency information</p>
             <p>• The system will automatically extract agency names, descriptions, contact info, and websites</p>
-            <p>• Hyperlinks within the PDF will be preserved and extracted</p>
-            <p>• Duplicate agencies will be updated with new information</p>
+            <p>• Hyperlinks within the document will be preserved and extracted</p>
             <p>• This improves the "Solve My Issue" search functionality for users</p>
           </div>
         </CardContent>
@@ -242,4 +245,4 @@ const AgencyPDFUpload = () => {
   );
 };
 
-export default AgencyPDFUpload;
+export default AgencyDocumentUpload;
