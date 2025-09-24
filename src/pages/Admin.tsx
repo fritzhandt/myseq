@@ -12,6 +12,7 @@ import ResourceForm from '@/components/ResourceForm';
 import ResourcesList from '@/components/ResourcesList';
 import JobCSVUpload from '@/components/JobCSVUpload';
 import JobReportsList from '@/components/JobReportsList';
+import AgencyPDFUpload from '@/components/AgencyPDFUpload';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Calendar, LogOut, Star, AlertTriangle, Users, MapPin } from 'lucide-react';
@@ -165,7 +166,7 @@ const Admin = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="events" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-8">
+          <TabsList className="grid w-full grid-cols-6 mb-8">
             <TabsTrigger value="events" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
               Regular Events
@@ -185,6 +186,10 @@ const Admin = () => {
             <TabsTrigger value="jobs" className="flex items-center gap-2">
               <MapPin className="h-4 w-4" />
               Jobs
+            </TabsTrigger>
+            <TabsTrigger value="agencies" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Agency PDFs
             </TabsTrigger>
           </TabsList>
 
@@ -278,6 +283,18 @@ const Admin = () => {
               </div>
               <JobCSVUpload />
               <JobReportsList />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="agencies">
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-3xl font-bold">Government Agency PDFs</h2>
+              </div>
+              <p className="text-muted-foreground">
+                Upload PDF documents containing government agency information to improve the "Solve My Issue" search functionality.
+              </p>
+              <AgencyPDFUpload />
             </div>
           </TabsContent>
         </Tabs>

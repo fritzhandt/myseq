@@ -56,3 +56,6 @@ enabled = true
 
 [functions.search-agencies]
 verify_jwt = false
+
+[functions.process-agency-pdf]
+verify_jwt = true
