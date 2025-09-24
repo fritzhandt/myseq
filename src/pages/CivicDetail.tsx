@@ -508,14 +508,14 @@ const CivicDetail = () => {
                           
                           {leader.contact_info && (
                             <div className="space-y-1 text-sm">
-                              {leader.contact_info.email && (
+                               {leader.contact_info.email && (
                                 <div className="flex items-center justify-center gap-2">
                                   <Mail className="h-3 w-3" />
                                   <a 
                                     href={`mailto:${leader.contact_info.email}`}
                                     className="hover:text-green-600"
                                   >
-                                    Email
+                                    {leader.contact_info.email}
                                   </a>
                                 </div>
                               )}
@@ -526,7 +526,7 @@ const CivicDetail = () => {
                                     href={`tel:${leader.contact_info.phone}`}
                                     className="hover:text-green-600"
                                   >
-                                    Call
+                                    {leader.contact_info.phone}
                                   </a>
                                 </div>
                               )}
