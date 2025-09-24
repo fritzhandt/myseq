@@ -72,6 +72,9 @@ export default function DefaultPage() {
 
               {/* Solve My Issue Card */}
               <Card className="group relative overflow-hidden border-2 hover:border-orange-500/20 transition-all duration-500 hover:shadow-2xl hover:scale-105 bg-gradient-to-br from-background to-orange-500/5 flex flex-col h-full">
+                <div className="absolute top-2 right-2 z-20 bg-orange-500 text-white text-xs px-2 py-1 rounded-full font-semibold">
+                  EXPERIMENTAL
+                </div>
                 <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <CardHeader className="relative z-10 pb-6">
                   <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
