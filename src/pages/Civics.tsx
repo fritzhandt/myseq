@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
-import { Users, MapPin, Search, Building2, ExternalLink } from "lucide-react";
+import { Users, MapPin, Search, Building2, ExternalLink, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface CivicOrganization {
@@ -146,7 +146,6 @@ const Civics = () => {
                 <Card 
                   key={org.id} 
                   className="group cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105 border-2 hover:border-green-500/20"
-                  onClick={() => handleOrgClick(org.id)}
                 >
                   <CardHeader>
                     <CardTitle className="flex items-start justify-between gap-2">
@@ -155,24 +154,47 @@ const Civics = () => {
                       </span>
                       <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-green-600 transition-colors flex-shrink-0" />
                     </CardTitle>
-                    <CardDescription className="line-clamp-2">
-                      {org.description}
-                    </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <MapPin className="h-4 w-4 flex-shrink-0" />
-                        <span className="truncate">{org.coverage_area}</span>
+                  <CardContent className="space-y-4">
+                    {/* Coverage Area */}
+                    <div className="flex items-start gap-2">
+                      <MapPin className="h-4 w-4 mt-0.5 text-green-600 flex-shrink-0" />
+                      <div>
+                        <p className="text-sm font-medium">Coverage Area</p>
+                        <p className="text-sm text-muted-foreground">{org.coverage_area}</p>
                       </div>
-                      
-                      {org.meeting_info && (
-                        <Badge variant="secondary" className="text-xs">
-                          <Users className="h-3 w-3 mr-1" />
-                          Meetings Available
-                        </Badge>
-                      )}
                     </div>
+                    
+                    {/* Meeting Information */}
+                    {org.meeting_info && (
+                      <div className="flex items-start gap-2">
+                        <Users className="h-4 w-4 mt-0.5 text-blue-600 flex-shrink-0" />
+                        <div>
+                          <p className="text-sm font-medium">Meetings</p>
+                          <p className="text-sm text-muted-foreground">{org.meeting_info}</p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Phone Number */}
+                    {org.contact_info?.phone && (
+                      <div className="flex items-start gap-2">
+                        <Phone className="h-4 w-4 mt-0.5 text-purple-600 flex-shrink-0" />
+                        <div>
+                          <p className="text-sm font-medium">Phone</p>
+                          <p className="text-sm text-muted-foreground">{org.contact_info.phone}</p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Learn More Button */}
+                    <Button 
+                      className="w-full mt-4"
+                      variant="outline"
+                      onClick={() => handleOrgClick(org.id)}
+                    >
+                      Learn More
+                    </Button>
                   </CardContent>
                 </Card>
               ))
