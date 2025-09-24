@@ -243,7 +243,7 @@ Be very precise - only return agencies that truly match the user's issue. If no 
         
         // Try to match the user's query to a specific complaint type
         const userQuery = query.toLowerCase();
-        let bestMatch = null;
+        let bestMatch: { url: string; title: string; description: string } | null = null;
         let bestMatchScore = 0;
         
         // Look for keyword matches in complaint types
@@ -253,7 +253,7 @@ Be very precise - only return agencies that truly match the user's issue. If no 
           
           let matchCount = 0;
           for (const typeWord of typeWords) {
-            if (queryWords.some(qWord => 
+            if (queryWords.some((qWord: string) => 
               qWord.includes(typeWord.toLowerCase()) || 
               typeWord.toLowerCase().includes(qWord)
             )) {
@@ -264,7 +264,7 @@ Be very precise - only return agencies that truly match the user's issue. If no 
           const matchScore = matchCount / typeWords.length;
           if (matchScore > bestMatchScore && matchScore >= 0.3) {
             bestMatchScore = matchScore;
-            bestMatch = data;
+            bestMatch = data as { url: string; title: string; description: string };
           }
         }
         
@@ -329,8 +329,9 @@ Be very precise - only return agencies that truly match the user's issue. If no 
 
   } catch (error) {
     console.error('Error in search-agencies function:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(
-      JSON.stringify({ error: 'Internal server error', details: error.message }),
+      JSON.stringify({ error: 'Internal server error', details: errorMessage }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }

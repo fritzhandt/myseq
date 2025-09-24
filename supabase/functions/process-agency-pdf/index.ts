@@ -52,7 +52,7 @@ serve(async (req) => {
     // This is a simplified approach - in production you'd use proper PDF/Word parsing libraries
     let extractedContent = '';
     let hyperlinks: Array<{text: string, url: string, context: string}> = [];
-    let complaint311Map = {}; // Declare at top level
+    let complaint311Map: { [key: string]: { url: string; title: string; description: string } } = {}; // Declare at top level
 
     try {
       // Convert file content to text for basic parsing
@@ -234,7 +234,7 @@ serve(async (req) => {
       JSON.stringify({ 
         success: false,
         message: 'Failed to process document',
-        error: error.message 
+        error: error instanceof Error ? error.message : 'Unknown error occurred'
       }),
       {
         status: 500,

@@ -114,9 +114,10 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('API Gateway error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(JSON.stringify({ 
       error: 'Gateway error',
-      message: error.message 
+      message: errorMessage 
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
