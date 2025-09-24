@@ -93,7 +93,7 @@ const SolveMyIssue = () => {
         <CardContent className="space-y-4">
           <div className="flex gap-2">
             <Input
-              placeholder="Describe your issue (e.g., 'My landlord won't fix the heat', 'I need to report a scam', 'Noise complaint about neighbor')"
+              placeholder="describe your issue as you would to a friend (e.g., my landlord won't fix my heat)."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyPress={handleKeyPress}
@@ -115,13 +115,21 @@ const SolveMyIssue = () => {
             </Button>
           </div>
 
+          <Alert className="bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800">
+            <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+            <AlertDescription className="text-yellow-800 dark:text-yellow-200">
+              <strong>Disclaimer:</strong> Solve My Issue is experimental and may not be accurate.
+            </AlertDescription>
+          </Alert>
+
           <div className="text-sm text-muted-foreground">
             <p className="mb-2"><strong>Tips for better results:</strong></p>
-            <ul className="list-disc list-inside space-y-1">
-              <li>Be specific about your problem</li>
-              <li>Include relevant details (housing, business, health, etc.)</li>
-              <li>Mention if it's urgent or ongoing</li>
-            </ul>
+            <p className="leading-relaxed">
+              The Solve My Issue algorithm uses natural language to pair you with the right government agency. 
+              Simply describe your problem as you would to a friend. The more detailed the better. 
+              If the AI is not confident based on your description, it may provide multiple agencies. 
+              You can always try to redescribe your issue.
+            </p>
           </div>
         </CardContent>
       </Card>
