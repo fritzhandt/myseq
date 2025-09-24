@@ -60,54 +60,113 @@ serve(async (req) => {
       
       console.log('Raw text length:', rawText.length);
       
-      // Extract visible text (this is a simplified approach)
-      // Look for URLs in the text
+      // Extract visible text and URLs from Word document
+      // Word documents contain URLs in multiple formats
       const urlRegex = /(https?:\/\/[^\s<>"{}|\\^`[\]]+)/g;
       const foundUrls = [...rawText.matchAll(urlRegex)];
       
-      console.log('Found URLs:', foundUrls.length);
+      // Also look for Word hyperlink patterns (they often contain URLs in XML-like format)
+      const wordHyperlinkRegex = /HYPERLINK\s+"([^"]+)"/g;
+      const wordHyperlinks = [...rawText.matchAll(wordHyperlinkRegex)];
+      
+      // Look for 311.nyc.gov URLs specifically (common pattern in NYC documents)
+      const nyc311Regex = /(portal\.311\.nyc\.gov[^\s<>"{}|\\^`[\]]*)/g;
+      const nyc311Links = [...rawText.matchAll(nyc311Regex)];
+      
+      console.log('Found regular URLs:', foundUrls.length);
+      console.log('Found Word hyperlinks:', wordHyperlinks.length);
+      console.log('Found NYC 311 links:', nyc311Links.length);
+      
+      // Combine all found URLs
+      const allUrls = new Set();
+      
+      // Add regular URLs
+      foundUrls.forEach(match => allUrls.add(match[1]));
+      
+      // Add Word hyperlinks  
+      wordHyperlinks.forEach(match => {
+        const url = match[1];
+        if (url.startsWith('http')) {
+          allUrls.add(url);
+        }
+      });
+      
+      // Add NYC 311 links (add https:// if missing)
+      nyc311Links.forEach(match => {
+        const url = match[1].startsWith('http') ? match[1] : `https://${match[1]}`;
+        allUrls.add(url);
+      });
+      
+      console.log('Total unique URLs found:', allUrls.size);
       
       // Create hyperlinks from found URLs
-      foundUrls.forEach((match, index) => {
-        const url = match[1];
-        // Extract context around the URL (50 chars before and after)
-        const start = Math.max(0, match.index! - 50);
-        const end = Math.min(rawText.length, match.index! + url.length + 50);
-        const context = rawText.substring(start, end).replace(/[\n\r\t]/g, ' ').trim();
-        
-        // Try to extract a meaningful title from the context
+      let urlIndex = 0;
+      allUrls.forEach(url => {
+        // Extract context around the URL (look for text that might describe it)
+        const urlIndex_in_text = rawText.indexOf(url) || rawText.indexOf(url.replace('https://', ''));
+        let context = 'NYC agency service';
         let title = url;
-        if (context) {
-          // Look for text before the URL that might be a title
-          const beforeUrl = rawText.substring(Math.max(0, match.index! - 100), match.index!);
-          const titleMatch = beforeUrl.match(/([A-Za-z0-9\s\-&().,]+)\s*:?\s*$/);
-          if (titleMatch) {
-            title = titleMatch[1].trim();
+        
+        if (urlIndex_in_text >= 0) {
+          // Look for descriptive text before the URL
+          const start = Math.max(0, urlIndex_in_text - 200);
+          const end = Math.min(rawText.length, urlIndex_in_text + url.length + 100);
+          const surroundingText = rawText.substring(start, end).replace(/[\n\r\t\x00-\x1F]/g, ' ').replace(/\s+/g, ' ');
+          
+          // Try to extract a meaningful title from nearby text
+          const titlePatterns = [
+            /([A-Za-z0-9\s\-&().,]+)\s*[-–—:]\s*(?=https?:\/\/)/i,
+            /([A-Za-z0-9\s\-&().,]{10,})\s+(?=https?:\/\/)/i,
+            /(\w+(?:\s+\w+){1,5})\s*(?:complaint|report|service|form|application|permit)/i
+          ];
+          
+          for (const pattern of titlePatterns) {
+            const match = surroundingText.match(pattern);
+            if (match && match[1]) {
+              title = match[1].trim();
+              break;
+            }
+          }
+          
+          context = surroundingText.substring(0, 150) + (surroundingText.length > 150 ? '...' : '');
+        }
+        
+        // Special handling for 311 URLs
+        if (url.includes('311.nyc.gov')) {
+          if (url.includes('complaint') || url.includes('report')) {
+            title = title.includes('311') ? title : `NYC 311 - ${title}`;
+          } else if (!title.includes('311')) {
+            title = `NYC 311 Service - ${title}`;
           }
         }
         
         hyperlinks.push({
-          text: title || `Link ${index + 1}`,
+          text: title || `NYC Service Link ${++urlIndex}`,
           url: url,
-          context: context || 'No context available'
+          context: context || 'NYC government service'
         });
       });
 
       // Create a cleaned version of the content for storage
-      extractedContent = `Document: ${fileName}\n\nExtracted from uploaded document:\n\n`;
+      extractedContent = `Document: ${fileName}\n\nExtracted content from uploaded NYC agencies document:\n\n`;
       
-      // Try to extract meaningful content
-      // This is a basic approach - split by common delimiters and clean up
-      const lines = rawText.split(/[\n\r]+/).map(line => 
-        line.replace(/[^\x20-\x7E\u00A0-\u024F\u1E00-\u1EFF]/g, ' ')
-            .replace(/\s+/g, ' ')
-            .trim()
-      ).filter(line => line.length > 10); // Only keep substantial lines
+      // Clean up the raw text and extract meaningful content
+      const lines = rawText
+        .replace(/[\x00-\x1F\x7F]/g, ' ') // Remove control characters
+        .split(/[\n\r]+/)
+        .map(line => line.replace(/\s+/g, ' ').trim())
+        .filter(line => line.length > 15 && !line.match(/^[^a-zA-Z]*$/)) // Keep substantial, meaningful lines
+        .slice(0, 200); // Limit to first 200 good lines
 
-      extractedContent += lines.slice(0, 100).join('\n'); // Limit to first 100 substantial lines
+      extractedContent += lines.join('\n');
+      
+      // If we found specific URLs, add them to the content description
+      if (allUrls.size > 0) {
+        extractedContent += `\n\nThis document contains ${allUrls.size} specific service links for NYC agencies.`;
+      }
 
-      console.log('Processed content length:', extractedContent.length);
-      console.log('Extracted hyperlinks:', hyperlinks.length);
+      console.log('Final processed content length:', extractedContent.length);
+      console.log('Final extracted hyperlinks:', hyperlinks.length);
 
     } catch (error) {
       console.error('Error parsing file content:', error);
