@@ -52,6 +52,75 @@ export type Database = {
           },
         ]
       }
+      civic_gallery: {
+        Row: {
+          civic_org_id: string
+          created_at: string
+          description: string | null
+          id: string
+          order_index: number | null
+          photo_url: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          civic_org_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          order_index?: number | null
+          photo_url: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          civic_org_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          order_index?: number | null
+          photo_url?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      civic_important_links: {
+        Row: {
+          civic_org_id: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          order_index: number | null
+          title: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          civic_org_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          order_index?: number | null
+          title: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          civic_org_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          order_index?: number | null
+          title?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       civic_leadership: {
         Row: {
           civic_org_id: string

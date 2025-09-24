@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from "@/components/Navbar";
-import { ArrowLeft, MapPin, Clock, Phone, Mail, Globe, Users, Calendar, FileText, Image } from "lucide-react";
+import { ArrowLeft, MapPin, Clock, Phone, Mail, Globe, Users, Calendar, FileText, Image, Link, Images } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format, parseISO } from "date-fns";
 import PDFViewer from "@/components/PDFViewer";
@@ -46,6 +46,23 @@ interface Newsletter {
   upload_date: string;
 }
 
+interface ImportantLink {
+  id: string;
+  title: string;
+  url: string;
+  description?: string;
+  order_index: number;
+  is_active: boolean;
+}
+
+interface GalleryPhoto {
+  id: string;
+  title?: string;
+  description?: string;
+  photo_url: string;
+  order_index: number;
+}
+
 const CivicDetail = () => {
   const { orgId } = useParams<{ orgId: string }>();
   const navigate = useNavigate();
@@ -55,6 +72,8 @@ const CivicDetail = () => {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [leadership, setLeadership] = useState<Leader[]>([]);
   const [newsletters, setNewsletters] = useState<Newsletter[]>([]);
+  const [importantLinks, setImportantLinks] = useState<ImportantLink[]>([]);
+  const [galleryPhotos, setGalleryPhotos] = useState<GalleryPhoto[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("general");
   const [selectedPDF, setSelectedPDF] = useState<{url: string; title: string} | null>(null);
@@ -117,6 +136,25 @@ const CivicDetail = () => {
         .order('upload_date', { ascending: false });
 
       setNewsletters(newslettersData || []);
+
+      // Fetch important links
+      const { data: linksData } = await supabase
+        .from('civic_important_links')
+        .select('*')
+        .eq('civic_org_id', orgId)
+        .eq('is_active', true)
+        .order('order_index');
+
+      setImportantLinks(linksData || []);
+
+      // Fetch gallery photos
+      const { data: galleryData } = await supabase
+        .from('civic_gallery')
+        .select('*')
+        .eq('civic_org_id', orgId)
+        .order('order_index');
+
+      setGalleryPhotos(galleryData || []);
 
     } catch (error) {
       console.error('Error:', error);
@@ -205,11 +243,13 @@ const CivicDetail = () => {
 
           {/* Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="general">General Info</TabsTrigger>
               <TabsTrigger value="newsletters">Newsletter</TabsTrigger>
               <TabsTrigger value="announcements">Announcements</TabsTrigger>
               <TabsTrigger value="leadership">Leadership</TabsTrigger>
+              <TabsTrigger value="links">Important Links</TabsTrigger>
+              <TabsTrigger value="gallery">Gallery</TabsTrigger>
             </TabsList>
 
             {/* General Information */}

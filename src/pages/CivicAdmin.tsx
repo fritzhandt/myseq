@@ -5,12 +5,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from "@/components/Navbar";
-import { Building2, LogOut, Settings, Users, FileText, Megaphone } from "lucide-react";
+import { Building2, LogOut, Settings, Users, FileText, Megaphone, Link, Images } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import CivicGeneralSettings from "@/components/CivicGeneralSettings";
 import CivicAnnouncementsManager from "@/components/CivicAnnouncementsManager";
 import CivicNewsletterManager from "@/components/CivicNewsletterManager";
 import CivicLeadershipManager from "@/components/CivicLeadershipManager";
+import CivicImportantLinksManager from "@/components/CivicImportantLinksManager";
+import CivicGalleryManager from "@/components/CivicGalleryManager";
 
 interface CivicSession {
   orgId: string;
@@ -146,7 +148,7 @@ const CivicAdmin = () => {
 
           {/* Admin Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="general" className="flex items-center gap-2">
                 <Settings className="h-4 w-4" />
                 General
@@ -162,6 +164,14 @@ const CivicAdmin = () => {
               <TabsTrigger value="leadership" className="flex items-center gap-2">
                 <Users className="h-4 w-4" />
                 Leadership
+              </TabsTrigger>
+              <TabsTrigger value="links" className="flex items-center gap-2">
+                <Link className="h-4 w-4" />
+                Links
+              </TabsTrigger>
+              <TabsTrigger value="gallery" className="flex items-center gap-2">
+                <Images className="h-4 w-4" />
+                Gallery
               </TabsTrigger>
             </TabsList>
 
@@ -183,6 +193,16 @@ const CivicAdmin = () => {
             {/* Leadership */}
             <TabsContent value="leadership">
               <CivicLeadershipManager orgId={session.orgId} />
+            </TabsContent>
+
+            {/* Important Links */}
+            <TabsContent value="links">
+              <CivicImportantLinksManager orgId={session.orgId} />
+            </TabsContent>
+
+            {/* Gallery */}
+            <TabsContent value="gallery">
+              <CivicGalleryManager orgId={session.orgId} />
             </TabsContent>
           </Tabs>
         </div>
