@@ -33,54 +33,133 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    console.log('Supabase client initialized');
+    // Download and process the actual PDF
+    console.log('Downloading PDF from:', fileUrl);
+    const pdfResponse = await fetch(fileUrl);
+    if (!pdfResponse.ok) {
+      throw new Error(`Failed to download PDF: ${pdfResponse.statusText}`);
+    }
 
-    // For now, let's use predefined NYC agency data based on your PDF
-    const agenciesToInsert = [
-      {
-        name: "NYC 311",
-        description: "Report non-emergency issues including obscured license plate complaints, noise complaints, street cleaning, parking violations, and quality of life issues.",
-        level: "city",
-        website: "https://portal.311.nyc.gov/",
-        keywords: ["311", "license plate", "obscured plate", "covered plate", "parking violations", "noise complaint", "street cleaning", "non-emergency"]
+    const pdfBytes = await pdfResponse.bytes();
+    console.log('PDF downloaded, size:', pdfBytes.length, 'bytes');
+
+    // Use OpenAI to extract text and agency info from the PDF
+    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+    if (!openAIApiKey) {
+      throw new Error('OpenAI API key not configured');
+    }
+
+    // Convert PDF bytes to base64 in chunks to avoid stack overflow
+    const chunkSize = 1000000; // 1MB chunks
+    let base64String = '';
+    
+    for (let i = 0; i < pdfBytes.length; i += chunkSize) {
+      const chunk = pdfBytes.slice(i, i + chunkSize);
+      const chunkBase64 = btoa(String.fromCharCode.apply(null, Array.from(chunk)));
+      base64String += chunkBase64;
+    }
+
+    console.log('PDF converted to base64, length:', base64String.length);
+
+    // Use OpenAI to analyze the PDF
+    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
       },
-      {
-        name: "Department of Consumer and Worker Protection",
-        description: "Handles business licensing, worker protection, consumer complaints, and marketplace regulations.",
-        level: "city", 
-        website: "https://www1.nyc.gov/site/dca/",
-        keywords: ["consumer protection", "worker protection", "business license", "marketplace", "consumer complaints", "DCWP"]
-      },
-      {
-        name: "Department of Transportation",
-        description: "Manages street repairs, traffic signals, parking permits, bike lanes, and transportation infrastructure.",
-        level: "city",
-        website: "https://www1.nyc.gov/html/dot/",
-        keywords: ["transportation", "DOT", "street repair", "traffic signal", "parking permit", "bike lane", "road work"]
-      },
-      {
-        name: "Department of Environmental Protection", 
-        description: "Oversees water quality, air quality, noise enforcement, and environmental compliance.",
-        level: "city",
-        website: "https://www1.nyc.gov/site/dep/",
-        keywords: ["environmental", "DEP", "water quality", "air quality", "noise enforcement", "pollution", "environment"]
-      },
-      {
-        name: "New York Police Department",
-        description: "Provides emergency services, crime reporting, traffic enforcement, and public safety.",
-        level: "city",
-        website: "https://www1.nyc.gov/site/nypd/",
-        keywords: ["NYPD", "police", "emergency", "crime report", "traffic enforcement", "public safety", "911"]
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: `You are an expert at extracting government agency information from PDF documents.
+
+            Analyze the provided PDF document and extract ALL government agencies mentioned. For each agency, provide:
+            1. Name (exact official name from document)
+            2. Description (what services they provide)
+            3. Level (city, state, or federal - default to city for NYC agencies)
+            4. Website URL (if mentioned in document)
+            5. Keywords (array of services, issues they handle)
+
+            Return results as JSON:
+            {
+              "agencies": [
+                {
+                  "name": "Agency Name",
+                  "description": "Services and responsibilities",
+                  "level": "city|state|federal",
+                  "website": "https://website.com or null",
+                  "keywords": ["service1", "service2", "complaint_type"]
+                }
+              ]
+            }
+
+            Extract ALL agencies from the document - there should be dozens. Include specific complaint types and services as keywords.`
+          },
+          {
+            role: 'user',
+            content: [
+              {
+                type: "text",
+                text: `Extract all government agencies from this NYC agencies PDF document. Make sure to get every single agency listed and their services.`
+              },
+              {
+                type: "image_url",
+                image_url: {
+                  url: `data:application/pdf;base64,${base64String}`
+                }
+              }
+            ]
+          }
+        ],
+        max_tokens: 4000,
+        temperature: 0.1
+      }),
+    });
+
+    if (!openaiResponse.ok) {
+      const errorText = await openaiResponse.text();
+      console.error('OpenAI API error:', errorText);
+      throw new Error(`OpenAI API error: ${openaiResponse.status}`);
+    }
+
+    const aiResult = await openaiResponse.json();
+    const aiContent = aiResult.choices?.[0]?.message?.content;
+    
+    console.log('AI Response received, length:', aiContent?.length);
+
+    if (!aiContent) {
+      throw new Error('No response from AI analysis');
+    }
+
+    // Parse the AI response
+    let extractedData;
+    try {
+      // Try to extract JSON from the response
+      const jsonMatch = aiContent.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        extractedData = JSON.parse(jsonMatch[0]);
+      } else {
+        extractedData = JSON.parse(aiContent);
       }
-    ];
+    } catch (parseError) {
+      console.error('Failed to parse AI response:', parseError);
+      console.error('Raw AI content:', aiContent);
+      throw new Error('Failed to parse AI response as JSON');
+    }
 
-    console.log(`Processing ${agenciesToInsert.length} agencies`);
+    if (!extractedData.agencies || !Array.isArray(extractedData.agencies)) {
+      throw new Error('Invalid response format from AI - no agencies array found');
+    }
+
+    console.log('Extracted agencies from PDF:', extractedData.agencies.length);
 
     // Insert/update agencies in the database
     let processedCount = 0;
     const errors = [];
 
-    for (const agency of agenciesToInsert) {
+    for (const agency of extractedData.agencies) {
       try {
         console.log(`Processing agency: ${agency.name}`);
         
@@ -141,7 +220,7 @@ serve(async (req) => {
       success: true,
       message: `PDF processed successfully. ${processedCount} agencies processed from NYC agency data.`,
       agenciesProcessed: processedCount,
-      totalExtracted: agenciesToInsert.length,
+      totalExtracted: extractedData.agencies.length,
       errors: errors.length > 0 ? errors : undefined
     };
 
