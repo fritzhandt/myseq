@@ -68,19 +68,25 @@ serve(async (req) => {
       `${index + 1}. ${agency.name} (${agency.level}): ${agency.description}`
     ).join('\n\n');
 
-    // Call OpenAI to analyze and rank agencies
-    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-5-nano-2025-08-07',
-        messages: [
-          {
-            role: 'system',
-            content: `You are an expert in government services and agencies. Your task is to analyze a user's issue and match it with the most appropriate government agencies.
+    // Call OpenAI to analyze and rank agencies with timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
+    let openaiResponse;
+    try {
+      openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
+          'Content-Type': 'application/json',
+        },
+        signal: controller.signal,
+        body: JSON.stringify({
+          model: 'gpt-5.0-nano',
+          messages: [
+            {
+              role: 'system',
+              content: `You are an expert in government services and agencies. Your task is to analyze a user's issue and match it with the most appropriate government agencies.
 
 AGENCIES LIST:
 ${agencyList}
@@ -101,15 +107,31 @@ Instructions:
 }
 
 Be very precise - only return agencies that truly match the user's issue. If no agency has 80%+ confidence, return empty results array.`
-          },
-          {
-            role: 'user',
-            content: `User's issue: "${query}"`
-          }
-        ],
-        max_completion_tokens: 1000
-      }),
-    });
+            },
+            {
+              role: 'user',
+              content: `User's issue: "${query}"`
+            }
+          ],
+          max_completion_tokens: 1000
+        }),
+      });
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      console.error('OpenAI API fetch error:', fetchError);
+      return new Response(
+        JSON.stringify({ 
+          error: 'AI service timeout or connection error',
+          message: 'Please try rephrasing your inquiry with more specific details.'
+        }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+    
+    clearTimeout(timeoutId);
 
     if (!openaiResponse.ok) {
       const error = await openaiResponse.text();
@@ -129,16 +151,38 @@ Be very precise - only return agencies that truly match the user's issue. If no 
     
     console.log('AI Response:', aiContent);
 
+    // Check for empty or null AI response
+    if (!aiContent || aiContent.trim().length === 0) {
+      console.error('Empty AI response received');
+      return new Response(
+        JSON.stringify({
+          results: [],
+          totalFound: 0,
+          message: 'Unable to analyze your query at this time. Please try rephrasing your inquiry with more specific details.',
+          confidence: 0
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
     let parsedResults;
     try {
       parsedResults = JSON.parse(aiContent);
     } catch (parseError) {
       console.error('Failed to parse AI response:', parseError);
       console.error('Raw AI content:', aiContent);
+      
+      // Return fallback response instead of error
       return new Response(
-        JSON.stringify({ error: 'Failed to analyze query', rawResponse: aiContent }),
+        JSON.stringify({
+          results: [],
+          totalFound: 0,
+          message: 'Unable to process your query properly. Please try rephrasing your inquiry with more specific details.',
+          confidence: 0
+        }),
         {
-          status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       );
