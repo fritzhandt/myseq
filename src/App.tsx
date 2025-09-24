@@ -17,6 +17,10 @@ import Resources from "./pages/Resources";
 import Jobs from "./pages/Jobs";
 import PolicePrecincts from "./pages/PolicePrecincts";
 // import SolveIssue from "@/pages/SolveIssue";
+import Civics from "./pages/Civics";
+import CivicDetail from "./pages/CivicDetail";
+import CivicAuth from "./pages/CivicAuth";
+import CivicAdmin from "./pages/CivicAdmin";
 import NotFound from "./pages/NotFound";
 import "./index.css";
 
@@ -49,6 +53,10 @@ const App = () => (
           <Route path="/jobs" element={<Jobs />} />
           {/* <Route path="/solve-issue" element={<SolveIssue />} /> */}
           <Route path="/police-precincts" element={<PolicePrecincts />} />
+          <Route path="/civics" element={<Civics />} />
+          <Route path="/civics/:orgId" element={<CivicDetail />} />
+          <Route path="/civic-auth" element={<CivicAuth />} />
+          <Route path="/civic-admin" element={<CivicAdmin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />

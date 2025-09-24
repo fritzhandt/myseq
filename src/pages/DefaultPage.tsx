@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Navbar from "@/components/Navbar";
 import CommunityAlertBanner from "@/components/CommunityAlertBanner";
-import { Calendar, Users, Briefcase, ArrowRight, MapPin, Heart, HelpCircle } from "lucide-react";
+import { Calendar, Users, Briefcase, ArrowRight, MapPin, Heart, HelpCircle, Building2 } from "lucide-react";
 
 export default function DefaultPage() {
   return (
@@ -70,37 +70,59 @@ export default function DefaultPage() {
                 </CardContent>
               </Card>
 
+              {/* Civics Card */}
+              <Card className="group relative overflow-hidden border-2 hover:border-green-500/20 transition-all duration-500 hover:shadow-2xl hover:scale-105 bg-gradient-to-br from-background to-green-500/5 flex flex-col h-full">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-2xl font-bold flex items-center gap-3 text-green-600">
+                    <Users className="h-8 w-8" />
+                    Civic Organizations
+                  </CardTitle>
+                  <CardDescription className="text-base leading-relaxed">
+                    Connect with local civic organizations in your community. Find meeting information, announcements, and ways to get involved in local governance.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex-grow flex flex-col justify-end">
+                  <Button 
+                    size="lg" 
+                    className="w-full group-hover:scale-105 transition-transform duration-300 bg-green-600 hover:bg-green-700"
+                    onClick={() => window.location.href = '/civics'}
+                  >
+                    <Building2 className="mr-2 h-5 w-5" />
+                    Browse Organizations
+                  </Button>
+                </CardContent>
+              </Card>
+
               {/* Temporarily hidden due to API costs */}
               {/* Solve My Issue Card */}
               {/*
               <Card className="group relative overflow-hidden border-2 hover:border-orange-500/20 transition-all duration-500 hover:shadow-2xl hover:scale-105 bg-gradient-to-br from-background to-orange-500/5 flex flex-col h-full">
-                <div className="absolute top-2 right-2 z-20 bg-orange-500 text-white text-xs px-2 py-1 rounded-full font-semibold">
-                  EXPERIMENTAL
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <CardHeader className="relative z-10 pb-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                    <HelpCircle className="h-8 w-8 text-white" />
-                  </div>
-                  <CardTitle className="text-2xl mb-2 group-hover:text-orange-500 transition-colors duration-300">
-                    Solve My Issue
+...
+              </Card>
+              */}
+
+              {/* Civics Card */}
+              <Card className="group relative overflow-hidden border-2 hover:border-green-500/20 transition-all duration-500 hover:shadow-2xl hover:scale-105 bg-gradient-to-br from-background to-green-500/5 flex flex-col h-full">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-2xl font-bold flex items-center gap-3 text-green-600">
+                    <Users className="h-8 w-8" />
+                    Civic Organizations
                   </CardTitle>
                   <CardDescription className="text-base leading-relaxed">
-                    AI-powered search to find the right government agency for your specific problem
+                    Connect with local civic organizations in your community. Find meeting information, announcements, and ways to get involved in local governance.
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="relative z-10 mt-auto">
+                <CardContent className="flex-grow flex flex-col justify-end">
                   <Button 
-                    className="w-full group-hover:bg-orange-500 group-hover:text-white transition-all duration-300" 
-                    variant="outline"
-                    onClick={() => window.location.href = '/solve-issue'}
+                    size="lg" 
+                    className="w-full group-hover:scale-105 transition-transform duration-300 bg-green-600 hover:bg-green-700"
+                    onClick={() => window.location.href = '/civics'}
                   >
-                    Get Help
-                    <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                    <Building2 className="mr-2 h-5 w-5" />
+                    Browse Organizations
                   </Button>
                 </CardContent>
               </Card>
-              */}
 
               {/* Resources Card */}
               <Card className="group relative overflow-hidden border-2 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:scale-105 bg-gradient-to-br from-background to-primary/5 flex flex-col h-full">

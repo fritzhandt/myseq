@@ -14,6 +14,168 @@ export type Database = {
   }
   public: {
     Tables: {
+      civic_announcements: {
+        Row: {
+          civic_org_id: string
+          content: string
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          civic_org_id: string
+          content: string
+          created_at?: string
+          id?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          civic_org_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "civic_announcements_civic_org_id_fkey"
+            columns: ["civic_org_id"]
+            isOneToOne: false
+            referencedRelation: "civic_organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      civic_leadership: {
+        Row: {
+          civic_org_id: string
+          contact_info: Json | null
+          created_at: string
+          id: string
+          name: string
+          order_index: number | null
+          photo_url: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          civic_org_id: string
+          contact_info?: Json | null
+          created_at?: string
+          id?: string
+          name: string
+          order_index?: number | null
+          photo_url?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          civic_org_id?: string
+          contact_info?: Json | null
+          created_at?: string
+          id?: string
+          name?: string
+          order_index?: number | null
+          photo_url?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "civic_leadership_civic_org_id_fkey"
+            columns: ["civic_org_id"]
+            isOneToOne: false
+            referencedRelation: "civic_organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      civic_newsletters: {
+        Row: {
+          civic_org_id: string
+          created_at: string
+          file_path: string
+          id: string
+          title: string
+          updated_at: string
+          upload_date: string
+        }
+        Insert: {
+          civic_org_id: string
+          created_at?: string
+          file_path: string
+          id?: string
+          title: string
+          updated_at?: string
+          upload_date?: string
+        }
+        Update: {
+          civic_org_id?: string
+          created_at?: string
+          file_path?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          upload_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "civic_newsletters_civic_org_id_fkey"
+            columns: ["civic_org_id"]
+            isOneToOne: false
+            referencedRelation: "civic_organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      civic_organizations: {
+        Row: {
+          access_code: string
+          contact_info: Json
+          coverage_area: string
+          created_at: string
+          description: string
+          id: string
+          is_active: boolean
+          meeting_address: string | null
+          meeting_info: string | null
+          name: string
+          password_hash: string
+          updated_at: string
+        }
+        Insert: {
+          access_code: string
+          contact_info?: Json
+          coverage_area: string
+          created_at?: string
+          description: string
+          id?: string
+          is_active?: boolean
+          meeting_address?: string | null
+          meeting_info?: string | null
+          name: string
+          password_hash: string
+          updated_at?: string
+        }
+        Update: {
+          access_code?: string
+          contact_info?: Json
+          coverage_area?: string
+          created_at?: string
+          description?: string
+          id?: string
+          is_active?: boolean
+          meeting_address?: string | null
+          meeting_info?: string | null
+          name?: string
+          password_hash?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       community_alerts: {
         Row: {
           created_at: string
