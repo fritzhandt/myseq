@@ -114,8 +114,9 @@ Be very precise - only return agencies that truly match the user's issue. If no 
     if (!openaiResponse.ok) {
       const error = await openaiResponse.text();
       console.error('OpenAI API error:', error);
+      console.error('OpenAI API status:', openaiResponse.status);
       return new Response(
-        JSON.stringify({ error: 'AI analysis failed' }),
+        JSON.stringify({ error: 'AI analysis failed', details: error }),
         {
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -133,8 +134,9 @@ Be very precise - only return agencies that truly match the user's issue. If no 
       parsedResults = JSON.parse(aiContent);
     } catch (parseError) {
       console.error('Failed to parse AI response:', parseError);
+      console.error('Raw AI content:', aiContent);
       return new Response(
-        JSON.stringify({ error: 'Failed to analyze query' }),
+        JSON.stringify({ error: 'Failed to analyze query', rawResponse: aiContent }),
         {
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
