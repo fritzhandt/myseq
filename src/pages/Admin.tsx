@@ -15,7 +15,8 @@ import JobReportsList from '@/components/JobReportsList';
 import AgencyDocumentUpload from '@/components/AgencyDocumentUpload';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Calendar, LogOut, Star, AlertTriangle, Users, MapPin, FileText } from 'lucide-react';
+import { Plus, Calendar, LogOut, Star, AlertTriangle, Users, MapPin, FileText, Building2 } from 'lucide-react';
+import CivicOrganizationsManager from '@/components/CivicOrganizationsManager';
 
 const Admin = () => {
   const [showForm, setShowForm] = useState(false);
@@ -166,7 +167,7 @@ const Admin = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="events" className="w-full">
-          <TabsList className="grid w-full grid-cols-6 mb-8">
+          <TabsList className="grid w-full grid-cols-7 mb-8">
             <TabsTrigger value="events" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
               Regular Events
@@ -182,6 +183,10 @@ const Admin = () => {
             <TabsTrigger value="resources" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
               Resources
+            </TabsTrigger>
+            <TabsTrigger value="civics" className="flex items-center gap-2">
+              <Building2 className="h-4 w-4" />
+              Civic Orgs
             </TabsTrigger>
             <TabsTrigger value="jobs" className="flex items-center gap-2">
               <MapPin className="h-4 w-4" />
@@ -276,6 +281,10 @@ const Admin = () => {
               </div>
             )}
           </TabsContent>
+          <TabsContent value="civics">
+            <CivicOrganizationsManager />
+          </TabsContent>
+
           <TabsContent value="jobs">
             <div className="space-y-6">
               <div className="flex justify-between items-center">
