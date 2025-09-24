@@ -52,6 +52,7 @@ serve(async (req) => {
     // This is a simplified approach - in production you'd use proper PDF/Word parsing libraries
     let extractedContent = '';
     let hyperlinks: Array<{text: string, url: string, context: string}> = [];
+    let complaint311Map = {}; // Declare at top level
 
     try {
       // Convert file content to text for basic parsing
@@ -67,7 +68,7 @@ serve(async (req) => {
       console.log('Found 311 complaint patterns:', complaint311Matches.length);
       
       // Create a mapping of complaint types to specific URLs
-      const complaint311Map = {};
+      complaint311Map = {};
       complaint311Matches.forEach(match => {
         const complaintType = match[1].trim().toLowerCase();
         const specificUrl = match[2].trim();
