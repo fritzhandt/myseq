@@ -10,6 +10,7 @@ import { ArrowLeft, MapPin, Clock, Phone, Mail, Globe, Users, Calendar, FileText
 import { useToast } from "@/hooks/use-toast";
 import { format, parseISO } from "date-fns";
 import PDFViewer from "@/components/PDFViewer";
+import AnnouncementDialog from "@/components/AnnouncementDialog";
 
 interface CivicOrganization {
   id: string;
@@ -57,6 +58,7 @@ const CivicDetail = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("general");
   const [selectedPDF, setSelectedPDF] = useState<{url: string; title: string} | null>(null);
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
 
   useEffect(() => {
     if (orgId) {
@@ -367,45 +369,44 @@ const CivicDetail = () => {
                       </p>
                     </div>
                   ) : (
-                    <div className="space-y-6">
+                    <div className="grid grid-cols-1 gap-4">
                       {announcements.map((announcement) => (
-                        <div key={announcement.id} className="border-b pb-6 last:border-b-0">
-                          <div className="flex items-start justify-between mb-2">
-                            <h3 className="font-semibold text-lg">{announcement.title}</h3>
-                            <Badge variant="outline" className="text-xs">
-                              {format(parseISO(announcement.created_at), 'MMM d, yyyy')}
-                            </Badge>
-                          </div>
-                          <div className="prose prose-sm max-w-none text-muted-foreground">
-                            {announcement.content.split('\n').map((paragraph, index) => (
-                              <p key={index} className="mb-2 last:mb-0">
-                                {paragraph}
-                              </p>
-                            ))}
-                          </div>
-                          
-                          {/* Display announcement photos */}
-                          {announcement.photos && announcement.photos.length > 0 && (
-                            <div className="mt-4 space-y-2">
-                              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                                <Image className="h-4 w-4" />
-                                Photos
-                              </div>
-                              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                {announcement.photos.map((photoUrl, index) => (
-                                  <div key={index} className="relative group">
-                                    <img
-                                      src={photoUrl}
-                                      alt={`Announcement photo ${index + 1}`}
-                                      className="w-full h-32 object-cover rounded border cursor-pointer hover:opacity-90 transition-opacity"
-                                      onClick={() => window.open(photoUrl, '_blank')}
-                                    />
-                                  </div>
-                                ))}
-                              </div>
+                        <Card 
+                          key={announcement.id} 
+                          className="cursor-pointer hover:shadow-md hover:scale-[1.02] transition-all duration-200 border-2 hover:border-primary/20"
+                          onClick={() => setSelectedAnnouncement(announcement)}
+                        >
+                          <CardHeader className="pb-3">
+                            <div className="flex items-start justify-between gap-4">
+                              <h3 className="font-semibold text-lg line-clamp-2 flex-1">
+                                {announcement.title}
+                              </h3>
+                              <Badge variant="outline" className="text-xs flex-shrink-0">
+                                {format(parseISO(announcement.created_at), 'MMM d')}
+                              </Badge>
                             </div>
-                          )}
-                        </div>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="text-muted-foreground line-clamp-3 text-sm leading-relaxed mb-3">
+                              {announcement.content}
+                            </p>
+                            
+                            {/* Preview indicators */}
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                                {announcement.photos && announcement.photos.length > 0 && (
+                                  <div className="flex items-center gap-1">
+                                    <Image className="h-3 w-3" />
+                                    <span>{announcement.photos.length} photo{announcement.photos.length !== 1 ? 's' : ''}</span>
+                                  </div>
+                                )}
+                              </div>
+                              <span className="text-xs text-primary font-medium">
+                                Click to read more →
+                              </span>
+                            </div>
+                          </CardContent>
+                        </Card>
                       ))}
                     </div>
                   )}
@@ -495,6 +496,13 @@ const CivicDetail = () => {
           title={selectedPDF.title}
         />
       )}
+      
+      {/* Announcement Dialog */}
+      <AnnouncementDialog
+        announcement={selectedAnnouncement}
+        isOpen={!!selectedAnnouncement}
+        onClose={() => setSelectedAnnouncement(null)}
+      />
     </div>
   );
 };
