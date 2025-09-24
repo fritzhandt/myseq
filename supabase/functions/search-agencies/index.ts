@@ -82,7 +82,7 @@ serve(async (req) => {
         },
         signal: controller.signal,
         body: JSON.stringify({
-          model: 'gpt-5-nano-2025-08-07',
+          model: 'gpt-4o-mini',
           messages: [
             {
               role: 'system',
@@ -113,7 +113,8 @@ Be very precise - only return agencies that truly match the user's issue. If no 
               content: `User's issue: "${query}"`
             }
           ],
-          max_completion_tokens: 1000
+          max_tokens: 1000,
+          temperature: 0.3
         }),
       });
     } catch (fetchError) {
@@ -147,7 +148,9 @@ Be very precise - only return agencies that truly match the user's issue. If no 
     }
 
     const aiResult = await openaiResponse.json();
-    const aiContent = aiResult.choices[0].message.content;
+    console.log('Full OpenAI response:', JSON.stringify(aiResult, null, 2));
+    
+    const aiContent = aiResult.choices?.[0]?.message?.content;
     
     console.log('AI Response:', aiContent);
 
