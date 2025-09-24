@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { Navbar } from '@/components/Navbar';
-import { CommunityAlertBanner } from '@/components/CommunityAlertBanner';
+import Navbar from '@/components/Navbar';
+import CommunityAlertBanner from '@/components/CommunityAlertBanner';
 import SolveMyIssue from '@/components/SolveMyIssue';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';

@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Navbar from "@/components/Navbar";
 import CommunityAlertBanner from "@/components/CommunityAlertBanner";
-import { Calendar, Users, Briefcase, ArrowRight, MapPin, Heart } from "lucide-react";
+import { Calendar, Users, Briefcase, ArrowRight, MapPin, Heart, HelpCircle } from "lucide-react";
 
 export default function DefaultPage() {
   return (
@@ -43,7 +43,7 @@ export default function DefaultPage() {
         {/* Features Section */}
         <section className="pt-4 pb-20 px-4">
           <div className="container mx-auto">
-            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
               {/* Events Card */}
               <Card className="group relative overflow-hidden border-2 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:scale-105 bg-gradient-to-br from-background to-primary/5 flex flex-col h-full">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -65,6 +65,32 @@ export default function DefaultPage() {
                     onClick={() => window.location.href = '/home'}
                   >
                     Discover Events
+                    <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Solve My Issue Card */}
+              <Card className="group relative overflow-hidden border-2 hover:border-orange-500/20 transition-all duration-500 hover:shadow-2xl hover:scale-105 bg-gradient-to-br from-background to-orange-500/5 flex flex-col h-full">
+                <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <CardHeader className="relative z-10 pb-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <HelpCircle className="h-8 w-8 text-white" />
+                  </div>
+                  <CardTitle className="text-2xl mb-2 group-hover:text-orange-500 transition-colors duration-300">
+                    Solve My Issue
+                  </CardTitle>
+                  <CardDescription className="text-base leading-relaxed">
+                    AI-powered search to find the right government agency for your specific problem
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="relative z-10 mt-auto">
+                  <Button 
+                    className="w-full group-hover:bg-orange-500 group-hover:text-white transition-all duration-300" 
+                    variant="outline"
+                    onClick={() => window.location.href = '/solve-issue'}
+                  >
+                    Get Help
                     <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                   </Button>
                 </CardContent>

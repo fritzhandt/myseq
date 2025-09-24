@@ -16,6 +16,7 @@ import CommunityAlert from "./pages/CommunityAlert";
 import Resources from "./pages/Resources";
 import Jobs from "./pages/Jobs";
 import PolicePrecincts from "./pages/PolicePrecincts";
+import SolveIssue from "@/pages/SolveIssue";
 import NotFound from "./pages/NotFound";
 import "./index.css";
 
@@ -46,6 +47,7 @@ const App = () => (
           <Route path="/community-alert/:id" element={<CommunityAlert />} />
           <Route path="/resources" element={<Resources />} />
           <Route path="/jobs" element={<Jobs />} />
+          <Route path="/solve-issue" element={<SolveIssue />} />
           <Route path="/police-precincts" element={<PolicePrecincts />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
