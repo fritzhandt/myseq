@@ -87,8 +87,8 @@ export default function DefaultPage() {
                     className="w-full group-hover:scale-105 transition-transform duration-300 bg-green-600 hover:bg-green-700"
                     onClick={() => window.location.href = '/civics'}
                   >
-                    <Building2 className="mr-2 h-5 w-5" />
-                    Browse Organizations
+                    Browse Civics
+                    <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </CardContent>
               </Card>
