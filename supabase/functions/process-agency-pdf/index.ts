@@ -62,88 +62,68 @@ serve(async (req) => {
       
       // Extract visible text and URLs from Word document
       // Word documents contain URLs in multiple formats
-      const urlRegex = /(https?:\/\/[^\s<>"{}|\\^`[\]]+)/g;
+      const urlRegex = /(https?:\/\/[^\s<>"{}|\\^`[\]()]+)/gi;
       const foundUrls = [...rawText.matchAll(urlRegex)];
       
+      // Enhanced pattern for complaint titles with URLs (like the user's example)
+      const complaintUrlPattern = /([^•\n]+?)\s+(https?:\/\/[^\s<>"{}|\\^`[\]()]+)/gi;
+      const complaintMatches = [...rawText.matchAll(complaintUrlPattern)];
+      
       // Also look for Word hyperlink patterns (they often contain URLs in XML-like format)
-      const wordHyperlinkRegex = /HYPERLINK\s+"([^"]+)"/g;
+      const wordHyperlinkRegex = /HYPERLINK\s+"([^"]+)"/gi;
       const wordHyperlinks = [...rawText.matchAll(wordHyperlinkRegex)];
       
       // Look for 311.nyc.gov URLs specifically (common pattern in NYC documents)
-      const nyc311Regex = /(portal\.311\.nyc\.gov[^\s<>"{}|\\^`[\]]*)/g;
+      const nyc311Regex = /(portal\.311\.nyc\.gov[^\s<>"{}|\\^`[\]()]*)/gi;
       const nyc311Links = [...rawText.matchAll(nyc311Regex)];
       
       console.log('Found regular URLs:', foundUrls.length);
+      console.log('Found complaint URLs with titles:', complaintMatches.length);
       console.log('Found Word hyperlinks:', wordHyperlinks.length);
       console.log('Found NYC 311 links:', nyc311Links.length);
       
-      // Combine all found URLs
-      const allUrls = new Set();
+      // Combine all found URLs with better context
+      const allUrls = new Map(); // Use Map to store URL -> context mapping
+      
+      // Add complaint URLs with their titles
+      complaintMatches.forEach(match => {
+        const title = match[1].trim().replace(/^[•\-\s]+/, ''); // Remove bullet points and dashes
+        const url = match[2].trim();
+        allUrls.set(url, { title, context: `NYC 311 service: ${title}` });
+      });
       
       // Add regular URLs
-      foundUrls.forEach(match => allUrls.add(match[1]));
+      foundUrls.forEach(match => {
+        const url = match[1].trim();
+        if (!allUrls.has(url)) {
+          allUrls.set(url, { title: url, context: 'NYC agency service' });
+        }
+      });
       
       // Add Word hyperlinks  
       wordHyperlinks.forEach(match => {
-        const url = match[1];
-        if (url.startsWith('http')) {
-          allUrls.add(url);
+        const url = match[1].trim();
+        if (url.startsWith('http') && !allUrls.has(url)) {
+          allUrls.set(url, { title: url, context: 'NYC agency service' });
         }
       });
       
       // Add NYC 311 links (add https:// if missing)
       nyc311Links.forEach(match => {
         const url = match[1].startsWith('http') ? match[1] : `https://${match[1]}`;
-        allUrls.add(url);
+        if (!allUrls.has(url)) {
+          allUrls.set(url, { title: 'NYC 311 Service', context: 'NYC 311 service portal' });
+        }
       });
       
       console.log('Total unique URLs found:', allUrls.size);
       
-      // Create hyperlinks from found URLs
-      let urlIndex = 0;
-      allUrls.forEach(url => {
-        // Extract context around the URL (look for text that might describe it)
-        const urlIndex_in_text = rawText.indexOf(url) || rawText.indexOf(url.replace('https://', ''));
-        let context = 'NYC agency service';
-        let title = url;
-        
-        if (urlIndex_in_text >= 0) {
-          // Look for descriptive text before the URL
-          const start = Math.max(0, urlIndex_in_text - 200);
-          const end = Math.min(rawText.length, urlIndex_in_text + url.length + 100);
-          const surroundingText = rawText.substring(start, end).replace(/[\n\r\t\x00-\x1F]/g, ' ').replace(/\s+/g, ' ');
-          
-          // Try to extract a meaningful title from nearby text
-          const titlePatterns = [
-            /([A-Za-z0-9\s\-&().,]+)\s*[-–—:]\s*(?=https?:\/\/)/i,
-            /([A-Za-z0-9\s\-&().,]{10,})\s+(?=https?:\/\/)/i,
-            /(\w+(?:\s+\w+){1,5})\s*(?:complaint|report|service|form|application|permit)/i
-          ];
-          
-          for (const pattern of titlePatterns) {
-            const match = surroundingText.match(pattern);
-            if (match && match[1]) {
-              title = match[1].trim();
-              break;
-            }
-          }
-          
-          context = surroundingText.substring(0, 150) + (surroundingText.length > 150 ? '...' : '');
-        }
-        
-        // Special handling for 311 URLs
-        if (url.includes('311.nyc.gov')) {
-          if (url.includes('complaint') || url.includes('report')) {
-            title = title.includes('311') ? title : `NYC 311 - ${title}`;
-          } else if (!title.includes('311')) {
-            title = `NYC 311 Service - ${title}`;
-          }
-        }
-        
+      // Create hyperlinks from found URLs with better context
+      allUrls.forEach((urlData, url) => {
         hyperlinks.push({
-          text: title || `NYC Service Link ${++urlIndex}`,
+          text: urlData.title || url,
           url: url,
-          context: context || 'NYC government service'
+          context: urlData.context || 'NYC agency service'
         });
       });
 

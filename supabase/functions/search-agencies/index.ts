@@ -222,8 +222,25 @@ Be very precise - only return agencies that truly match the user's issue. If no 
     // Map AI results back to agency data
     const matchedAgencies = parsedResults.results.map((result: any) => {
       const agency = agencies[result.agency_index - 1]; // Convert to 0-based index
+      
+      // If this is NYC 311 and we have PDF content with specific links, try to find a better URL
+      let finalWebsite = agency.website;
+      if (agency.name === 'NYC 311' && pdfContent && pdfContent.hyperlinks) {
+        const hyperlinksData = pdfContent.hyperlinks;
+        if (hyperlinksData.urls && Array.isArray(hyperlinksData.urls)) {
+          // Find a 311 portal link that might be more specific
+          const specific311Link = hyperlinksData.urls.find((url: string) => 
+            url.includes('portal.311.nyc.gov') || url.includes('311.nyc.gov')
+          );
+          if (specific311Link) {
+            finalWebsite = specific311Link;
+          }
+        }
+      }
+      
       return {
         ...agency,
+        website: finalWebsite,
         confidence: result.confidence,
         reasoning: result.reasoning
       };
