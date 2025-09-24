@@ -101,29 +101,6 @@ export default function DefaultPage() {
               </Card>
               */}
 
-              {/* Civics Card */}
-              <Card className="group relative overflow-hidden border-2 hover:border-green-500/20 transition-all duration-500 hover:shadow-2xl hover:scale-105 bg-gradient-to-br from-background to-green-500/5 flex flex-col h-full">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-2xl font-bold flex items-center gap-3 text-green-600">
-                    <Users className="h-8 w-8" />
-                    Civic Organizations
-                  </CardTitle>
-                  <CardDescription className="text-base leading-relaxed">
-                    Connect with local civic organizations in your community. Find meeting information, announcements, and ways to get involved in local governance.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="flex-grow flex flex-col justify-end">
-                  <Button 
-                    size="lg" 
-                    className="w-full group-hover:scale-105 transition-transform duration-300 bg-green-600 hover:bg-green-700"
-                    onClick={() => window.location.href = '/civics'}
-                  >
-                    <Building2 className="mr-2 h-5 w-5" />
-                    Browse Organizations
-                  </Button>
-                </CardContent>
-              </Card>
-
               {/* Resources Card */}
               <Card className="group relative overflow-hidden border-2 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:scale-105 bg-gradient-to-br from-background to-primary/5 flex flex-col h-full">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
