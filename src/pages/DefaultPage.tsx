@@ -70,7 +70,9 @@ export default function DefaultPage() {
                 </CardContent>
               </Card>
 
+              {/* Temporarily hidden due to API costs */}
               {/* Solve My Issue Card */}
+              {/*
               <Card className="group relative overflow-hidden border-2 hover:border-orange-500/20 transition-all duration-500 hover:shadow-2xl hover:scale-105 bg-gradient-to-br from-background to-orange-500/5 flex flex-col h-full">
                 <div className="absolute top-2 right-2 z-20 bg-orange-500 text-white text-xs px-2 py-1 rounded-full font-semibold">
                   EXPERIMENTAL
@@ -98,6 +100,7 @@ export default function DefaultPage() {
                   </Button>
                 </CardContent>
               </Card>
+              */}
 
               {/* Resources Card */}
               <Card className="group relative overflow-hidden border-2 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:scale-105 bg-gradient-to-br from-background to-primary/5 flex flex-col h-full">
