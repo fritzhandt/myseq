@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Upload, FileText, CheckCircle, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -17,6 +18,7 @@ interface ProcessingResult {
 
 const AgencyDocumentUpload = () => {
   const [file, setFile] = useState<File | null>(null);
+  const [documentType, setDocumentType] = useState<string>('general');
   const [uploading, setUploading] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -76,7 +78,8 @@ const AgencyDocumentUpload = () => {
       const { data: processData, error: processError } = await supabase.functions.invoke('process-agency-pdf', {
         body: { 
           fileUrl: publicUrl,
-          fileName: file.name
+          fileName: file.name,
+          documentType: documentType
         }
       });
 
@@ -119,6 +122,7 @@ const AgencyDocumentUpload = () => {
 
   const resetForm = () => {
     setFile(null);
+    setDocumentType('general');
     setResult(null);
     setUploadProgress(0);
     // Reset the file input
@@ -141,6 +145,21 @@ const AgencyDocumentUpload = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <label htmlFor="document-type" className="text-sm font-medium">
+              Document Type
+            </label>
+            <Select value={documentType} onValueChange={setDocumentType} disabled={uploading}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select document type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="general">General NYC Agencies</SelectItem>
+                <SelectItem value="311">NYC 311 Specific</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="space-y-2">
             <label htmlFor="pdf-upload" className="text-sm font-medium">
               Select Document File (PDF, Word)
@@ -234,10 +253,11 @@ const AgencyDocumentUpload = () => {
         </CardHeader>
         <CardContent>
           <div className="text-sm space-y-2 text-muted-foreground">
-            <p>• Upload PDF or Word documents (.pdf, .doc, .docx) containing government agency information</p>
-            <p>• The system will automatically extract agency names, descriptions, contact info, and websites</p>
-            <p>• Hyperlinks within the document will be preserved and extracted</p>
-            <p>• This improves the "Solve My Issue" search functionality for users</p>
+            <p>• <strong>General NYC Agencies:</strong> Upload documents containing broad government agency information</p>
+            <p>• <strong>NYC 311 Specific:</strong> Upload documents with detailed 311 complaint types and specific URLs</p>
+            <p>• You can upload multiple documents - they will work together to provide better search results</p>
+            <p>• The system automatically extracts agency info, descriptions, contact details, and hyperlinks</p>
+            <p>• This improves the "Solve My Issue" search functionality with specific complaint URLs when available</p>
           </div>
         </CardContent>
       </Card>

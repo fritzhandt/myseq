@@ -14,7 +14,7 @@ serve(async (req) => {
   }
 
   try {
-    const { fileUrl, fileName } = await req.json();
+    const { fileUrl, fileName, documentType = 'general' } = await req.json();
     
     if (!fileUrl) {
       return new Response(
@@ -182,17 +182,17 @@ serve(async (req) => {
     }
 
     // Store the extracted content in the database
-    // First, clear any existing content (replace all existing documents)
+    // Delete existing content of the same document type (not all documents)
     const { error: deleteError } = await supabase
       .from('pdf_content')
       .delete()
-      .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all records
+      .eq('document_type', documentType);
 
     if (deleteError) {
-      console.warn('Failed to delete existing content:', deleteError.message);
+      console.warn(`Failed to delete existing ${documentType} content:`, deleteError.message);
     }
 
-    // Insert new content (always replaces everything)
+    // Insert new content for this document type
     const { error: insertError } = await supabase
       .from('pdf_content')
       .insert({
@@ -201,18 +201,19 @@ serve(async (req) => {
         hyperlinks: {
           all_links: hyperlinks,
           complaint_311_map: complaint311Map || {}
-        }
+        },
+        document_type: documentType
       });
 
     if (insertError) {
       throw new Error(`Failed to store document content: ${insertError.message}`);
     }
 
-    console.log('Replaced all existing document content with new upload');
+    console.log(`Replaced existing ${documentType} document content with new upload`);
 
     const response = {
       success: true,
-      message: `Document content extracted and stored successfully. Now the AI can reference comprehensive NYC agency information for better search results.`,
+      message: `Document content extracted and stored successfully. Document type: ${documentType}. The AI can now reference this along with other uploaded documents for better search results.`,
       contentLength: extractedContent.length,
       hyperlinksFound: hyperlinks.length,
       fileName: fileName

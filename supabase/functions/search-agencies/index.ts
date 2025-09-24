@@ -33,30 +33,38 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Get PDF content to enhance the search
-    const { data: pdfContent } = await supabase
+    // Get PDF content to enhance the search - fetch ALL documents
+    const { data: allPdfContent } = await supabase
       .from('pdf_content')
-      .select('content, hyperlinks')
-      .limit(1)
-      .single();
+      .select('content, hyperlinks, document_type, file_name')
+      .order('created_at', { ascending: false });
 
     let contextualInfo = '';
-    if (pdfContent && pdfContent.content) {
-      contextualInfo = `
-
-ADDITIONAL CONTEXT FROM NYC AGENCIES DOCUMENT:
-${pdfContent.content}
-
-HYPERLINKS AVAILABLE:
-${pdfContent.hyperlinks ? JSON.stringify(pdfContent.hyperlinks, null, 2) : 'None'}
-
-NYC 311 COMPLAINT MAPPINGS:
-${pdfContent.hyperlinks && pdfContent.hyperlinks.complaint_311_map ? 
-  Object.entries(pdfContent.hyperlinks.complaint_311_map).map(([type, data]) => 
-    `${type}: ${data.url} - ${data.description}`
-  ).join('\n') : 'None'}
-
-Use this context to better match user queries with the right agencies. For NYC 311 matches, use the specific complaint URLs when available.`;
+    let all311ComplaintMaps = {};
+    
+    if (allPdfContent && allPdfContent.length > 0) {
+      contextualInfo = '\nADDITIONAL CONTEXT FROM NYC DOCUMENTS:\n\n';
+      
+      allPdfContent.forEach((doc, index) => {
+        contextualInfo += `DOCUMENT ${index + 1} - ${doc.document_type.toUpperCase()} (${doc.file_name}):\n`;
+        contextualInfo += `${doc.content.substring(0, 3000)}...\n\n`;
+        
+        if (doc.hyperlinks && doc.hyperlinks.complaint_311_map) {
+          // Merge all 311 complaint mappings from all documents
+          all311ComplaintMaps = { ...all311ComplaintMaps, ...doc.hyperlinks.complaint_311_map };
+        }
+      });
+      
+      contextualInfo += `NYC 311 COMPLAINT MAPPINGS (from all documents):\n`;
+      if (Object.keys(all311ComplaintMaps).length > 0) {
+        contextualInfo += Object.entries(all311ComplaintMaps).map(([type, data]: [string, any]) => 
+          `${type}: ${data.url} - ${data.description}`
+        ).join('\n');
+      } else {
+        contextualInfo += 'None found';
+      }
+      
+      contextualInfo += '\n\nUse this context to better match user queries with the right agencies. For NYC 311 matches, use the specific complaint URLs when available.';
     }
 
     // Get all agencies from database
@@ -229,10 +237,9 @@ Be very precise - only return agencies that truly match the user's issue. If no 
     const matchedAgencies = parsedResults.results.map((result: any) => {
       const agency = agencies[result.agency_index - 1]; // Convert to 0-based index
       
-      // If this is NYC 311 and we have PDF content with specific complaint mappings
+      // If this is NYC 311 and we have 311 complaint mappings from any document
       let finalWebsite = agency.website;
-      if (agency.name === 'NYC 311' && pdfContent && pdfContent.hyperlinks && pdfContent.hyperlinks.complaint_311_map) {
-        const complaint311Map = pdfContent.hyperlinks.complaint_311_map;
+      if (agency.name === 'NYC 311' && Object.keys(all311ComplaintMaps).length > 0) {
         
         // Try to match the user's query to a specific complaint type
         const userQuery = query.toLowerCase();
@@ -240,7 +247,7 @@ Be very precise - only return agencies that truly match the user's issue. If no 
         let bestMatchScore = 0;
         
         // Look for keyword matches in complaint types
-        for (const [complaintType, data] of Object.entries(complaint311Map)) {
+        for (const [complaintType, data] of Object.entries(all311ComplaintMaps)) {
           const typeWords = complaintType.split(/\s+/);
           const queryWords = userQuery.split(/\s+/);
           

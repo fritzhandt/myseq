@@ -284,6 +284,7 @@ export type Database = {
         Row: {
           content: string
           created_at: string
+          document_type: string | null
           file_name: string
           hyperlinks: Json | null
           id: string
@@ -292,6 +293,7 @@ export type Database = {
         Insert: {
           content: string
           created_at?: string
+          document_type?: string | null
           file_name: string
           hyperlinks?: Json | null
           id?: string
@@ -300,6 +302,7 @@ export type Database = {
         Update: {
           content?: string
           created_at?: string
+          document_type?: string | null
           file_name?: string
           hyperlinks?: Json | null
           id?: string
