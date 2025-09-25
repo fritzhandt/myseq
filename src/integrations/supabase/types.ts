@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_search_usage: {
+        Row: {
+          created_at: string
+          id: string
+          search_count: number
+          search_date: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          search_count?: number
+          search_date?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          search_count?: number
+          search_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       civic_announcements: {
         Row: {
           civic_org_id: string

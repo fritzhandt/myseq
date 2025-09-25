@@ -1,7 +1,10 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -40,6 +43,56 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400
       });
+    }
+
+    // Check daily search limit
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const today = new Date().toISOString().split('T')[0]; // Get YYYY-MM-DD format
+    
+    // Get or create today's usage record
+    const { data: usageData, error: usageError } = await supabase
+      .from('ai_search_usage')
+      .select('search_count')
+      .eq('search_date', today)
+      .single();
+
+    if (usageError && usageError.code !== 'PGRST116') { // PGRST116 = no rows found
+      console.error('Error checking usage:', usageError);
+      return new Response(JSON.stringify({
+        success: false,
+        error: "Service temporarily unavailable"
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500
+      });
+    }
+
+    const currentCount = usageData?.search_count || 0;
+    console.log('Current daily search count:', currentCount);
+
+    if (currentCount >= 1000) {
+      console.log('Daily search limit exceeded');
+      return new Response(JSON.stringify({
+        success: false,
+        error: "Daily search limit exceeded"
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 429
+      });
+    }
+
+    // Increment the search count
+    if (usageData) {
+      // Update existing record
+      await supabase
+        .from('ai_search_usage')
+        .update({ search_count: currentCount + 1 })
+        .eq('search_date', today);
+    } else {
+      // Create new record for today
+      await supabase
+        .from('ai_search_usage')
+        .insert({ search_date: today, search_count: 1 });
     }
 
     if (!openAIApiKey) {

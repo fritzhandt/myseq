@@ -23,6 +23,8 @@ export default function AISearchBar() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  const MAX_QUERY_LENGTH = 500;
+
   const handleSearch = async () => {
     if (!query.trim()) return;
 
@@ -46,7 +48,11 @@ export default function AISearchBar() {
       
       if (!response.success) {
         console.log('AI returned error:', response.error);
-        toast.error(response.error || "Sorry, I couldn't understand your request. Please try rephrasing.");
+        if (response.error === 'Daily search limit exceeded') {
+          toast.error("Our AI needs a break! You've reached the daily limit of 1,000 searches. Come back tomorrow to use AI search, or navigate the site manually.");
+        } else {
+          toast.error(response.error || "Sorry, I couldn't understand your request. Please try rephrasing.");
+        }
         return;
       }
 
@@ -103,7 +109,12 @@ export default function AISearchBar() {
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value.length <= MAX_QUERY_LENGTH) {
+                  setQuery(value);
+                }
+              }}
               onKeyPress={handleKeyPress}
               placeholder="Ask me anything about Southeast Queens..."
               className="pl-12 pr-4 py-6 text-lg bg-background/80 backdrop-blur-sm border-2 border-primary/20 focus:border-primary/40 rounded-2xl shadow-card"
@@ -122,6 +133,13 @@ export default function AISearchBar() {
               <Sparkles className="h-5 w-5" />
             )}
           </Button>
+        </div>
+        
+        {/* Character counter */}
+        <div className="text-right mt-2">
+          <span className={`text-xs ${query.length > MAX_QUERY_LENGTH * 0.9 ? 'text-orange-500' : 'text-muted-foreground'}`}>
+            {query.length}/{MAX_QUERY_LENGTH}
+          </span>
         </div>
       </div>
 
