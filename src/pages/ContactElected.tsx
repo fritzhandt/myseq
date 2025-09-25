@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -84,34 +84,38 @@ const ContactElected = () => {
     return 0;
   };
 
-  const groupedOfficials = officials.reduce((acc, official) => {
-    const key = official.level;
-    if (!acc[key]) {
-      acc[key] = {};
-    }
-    if (!acc[key][official.category]) {
-      acc[key][official.category] = [];
-    }
-    acc[key][official.category].push(official);
-    return acc;
-  }, {} as Record<string, Record<string, ElectedOfficial[]>>);
+  const groupedOfficials = useMemo(() => {
+    const grouped = officials.reduce((acc, official) => {
+      const key = official.level;
+      if (!acc[key]) {
+        acc[key] = {};
+      }
+      if (!acc[key][official.category]) {
+        acc[key][official.category] = [];
+      }
+      acc[key][official.category].push(official);
+      return acc;
+    }, {} as Record<string, Record<string, ElectedOfficial[]>>);
 
-  // Sort officials within each category with custom ordering
-  Object.entries(groupedOfficials).forEach(([level, categories]) => {
-    Object.entries(categories).forEach(([category, officials]) => {
-      officials.sort((a, b) => {
-        const orderA = getCustomOrder(a, level, category);
-        const orderB = getCustomOrder(b, level, category);
-        
-        if (orderA !== orderB) {
-          return orderA - orderB;
-        }
-        
-        // Default alphabetical sorting
-        return a.name.localeCompare(b.name);
+    // Sort officials within each category with custom ordering
+    Object.entries(grouped).forEach(([level, categories]) => {
+      Object.entries(categories).forEach(([category, officials]) => {
+        officials.sort((a, b) => {
+          const orderA = getCustomOrder(a, level, category);
+          const orderB = getCustomOrder(b, level, category);
+          
+          if (orderA !== orderB) {
+            return orderA - orderB;
+          }
+          
+          // Default alphabetical sorting
+          return a.name.localeCompare(b.name);
+        });
       });
     });
-  });
+
+    return grouped;
+  }, [officials]);
 
   const levelOrder = ['federal', 'state', 'city'];
   const levelTitles = {
