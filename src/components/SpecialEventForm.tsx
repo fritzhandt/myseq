@@ -140,7 +140,7 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
               console.log('Assignments for day:', day.id, assignments);
 
               const events = assignments?.map(assignment => {
-                const event = assignment.events;
+                const event = (assignment as any).events;
                 return {
                   id: event?.id, // Include the event ID for updates
                   title: event?.title || '',
@@ -201,7 +201,7 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
         console.log('Single day assignments:', assignments);
 
         const events = assignments?.map(assignment => {
-          const event = assignment.events;
+          const event = (assignment as any).events;
           return {
             id: event?.id, // Include the event ID for updates
             title: event?.title || '',

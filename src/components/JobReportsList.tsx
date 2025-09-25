@@ -50,7 +50,7 @@ export default function JobReportsList() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setReports(data || []);
+      setReports((data as any) || []);
     } catch (error) {
       console.error('Error fetching reports:', error);
       toast({
