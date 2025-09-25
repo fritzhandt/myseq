@@ -18,6 +18,7 @@ import JobReportsList from '@/components/JobReportsList';
 // Temporary comment to force rebuild
 import AgencyDocumentUpload from '@/components/AgencyDocumentUpload';
 import { PendingApprovalsManager } from '@/components/PendingApprovalsManager';
+import MyPendingSubmissions from '@/components/MyPendingSubmissions';
 import { useToast } from '@/hooks/use-toast';
 import { useUserRole } from '@/hooks/useUserRole';
 import { Plus, Calendar, LogOut, Star, AlertTriangle, Users, MapPin, FileText, Building2, Clock } from 'lucide-react';
@@ -26,7 +27,7 @@ import { Plus, Calendar, LogOut, Star, AlertTriangle, Users, MapPin, FileText, B
 const Admin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { userRole, loading: roleLoading, isMainAdmin, hasAdminAccess } = useUserRole();
+  const { userRole, loading: roleLoading, isMainAdmin, isSubAdmin, hasAdminAccess } = useUserRole();
   const [loading, setLoading] = useState(true);
   const [pendingCount, setPendingCount] = useState(0);
   
@@ -229,8 +230,8 @@ const Admin = () => {
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        <Tabs defaultValue={isMainAdmin ? "pending-approvals" : "events"} className="w-full">
-          <TabsList className={`grid w-full ${isMainAdmin ? 'grid-cols-8' : 'grid-cols-7'} mb-8`}>
+        <Tabs defaultValue={isMainAdmin ? "pending-approvals" : (isSubAdmin ? "my-submissions" : "events")} className="w-full">
+          <TabsList className={`grid w-full ${isMainAdmin ? 'grid-cols-8' : (isSubAdmin ? 'grid-cols-8' : 'grid-cols-7')} mb-8`}>
             {isMainAdmin && (
               <TabsTrigger value="pending-approvals" className="flex items-center gap-2 relative">
                 <Clock className="h-4 w-4" />
@@ -240,6 +241,12 @@ const Admin = () => {
                     {pendingCount}
                   </Badge>
                 )}
+              </TabsTrigger>
+            )}
+            {isSubAdmin && (
+              <TabsTrigger value="my-submissions" className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                My Submissions
               </TabsTrigger>
             )}
             <TabsTrigger value="events" className="flex items-center gap-2">
@@ -275,6 +282,12 @@ const Admin = () => {
           {isMainAdmin && (
             <TabsContent value="pending-approvals" className="space-y-4">
               <PendingApprovalsManager />
+            </TabsContent>
+          )}
+
+          {isSubAdmin && (
+            <TabsContent value="my-submissions" className="space-y-4">
+              <MyPendingSubmissions />
             </TabsContent>
           )}
 
