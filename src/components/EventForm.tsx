@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useUserRole } from '@/hooks/useUserRole';
 import { ArrowLeft, Upload, X, Save, Tag, Plus } from 'lucide-react';
 
 interface EventFormProps {
@@ -20,6 +21,7 @@ interface EventFormProps {
 }
 
 export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
+  const { isSubAdmin } = useUserRole();
   const [formData, setFormData] = useState({
     title: event?.title || '',
     description: event?.description || '',
@@ -155,6 +157,7 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
       };
 
       if (event) {
+        // Updates always go to main table regardless of role
         const { error } = await supabase
           .from('events')
           .update(eventData)
@@ -167,15 +170,23 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
           description: "Event updated successfully!",
         });
       } else {
+        // New events: sub-admins go to pending table, others go directly to main table
+        const tableName = isSubAdmin ? 'pending_events' : 'events';
+        const insertData = isSubAdmin 
+          ? { ...eventData, submitted_by: (await supabase.auth.getUser()).data.user?.id }
+          : eventData;
+        
         const { error } = await supabase
-          .from('events')
-          .insert([eventData]);
+          .from(tableName)
+          .insert([insertData]);
         
         if (error) throw error;
         
         toast({
           title: "Success",
-          description: "Event created successfully!",
+          description: isSubAdmin 
+            ? "Event submitted for approval! You'll be notified once it's reviewed."
+            : "Event created successfully!",
         });
       }
 

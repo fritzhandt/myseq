@@ -8,6 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useUserRole } from '@/hooks/useUserRole';
 import { X } from 'lucide-react';
 import { format } from 'date-fns';
 import { EventAssignmentSection } from './EventAssignmentSection';
@@ -50,6 +51,8 @@ interface SpecialEventFormProps {
 }
 
 const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormProps) => {
+  const { toast } = useToast();
+  const { isSubAdmin } = useUserRole();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [type, setType] = useState<'single_day' | 'multi_day'>('single_day');
@@ -59,7 +62,6 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
   const [days, setDays] = useState<SpecialEventDay[]>([]);
   const [loading, setLoading] = useState(false);
   const [assignmentsLoaded, setAssignmentsLoaded] = useState(false);
-  const { toast } = useToast();
 
   useEffect(() => {
     if (specialEvent) {
@@ -318,7 +320,7 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
       let specialEventId: string;
 
       if (specialEvent?.id) {
-        // Update existing
+        // Updates always go to main table regardless of role
         const { error } = await supabase
           .from('special_events')
           .update(specialEventData)
@@ -327,15 +329,38 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
         if (error) throw error;
         specialEventId = specialEvent.id;
       } else {
-        // Create new
-        const { data, error } = await supabase
-          .from('special_events')
-          .insert(specialEventData)
-          .select()
-          .single();
-        
-        if (error) throw error;
-        specialEventId = data.id;
+        // New special events: sub-admins go to pending table, others go directly to main table
+        if (isSubAdmin) {
+          const pendingData = { 
+            ...specialEventData, 
+            submitted_by: (await supabase.auth.getUser()).data.user?.id 
+          };
+          const { data, error } = await supabase
+            .from('pending_special_events')
+            .insert(pendingData)
+            .select()
+            .single();
+          
+          if (error) throw error;
+          
+          toast({
+            title: "Success",
+            description: "Special event submitted for approval! You'll be notified once it's reviewed.",
+          });
+          
+          onSave();
+          return; // Exit early for sub-admin submissions
+        } else {
+          // Main admin creates directly
+          const { data, error } = await supabase
+            .from('special_events')
+            .insert(specialEventData)
+            .select()
+            .single();
+          
+          if (error) throw error;
+          specialEventId = data.id;
+        }
       }
 
       // Don't clear existing assignments and days - we'll update them instead

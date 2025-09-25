@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useUserRole } from '@/hooks/useUserRole';
 import { X, Upload, Trash2 } from 'lucide-react';
 
 interface CommunityAlert {
@@ -25,6 +26,7 @@ interface CommunityAlertFormProps {
 }
 
 const CommunityAlertForm = ({ alert, onClose, onSave }: CommunityAlertFormProps) => {
+  const { isSubAdmin } = useUserRole();
   const [formData, setFormData] = useState<CommunityAlert>({
     title: '',
     short_description: '',
@@ -103,7 +105,7 @@ const CommunityAlertForm = ({ alert, onClose, onSave }: CommunityAlertFormProps)
 
     try {
       if (alert?.id) {
-        // Update existing alert
+        // Updates always go to main table regardless of role
         const { error } = await supabase
           .from('community_alerts')
           .update(formData)
@@ -116,16 +118,23 @@ const CommunityAlertForm = ({ alert, onClose, onSave }: CommunityAlertFormProps)
           description: "Community alert updated successfully!",
         });
       } else {
-        // Create new alert
+        // New alerts: sub-admins go to pending table, others go directly to main table
+        const tableName = isSubAdmin ? 'pending_community_alerts' : 'community_alerts';
+        const insertData = isSubAdmin 
+          ? { ...formData, submitted_by: (await supabase.auth.getUser()).data.user?.id }
+          : formData;
+
         const { error } = await supabase
-          .from('community_alerts')
-          .insert([formData]);
+          .from(tableName)
+          .insert([insertData]);
 
         if (error) throw error;
 
         toast({
           title: "Success",
-          description: "Community alert created successfully!",
+          description: isSubAdmin 
+            ? "Community alert submitted for approval! You'll be notified once it's reviewed."
+            : "Community alert created successfully!",
         });
       }
 

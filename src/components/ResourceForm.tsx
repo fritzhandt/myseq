@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useUserRole } from "@/hooks/useUserRole";
 import { X, Upload, Trash2, Wand2 } from "lucide-react";
 import { removeBackground, loadImage } from "@/utils/backgroundRemoval";
 
@@ -40,6 +41,7 @@ const CATEGORIES = [
 
 export default function ResourceForm({ resource, onClose, onSave }: ResourceFormProps) {
   const { toast } = useToast();
+  const { isSubAdmin } = useUserRole();
   const [loading, setLoading] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
@@ -332,7 +334,7 @@ export default function ResourceForm({ resource, onClose, onSave }: ResourceForm
       };
 
       if (resource?.id) {
-        // Update existing resource
+        // Updates always go to main table regardless of role
         const { error } = await supabase
           .from("resources")
           .update(dataToSave)
@@ -345,16 +347,23 @@ export default function ResourceForm({ resource, onClose, onSave }: ResourceForm
           description: "Resource updated successfully",
         });
       } else {
-        // Create new resource
+        // New resources: sub-admins go to pending table, others go directly to main table
+        const tableName = isSubAdmin ? 'pending_resources' : 'resources';
+        const insertData = isSubAdmin 
+          ? { ...dataToSave, submitted_by: (await supabase.auth.getUser()).data.user?.id }
+          : dataToSave;
+
         const { error } = await supabase
-          .from("resources")
-          .insert([dataToSave]);
+          .from(tableName)
+          .insert([insertData]);
 
         if (error) throw error;
 
         toast({
           title: "Success",
-          description: "Resource created successfully",
+          description: isSubAdmin 
+            ? "Resource submitted for approval! You'll be notified once it's reviewed."
+            : "Resource created successfully",
         });
       }
 

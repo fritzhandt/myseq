@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { useUserRole } from '@/hooks/useUserRole';
 import { supabase } from '@/integrations/supabase/client';
 import { Upload, FileText, Trash2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -19,11 +20,12 @@ interface Job {
 }
 
 export default function JobCSVUpload() {
+  const { toast } = useToast();
+  const { isSubAdmin } = useUserRole();
   const [uploading, setUploading] = useState(false);
   const [previewJobs, setPreviewJobs] = useState<Job[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('city');
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
 
   const parseXLSX = (arrayBuffer: ArrayBuffer): Job[] => {
     try {
@@ -157,6 +159,8 @@ export default function JobCSVUpload() {
         category: selectedCategory
       }));
 
+      // Sub-admins jobs are not currently supported in pending tables
+      // Jobs go directly to main table for all users
       const { error } = await supabase
         .from('jobs')
         .insert(jobsToInsert);
