@@ -119,7 +119,7 @@ export default function AISearchBar() {
       <div className="relative mb-6">
         <div className="flex gap-2">
           <div className="relative flex-1">
-            <span className="absolute left-4 top-1/2 transform -translate-y-1/2 font-orbitron font-black text-primary text-lg tracking-wider">AI</span>
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 font-orbitron font-black text-primary text-sm tracking-wider z-10 pointer-events-none">AI</span>
             <Input
               value={query}
               onChange={(e) => {
@@ -136,7 +136,7 @@ export default function AISearchBar() {
               }}
               onKeyPress={handleKeyPress}
               placeholder="Ask me anything about Southeast Queens..."
-              className="pl-16 pr-4 py-6 text-lg bg-background/80 backdrop-blur-sm border-2 border-primary/20 focus:border-primary/40 rounded-2xl shadow-card"
+              className="pl-12 pr-4 py-6 text-lg bg-background/80 backdrop-blur-sm border-2 border-primary/20 focus:border-primary/40 rounded-2xl shadow-card"
               disabled={isLoading}
             />
           </div>
