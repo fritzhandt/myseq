@@ -9,7 +9,7 @@ const corsHeaders = {
 };
 
 interface NavigationResponse {
-  destination: string;
+  destination?: string;
   searchTerm?: string;
   category?: string;
   dateStart?: string;
@@ -86,27 +86,50 @@ For errors:
           { role: 'system', content: systemPrompt },
           { role: 'user', content: query }
         ],
-        max_completion_tokens: 200,
+        max_completion_tokens: 300,
+        temperature: undefined, // GPT-5 doesn't support temperature
       }),
     });
 
     if (!response.ok) {
-      const errorMessage = `OpenAI API error: ${response.status}`;
+      const errorText = await response.text();
+      const errorMessage = `OpenAI API error: ${response.status} - ${errorText}`;
       console.error(errorMessage);
       throw new Error(errorMessage);
     }
 
     const data = await response.json();
+    console.log('OpenAI Full Response:', JSON.stringify(data, null, 2));
+    
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error('Invalid OpenAI response structure:', data);
+      throw new Error('Invalid response from OpenAI API');
+    }
+    
     const aiResponse = data.choices[0].message.content;
 
     console.log('AI Response:', aiResponse);
 
+    // Check if aiResponse is empty or null
+    if (!aiResponse || aiResponse.trim() === '') {
+      console.error('Empty AI response received');
+      return new Response(JSON.stringify({
+        success: false,
+        error: "I received an empty response from the AI. Please try again."
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     // Parse the AI response
     let navigationResponse: NavigationResponse;
     try {
-      navigationResponse = JSON.parse(aiResponse);
+      // Clean the response in case there are extra characters
+      const cleanResponse = aiResponse.trim();
+      navigationResponse = JSON.parse(cleanResponse);
     } catch (parseError) {
       console.error('Failed to parse AI response:', parseError);
+      console.error('Raw AI response:', JSON.stringify(aiResponse));
       navigationResponse = {
         success: false,
         error: "I couldn't understand your request. Please try rephrasing it."
