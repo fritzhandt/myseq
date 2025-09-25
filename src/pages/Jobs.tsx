@@ -34,6 +34,7 @@ export default function Jobs() {
   const [locationFilter, setLocationFilter] = useState('all');
   const [employerFilter, setEmployerFilter] = useState('all');
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [activeTab, setActiveTab] = useState('city');
   const itemsPerPage = 10;
@@ -47,6 +48,10 @@ export default function Jobs() {
       if (state.searchTerm) setSearchQuery(state.searchTerm);
       if (state.employer) setEmployerFilter(state.employer);
       if (state.location) setLocationFilter(state.location);
+      // Auto-trigger search when coming from AI navigation
+      setTimeout(() => {
+        handleManualSearch();
+      }, 100);
       // Clear the navigation state
       navigate(location.pathname, { replace: true });
     }
@@ -57,8 +62,9 @@ export default function Jobs() {
   }, []);
 
   useEffect(() => {
-    filterJobs();
-  }, [jobs, searchQuery, locationFilter, employerFilter, activeTab]);
+    // Only apply basic filters automatically, not AI search
+    applyBasicFilters();
+  }, [jobs, locationFilter, employerFilter, activeTab]);
 
   const fetchJobs = async () => {
     try {
@@ -76,40 +82,48 @@ export default function Jobs() {
     }
   };
 
-  const filterJobs = useCallback(async () => {
-    if (!searchQuery) {
-      // No search query - apply basic filters only
-      let filtered = [...jobs];
+  const applyBasicFilters = useCallback(() => {
+    if (searchQuery) {
+      // Don't auto-filter when there's a search query - require manual search
+      return;
+    }
+    
+    let filtered = [...jobs];
 
-      // Filter by category (city/state)
-      filtered = filtered.filter(job => 
-        job.category === activeTab || job.category === 'both'
+    // Filter by category (city/state)
+    filtered = filtered.filter(job => 
+      job.category === activeTab || job.category === 'both'
+    );
+
+    // Filter by location
+    if (locationFilter && locationFilter !== 'all') {
+      filtered = filtered.filter(job =>
+        job.location.toLowerCase().includes(locationFilter.toLowerCase())
       );
+    }
 
-      // Filter by location
-      if (locationFilter && locationFilter !== 'all') {
-        filtered = filtered.filter(job =>
-          job.location.toLowerCase().includes(locationFilter.toLowerCase())
-        );
-      }
+    // Filter by employer
+    if (employerFilter && employerFilter !== 'all') {
+      filtered = filtered.filter(job =>
+        job.employer.toLowerCase().includes(employerFilter.toLowerCase())
+      );
+    }
 
-      // Filter by employer
-      if (employerFilter && employerFilter !== 'all') {
-        filtered = filtered.filter(job =>
-          job.employer.toLowerCase().includes(employerFilter.toLowerCase())
-        );
-      }
+    setFilteredJobs(filtered);
+    setCurrentPage(1);
+  }, [jobs, searchQuery, locationFilter, employerFilter, activeTab]);
 
-
-      setFilteredJobs(filtered);
-      setCurrentPage(1);
+  const handleManualSearch = useCallback(async () => {
+    if (!searchQuery.trim()) {
+      // If no search query, just apply basic filters
+      applyBasicFilters();
       return;
     }
 
-    // Use AI-powered search when there's a search query
-    console.log('Starting AI job search with query:', searchQuery);
-    
+    setIsSearching(true);
     try {
+      console.log('Starting manual AI job search with query:', searchQuery);
+      
       const { data, error } = await supabase.functions.invoke('ai-job-search', {
         body: { 
           query: searchQuery,
@@ -135,10 +149,18 @@ export default function Jobs() {
     } catch (error) {
       console.error('AI search failed, using fallback:', error);
       fallbackSearch();
+    } finally {
+      setIsSearching(false);
     }
     
     setCurrentPage(1);
-  }, [jobs, searchQuery, locationFilter, employerFilter, activeTab]);
+  }, [searchQuery, locationFilter, employerFilter, activeTab, applyBasicFilters]);
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleManualSearch();
+    }
+  };
 
   const fallbackSearch = () => {
     let filtered = [...jobs];
@@ -176,6 +198,10 @@ export default function Jobs() {
     setSearchQuery('');
     setLocationFilter('all');
     setEmployerFilter('all');
+    // Auto-apply filters after clearing
+    setTimeout(() => {
+      applyBasicFilters();
+    }, 0);
   };
 
   const uniqueLocations = [...new Set(jobs.filter(job => job.category === activeTab || job.category === 'both').map(job => job.location))];
@@ -237,13 +263,24 @@ export default function Jobs() {
                        <Briefcase className="h-4 w-4" />
                        Job Title
                      </label>
-                     <Input
-                       placeholder="Search jobs (understands related titles like 'accountant' → bookkeeper)"
-                       value={searchQuery}
-                       onChange={(e) => setSearchQuery(e.target.value)}
-                     />
+                     <div className="flex gap-2">
+                       <Input
+                         placeholder="Search jobs (understands related titles like 'accountant' → bookkeeper)"
+                         value={searchQuery}
+                         onChange={(e) => setSearchQuery(e.target.value)}
+                         onKeyPress={handleKeyPress}
+                         className="flex-1"
+                       />
+                       <Button 
+                         onClick={handleManualSearch}
+                         disabled={isSearching}
+                         className="shrink-0"
+                       >
+                         {isSearching ? 'Searching...' : 'Search'}
+                       </Button>
+                     </div>
                      <p className="text-xs text-muted-foreground">
-                       Smart search finds related job titles and skills automatically.
+                       Smart search finds related job titles and skills automatically. Press Enter or click Search.
                      </p>
                    </div>
 
@@ -322,13 +359,24 @@ export default function Jobs() {
                        <Briefcase className="h-4 w-4" />
                        Job Title
                      </label>
-                     <Input
-                       placeholder="Search jobs (understands related titles like 'accountant' → bookkeeper)"
-                       value={searchQuery}
-                       onChange={(e) => setSearchQuery(e.target.value)}
-                     />
+                     <div className="flex gap-2">
+                       <Input
+                         placeholder="Search jobs (understands related titles like 'accountant' → bookkeeper)"
+                         value={searchQuery}
+                         onChange={(e) => setSearchQuery(e.target.value)}
+                         onKeyPress={handleKeyPress}
+                         className="flex-1"
+                       />
+                       <Button 
+                         onClick={handleManualSearch}
+                         disabled={isSearching}
+                         className="shrink-0"
+                       >
+                         {isSearching ? 'Searching...' : 'Search'}
+                       </Button>
+                     </div>
                      <p className="text-xs text-muted-foreground">
-                       Smart search finds related job titles and skills automatically.
+                       Smart search finds related job titles and skills automatically. Press Enter or click Search.
                      </p>
                    </div>
 
