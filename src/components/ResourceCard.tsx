@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Phone, Mail, MapPin } from "lucide-react";
+import { ExternalLink, Phone, Mail, MapPin, ChevronDown, ChevronUp } from "lucide-react";
 
 interface Resource {
   id: string;
@@ -21,6 +22,8 @@ interface ResourceCardProps {
 }
 
 export default function ResourceCard({ resource }: ResourceCardProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   return (
     <Card className="h-full hover:shadow-lg transition-shadow overflow-hidden flex flex-col">
       {/* Cover Photo Section */}
@@ -62,9 +65,29 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
       </CardHeader>
 
       <CardContent className="flex-1 flex flex-col">
-        <p className="text-muted-foreground mb-4 line-clamp-3">
-          {resource.description}
-        </p>
+        <div className="mb-4">
+          <p className={`text-muted-foreground ${isExpanded ? '' : 'line-clamp-3'}`}>
+            {resource.description}
+          </p>
+          {resource.description.length > 120 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="mt-2 p-0 h-auto text-sm text-primary hover:text-primary/80 font-medium"
+            >
+              {isExpanded ? (
+                <>
+                  Show less <ChevronUp className="h-4 w-4 ml-1" />
+                </>
+              ) : (
+                <>
+                  Show more <ChevronDown className="h-4 w-4 ml-1" />
+                </>
+              )}
+            </Button>
+          )}
+        </div>
         
         {/* Contact Information */}
         {(resource.phone || resource.email || resource.address) && (
