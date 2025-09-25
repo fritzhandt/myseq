@@ -95,13 +95,13 @@ For errors:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-5-mini-2025-08-07',
+        model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: query }
         ],
-        max_completion_tokens: 300,
-        temperature: undefined, // GPT-5 doesn't support temperature
+        max_tokens: 800,
+        temperature: 0.1
       }),
     });
 
