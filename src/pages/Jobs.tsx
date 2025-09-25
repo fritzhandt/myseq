@@ -539,7 +539,7 @@ export default function Jobs() {
         </div>
 
         {/* Job List */}
-        <JobList jobs={paginatedJobs} loading={loading} />
+        <JobList jobs={paginatedJobs} loading={loading} isSearching={isSearching} />
         
         {/* Pagination */}
         {filteredJobs.length > 0 && (

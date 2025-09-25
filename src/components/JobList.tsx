@@ -16,9 +16,10 @@ interface Job {
 interface JobListProps {
   jobs: Job[];
   loading: boolean;
+  isSearching?: boolean;
 }
 
-export default function JobList({ jobs, loading }: JobListProps) {
+export default function JobList({ jobs, loading, isSearching = false }: JobListProps) {
 
   if (loading) {
     return (
@@ -44,6 +45,15 @@ export default function JobList({ jobs, loading }: JobListProps) {
   }
 
   if (jobs.length === 0) {
+    if (isSearching) {
+      return (
+        <div className="text-center py-12">
+          <h3 className="text-lg font-medium mb-2">Searching...</h3>
+          <p className="text-muted-foreground">Finding the best job matches for you.</p>
+        </div>
+      );
+    }
+    
     return (
       <div className="text-center py-12">
         <h3 className="text-lg font-medium mb-2">No jobs found</h3>
