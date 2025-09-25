@@ -98,42 +98,27 @@ serve(async (req) => {
       });
     }
 
-    // Use AI to analyze and match jobs
-    const systemPrompt = `You are an AI job matching system. Given a user's search query and a list of job listings, your task is to:
+    // Use AI to analyze and match jobs based on titles only
+    const systemPrompt = `You are helping a person find a job. Here are all the job titles available. A person may type in a job that doesn't exactly match the title. Please return related job titles and matching ones.
 
-1. Find jobs that semantically match the user's query, even if they don't contain exact keywords
-2. Consider related job titles, skills, and responsibilities
-3. Score each job on relevance (0-100)
-4. Return only jobs with a relevance score of 30 or higher
-5. Sort results by relevance score (highest first)
-
-Examples of semantic matching:
-- "accountant" should match "bookkeeper", "financial analyst", "accounting clerk"
-- "teacher" should match "educator", "instructor", "tutor", "academic specialist" 
-- "nurse" should match "healthcare worker", "medical assistant", "patient care"
-- "driver" should match "transportation", "delivery", "logistics"
-
-User Query: "${query}"
-
-Respond with a JSON array of job IDs with their relevance scores:
+Return a JSON array of job IDs that match or are related to the user's query, ordered by relevance:
 [
-  {"id": "job_id", "score": 85, "reason": "Brief explanation of match"},
-  {"id": "job_id", "score": 72, "reason": "Brief explanation of match"}
+  "job_id_1",
+  "job_id_2", 
+  "job_id_3"
 ]
 
-Only include jobs with score >= 30. If no jobs meet the threshold, return an empty array.`;
+Only include jobs that are reasonably related to the search query. If no jobs match, return an empty array.`;
 
-    const jobsForAI = allJobs.map(job => ({
+    const jobTitlesForAI = allJobs.map(job => ({
       id: job.id,
-      title: job.title || '',
-      description: job.description || '',
-      employer: job.employer || '',
-      location: job.location || ''
+      title: job.title,
+      employer: job.employer
     }));
 
-    const userPrompt = `Jobs to analyze:\n${JSON.stringify(jobsForAI, null, 2)}`;
+    const userPrompt = `User is looking for: "${query}"\n\nAvailable jobs:\n${JSON.stringify(jobTitlesForAI, null, 2)}`;
 
-    console.log('Sending to OpenAI - Jobs count:', allJobs.length);
+    console.log('Sending to OpenAI - Jobs count:', allJobs.length, 'Query:', query);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -147,7 +132,7 @@ Only include jobs with score >= 30. If no jobs meet the threshold, return an emp
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
-        max_tokens: 2000,
+        max_tokens: 1000,
         temperature: 0.3,
       }),
     });
@@ -168,16 +153,23 @@ Only include jobs with score >= 30. If no jobs meet the threshold, return an emp
     const aiResponse = aiData.choices[0].message.content;
     console.log('AI Response:', aiResponse);
 
-    let matchedJobs: { id: string; score: number; reason: string }[] = [];
+    let matchedJobIds: string[] = [];
     try {
-      matchedJobs = JSON.parse(aiResponse);
+      // Try to parse as array of job IDs
+      const parsed = JSON.parse(aiResponse);
+      if (Array.isArray(parsed)) {
+        matchedJobIds = parsed;
+      } else {
+        console.error('AI response is not an array:', parsed);
+        throw new Error('Invalid AI response format');
+      }
     } catch (parseError) {
       console.error('Failed to parse AI response:', parseError);
       console.error('Raw AI response:', aiResponse);
       
       // Fallback to basic text search if AI fails
       const fallbackJobs = allJobs.filter(job => {
-        const searchText = `${job.title} ${job.description} ${job.employer}`.toLowerCase();
+        const searchText = `${job.title} ${job.employer}`.toLowerCase();
         return searchText.includes(query.toLowerCase());
       });
       
@@ -190,14 +182,7 @@ Only include jobs with score >= 30. If no jobs meet the threshold, return an emp
     }
 
     // Get the full job data for matched jobs
-    const matchedJobIds = matchedJobs.map(match => match.id);
-    const finalJobs = allJobs
-      .filter(job => matchedJobIds.includes(job.id))
-      .sort((a, b) => {
-        const scoreA = matchedJobs.find(m => m.id === a.id)?.score || 0;
-        const scoreB = matchedJobs.find(m => m.id === b.id)?.score || 0;
-        return scoreB - scoreA; // Sort by score descending
-      });
+    const finalJobs = allJobs.filter(job => matchedJobIds.includes(job.id));
 
     console.log(`Matched ${finalJobs.length} jobs out of ${allJobs.length} total jobs`);
 

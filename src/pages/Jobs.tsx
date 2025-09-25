@@ -34,6 +34,7 @@ export default function Jobs() {
   const [locationFilter, setLocationFilter] = useState('all');
   const [employerFilter, setEmployerFilter] = useState('all');
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [activeTab, setActiveTab] = useState('city');
   const itemsPerPage = 10;
@@ -47,6 +48,10 @@ export default function Jobs() {
       if (state.searchTerm) setSearchQuery(state.searchTerm);
       if (state.employer) setEmployerFilter(state.employer);
       if (state.location) setLocationFilter(state.location);
+      // Auto-trigger search when coming from AI navigation
+      setTimeout(() => {
+        handleManualSearch();
+      }, 100);
       // Clear the navigation state
       navigate(location.pathname, { replace: true });
     }
@@ -57,8 +62,9 @@ export default function Jobs() {
   }, []);
 
   useEffect(() => {
-    applyFilters();
-  }, [jobs, searchQuery, locationFilter, employerFilter, activeTab]);
+    // Only apply basic filters automatically, not AI search
+    applyBasicFilters();
+  }, [jobs, locationFilter, employerFilter, activeTab]);
 
   const fetchJobs = async () => {
     try {
@@ -76,22 +82,18 @@ export default function Jobs() {
     }
   };
 
-  const applyFilters = useCallback(() => {
+  const applyBasicFilters = useCallback(() => {
+    if (searchQuery) {
+      // Don't auto-filter when there's a search query - require manual search
+      return;
+    }
+    
     let filtered = [...jobs];
 
     // Filter by category (city/state)
     filtered = filtered.filter(job => 
       job.category === activeTab || job.category === 'both'
     );
-
-    // Basic text search across title, description, and employer
-    if (searchQuery) {
-      filtered = filtered.filter(job =>
-        job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.employer.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
 
     // Filter by location
     if (locationFilter && locationFilter !== 'all') {
@@ -111,11 +113,96 @@ export default function Jobs() {
     setCurrentPage(1);
   }, [jobs, searchQuery, locationFilter, employerFilter, activeTab]);
 
+  const handleManualSearch = useCallback(async () => {
+    if (!searchQuery.trim()) {
+      // If no search query, just apply basic filters
+      applyBasicFilters();
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      console.log('Starting manual AI job search with query:', searchQuery);
+      
+      const { data, error } = await supabase.functions.invoke('ai-job-search', {
+        body: { 
+          query: searchQuery,
+          location: locationFilter !== 'all' ? locationFilter : undefined,
+          employer: employerFilter !== 'all' ? employerFilter : undefined,
+          category: activeTab
+        }
+      });
+
+      if (error) {
+        console.error('AI job search error:', error);
+        throw error;
+      }
+
+      if (data.success) {
+        console.log(`AI found ${data.jobs.length} matching jobs`);
+        setFilteredJobs(data.jobs || []);
+      } else {
+        console.error('AI job search failed:', data.error);
+        // Fallback to basic search
+        fallbackSearch();
+      }
+    } catch (error) {
+      console.error('AI search failed, using fallback:', error);
+      fallbackSearch();
+    } finally {
+      setIsSearching(false);
+    }
+    
+    setCurrentPage(1);
+  }, [searchQuery, locationFilter, employerFilter, activeTab, applyBasicFilters]);
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleManualSearch();
+    }
+  };
+
+  const fallbackSearch = () => {
+    let filtered = [...jobs];
+
+    // Filter by category (city/state)
+    filtered = filtered.filter(job => 
+      job.category === activeTab || job.category === 'both'
+    );
+
+    // Basic text search across title, description, and employer
+    if (searchQuery) {
+      filtered = filtered.filter(job =>
+        job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        job.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        job.employer.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    // Apply other filters
+    if (locationFilter && locationFilter !== 'all') {
+      filtered = filtered.filter(job =>
+        job.location.toLowerCase().includes(locationFilter.toLowerCase())
+      );
+    }
+    if (employerFilter && employerFilter !== 'all') {
+      filtered = filtered.filter(job =>
+        job.employer.toLowerCase().includes(employerFilter.toLowerCase())
+      );
+    }
+    
+    setFilteredJobs(filtered);
+  };
+
 
   const clearFilters = () => {
     setSearchQuery('');
     setLocationFilter('all');
     setEmployerFilter('all');
+    // Auto-apply filters after clearing
+    setTimeout(() => {
+      applyBasicFilters();
+    }, 0);
   };
 
   const uniqueLocations = [...new Set(jobs.filter(job => job.category === activeTab || job.category === 'both').map(job => job.location))];
@@ -170,19 +257,32 @@ export default function Jobs() {
           <TabsContent value="city" className="mt-0">
             <Card className="mb-8">
               <CardContent className="p-6">
-                 {/* Job Title Search */}
+                 {/* Always visible: Job Title Search */}
                  <div className="space-y-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium flex items-center gap-2">
                         <Briefcase className="h-4 w-4" />
                         Job Title
                       </label>
-                      <Input
-                        placeholder="Search job titles, employers, descriptions..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full"
-                      />
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Search job titles (e.g., 'accountant' finds bookkeeper, financial analyst)"
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          onKeyPress={handleKeyPress}
+                          className="flex-1"
+                        />
+                        <Button 
+                          onClick={handleManualSearch}
+                          disabled={isSearching}
+                          className="shrink-0"
+                        >
+                          {isSearching ? 'Searching...' : 'Search'}
+                        </Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Smart search matches similar job titles. Press Enter or click Search.
+                      </p>
                     </div>
 
                   {/* Advanced Search Toggle Button - only visible on mobile */}
@@ -253,19 +353,32 @@ export default function Jobs() {
           <TabsContent value="state" className="mt-0">
             <Card className="mb-8">
               <CardContent className="p-6">
-                 {/* Job Title Search */}
+                 {/* Always visible: Job Title Search */}
                  <div className="space-y-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium flex items-center gap-2">
                         <Briefcase className="h-4 w-4" />
                         Job Title
                       </label>
-                      <Input
-                        placeholder="Search job titles, employers, descriptions..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full"
-                      />
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Search job titles (e.g., 'accountant' finds bookkeeper, financial analyst)"
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          onKeyPress={handleKeyPress}
+                          className="flex-1"
+                        />
+                        <Button 
+                          onClick={handleManualSearch}
+                          disabled={isSearching}
+                          className="shrink-0"
+                        >
+                          {isSearching ? 'Searching...' : 'Search'}
+                        </Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Smart search matches similar job titles. Press Enter or click Search.
+                      </p>
                     </div>
 
                   {/* Advanced Search Toggle Button - only visible on mobile */}
