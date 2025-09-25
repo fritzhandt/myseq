@@ -238,12 +238,12 @@ export default function Jobs() {
                        Job Title
                      </label>
                      <Input
-                       placeholder="🤖 AI-powered search (e.g., 'accountant', 'data analysis')"
+                       placeholder="Search jobs (understands related titles like 'accountant' → bookkeeper)"
                        value={searchQuery}
                        onChange={(e) => setSearchQuery(e.target.value)}
                      />
                      <p className="text-xs text-muted-foreground">
-                       AI search understands related job titles. Try "accountant" to find bookkeeper roles, or "teacher" to find educator positions.
+                       Smart search finds related job titles and skills automatically.
                      </p>
                    </div>
 
@@ -323,12 +323,12 @@ export default function Jobs() {
                        Job Title
                      </label>
                      <Input
-                       placeholder="🤖 AI-powered search (e.g., 'accountant', 'data analysis')"
+                       placeholder="Search jobs (understands related titles like 'accountant' → bookkeeper)"
                        value={searchQuery}
                        onChange={(e) => setSearchQuery(e.target.value)}
                      />
                      <p className="text-xs text-muted-foreground">
-                       AI search understands related job titles. Try "accountant" to find bookkeeper roles, or "teacher" to find educator positions.
+                       Smart search finds related job titles and skills automatically.
                      </p>
                    </div>
 
