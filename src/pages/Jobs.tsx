@@ -49,17 +49,75 @@ export default function Jobs() {
   useEffect(() => {
     const state = location.state as any;
     if (state?.searchTerm || state?.employer || state?.location) {
+      // Set parameters first
       if (state.searchTerm) setSearchQuery(state.searchTerm);
       if (state.employer) setEmployerFilter(state.employer);
       if (state.location) setLocationFilter(state.location);
-      // Auto-trigger search when coming from AI navigation
-      setTimeout(() => {
-        handleManualSearch();
-      }, 100);
+      
+      // Auto-trigger search after state is set
+      const triggerSearch = async () => {
+        await new Promise(resolve => setTimeout(resolve, 200)); // Give time for state to update
+        
+        // Manually trigger the AI search
+        setIsSearching(true);
+        try {
+          console.log('Auto-triggering AI job search from navigation:', state.searchTerm);
+          
+          const { data, error } = await supabase.functions.invoke('ai-job-search', {
+            body: { 
+              query: state.searchTerm || '',
+              location: state.location !== 'all' ? state.location : undefined,
+              employer: state.employer !== 'all' ? state.employer : undefined,
+              category: activeTab
+            }
+          });
+
+          if (error) {
+            console.error('AI job search error:', error);
+            throw error;
+          }
+
+          if (data.success) {
+            console.log(`AI auto-search found ${data.jobs.length} matching jobs`);
+            setFilteredJobs(data.jobs || []);
+          } else {
+            console.error('AI job search failed:', data.error);
+            // Fallback to basic search
+            let filtered = [...jobs];
+            if (state.searchTerm) {
+              filtered = filtered.filter(job =>
+                job.title.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
+                job.description.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
+                job.employer.toLowerCase().includes(state.searchTerm.toLowerCase())
+              );
+            }
+            setFilteredJobs(filtered);
+          }
+        } catch (error) {
+          console.error('Auto AI search failed, using fallback:', error);
+          // Fallback search
+          let filtered = [...jobs];
+          if (state.searchTerm) {
+            filtered = filtered.filter(job =>
+              job.title.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
+              job.description.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
+              job.employer.toLowerCase().includes(state.searchTerm.toLowerCase())
+            );
+          }
+          setFilteredJobs(filtered);
+        } finally {
+          setIsSearching(false);
+        }
+        
+        setCurrentPage(1);
+      };
+      
+      triggerSearch();
+      
       // Clear the navigation state
       navigate(location.pathname, { replace: true });
     }
-  }, [location.state, navigate, location.pathname]);
+  }, [location.state, navigate, location.pathname, activeTab, jobs]);
 
   useEffect(() => {
     fetchJobs();
