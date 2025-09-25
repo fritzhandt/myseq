@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import { Briefcase, MapPin, Building, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
 
 interface Job {
@@ -40,6 +41,9 @@ export default function Jobs() {
   const itemsPerPage = 10;
   const location = useLocation();
   const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const MAX_JOB_SEARCH_LENGTH = 100;
 
   // Handle AI navigation state
   useEffect(() => {
@@ -268,7 +272,18 @@ export default function Jobs() {
                         <Input
                           placeholder="Search job titles (e.g., 'accountant' finds bookkeeper, financial analyst)"
                           value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (value.length <= MAX_JOB_SEARCH_LENGTH) {
+                              setSearchQuery(value);
+                            } else {
+                              toast({
+                                title: "Character limit reached",
+                                description: "100 character limit please.",
+                                variant: "destructive"
+                              });
+                            }
+                          }}
                           onKeyPress={handleKeyPress}
                           className="flex-1"
                         />
@@ -364,7 +379,18 @@ export default function Jobs() {
                         <Input
                           placeholder="Search job titles (e.g., 'accountant' finds bookkeeper, financial analyst)"
                           value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (value.length <= MAX_JOB_SEARCH_LENGTH) {
+                              setSearchQuery(value);
+                            } else {
+                              toast({
+                                title: "Character limit reached",
+                                description: "100 character limit please.",
+                                variant: "destructive"
+                              });
+                            }
+                          }}
                           onKeyPress={handleKeyPress}
                           className="flex-1"
                         />

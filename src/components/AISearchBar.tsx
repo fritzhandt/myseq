@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Sparkles, Loader2, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 
 interface AINavigationResponse {
   destination: string;
@@ -22,6 +22,7 @@ export default function AISearchBar() {
   const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const MAX_QUERY_LENGTH = 500;
 
@@ -49,9 +50,17 @@ export default function AISearchBar() {
       if (!response.success) {
         console.log('AI returned error:', response.error);
         if (response.error === 'Daily search limit exceeded') {
-          toast.error("Our AI needs a break! You've reached the daily limit of 1,000 searches. Come back tomorrow to use AI search, or navigate the site manually.");
+          toast({
+            title: "Daily limit reached",
+            description: "Our AI needs a break! You've reached the daily limit of 1,000 searches. Come back tomorrow to use AI search, or navigate the site manually.",
+            variant: "destructive"
+          });
         } else {
-          toast.error(response.error || "Sorry, I couldn't understand your request. Please try rephrasing.");
+          toast({
+            title: "Search error",
+            description: response.error || "Sorry, I couldn't understand your request. Please try rephrasing.",
+            variant: "destructive"
+          });
         }
         return;
       }
@@ -80,7 +89,11 @@ export default function AISearchBar() {
       
     } catch (error) {
       console.error('AI search error:', error);
-      toast.error("Something went wrong. Please try again.");
+      toast({
+        title: "Search error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
@@ -113,6 +126,12 @@ export default function AISearchBar() {
                 const value = e.target.value;
                 if (value.length <= MAX_QUERY_LENGTH) {
                   setQuery(value);
+                } else {
+                  toast({
+                    title: "Character limit reached",
+                    description: "500 character limit please.",
+                    variant: "destructive"
+                  });
                 }
               }}
               onKeyPress={handleKeyPress}
@@ -133,13 +152,6 @@ export default function AISearchBar() {
               <Sparkles className="h-5 w-5" />
             )}
           </Button>
-        </div>
-        
-        {/* Character counter */}
-        <div className="text-right mt-2">
-          <span className={`text-xs ${query.length > MAX_QUERY_LENGTH * 0.9 ? 'text-orange-500' : 'text-muted-foreground'}`}>
-            {query.length}/{MAX_QUERY_LENGTH}
-          </span>
         </div>
       </div>
 
