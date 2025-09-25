@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, Info, Users, Mail, Search, Vote, Shield, Calendar, Briefcase, Home, Building2 } from 'lucide-react';
+import AddToHomeButton from '@/components/AddToHomeButton';
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const closeMenu = () => setIsOpen(false);
@@ -15,14 +16,18 @@ const Navbar = () => {
             <span className="sm:hidden font-oswald text-black font-semibold uppercase">SEQ Events</span>
           </Link>
 
-          {/* Hamburger Menu */}
-          <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10">
-                <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span className="sr-only">Open menu</span>
-              </Button>
-            </SheetTrigger>
+          {/* Right side buttons */}
+          <div className="flex items-center gap-2">
+            <AddToHomeButton />
+            
+            {/* Hamburger Menu */}
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10">
+                  <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
+                  <span className="sr-only">Open menu</span>
+                </Button>
+              </SheetTrigger>
             <SheetContent className="w-[300px] sm:w-[400px] p-0">
               {/* Header */}
               <div className="px-6 py-6 border-b bg-gradient-to-r from-primary/5 to-primary/10">
@@ -152,7 +157,8 @@ const Navbar = () => {
                 </nav>
               </div>
             </SheetContent>
-          </Sheet>
+            </Sheet>
+          </div>
         </div>
       </div>
     </nav>;
