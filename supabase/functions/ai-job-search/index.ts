@@ -155,8 +155,16 @@ Only include jobs that are reasonably related to the search query. If no jobs ma
 
     let matchedJobIds: string[] = [];
     try {
+      // Strip markdown code blocks if present
+      let cleanResponse = aiResponse.trim();
+      if (cleanResponse.startsWith('```json')) {
+        cleanResponse = cleanResponse.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+      } else if (cleanResponse.startsWith('```')) {
+        cleanResponse = cleanResponse.replace(/^```\s*/, '').replace(/\s*```$/, '');
+      }
+      
       // Try to parse as array of job IDs
-      const parsed = JSON.parse(aiResponse);
+      const parsed = JSON.parse(cleanResponse);
       if (Array.isArray(parsed)) {
         matchedJobIds = parsed;
       } else {
