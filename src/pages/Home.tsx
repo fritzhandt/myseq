@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { EventCard } from '@/components/EventCard';
 import { EventCalendar } from '@/components/EventCalendar';
@@ -62,6 +62,26 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
   const itemsPerPage = 12;
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Handle AI navigation state
+  useEffect(() => {
+    const state = location.state as any;
+    if (state) {
+      if (state.searchTerm) {
+        setSearchQuery(state.searchTerm);
+      }
+      if (state.dateStart || state.dateEnd) {
+        setSearchFilters(prev => ({
+          ...prev,
+          dateFrom: state.dateStart ? new Date(state.dateStart) : undefined,
+          dateTo: state.dateEnd ? new Date(state.dateEnd) : undefined
+        }));
+      }
+      // Clear the navigation state
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.state, navigate, location.pathname]);
 
   const ageGroups = ['Grade School', 'Young Adult', 'Adult', 'Senior'];
   const ageGroupIcons = {

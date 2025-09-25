@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Navbar from "@/components/Navbar";
 import CommunityAlertBanner from "@/components/CommunityAlertBanner";
+import AISearchBar from "@/components/AISearchBar";
 import { Calendar, Users, Briefcase, ArrowRight, MapPin, Heart, HelpCircle, Building2, Landmark } from "lucide-react";
 
 export default function DefaultPage() {
@@ -37,6 +38,13 @@ export default function DefaultPage() {
                 Discover events, connect with neighbors, find opportunities, and build stronger communities in Southeast Queens
               </p>
             </div>
+          </div>
+        </section>
+
+        {/* AI Search Section */}
+        <section className="px-4 pb-8">
+          <div className="container mx-auto">
+            <AISearchBar />
           </div>
         </section>
 

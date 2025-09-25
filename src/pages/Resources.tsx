@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, ArrowLeft } from "lucide-react";
@@ -38,6 +39,23 @@ export default function Resources() {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Handle AI navigation state
+  useEffect(() => {
+    const state = location.state as any;
+    if (state) {
+      if (state.searchTerm) {
+        setSearchQuery(state.searchTerm);
+      }
+      if (state.category) {
+        setSelectedCategory(state.category);
+      }
+      // Clear the navigation state
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.state, navigate, location.pathname]);
 
   const fetchResources = async () => {
     try {

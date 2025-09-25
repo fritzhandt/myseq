@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import CommunityAlertBanner from '@/components/CommunityAlertBanner';
 import JobList from '@/components/JobList';
@@ -38,6 +39,18 @@ export default function Jobs() {
   const [currentPage, setCurrentPage] = useState(1);
   const [activeTab, setActiveTab] = useState('city');
   const itemsPerPage = 10;
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Handle AI navigation state
+  useEffect(() => {
+    const state = location.state as any;
+    if (state?.searchTerm) {
+      setSearchQuery(state.searchTerm);
+      // Clear the navigation state
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.state, navigate, location.pathname]);
 
   useEffect(() => {
     fetchJobs();
