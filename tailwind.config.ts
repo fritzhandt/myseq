@@ -60,6 +60,7 @@ export default {
       },
       fontFamily: {
         'oswald': ['Oswald', 'sans-serif'],
+        'orbitron': ['Orbitron', 'monospace'],
       },
       borderRadius: {
         lg: "var(--radius)",

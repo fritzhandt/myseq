@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sparkles, Loader2, Search } from "lucide-react";
+import { Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -119,7 +119,7 @@ export default function AISearchBar() {
       <div className="relative mb-6">
         <div className="flex gap-2">
           <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-foreground/60" />
+            <span className="absolute left-4 top-1/2 transform -translate-y-1/2 font-orbitron font-black text-primary text-lg tracking-wider">AI</span>
             <Input
               value={query}
               onChange={(e) => {
@@ -136,7 +136,7 @@ export default function AISearchBar() {
               }}
               onKeyPress={handleKeyPress}
               placeholder="Ask me anything about Southeast Queens..."
-              className="pl-12 pr-4 py-6 text-lg bg-background/80 backdrop-blur-sm border-2 border-primary/20 focus:border-primary/40 rounded-2xl shadow-card"
+              className="pl-16 pr-4 py-6 text-lg bg-background/80 backdrop-blur-sm border-2 border-primary/20 focus:border-primary/40 rounded-2xl shadow-card"
               disabled={isLoading}
             />
           </div>
