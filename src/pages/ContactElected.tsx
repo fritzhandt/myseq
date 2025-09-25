@@ -66,6 +66,24 @@ const ContactElected = () => {
     fetchOfficials();
   }, []);
 
+  // Custom ordering for specific officials
+  const getCustomOrder = (official: ElectedOfficial, level: string, category: string) => {
+    // Federal senators: Schumer first, then Gilibrand
+    if (level === 'federal' && category === 'legislative' && official.office === 'U.S. Senate') {
+      if (official.name === 'Chuck Schumer') return 0;
+      if (official.name === 'Kirsten Gillibrand') return 1;
+      return 2;
+    }
+    
+    // State legislative: Clyde Vanel first
+    if (level === 'state' && category === 'legislative') {
+      if (official.name === 'Clyde Vanel') return 0;
+      return 1;
+    }
+    
+    return 0;
+  };
+
   const groupedOfficials = officials.reduce((acc, official) => {
     const key = official.level;
     if (!acc[key]) {
@@ -106,24 +124,6 @@ const ContactElected = () => {
     legislative: 'Legislative',
     executive: 'Executive',
     prosecutor: 'Prosecutors'
-  };
-
-  // Custom ordering for specific officials
-  const getCustomOrder = (official: ElectedOfficial, level: string, category: string) => {
-    // Federal senators: Schumer first, then Gilibrand
-    if (level === 'federal' && category === 'legislative' && official.office === 'U.S. Senate') {
-      if (official.name === 'Chuck Schumer') return 0;
-      if (official.name === 'Kirsten Gillibrand') return 1;
-      return 2;
-    }
-    
-    // State legislative: Clyde Vanel first
-    if (level === 'state' && category === 'legislative') {
-      if (official.name === 'Clyde Vanel') return 0;
-      return 1;
-    }
-    
-    return 0;
   };
 
   // Custom category title for city legislative
