@@ -90,7 +90,8 @@ export default function AISearchBar() {
     "Who is my elected official?",
     "Find giveaways in October",
     "Is UBS hiring?", 
-    "Teaching jobs in Queens"
+    "Teaching jobs in Queens",
+    "Which civic organization covers Rosedale?"
   ];
 
   return (

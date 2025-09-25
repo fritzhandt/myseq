@@ -75,6 +75,8 @@ Rules:
    - For location-specific queries, extract location
 4. For resources/services: use "/resources" with searchTerm and appropriate category
 5. For civic organizations/community boards: use "/civics" with searchTerm
+   - For coverage area queries like "which civic organization covers Rosedale" or "community board for Jamaica", extract the area name as searchTerm
+   - Look for neighborhood names, areas, or location-specific civic queries
 6. Dates should be in YYYY-MM-DD format
 7. If query is unclear, return error
 
