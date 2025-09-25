@@ -14,6 +14,8 @@ interface NavigationResponse {
   category?: string;
   dateStart?: string;
   dateEnd?: string;
+  employer?: string;
+  location?: string;
   success: boolean;
   error?: string;
 }
@@ -56,7 +58,7 @@ serve(async (req) => {
 Available pages:
 - "/my-elected-lookup" - For finding elected officials
 - "/home" - For community events (accepts searchTerm, dateStart, dateEnd)
-- "/jobs" - For employment opportunities (accepts searchTerm)
+- "/jobs" - For employment opportunities (accepts searchTerm, employer, location)
 - "/resources" - For community resources (accepts searchTerm, category)
 - "/civics" - For civic organizations (accepts searchTerm)
 
@@ -65,17 +67,23 @@ Resource categories: "housing", "healthcare", "education", "social services", "l
 Rules:
 1. For elected officials queries: use "/my-elected-lookup"
 2. For events/activities: use "/home" with searchTerm and dates if mentioned
-3. For jobs/employment: use "/jobs" with searchTerm
+3. For jobs/employment: use "/jobs" with appropriate parameters:
+   - Extract employer names (e.g., "UBS", "Amazon", "NYC Department", company names)
+   - Extract location information (e.g., "Queens", "Manhattan", "Brooklyn", "NYC", specific neighborhoods)
+   - For employer-focused queries like "is UBS hiring" or "UBS jobs", set employer and leave searchTerm empty
+   - For job title queries like "teacher jobs", set searchTerm and leave employer empty
+   - For location-specific queries, extract location
 4. For resources/services: use "/resources" with searchTerm and appropriate category
 5. For civic organizations/community boards: use "/civics" with searchTerm
 6. Dates should be in YYYY-MM-DD format
-7. Extract keywords for searchTerm from the user query
-8. If query is unclear, return error
+7. If query is unclear, return error
 
 Respond with JSON only in this format:
 {
   "destination": "/page-path",
-  "searchTerm": "extracted keywords", 
+  "searchTerm": "job title or keywords if applicable", 
+  "employer": "company/employer name if mentioned",
+  "location": "location if mentioned",
   "category": "category if resources",
   "dateStart": "YYYY-MM-DD if date mentioned",
   "dateEnd": "YYYY-MM-DD if date range",

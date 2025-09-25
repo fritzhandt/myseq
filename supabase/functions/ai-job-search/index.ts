@@ -15,8 +15,6 @@ interface JobSearchRequest {
   query: string;
   location?: string;
   employer?: string;
-  minSalary?: number;
-  maxSalary?: number;
   category?: 'city' | 'state';
 }
 
@@ -32,9 +30,9 @@ serve(async (req) => {
   }
 
   try {
-    const { query, location, employer, minSalary, maxSalary, category }: JobSearchRequest = await req.json();
+    const { query, location, employer, category }: JobSearchRequest = await req.json();
     
-    console.log('AI Job Search - Query:', query, 'Filters:', { location, employer, minSalary, maxSalary, category });
+    console.log('AI Job Search - Query:', query, 'Filters:', { location, employer, category });
 
     if (!query) {
       return new Response(JSON.stringify({ 
@@ -191,32 +189,13 @@ Only include jobs with score >= 30. If no jobs meet the threshold, return an emp
       });
     }
 
-    // Apply salary filters to matched jobs
-    let filteredMatchedJobs = matchedJobs;
-    if (minSalary || maxSalary) {
-      filteredMatchedJobs = matchedJobs.filter(match => {
-        const job = allJobs.find(j => j.id === match.id);
-        if (!job || !job.salary) return true; // Include jobs without salary info
-        
-        const salaryStr = job.salary.toString().replace(/[^0-9.-]/g, '');
-        const jobSalary = parseFloat(salaryStr);
-        
-        if (isNaN(jobSalary)) return true; // Include jobs with unparseable salary
-        
-        if (minSalary && jobSalary < minSalary) return false;
-        if (maxSalary && jobSalary > maxSalary) return false;
-        
-        return true;
-      });
-    }
-
     // Get the full job data for matched jobs
-    const matchedJobIds = filteredMatchedJobs.map(match => match.id);
+    const matchedJobIds = matchedJobs.map(match => match.id);
     const finalJobs = allJobs
       .filter(job => matchedJobIds.includes(job.id))
       .sort((a, b) => {
-        const scoreA = filteredMatchedJobs.find(m => m.id === a.id)?.score || 0;
-        const scoreB = filteredMatchedJobs.find(m => m.id === b.id)?.score || 0;
+        const scoreA = matchedJobs.find(m => m.id === a.id)?.score || 0;
+        const scoreB = matchedJobs.find(m => m.id === b.id)?.score || 0;
         return scoreB - scoreA; // Sort by score descending
       });
 

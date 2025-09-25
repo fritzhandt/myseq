@@ -12,6 +12,8 @@ interface AINavigationResponse {
   category?: string;
   dateStart?: string;
   dateEnd?: string;
+  employer?: string;
+  location?: string;
   success: boolean;
   error?: string;
 }
@@ -52,7 +54,9 @@ export default function AISearchBar() {
         searchTerm: response.searchTerm,
         category: response.category,
         dateStart: response.dateStart,
-        dateEnd: response.dateEnd
+        dateEnd: response.dateEnd,
+        employer: response.employer,
+        location: response.location
       });
 
       // Navigate to the destination with search parameters
@@ -60,7 +64,9 @@ export default function AISearchBar() {
         searchTerm: response.searchTerm,
         category: response.category,
         dateStart: response.dateStart,
-        dateEnd: response.dateEnd
+        dateEnd: response.dateEnd,
+        employer: response.employer,
+        location: response.location
       };
 
       navigate(response.destination, { state: navigationState });
@@ -83,8 +89,8 @@ export default function AISearchBar() {
   const exampleQueries = [
     "Who is my elected official?",
     "Find giveaways in October",
-    "Tennis lessons near me", 
-    "City jobs available"
+    "Is UBS hiring?", 
+    "Teaching jobs in Queens"
   ];
 
   return (

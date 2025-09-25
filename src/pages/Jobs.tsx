@@ -33,8 +33,6 @@ export default function Jobs() {
   const [searchQuery, setSearchQuery] = useState('');
   const [locationFilter, setLocationFilter] = useState('all');
   const [employerFilter, setEmployerFilter] = useState('all');
-  const [minSalary, setMinSalary] = useState('');
-  const [maxSalary, setMaxSalary] = useState('');
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [activeTab, setActiveTab] = useState('city');
@@ -45,8 +43,10 @@ export default function Jobs() {
   // Handle AI navigation state
   useEffect(() => {
     const state = location.state as any;
-    if (state?.searchTerm) {
-      setSearchQuery(state.searchTerm);
+    if (state?.searchTerm || state?.employer || state?.location) {
+      if (state.searchTerm) setSearchQuery(state.searchTerm);
+      if (state.employer) setEmployerFilter(state.employer);
+      if (state.location) setLocationFilter(state.location);
       // Clear the navigation state
       navigate(location.pathname, { replace: true });
     }
@@ -58,7 +58,7 @@ export default function Jobs() {
 
   useEffect(() => {
     filterJobs();
-  }, [jobs, searchQuery, locationFilter, employerFilter, minSalary, maxSalary, activeTab]);
+  }, [jobs, searchQuery, locationFilter, employerFilter, activeTab]);
 
   const fetchJobs = async () => {
     try {
@@ -100,20 +100,6 @@ export default function Jobs() {
         );
       }
 
-      // Filter by salary range
-      if (minSalary || maxSalary) {
-        filtered = filtered.filter(job => {
-          // Extract numeric values from salary string
-          const salaryNumbers = job.salary.match(/\d+/g);
-          if (!salaryNumbers) return true;
-          
-          const jobSalary = parseInt(salaryNumbers[0]);
-          const min = minSalary ? parseInt(minSalary) : 0;
-          const max = maxSalary ? parseInt(maxSalary) : Infinity;
-          
-          return jobSalary >= min && jobSalary <= max;
-        });
-      }
 
       setFilteredJobs(filtered);
       setCurrentPage(1);
@@ -129,8 +115,6 @@ export default function Jobs() {
           query: searchQuery,
           location: locationFilter !== 'all' ? locationFilter : undefined,
           employer: employerFilter !== 'all' ? employerFilter : undefined,
-          minSalary: minSalary ? parseInt(minSalary) : undefined,
-          maxSalary: maxSalary ? parseInt(maxSalary) : undefined,
           category: activeTab
         }
       });
@@ -154,7 +138,7 @@ export default function Jobs() {
     }
     
     setCurrentPage(1);
-  }, [jobs, searchQuery, locationFilter, employerFilter, minSalary, maxSalary, activeTab]);
+  }, [jobs, searchQuery, locationFilter, employerFilter, activeTab]);
 
   const fallbackSearch = () => {
     let filtered = [...jobs];
@@ -184,18 +168,6 @@ export default function Jobs() {
         job.employer.toLowerCase().includes(employerFilter.toLowerCase())
       );
     }
-    if (minSalary || maxSalary) {
-      filtered = filtered.filter(job => {
-        const salaryNumbers = job.salary.match(/\d+/g);
-        if (!salaryNumbers) return true;
-        
-        const jobSalary = parseInt(salaryNumbers[0]);
-        const min = minSalary ? parseInt(minSalary) : 0;
-        const max = maxSalary ? parseInt(maxSalary) : Infinity;
-        
-        return jobSalary >= min && jobSalary <= max;
-      });
-    }
     
     setFilteredJobs(filtered);
   };
@@ -204,8 +176,6 @@ export default function Jobs() {
     setSearchQuery('');
     setLocationFilter('all');
     setEmployerFilter('all');
-    setMinSalary('');
-    setMaxSalary('');
   };
 
   const uniqueLocations = [...new Set(jobs.filter(job => job.category === activeTab || job.category === 'both').map(job => job.location))];
@@ -293,72 +263,50 @@ export default function Jobs() {
                     </Button>
                   </div>
 
-                  {/* Advanced Filters - always visible on desktop, toggleable on mobile */}
-                  <div className={`${showAdvancedSearch ? 'block' : 'hidden'} md:block`}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {/* Location Filter */}
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium flex items-center gap-2">
-                          <MapPin className="h-4 w-4" />
-                          Location
-                        </label>
-                        <Select value={locationFilter} onValueChange={setLocationFilter}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="All locations" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All locations</SelectItem>
-                            {uniqueLocations.map(location => (
-                              <SelectItem key={location} value={location}>{location}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                   {/* Advanced Filters - always visible on desktop, toggleable on mobile */}
+                   <div className={`${showAdvancedSearch ? 'block' : 'hidden'} md:block`}>
+                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                       {/* Location Filter */}
+                       <div className="space-y-2">
+                         <label className="text-sm font-medium flex items-center gap-2">
+                           <MapPin className="h-4 w-4" />
+                           Location
+                         </label>
+                         <Select value={locationFilter} onValueChange={setLocationFilter}>
+                           <SelectTrigger>
+                             <SelectValue placeholder="All locations" />
+                           </SelectTrigger>
+                           <SelectContent>
+                             <SelectItem value="all">All locations</SelectItem>
+                             {uniqueLocations.map(location => (
+                               <SelectItem key={location} value={location}>{location}</SelectItem>
+                             ))}
+                           </SelectContent>
+                         </Select>
+                       </div>
 
-                      {/* Employer Filter */}
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium flex items-center gap-2">
-                          <Building className="h-4 w-4" />
-                          Employer
-                        </label>
-                        <SearchableEmployerDropdown
-                          employers={uniqueEmployers}
-                          value={employerFilter}
-                          onChange={setEmployerFilter}
-                          placeholder="All employers"
-                        />
-                      </div>
+                       {/* Employer Filter */}
+                       <div className="space-y-2">
+                         <label className="text-sm font-medium flex items-center gap-2">
+                           <Building className="h-4 w-4" />
+                           Employer
+                         </label>
+                         <SearchableEmployerDropdown
+                           employers={uniqueEmployers}
+                           value={employerFilter}
+                           onChange={setEmployerFilter}
+                           placeholder="All employers"
+                         />
+                       </div>
 
-                      {/* Salary Range */}
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium flex items-center gap-2">
-                          <DollarSign className="h-4 w-4" />
-                          Min Salary
-                        </label>
-                        <Input
-                          type="number"
-                          placeholder="Min $"
-                          value={minSalary}
-                          onChange={(e) => setMinSalary(e.target.value)}
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Max Salary</label>
-                        <div className="flex gap-2">
-                          <Input
-                            type="number"
-                            placeholder="Max $"
-                            value={maxSalary}
-                            onChange={(e) => setMaxSalary(e.target.value)}
-                          />
-                          <Button variant="outline" onClick={clearFilters} className="shrink-0">
-                            Clear
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                       {/* Clear Filters */}
+                       <div className="space-y-2 flex items-end">
+                         <Button variant="outline" onClick={clearFilters} className="w-full">
+                           Clear Filters
+                         </Button>
+                       </div>
+                     </div>
+                   </div>
                 </div>
               </CardContent>
             </Card>
@@ -400,72 +348,50 @@ export default function Jobs() {
                     </Button>
                   </div>
 
-                  {/* Advanced Filters - always visible on desktop, toggleable on mobile */}
-                  <div className={`${showAdvancedSearch ? 'block' : 'hidden'} md:block`}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {/* Location Filter */}
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium flex items-center gap-2">
-                          <MapPin className="h-4 w-4" />
-                          Location
-                        </label>
-                        <Select value={locationFilter} onValueChange={setLocationFilter}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="All locations" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All locations</SelectItem>
-                            {uniqueLocations.map(location => (
-                              <SelectItem key={location} value={location}>{location}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                   {/* Advanced Filters - always visible on desktop, toggleable on mobile */}
+                   <div className={`${showAdvancedSearch ? 'block' : 'hidden'} md:block`}>
+                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                       {/* Location Filter */}
+                       <div className="space-y-2">
+                         <label className="text-sm font-medium flex items-center gap-2">
+                           <MapPin className="h-4 w-4" />
+                           Location
+                         </label>
+                         <Select value={locationFilter} onValueChange={setLocationFilter}>
+                           <SelectTrigger>
+                             <SelectValue placeholder="All locations" />
+                           </SelectTrigger>
+                           <SelectContent>
+                             <SelectItem value="all">All locations</SelectItem>
+                             {uniqueLocations.map(location => (
+                               <SelectItem key={location} value={location}>{location}</SelectItem>
+                             ))}
+                           </SelectContent>
+                         </Select>
+                       </div>
 
-                      {/* Employer Filter */}
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium flex items-center gap-2">
-                          <Building className="h-4 w-4" />
-                          Employer
-                        </label>
-                        <SearchableEmployerDropdown
-                          employers={uniqueEmployers}
-                          value={employerFilter}
-                          onChange={setEmployerFilter}
-                          placeholder="All employers"
-                        />
-                      </div>
+                       {/* Employer Filter */}
+                       <div className="space-y-2">
+                         <label className="text-sm font-medium flex items-center gap-2">
+                           <Building className="h-4 w-4" />
+                           Employer
+                         </label>
+                         <SearchableEmployerDropdown
+                           employers={uniqueEmployers}
+                           value={employerFilter}
+                           onChange={setEmployerFilter}
+                           placeholder="All employers"
+                         />
+                       </div>
 
-                      {/* Salary Range */}
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium flex items-center gap-2">
-                          <DollarSign className="h-4 w-4" />
-                          Min Salary
-                        </label>
-                        <Input
-                          type="number"
-                          placeholder="Min $"
-                          value={minSalary}
-                          onChange={(e) => setMinSalary(e.target.value)}
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Max Salary</label>
-                        <div className="flex gap-2">
-                          <Input
-                            type="number"
-                            placeholder="Max $"
-                            value={maxSalary}
-                            onChange={(e) => setMaxSalary(e.target.value)}
-                          />
-                          <Button variant="outline" onClick={clearFilters} className="shrink-0">
-                            Clear
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                       {/* Clear Filters */}
+                       <div className="space-y-2 flex items-end">
+                         <Button variant="outline" onClick={clearFilters} className="w-full">
+                           Clear Filters
+                         </Button>
+                       </div>
+                     </div>
+                   </div>
                 </div>
               </CardContent>
             </Card>
