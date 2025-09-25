@@ -270,7 +270,7 @@ export default function Jobs() {
                       </label>
                       <div className="flex gap-2">
                         <Input
-                          placeholder="Search job titles (e.g., 'accountant' finds bookkeeper, financial analyst)"
+                          placeholder="Search job title using AI"
                           value={searchQuery}
                           onChange={(e) => {
                             const value = e.target.value;
@@ -377,7 +377,7 @@ export default function Jobs() {
                       </label>
                       <div className="flex gap-2">
                         <Input
-                          placeholder="Search job titles (e.g., 'accountant' finds bookkeeper, financial analyst)"
+                          placeholder="Search job title using AI"
                           value={searchQuery}
                           onChange={(e) => {
                             const value = e.target.value;
