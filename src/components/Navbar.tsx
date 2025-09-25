@@ -28,18 +28,18 @@ const Navbar = () => {
                   <span className="sr-only">Open menu</span>
                 </Button>
               </SheetTrigger>
-            <SheetContent className="w-[300px] sm:w-[400px] p-0">
+            <SheetContent className="w-[300px] sm:w-[400px] p-0 flex flex-col h-full max-h-screen">
               {/* Header */}
-              <div className="px-6 py-6 border-b bg-gradient-to-r from-primary/5 to-primary/10">
+              <div className="px-6 py-6 border-b bg-gradient-to-r from-primary/5 to-primary/10 flex-shrink-0">
                 <h2 className="font-oswald text-xl font-semibold text-foreground uppercase tracking-wide">
                   Southeast Queens Events
                 </h2>
                 <p className="text-sm text-muted-foreground mt-1">Navigate your community</p>
               </div>
 
-              {/* Menu Items */}
-              <div className="px-6 py-6">
-                <nav className="space-y-2">
+              {/* Menu Items - Scrollable */}
+              <div className="flex-1 overflow-y-auto overflow-x-hidden px-6 py-6 min-h-0">
+                <nav className="space-y-2 pb-4">
                   {/* Main Sections */}
                   <div className="mb-6">
                     <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3 px-4">
