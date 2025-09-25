@@ -5,6 +5,7 @@ import { Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface AINavigationResponse {
   destination: string;
@@ -23,6 +24,7 @@ export default function AISearchBar() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const MAX_QUERY_LENGTH = 500;
 
@@ -135,7 +137,7 @@ export default function AISearchBar() {
                 }
               }}
               onKeyPress={handleKeyPress}
-              placeholder="Ask me anything about Southeast Queens..."
+              placeholder={isMobile ? "Ask me anything..." : "Ask me anything about Southeast Queens..."}
               className="pl-12 pr-4 py-6 text-lg bg-background/80 backdrop-blur-sm border-2 border-primary/20 focus:border-primary/40 rounded-2xl shadow-card"
               disabled={isLoading}
             />
