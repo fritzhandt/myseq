@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import CommunityAlertBanner from '@/components/CommunityAlertBanner';
@@ -76,7 +76,87 @@ export default function Jobs() {
     }
   };
 
-  const filterJobs = () => {
+  const filterJobs = useCallback(async () => {
+    if (!searchQuery) {
+      // No search query - apply basic filters only
+      let filtered = [...jobs];
+
+      // Filter by category (city/state)
+      filtered = filtered.filter(job => 
+        job.category === activeTab || job.category === 'both'
+      );
+
+      // Filter by location
+      if (locationFilter && locationFilter !== 'all') {
+        filtered = filtered.filter(job =>
+          job.location.toLowerCase().includes(locationFilter.toLowerCase())
+        );
+      }
+
+      // Filter by employer
+      if (employerFilter && employerFilter !== 'all') {
+        filtered = filtered.filter(job =>
+          job.employer.toLowerCase().includes(employerFilter.toLowerCase())
+        );
+      }
+
+      // Filter by salary range
+      if (minSalary || maxSalary) {
+        filtered = filtered.filter(job => {
+          // Extract numeric values from salary string
+          const salaryNumbers = job.salary.match(/\d+/g);
+          if (!salaryNumbers) return true;
+          
+          const jobSalary = parseInt(salaryNumbers[0]);
+          const min = minSalary ? parseInt(minSalary) : 0;
+          const max = maxSalary ? parseInt(maxSalary) : Infinity;
+          
+          return jobSalary >= min && jobSalary <= max;
+        });
+      }
+
+      setFilteredJobs(filtered);
+      setCurrentPage(1);
+      return;
+    }
+
+    // Use AI-powered search when there's a search query
+    console.log('Starting AI job search with query:', searchQuery);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-job-search', {
+        body: { 
+          query: searchQuery,
+          location: locationFilter !== 'all' ? locationFilter : undefined,
+          employer: employerFilter !== 'all' ? employerFilter : undefined,
+          minSalary: minSalary ? parseInt(minSalary) : undefined,
+          maxSalary: maxSalary ? parseInt(maxSalary) : undefined,
+          category: activeTab
+        }
+      });
+
+      if (error) {
+        console.error('AI job search error:', error);
+        throw error;
+      }
+
+      if (data.success) {
+        console.log(`AI found ${data.jobs.length} matching jobs`);
+        setFilteredJobs(data.jobs || []);
+      } else {
+        console.error('AI job search failed:', data.error);
+        // Fallback to basic search
+        fallbackSearch();
+      }
+    } catch (error) {
+      console.error('AI search failed, using fallback:', error);
+      fallbackSearch();
+    }
+    
+    setCurrentPage(1);
+  }, [jobs, searchQuery, locationFilter, employerFilter, minSalary, maxSalary, activeTab]);
+
+  const fallbackSearch = () => {
     let filtered = [...jobs];
 
     // Filter by category (city/state)
@@ -84,31 +164,28 @@ export default function Jobs() {
       job.category === activeTab || job.category === 'both'
     );
 
-    // Search by job title
+    // Basic text search across title, description, and employer
     if (searchQuery) {
       filtered = filtered.filter(job =>
-        job.title.toLowerCase().includes(searchQuery.toLowerCase())
+        job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        job.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        job.employer.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-
-    // Filter by location
+    
+    // Apply other filters
     if (locationFilter && locationFilter !== 'all') {
       filtered = filtered.filter(job =>
         job.location.toLowerCase().includes(locationFilter.toLowerCase())
       );
     }
-
-    // Filter by employer
     if (employerFilter && employerFilter !== 'all') {
       filtered = filtered.filter(job =>
         job.employer.toLowerCase().includes(employerFilter.toLowerCase())
       );
     }
-
-    // Filter by salary range
     if (minSalary || maxSalary) {
       filtered = filtered.filter(job => {
-        // Extract numeric values from salary string
         const salaryNumbers = job.salary.match(/\d+/g);
         if (!salaryNumbers) return true;
         
@@ -119,9 +196,8 @@ export default function Jobs() {
         return jobSalary >= min && jobSalary <= max;
       });
     }
-
+    
     setFilteredJobs(filtered);
-    setCurrentPage(1); // Reset to first page when filters change
   };
 
   const clearFilters = () => {
@@ -186,17 +262,20 @@ export default function Jobs() {
               <CardContent className="p-6">
                 {/* Always visible: Job Title Search */}
                 <div className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium flex items-center gap-2">
-                      <Briefcase className="h-4 w-4" />
-                      Job Title
-                    </label>
-                    <Input
-                      placeholder="Search city jobs..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                  </div>
+                   <div className="space-y-2">
+                     <label className="text-sm font-medium flex items-center gap-2">
+                       <Briefcase className="h-4 w-4" />
+                       Job Title
+                     </label>
+                     <Input
+                       placeholder="🤖 AI-powered search (e.g., 'accountant', 'data analysis')"
+                       value={searchQuery}
+                       onChange={(e) => setSearchQuery(e.target.value)}
+                     />
+                     <p className="text-xs text-muted-foreground">
+                       AI search understands related job titles. Try "accountant" to find bookkeeper roles, or "teacher" to find educator positions.
+                     </p>
+                   </div>
 
                   {/* Advanced Search Toggle Button - only visible on mobile */}
                   <div className="md:hidden">
@@ -290,17 +369,20 @@ export default function Jobs() {
               <CardContent className="p-6">
                 {/* Always visible: Job Title Search */}
                 <div className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium flex items-center gap-2">
-                      <Briefcase className="h-4 w-4" />
-                      Job Title
-                    </label>
-                    <Input
-                      placeholder="Search state jobs..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                  </div>
+                   <div className="space-y-2">
+                     <label className="text-sm font-medium flex items-center gap-2">
+                       <Briefcase className="h-4 w-4" />
+                       Job Title
+                     </label>
+                     <Input
+                       placeholder="🤖 AI-powered search (e.g., 'accountant', 'data analysis')"
+                       value={searchQuery}
+                       onChange={(e) => setSearchQuery(e.target.value)}
+                     />
+                     <p className="text-xs text-muted-foreground">
+                       AI search understands related job titles. Try "accountant" to find bookkeeper roles, or "teacher" to find educator positions.
+                     </p>
+                   </div>
 
                   {/* Advanced Search Toggle Button - only visible on mobile */}
                   <div className="md:hidden">
