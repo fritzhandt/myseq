@@ -15,12 +15,14 @@ import ResourcesList from '@/components/ResourcesList';
 import CivicOrganizationsManager from '@/components/CivicOrganizationsManager';
 import JobCSVUpload from '@/components/JobCSVUpload';
 import JobReportsList from '@/components/JobReportsList';
+// Temporary comment to force rebuild
 import AgencyDocumentUpload from '@/components/AgencyDocumentUpload';
 import { PendingApprovalsManager } from '@/components/PendingApprovalsManager';
 import { useToast } from '@/hooks/use-toast';
 import { useUserRole } from '@/hooks/useUserRole';
 import { Plus, Calendar, LogOut, Star, AlertTriangle, Users, MapPin, FileText, Building2, Clock } from 'lucide-react';
 
+// Admin Panel - Role-based access control system
 const Admin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();

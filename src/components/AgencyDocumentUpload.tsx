@@ -16,6 +16,7 @@ interface ProcessingResult {
   error?: string;
 }
 
+// Agency Document Upload Component - Force Refresh
 const AgencyDocumentUpload = () => {
   const [file, setFile] = useState<File | null>(null);
   const [documentType, setDocumentType] = useState<string>('general');
