@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { EventForm } from '@/components/EventForm';
 import { EventList } from '@/components/EventList';
 import SpecialEventForm from '@/components/SpecialEventForm';
@@ -10,49 +12,90 @@ import CommunityAlertForm from '@/components/CommunityAlertForm';
 import CommunityAlertsList from '@/components/CommunityAlertsList';
 import ResourceForm from '@/components/ResourceForm';
 import ResourcesList from '@/components/ResourcesList';
+import CivicOrganizationsManager from '@/components/CivicOrganizationsManager';
 import JobCSVUpload from '@/components/JobCSVUpload';
 import JobReportsList from '@/components/JobReportsList';
 import AgencyDocumentUpload from '@/components/AgencyDocumentUpload';
-import { supabase } from '@/integrations/supabase/client';
+import { PendingApprovalsManager } from '@/components/PendingApprovalsManager';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Calendar, LogOut, Star, AlertTriangle, Users, MapPin, FileText, Building2 } from 'lucide-react';
-import CivicOrganizationsManager from '@/components/CivicOrganizationsManager';
+import { useUserRole } from '@/hooks/useUserRole';
+import { Plus, Calendar, LogOut, Star, AlertTriangle, Users, MapPin, FileText, Building2, Clock } from 'lucide-react';
 
 const Admin = () => {
-  const [showForm, setShowForm] = useState(false);
-  const [editingEvent, setEditingEvent] = useState(null);
-  const [showSpecialEventForm, setShowSpecialEventForm] = useState(false);
-  const [editingSpecialEvent, setEditingSpecialEvent] = useState(null);
-  const [showCommunityAlertForm, setShowCommunityAlertForm] = useState(false);
-  const [editingCommunityAlert, setEditingCommunityAlert] = useState(null);
-  const [showResourceForm, setShowResourceForm] = useState(false);
-  const [editingResource, setEditingResource] = useState(null);
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { userRole, loading: roleLoading, isMainAdmin, hasAdminAccess } = useUserRole();
+  const [loading, setLoading] = useState(true);
+  const [pendingCount, setPendingCount] = useState(0);
+  
+  // Form visibility states
+  const [showEventForm, setShowEventForm] = useState(false);
+  const [showSpecialEventForm, setShowSpecialEventForm] = useState(false);
+  const [showCommunityAlertForm, setShowCommunityAlertForm] = useState(false);
+  const [showResourceForm, setShowResourceForm] = useState(false);
+  
+  // Editing states
+  const [editingEvent, setEditingEvent] = useState<any>(null);
+  const [editingSpecialEvent, setEditingSpecialEvent] = useState<any>(null);
+  const [editingCommunityAlert, setEditingCommunityAlert] = useState<any>(null);
+  const [editingResource, setEditingResource] = useState<any>(null);
 
   useEffect(() => {
-    // Check authentication
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+          navigate('/auth');
+          return;
+        }
+        
+        setLoading(false);
+      } catch (error) {
+        console.error('Error checking auth:', error);
         navigate('/auth');
-        return;
       }
-      setLoading(false);
     };
 
     checkAuth();
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!session && event === 'SIGNED_OUT') {
-        navigate('/auth');
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (event === 'SIGNED_OUT' || !session) {
+          navigate('/auth');
+        }
       }
-    });
+    );
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  // Fetch pending approvals count for main admin
+  useEffect(() => {
+    const fetchPendingCount = async () => {
+      if (!isMainAdmin) return;
+      
+      try {
+        const [events, resources, alerts, specialEvents] = await Promise.all([
+          supabase.from('pending_events').select('id', { count: 'exact' }).eq('status', 'pending'),
+          supabase.from('pending_resources').select('id', { count: 'exact' }).eq('status', 'pending'),
+          supabase.from('pending_community_alerts').select('id', { count: 'exact' }).eq('status', 'pending'),
+          supabase.from('pending_special_events').select('id', { count: 'exact' }).eq('status', 'pending')
+        ]);
+        
+        const total = (events.count || 0) + (resources.count || 0) + (alerts.count || 0) + (specialEvents.count || 0);
+        setPendingCount(total);
+      } catch (error) {
+        console.error('Error fetching pending count:', error);
+      }
+    };
+
+    fetchPendingCount();
+    
+    // Refresh count every 30 seconds
+    const interval = setInterval(fetchPendingCount, 30000);
+    return () => clearInterval(interval);
+  }, [isMainAdmin]);
 
   const handleSignOut = async () => {
     try {
@@ -70,18 +113,19 @@ const Admin = () => {
     }
   };
 
+  // Event handlers
   const handleCreateEvent = () => {
     setEditingEvent(null);
-    setShowForm(true);
+    setShowEventForm(true);
   };
 
   const handleEditEvent = (event: any) => {
     setEditingEvent(event);
-    setShowForm(true);
+    setShowEventForm(true);
   };
 
-  const handleFormClose = () => {
-    setShowForm(false);
+  const handleEventFormClose = () => {
+    setShowEventForm(false);
     setEditingEvent(null);
   };
 
@@ -130,12 +174,24 @@ const Admin = () => {
     setEditingResource(null);
   };
 
-  if (loading) {
+  if (loading || roleLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
-          <p className="text-muted-foreground">Loading admin panel...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!hasAdminAccess) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
+          <p className="text-muted-foreground mb-4">You don't have admin access to this page.</p>
+          <Button onClick={() => navigate('/')}>Go Home</Button>
         </div>
       </div>
     );
@@ -149,7 +205,12 @@ const Admin = () => {
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
               <Calendar className="h-8 w-8 text-primary" />
-              <h1 className="text-2xl font-bold">Event Admin Panel</h1>
+              <div>
+                <h1 className="text-2xl font-bold">Admin Panel</h1>
+                <p className="text-sm text-muted-foreground">
+                  Role: {userRole === 'main_admin' ? 'Main Admin' : 'Sub Admin'}
+                </p>
+              </div>
             </div>
             <div className="flex gap-2">
               <Button onClick={() => navigate('/')} variant="outline">
@@ -166,19 +227,30 @@ const Admin = () => {
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="events" className="w-full">
-          <TabsList className="grid w-full grid-cols-7 mb-8">
+        <Tabs defaultValue={isMainAdmin ? "pending-approvals" : "events"} className="w-full">
+          <TabsList className={`grid w-full ${isMainAdmin ? 'grid-cols-8' : 'grid-cols-7'} mb-8`}>
+            {isMainAdmin && (
+              <TabsTrigger value="pending-approvals" className="flex items-center gap-2 relative">
+                <Clock className="h-4 w-4" />
+                Pending
+                {pendingCount > 0 && (
+                  <Badge variant="destructive" className="ml-1 h-5 w-5 p-0 text-xs">
+                    {pendingCount}
+                  </Badge>
+                )}
+              </TabsTrigger>
+            )}
             <TabsTrigger value="events" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              Regular Events
+              Events
             </TabsTrigger>
             <TabsTrigger value="special-events" className="flex items-center gap-2">
               <Star className="h-4 w-4" />
-              Special Events
+              Special
             </TabsTrigger>
             <TabsTrigger value="community-alerts" className="flex items-center gap-2">
               <AlertTriangle className="h-4 w-4" />
-              Community Alerts
+              Alerts
             </TabsTrigger>
             <TabsTrigger value="resources" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
@@ -194,16 +266,22 @@ const Admin = () => {
             </TabsTrigger>
             <TabsTrigger value="agencies" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
-              Agency Docs
+              Docs
             </TabsTrigger>
           </TabsList>
 
+          {isMainAdmin && (
+            <TabsContent value="pending-approvals" className="space-y-4">
+              <PendingApprovalsManager />
+            </TabsContent>
+          )}
+
           <TabsContent value="events">
-            {showForm ? (
+            {showEventForm ? (
               <EventForm
                 event={editingEvent}
-                onClose={handleFormClose}
-                onSave={handleFormClose}
+                onClose={handleEventFormClose}
+                onSave={handleEventFormClose}
               />
             ) : (
               <div className="space-y-6">
@@ -281,6 +359,7 @@ const Admin = () => {
               </div>
             )}
           </TabsContent>
+
           <TabsContent value="civics">
             <CivicOrganizationsManager />
           </TabsContent>

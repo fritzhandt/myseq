@@ -582,6 +582,261 @@ export type Database = {
         }
         Relationships: []
       }
+      pending_community_alerts: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          long_description: string
+          photos: string[] | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          short_description: string
+          status: string
+          submitted_at: string
+          submitted_by: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          long_description: string
+          photos?: string[] | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          short_description: string
+          status?: string
+          submitted_at?: string
+          submitted_by: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          long_description?: string
+          photos?: string[] | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          short_description?: string
+          status?: string
+          submitted_at?: string
+          submitted_by?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pending_events: {
+        Row: {
+          additional_images: string[] | null
+          age_group: string[] | null
+          civic_org_id: string | null
+          cover_photo_url: string | null
+          created_at: string
+          description: string
+          elected_officials: string[] | null
+          event_date: string
+          event_time: string
+          id: string
+          is_public: boolean
+          location: string
+          office_address: string | null
+          registration_email: string | null
+          registration_link: string | null
+          registration_notes: string | null
+          registration_phone: string | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string
+          submitted_by: string
+          tags: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          additional_images?: string[] | null
+          age_group?: string[] | null
+          civic_org_id?: string | null
+          cover_photo_url?: string | null
+          created_at?: string
+          description: string
+          elected_officials?: string[] | null
+          event_date: string
+          event_time: string
+          id?: string
+          is_public?: boolean
+          location: string
+          office_address?: string | null
+          registration_email?: string | null
+          registration_link?: string | null
+          registration_notes?: string | null
+          registration_phone?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+          submitted_by: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          additional_images?: string[] | null
+          age_group?: string[] | null
+          civic_org_id?: string | null
+          cover_photo_url?: string | null
+          created_at?: string
+          description?: string
+          elected_officials?: string[] | null
+          event_date?: string
+          event_time?: string
+          id?: string
+          is_public?: boolean
+          location?: string
+          office_address?: string | null
+          registration_email?: string | null
+          registration_link?: string | null
+          registration_notes?: string | null
+          registration_phone?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+          submitted_by?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pending_resources: {
+        Row: {
+          address: string | null
+          categories: string[]
+          cover_photo_url: string | null
+          created_at: string
+          description: string
+          email: string | null
+          id: string
+          logo_url: string | null
+          organization_name: string
+          phone: string | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string
+          submitted_by: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          categories?: string[]
+          cover_photo_url?: string | null
+          created_at?: string
+          description: string
+          email?: string | null
+          id?: string
+          logo_url?: string | null
+          organization_name: string
+          phone?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+          submitted_by: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          categories?: string[]
+          cover_photo_url?: string | null
+          created_at?: string
+          description?: string
+          email?: string | null
+          id?: string
+          logo_url?: string | null
+          organization_name?: string
+          phone?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+          submitted_by?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      pending_special_events: {
+        Row: {
+          created_at: string
+          description: string | null
+          end_date: string | null
+          id: string
+          is_active: boolean
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          start_date: string
+          status: string
+          submitted_at: string
+          submitted_by: string
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          start_date: string
+          status?: string
+          submitted_at?: string
+          submitted_by: string
+          title: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          start_date?: string
+          status?: string
+          submitted_at?: string
+          submitted_by?: string
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       resources: {
         Row: {
           address: string | null
@@ -747,6 +1002,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -756,9 +1038,17 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      get_user_role: {
+        Args: { user_id: string }
+        Returns: Database["public"]["Enums"]["user_role"]
+      }
+      is_main_admin: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      user_role: "main_admin" | "sub_admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -885,6 +1175,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_role: ["main_admin", "sub_admin"],
+    },
   },
 } as const
