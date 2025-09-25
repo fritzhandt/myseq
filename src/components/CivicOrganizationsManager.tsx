@@ -82,11 +82,18 @@ export default function CivicOrganizationsManager() {
   };
 
   const generatePassword = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-    let result = '';
-    for (let i = 0; i < 12; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
+    const words = [
+      'apple', 'beach', 'chair', 'dance', 'eagle', 'flame', 'grape', 'house',
+      'island', 'jungle', 'kite', 'lemon', 'magic', 'ocean', 'piano', 'quiet',
+      'river', 'storm', 'tower', 'urban', 'voice', 'water', 'xerus', 'young', 'zebra',
+      'bridge', 'castle', 'dragon', 'forest', 'garden', 'happy', 'knight', 'light',
+      'mountain', 'night', 'orange', 'purple', 'queen', 'royal', 'silver', 'tiger'
+    ];
+    
+    const getRandomWord = () => words[Math.floor(Math.random() * words.length)];
+    const getRandomNumber = () => Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    
+    const result = `${getRandomWord()}-${getRandomNumber()}-${getRandomWord()}-${getRandomNumber()}`;
     setFormData(prev => ({ ...prev, password: result }));
   };
 
