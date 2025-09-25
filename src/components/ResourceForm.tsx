@@ -36,7 +36,8 @@ const CATEGORIES = [
   "arts",
   "business",
   "recreational",
-  "wellness"
+  "wellness",
+  "legal services"
 ];
 
 export default function ResourceForm({ resource, onClose, onSave }: ResourceFormProps) {
