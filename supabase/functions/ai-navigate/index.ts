@@ -26,14 +26,28 @@ serve(async (req) => {
 
   try {
     const { query } = await req.json();
+    
+    console.log('Received query:', query);
 
     if (!query) {
+      console.log('No query provided');
       return new Response(JSON.stringify({ 
         success: false, 
         error: "Please provide a search query" 
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400
+      });
+    }
+
+    if (!openAIApiKey) {
+      console.error('OpenAI API key not found');
+      return new Response(JSON.stringify({
+        success: false,
+        error: "AI service is not configured properly"
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500
       });
     }
 
@@ -81,7 +95,7 @@ For errors:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-5-nano-2025-08-07',
+        model: 'gpt-5-mini-2025-08-07',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: query }

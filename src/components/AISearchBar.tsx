@@ -24,20 +24,36 @@ export default function AISearchBar() {
   const handleSearch = async () => {
     if (!query.trim()) return;
 
+    console.log('Starting AI search with query:', query);
     setIsLoading(true);
     try {
+      console.log('Calling supabase function...');
       const { data, error } = await supabase.functions.invoke('ai-navigate', {
         body: { query: query.trim() }
       });
 
-      if (error) throw error;
+      console.log('Function response:', { data, error });
+
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
 
       const response: AINavigationResponse = data;
+      console.log('Parsed response:', response);
       
       if (!response.success) {
+        console.log('AI returned error:', response.error);
         toast.error(response.error || "Sorry, I couldn't understand your request. Please try rephrasing.");
         return;
       }
+
+      console.log('Navigating to:', response.destination, 'with state:', {
+        searchTerm: response.searchTerm,
+        category: response.category,
+        dateStart: response.dateStart,
+        dateEnd: response.dateEnd
+      });
 
       // Navigate to the destination with search parameters
       const navigationState = {
