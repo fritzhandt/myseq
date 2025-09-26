@@ -48,7 +48,7 @@ export default function Jobs() {
   // Handle AI navigation state
   useEffect(() => {
     const state = location.state as any;
-    if (state?.searchTerm || state?.employer || state?.location) {
+    if ((state?.searchTerm || state?.employer || state?.location) && jobs.length > 0 && !loading) {
       // Set parameters first
       if (state.searchTerm) setSearchQuery(state.searchTerm);
       if (state.employer) setEmployerFilter(state.employer);
@@ -56,7 +56,7 @@ export default function Jobs() {
       
       // Auto-trigger search after state is set
       const triggerSearch = async () => {
-        await new Promise(resolve => setTimeout(resolve, 200)); // Give time for state to update
+        await new Promise(resolve => setTimeout(resolve, 100)); // Give time for state to update
         
         // Manually trigger the AI search
         setIsSearching(true);
@@ -80,6 +80,10 @@ export default function Jobs() {
           if (data.success) {
             console.log(`AI auto-search found ${data.jobs.length} matching jobs`);
             setFilteredJobs(data.jobs || []);
+            toast({
+              title: "Search completed",
+              description: `Found ${data.jobs.length} matching jobs for "${state.searchTerm}"`,
+            });
           } else {
             console.error('AI job search failed:', data.error);
             // Fallback to basic search
@@ -92,6 +96,10 @@ export default function Jobs() {
               );
             }
             setFilteredJobs(filtered);
+            toast({
+              title: "Search completed",
+              description: `Found ${filtered.length} matching jobs using basic search`,
+            });
           }
         } catch (error) {
           console.error('Auto AI search failed, using fallback:', error);
@@ -105,6 +113,10 @@ export default function Jobs() {
             );
           }
           setFilteredJobs(filtered);
+          toast({
+            title: "Search completed",
+            description: `Found ${filtered.length} matching jobs using fallback search`,
+          });
         } finally {
           setIsSearching(false);
         }
@@ -117,7 +129,7 @@ export default function Jobs() {
       // Clear the navigation state
       navigate(location.pathname, { replace: true });
     }
-  }, [location.state, navigate, location.pathname, activeTab, jobs]);
+  }, [location.state, navigate, location.pathname, activeTab, jobs, loading, toast]);
 
   useEffect(() => {
     fetchJobs();
