@@ -55,7 +55,25 @@ const CommunityAlertForm = ({ alert, onClose, onSave }: CommunityAlertFormProps)
     setUploading(true);
 
     try {
-      const uploadPromises = Array.from(files).map(async (file) => {
+      // Compress images before upload
+      const { compressImages, getOptimalCompressionOptions } = await import('../utils/imageCompression');
+      
+      const compressedFiles = await Promise.all(
+        Array.from(files).map(async (file) => {
+          try {
+            const compressionOptions = getOptimalCompressionOptions(file.size);
+            return await compressImages([file], compressionOptions);
+          } catch (error) {
+            console.warn('Failed to compress image, using original:', error);
+            return [file];
+          }
+        })
+      );
+      
+      const flatCompressedFiles = compressedFiles.flat();
+      console.log(`Compressed ${files.length} images for community alert upload`);
+
+      const uploadPromises = flatCompressedFiles.map(async (file) => {
         const fileName = `${Date.now()}-${file.name}`;
         const { data, error } = await supabase.storage
           .from('event-images')

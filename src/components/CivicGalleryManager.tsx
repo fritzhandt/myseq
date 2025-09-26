@@ -70,7 +70,7 @@ const CivicGalleryManager = ({ orgId }: CivicGalleryManagerProps) => {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     
     if (files.length === 0) return;
@@ -86,17 +86,6 @@ const CivicGalleryManager = ({ orgId }: CivicGalleryManagerProps) => {
       return;
     }
 
-    // Check file sizes (5MB limit each)
-    const oversizedFiles = files.filter(file => file.size > 5 * 1024 * 1024);
-    if (oversizedFiles.length > 0) {
-      toast({
-        title: "Error",
-        description: "Images must be under 5MB each",
-        variant: "destructive",
-      });
-      return;
-    }
-
     // Check total limit
     if (photos.length + files.length > GALLERY_PHOTO_LIMIT) {
       toast({
@@ -107,7 +96,47 @@ const CivicGalleryManager = ({ orgId }: CivicGalleryManagerProps) => {
       return;
     }
 
-    setFormData(prev => ({ ...prev, files }));
+    // Compress images before setting them
+    try {
+      const { compressImages, getOptimalCompressionOptions } = await import('../utils/imageCompression');
+      
+      const compressionPromises = files.map(async (file) => {
+        const compressionOptions = getOptimalCompressionOptions(file.size);
+        return await compressImages([file], compressionOptions);
+      });
+      
+      const compressedFilesArrays = await Promise.all(compressionPromises);
+      const compressedFiles = compressedFilesArrays.flat();
+      
+      // Check compressed file sizes (5MB limit each)
+      const oversizedFiles = compressedFiles.filter(file => file.size > 5 * 1024 * 1024);
+      if (oversizedFiles.length > 0) {
+        toast({
+          title: "Error",
+          description: "Some images are still too large after compression. Please use smaller images.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      console.log(`Compressed ${files.length} images for gallery upload`);
+      setFormData(prev => ({ ...prev, files: compressedFiles }));
+    } catch (error) {
+      console.warn('Failed to compress images, using originals:', error);
+      
+      // Fallback to original size check
+      const oversizedFiles = files.filter(file => file.size > 5 * 1024 * 1024);
+      if (oversizedFiles.length > 0) {
+        toast({
+          title: "Error",
+          description: "Images must be under 5MB each",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      setFormData(prev => ({ ...prev, files }));
+    }
   };
 
   const handleUpload = async () => {

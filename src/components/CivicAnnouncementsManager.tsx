@@ -194,11 +194,24 @@ const CivicAnnouncementsManager = ({ orgId }: CivicAnnouncementsManagerProps) =>
           continue;
         }
 
-        // Validate file size (5MB limit)
-        if (file.size > 5 * 1024 * 1024) {
+        // Compress the image before upload
+        let compressedFile: File;
+        try {
+          const { compressImage, getOptimalCompressionOptions } = await import('../utils/imageCompression');
+          const compressionOptions = getOptimalCompressionOptions(file.size);
+          compressedFile = await compressImage(file, compressionOptions);
+          
+          console.log(`Compressed ${file.name}: ${file.size} -> ${compressedFile.size} bytes`);
+        } catch (compressionError) {
+          console.warn('Failed to compress image, using original:', compressionError);
+          compressedFile = file;
+        }
+
+        // Validate compressed file size (still check 5MB limit)
+        if (compressedFile.size > 5 * 1024 * 1024) {
           toast({
             title: "Error",
-            description: `${file.name} is too large. Please use images under 5MB`,
+            description: `${file.name} is still too large after compression. Please use a smaller image`,
             variant: "destructive",
           });
           continue;
@@ -208,7 +221,7 @@ const CivicAnnouncementsManager = ({ orgId }: CivicAnnouncementsManagerProps) =>
         
         const { data, error } = await supabase.storage
           .from('civic-files')
-          .upload(fileName, file);
+          .upload(fileName, compressedFile);
 
         if (error) throw error;
 

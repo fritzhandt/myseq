@@ -134,9 +134,22 @@ export const CivicEventsManager = ({ civicOrgId }: CivicEventsManagerProps) => {
   };
 
   const uploadFile = async (file: File, path: string) => {
+    // Compress the image before upload
+    let compressedFile: File;
+    try {
+      const { compressImage, getOptimalCompressionOptions } = await import('../utils/imageCompression');
+      const compressionOptions = getOptimalCompressionOptions(file.size);
+      compressedFile = await compressImage(file, compressionOptions);
+      
+      console.log(`Compressed event image: ${file.size} -> ${compressedFile.size} bytes`);
+    } catch (compressionError) {
+      console.warn('Failed to compress image, using original:', compressionError);
+      compressedFile = file;
+    }
+
     const { data, error } = await supabase.storage
       .from('event-images')
-      .upload(path, file);
+      .upload(path, compressedFile);
     
     if (error) throw error;
     
