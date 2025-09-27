@@ -115,7 +115,7 @@ Available pages:
 - "/resources" - For community resources (accepts searchTerm, category)
 - "/civics" - For civic organizations (accepts searchTerm)
 
-Resource categories: "housing", "healthcare", "education", "social services", "legal services", "financial services", "food assistance", "transportation", "employment", "senior services", "youth services", "disability services", "mental health", "childcare", "immigration", "veterans", "lgbt", "arts", "environment", "sports", "other"
+Resource categories: "sports", "mental health", "arts", "business", "recreational", "wellness", "legal services", "educational"
 
 Rules:
 1. For elected officials queries: use "/my-elected-lookup"

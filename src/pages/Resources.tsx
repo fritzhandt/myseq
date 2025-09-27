@@ -45,20 +45,74 @@ export default function Resources() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Handle AI navigation state
+  // Handle AI navigation state and auto-search
   useEffect(() => {
     const state = location.state as any;
-    if (state) {
-      if (state.searchTerm) {
-        setSearchQuery(state.searchTerm);
-      }
+    if (state?.searchTerm && resources.length > 0 && !loading) {
+      // Set parameters first
+      if (state.searchTerm) setSearchQuery(state.searchTerm);
+      if (state.category) setSelectedCategory(state.category);
+      
+      // Auto-trigger AI search after state is set
+      const triggerSearch = async () => {
+        await new Promise(resolve => setTimeout(resolve, 100)); // Give time for state to update
+        
+        try {
+          console.log('Auto-triggering AI resource search from navigation:', state.searchTerm);
+          
+          const { data, error } = await supabase.functions.invoke('ai-resource-search', {
+            body: { 
+              query: state.searchTerm || '',
+              category: state.category || selectedCategory
+            }
+          });
+
+          if (error) {
+            console.error('AI resource search error:', error);
+            throw error;
+          }
+
+          if (data.success) {
+            console.log(`AI auto-search found ${data.resources.length} matching resources`);
+            setFilteredResources(data.resources || []);
+            toast({
+              title: "Search completed",
+              description: `Found ${data.resources.length} matching resources for "${state.searchTerm}"`,
+            });
+          } else {
+            console.error('AI resource search failed:', data.error);
+            // Fallback to basic search
+            filterResources();
+            toast({
+              title: "Search completed",
+              description: `Found results using basic search`,
+            });
+          }
+        } catch (error) {
+          console.error('Auto AI search failed, using fallback:', error);
+          // Fallback search
+          filterResources();
+          toast({
+            title: "Search completed",
+            description: `Found results using fallback search`,
+          });
+        }
+        
+        setCurrentPage(1);
+      };
+      
+      triggerSearch();
+      
+      // Clear the navigation state
+      navigate(location.pathname, { replace: true });
+    } else if (state && !state.searchTerm) {
+      // Handle basic category navigation without search
       if (state.category) {
         setSelectedCategory(state.category);
       }
-      // Clear the navigation state
       navigate(location.pathname, { replace: true });
     }
-  }, [location.state, navigate, location.pathname]);
+  }, [location.state, navigate, location.pathname, resources, loading, selectedCategory, toast]);
 
   const fetchResources = async () => {
     try {
@@ -106,6 +160,58 @@ export default function Resources() {
     setCurrentPage(1); // Reset to first page when filters change
   };
 
+  const handleAISearch = async () => {
+    if (!searchQuery.trim()) {
+      filterResources();
+      return;
+    }
+
+    setLoading(true);
+    try {
+      console.log('Starting AI resource search with query:', searchQuery);
+      
+      const { data, error } = await supabase.functions.invoke('ai-resource-search', {
+        body: { 
+          query: searchQuery,
+          category: selectedCategory || undefined
+        }
+      });
+
+      if (error) {
+        console.error('AI resource search error:', error);
+        throw error;
+      }
+
+      if (data.success) {
+        console.log(`AI found ${data.resources.length} matching resources`);
+        setFilteredResources(data.resources || []);
+        toast({
+          title: "AI Search completed",
+          description: `Found ${data.resources.length} matching resources`,
+        });
+      } else {
+        console.error('AI resource search failed:', data.error);
+        // Fallback to basic search
+        filterResources();
+        toast({
+          title: "Search completed",
+          description: "Using basic search results",
+        });
+      }
+    } catch (error) {
+      console.error('AI search failed, using fallback:', error);
+      filterResources();
+      toast({
+        title: "Search completed",
+        description: "Using fallback search results",
+      });
+    } finally {
+      setLoading(false);
+    }
+    
+    setCurrentPage(1);
+  };
+
   const handleCategorySelect = (category: string) => {
     setSelectedCategory(selectedCategory === category ? "" : category);
   };
@@ -114,13 +220,22 @@ export default function Resources() {
     setSearchQuery(e.target.value);
   };
 
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleAISearch();
+    }
+  };
+
   useEffect(() => {
     fetchResources();
   }, []);
 
   useEffect(() => {
-    filterResources();
-  }, [resources, searchQuery, selectedCategory]);
+    if (!searchQuery.trim()) {
+      // Only auto-filter when there's no search query
+      filterResources();
+    }
+  }, [resources, selectedCategory]);
 
   // Paginate filtered resources
   const totalPages = Math.ceil(filteredResources.length / itemsPerPage);
@@ -180,15 +295,28 @@ export default function Resources() {
 
         {/* Search Bar */}
         <div className="max-w-2xl mx-auto mb-8">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              value={searchQuery}
-              onChange={handleSearchChange}
-              placeholder="Search resources by name, description, or category..."
-              className="pl-10 pr-4 py-3 text-base"
-            />
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onKeyPress={handleKeyPress}
+                placeholder="Search resources using AI..."
+                className="pl-10 pr-4 py-3 text-base"
+              />
+            </div>
+            <Button 
+              onClick={handleAISearch}
+              disabled={loading}
+              className="shrink-0 px-6"
+            >
+              {loading ? 'Searching...' : 'Search'}
+            </Button>
           </div>
+          <p className="text-xs text-muted-foreground mt-2 text-center">
+            Smart search finds relevant resources. Press Enter or click Search.
+          </p>
         </div>
 
         {/* Resources Grid */}
