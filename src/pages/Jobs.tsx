@@ -407,10 +407,12 @@ export default function Jobs() {
                             <TranslatedText contentKey="jobs.location_label" originalText="Location" />
                           </label>
                           <Select value={locationFilter} onValueChange={setLocationFilter}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="All locations" />
+                            <SelectTrigger className="w-full bg-background">
+                              <SelectValue placeholder="All locations">
+                                {locationFilter === 'all' ? 'All locations' : locationFilter}
+                              </SelectValue>
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="bg-background z-50">
                               <SelectItem value="all"><TranslatedText contentKey="jobs.all_locations" originalText="All locations" /></SelectItem>
                               {uniqueLocations.map(location => (
                                 <SelectItem key={location} value={location}>{location}</SelectItem>
@@ -520,10 +522,12 @@ export default function Jobs() {
                             <TranslatedText contentKey="jobs.location_label" originalText="Location" />
                           </label>
                           <Select value={locationFilter} onValueChange={setLocationFilter}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="All locations" />
+                            <SelectTrigger className="w-full bg-background">
+                              <SelectValue placeholder="All locations">
+                                {locationFilter === 'all' ? 'All locations' : locationFilter}
+                              </SelectValue>
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="bg-background z-50">
                               <SelectItem value="all"><TranslatedText contentKey="jobs.all_locations" originalText="All locations" /></SelectItem>
                               {uniqueLocations.map(location => (
                                 <SelectItem key={location} value={location}>{location}</SelectItem>
