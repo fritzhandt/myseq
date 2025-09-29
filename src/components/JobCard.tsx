@@ -6,6 +6,7 @@ import JobReportModal from '@/components/JobReportModal';
 import { Building, MapPin, DollarSign, ExternalLink, Info, Flag, MoreHorizontal, Calendar } from 'lucide-react';
 import { useState } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { TranslatedText } from '@/components/TranslatedText';
 
 interface Job {
   id: string;
@@ -63,7 +64,12 @@ export default function JobCard({ job }: JobCardProps) {
       <Card className="p-4 border border-border">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-foreground truncate">{job.title}</h3>
+            <TranslatedText 
+              contentKey={`job.${job.id}_title`}
+              originalText={job.title}
+              as="h3"
+              className="font-semibold text-foreground truncate"
+            />
             <div className="flex items-center gap-1 mt-1 text-sm text-muted-foreground">
               <Building className="h-3 w-3" />
               <span className="truncate">{job.employer}</span>
@@ -87,7 +93,7 @@ export default function JobCard({ job }: JobCardProps) {
                 className="text-xs"
               >
                 <MoreHorizontal className="h-3 w-3 mr-1" />
-                More Info
+                <TranslatedText contentKey="job_card.more_info" originalText="More Info" />
               </Button>
             ) : (
               <div className="flex gap-2">
@@ -98,18 +104,18 @@ export default function JobCard({ job }: JobCardProps) {
                   className="text-xs"
                 >
                   <Flag className="h-3 w-3 mr-1" />
-                  Report
+                  <TranslatedText contentKey="job_card.report" originalText="Report" />
                 </Button>
                 <Button onClick={handleApplyClick} size="sm" className="text-xs">
                   {job.is_apply_link ? (
                     <>
                       <ExternalLink className="h-3 w-3 mr-1" />
-                      Apply
+                      <TranslatedText contentKey="job_card.apply" originalText="Apply" />
                     </>
                   ) : (
                     <>
                       <Info className="h-3 w-3 mr-1" />
-                      Info
+                      <TranslatedText contentKey="job_card.info" originalText="Info" />
                     </>
                   )}
                 </Button>
@@ -123,7 +129,12 @@ export default function JobCard({ job }: JobCardProps) {
       <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
         <DialogContent className="sm:max-w-md max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-left">{job.title}</DialogTitle>
+            <DialogTitle className="text-left">
+              <TranslatedText 
+                contentKey={`job.${job.id}_title`}
+                originalText={job.title}
+              />
+            </DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4">
@@ -157,7 +168,7 @@ export default function JobCard({ job }: JobCardProps) {
               className="w-full sm:w-auto"
             >
               <Flag className="h-4 w-4 mr-2" />
-              Report Job
+              <TranslatedText contentKey="job_card.report_job" originalText="Report Job" />
             </Button>
             <Button 
               onClick={() => {
@@ -169,12 +180,12 @@ export default function JobCard({ job }: JobCardProps) {
               {job.is_apply_link ? (
                 <>
                   <ExternalLink className="h-4 w-4 mr-2" />
-                  Apply Now
+                  <TranslatedText contentKey="job_card.apply_now" originalText="Apply Now" />
                 </>
               ) : (
                 <>
                   <Info className="h-4 w-4 mr-2" />
-                  Application Info
+                  <TranslatedText contentKey="job_card.application_info" originalText="Application Info" />
                 </>
               )}
             </Button>
@@ -185,22 +196,32 @@ export default function JobCard({ job }: JobCardProps) {
       <Dialog open={showExternalDialog} onOpenChange={setShowExternalDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Leaving This Site</DialogTitle>
+            <DialogTitle>
+              <TranslatedText 
+                contentKey="job_card.leaving_site" 
+                originalText="Leaving This Site"
+              />
+            </DialogTitle>
             <DialogDescription className="text-left">
-              This link is taking you to an external website:
+              <TranslatedText 
+                contentKey="job_card.external_warning" 
+                originalText="This link is taking you to an external website:"
+              />
               <br />
               <strong>{job.apply_info}</strong>
               <br /><br />
-              This is a third-party website not operated by us. Your information will be 
-              handled according to their privacy policies and terms of service.
+              <TranslatedText 
+                contentKey="job_card.privacy_notice" 
+                originalText="This is a third-party website not operated by us. Your information will be handled according to their privacy policies and terms of service."
+              />
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowExternalDialog(false)}>
-              Cancel
+              <TranslatedText contentKey="job_card.cancel" originalText="Cancel" />
             </Button>
             <Button onClick={handleExternalConfirm}>
-              Continue to External Site
+              <TranslatedText contentKey="job_card.continue_external" originalText="Continue to External Site" />
               <ExternalLink className="ml-2 w-4 h-4" />
             </Button>
           </DialogFooter>
