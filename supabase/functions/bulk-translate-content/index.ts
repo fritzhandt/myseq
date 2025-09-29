@@ -116,15 +116,14 @@ ${item.original_text}`;
               'Authorization': `Bearer ${openaiApiKey}`,
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-              model: 'gpt-5-mini-2025-08-07',
-              messages: [
-                { role: 'system', content: 'You are a professional translator. Return only the translated text with no additional commentary.' },
-                { role: 'user', content: prompt }
-              ],
-              temperature: 0.3,
-              max_tokens: 2000,
-            }),
+          body: JSON.stringify({
+            model: 'gpt-5-mini-2025-08-07',
+            messages: [
+              { role: 'system', content: 'You are a professional translator. Return only the translated text with no additional commentary.' },
+              { role: 'user', content: prompt }
+            ],
+            max_completion_tokens: 2000,
+          }),
           });
 
           if (response.ok) {
