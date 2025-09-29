@@ -10,14 +10,8 @@ type Language = {
 const SUPPORTED_LANGUAGES: Language[] = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
   { code: 'es', name: 'Español', flag: '🇪🇸' },
-  { code: 'fr', name: 'Français', flag: '🇫🇷' },
-  { code: 'ko', name: '한국어', flag: '🇰🇷' },
-  { code: 'zh', name: '中文', flag: '🇨🇳' },
-  { code: 'ar', name: 'العربية', flag: '🇸🇦' },
-  { code: 'ru', name: 'Русский', flag: '🇷🇺' },
-  { code: 'pt', name: 'Português', flag: '🇵🇹' },
-  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-  { code: 'it', name: 'Italiano', flag: '🇮🇹' },
+  { code: 'ht', name: 'Kreyòl', flag: '🇭🇹' },
+  { code: 'he', name: 'עברית', flag: '🇮🇱' },
 ];
 
 type TranslationContextType = {
