@@ -41,78 +41,38 @@ export default function Resources() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [pendingAutoSearch, setPendingAutoSearch] = useState(false);
   const itemsPerPage = 12;
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Handle AI navigation state and auto-search
+  // Handle AI navigation state 
   useEffect(() => {
     const state = location.state as any;
-    if (state?.searchTerm && resources.length > 0 && !loading) {
-      // Set parameters first
-      if (state.searchTerm) setSearchQuery(state.searchTerm);
+    if (state?.searchTerm) {
+      // Set search parameters immediately
+      setSearchQuery(state.searchTerm);
       if (state.category) setSelectedCategory(state.category);
       
-      // Auto-trigger AI search after state is set
-      const triggerSearch = async () => {
-        await new Promise(resolve => setTimeout(resolve, 100)); // Give time for state to update
-        
-        try {
-          console.log('Auto-triggering AI resource search from navigation:', state.searchTerm);
-          
-          const { data, error } = await supabase.functions.invoke('ai-resource-search', {
-            body: { 
-              query: state.searchTerm || '',
-              category: state.category || selectedCategory
-            }
-          });
-
-          if (error) {
-            console.error('AI resource search error:', error);
-            throw error;
-          }
-
-          if (data.success) {
-            console.log(`AI auto-search found ${data.resources.length} matching resources`);
-            setFilteredResources(data.resources || []);
-            toast({
-              title: "Search completed",
-              description: `Found ${data.resources.length} matching resources for "${state.searchTerm}"`,
-            });
-          } else {
-            console.error('AI resource search failed:', data.error);
-            // Fallback to basic search
-            filterResources();
-            toast({
-              title: "Search completed",
-              description: `Found results using basic search`,
-            });
-          }
-        } catch (error) {
-          console.error('Auto AI search failed, using fallback:', error);
-          // Fallback search
-          filterResources();
-          toast({
-            title: "Search completed",
-            description: `Found results using fallback search`,
-          });
-        }
-        
-        setCurrentPage(1);
-      };
+      // Mark that we need to auto-search once resources are loaded
+      setPendingAutoSearch(true);
       
-      triggerSearch();
-      
-      // Clear the navigation state
+      // Clear navigation state immediately
       navigate(location.pathname, { replace: true });
-    } else if (state && !state.searchTerm) {
+    } else if (state?.category) {
       // Handle basic category navigation without search
-      if (state.category) {
-        setSelectedCategory(state.category);
-      }
+      setSelectedCategory(state.category);
       navigate(location.pathname, { replace: true });
     }
-  }, [location.state, navigate, location.pathname, resources, loading, selectedCategory, toast]);
+  }, [location.state, navigate, location.pathname]);
+
+  // Auto-trigger search when resources are loaded and we have a pending search
+  useEffect(() => {
+    if (pendingAutoSearch && resources.length > 0 && !loading && searchQuery) {
+      setPendingAutoSearch(false);
+      handleAISearch();
+    }
+  }, [pendingAutoSearch, resources.length, loading, searchQuery]);
 
   const fetchResources = async () => {
     try {
