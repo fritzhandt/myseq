@@ -140,33 +140,29 @@ ROUTING EXAMPLES:
 ✗ "history of jamaica" → NO_MATCH
 ✗ "famous people" → NO_MATCH
 
-RESPONSE FORMAT:
+CRITICAL: Return ONLY valid JSON, no other text or explanations.
 
-Found a route:
+RESPONSE FORMAT (ONLY JSON, NO TEXT):
+
 {
   "destination": "/page",
   "searchTerm": "optional",
-  "employer": "optional",
-  "location": "optional",
-  "category": "optional",
-  "dateStart": "YYYY-MM-DD",
-  "dateEnd": "YYYY-MM-DD",
   "success": true
 }
 
-No route exists:
+OR
+
 {
   "success": false,
   "noMatch": true
 }
 
-Off-topic query:
+OR
+
 {
   "success": false,
   "error": "Only Southeast Queens queries allowed"
-}
-
-CRITICAL: You NEVER provide answers. You ONLY route to pages or say NO_MATCH.`;
+}`;
 
     // STEP 1: Try navigation first
     const navigationResponse = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -204,11 +200,20 @@ CRITICAL: You NEVER provide answers. You ONLY route to pages or say NO_MATCH.`;
     const navAiResponse = navData.choices[0].message.content;
     console.log('Navigation AI Response:', navAiResponse);
 
+    // Extract JSON from response (strip any text before/after JSON)
+    let jsonStr = navAiResponse.trim();
+    const firstBrace = jsonStr.indexOf('{');
+    const lastBrace = jsonStr.lastIndexOf('}');
+    if (firstBrace !== -1 && lastBrace !== -1) {
+      jsonStr = jsonStr.substring(firstBrace, lastBrace + 1);
+    }
+
     let parsedNavResponse: NavigationResponse;
     try {
-      parsedNavResponse = JSON.parse(navAiResponse.trim());
+      parsedNavResponse = JSON.parse(jsonStr);
     } catch (parseError) {
       console.error('Failed to parse navigation response:', parseError);
+      console.error('Raw response:', navAiResponse);
       parsedNavResponse = {
         success: false,
         error: "I couldn't understand your request. Please try rephrasing it."
@@ -258,22 +263,22 @@ A: "Southeast Queens has produced many legendary hip-hop artists including LL Co
 Q: "history of jamaica queens"
 A: "Jamaica, Queens was founded in 1656 and is one of the oldest neighborhoods in NYC. It became a major commercial and transit hub in the 20th century."
 
-RESPONSE FORMAT:
+CRITICAL: Return ONLY valid JSON, no other text or explanations.
 
-Valid question:
+RESPONSE FORMAT (ONLY JSON, NO TEXT):
+
 {
   "isGeneralQuery": true,
   "answer": "Your 2-3 sentence factual answer",
   "success": true
 }
 
-Off-topic question:
+OR
+
 {
   "success": false,
   "error": "I only answer questions about Southeast Queens"
-}
-
-CRITICAL: You NEVER route to pages. You ONLY provide answers.`;
+}`;
 
       const generalResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -304,11 +309,20 @@ CRITICAL: You NEVER route to pages. You ONLY provide answers.`;
       const genAiResponse = genData.choices[0].message.content;
       console.log('General AI Response:', genAiResponse);
 
+      // Extract JSON from response (strip any text before/after JSON)
+      let genJsonStr = genAiResponse.trim();
+      const genFirstBrace = genJsonStr.indexOf('{');
+      const genLastBrace = genJsonStr.lastIndexOf('}');
+      if (genFirstBrace !== -1 && genLastBrace !== -1) {
+        genJsonStr = genJsonStr.substring(genFirstBrace, genLastBrace + 1);
+      }
+
       let parsedGenResponse: NavigationResponse;
       try {
-        parsedGenResponse = JSON.parse(genAiResponse.trim());
+        parsedGenResponse = JSON.parse(genJsonStr);
       } catch (parseError) {
         console.error('Failed to parse general response:', parseError);
+        console.error('Raw response:', genAiResponse);
         parsedGenResponse = {
           success: false,
           error: "I couldn't process your question. Please try again."
