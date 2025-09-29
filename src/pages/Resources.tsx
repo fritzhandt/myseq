@@ -8,6 +8,7 @@ import ResourceCard from "@/components/ResourceCard";
 import UserPagination from "@/components/UserPagination";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { TranslatedText } from "@/components/TranslatedText";
 
 interface Resource {
   id: string;
@@ -216,7 +217,9 @@ export default function Resources() {
             className="flex items-center text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Main Menu
+            <TranslatedText contentKey="resources.back_to_menu" pagePath="/resources">
+              Back to Main Menu
+            </TranslatedText>
           </Button>
         </div>
       </div>
@@ -224,10 +227,22 @@ export default function Resources() {
       <main className="container mx-auto px-4 py-8">
         <div className="text-center mb-8">
           <div className="flex-1">
-            <h1 className="text-4xl font-bold mb-4">Community Resources</h1>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            <TranslatedText 
+              contentKey="resources.page_title" 
+              pagePath="/resources" 
+              as="h1" 
+              className="text-4xl font-bold mb-4"
+            >
+              Community Resources
+            </TranslatedText>
+            <TranslatedText 
+              contentKey="resources.page_description" 
+              pagePath="/resources" 
+              as="p" 
+              className="text-muted-foreground text-lg max-w-2xl mx-auto"
+            >
               Discover local organizations and services available in your community
-            </p>
+            </TranslatedText>
           </div>
         </div>
 
@@ -238,7 +253,9 @@ export default function Resources() {
             size="sm"
             onClick={() => setSelectedCategory("")}
           >
-            All Categories
+            <TranslatedText contentKey="resources.all_categories" pagePath="/resources">
+              All Categories
+            </TranslatedText>
           </Button>
           {CATEGORIES.map((category) => (
             <Button
@@ -275,18 +292,29 @@ export default function Resources() {
             </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-2 text-center">
-            Smart search finds relevant resources. Press Enter or click Search.
+            <TranslatedText contentKey="resources.search_help" pagePath="/resources">
+              Smart search finds relevant resources. Press Enter or click Search.
+            </TranslatedText>
           </p>
         </div>
 
         {/* Resources Grid */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="text-muted-foreground">Loading resources...</div>
+            <TranslatedText contentKey="resources.loading" pagePath="/resources" className="text-muted-foreground">
+              Loading resources...
+            </TranslatedText>
           </div>
         ) : filteredResources.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground text-lg">No resources found.</p>
+            <TranslatedText 
+              contentKey="resources.no_results" 
+              pagePath="/resources" 
+              as="p" 
+              className="text-muted-foreground text-lg"
+            >
+              No resources found.
+            </TranslatedText>
             {(searchQuery || selectedCategory) && (
               <Button
                 variant="outline"
@@ -296,7 +324,9 @@ export default function Resources() {
                 }}
                 className="mt-4"
               >
-                Clear Filters
+                <TranslatedText contentKey="resources.clear_filters" pagePath="/resources">
+                  Clear Filters
+                </TranslatedText>
               </Button>
             )}
           </div>
