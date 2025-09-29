@@ -138,7 +138,7 @@ ${item.original_text}`;
               target_language: item.target_language,
               page_path: item.page_path,
             }, {
-              onConflict: 'content_key,target_language,source_language,original_text'
+              onConflict: 'content_key,target_language'
             });
 
             completed++;

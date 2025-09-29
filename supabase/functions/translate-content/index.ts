@@ -111,7 +111,7 @@ ${original_text}`;
         target_language,
         page_path,
       }, {
-        onConflict: 'content_key,target_language,source_language,original_text'
+        onConflict: 'content_key,target_language'
       });
 
     if (insertError) {
