@@ -49,6 +49,17 @@ const Navbar = () => {
                     </h3>
                     <div className="space-y-1">
                       <Link 
+                        to="/" 
+                        className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
+                        onClick={closeMenu}
+                      >
+                        <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
+                          <Home className="w-4 h-4" />
+                        </div>
+                        <span>Main Menu</span>
+                      </Link>
+                      
+                      <Link 
                         to="/home" 
                         className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
                         onClick={closeMenu}
