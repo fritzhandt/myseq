@@ -23,6 +23,7 @@ const SUPPORTED_LANGUAGES = {
   'zh': '中文',
   'ar': 'العربية',
   'hi': 'हिन्दी',
+  'ht': 'Kreyòl Ayisyen',
   'nl': 'Nederlands',
   'sv': 'Svenska',
   'da': 'Dansk',

@@ -74,6 +74,7 @@ serve(async (req) => {
       'zh': 'Chinese (Simplified)',
       'ar': 'Arabic',
       'hi': 'Hindi',
+      'ht': 'Haitian Creole',
       'nl': 'Dutch',
       'sv': 'Swedish',
       'da': 'Danish',
