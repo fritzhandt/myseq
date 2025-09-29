@@ -172,10 +172,17 @@ const ContactElected = () => {
             
             <div className="text-center mb-12">
               <h1 className="text-4xl font-bold mb-6">Contact Your Elected Officials</h1>
-              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-6">
                 Reach out to your representatives to share your thoughts, concerns, and ideas. 
                 Your voice matters in shaping the policies that affect Southeast Queens.
               </p>
+              <Button
+                onClick={() => navigate('/my-elected-lookup')}
+                className="bg-primary hover:bg-primary/90 text-white px-6 py-3"
+              >
+                <User className="mr-2 h-4 w-4" />
+                Find My Specific Representatives
+              </Button>
             </div>
 
             {levelOrder.map((level) => {
