@@ -17,7 +17,7 @@ const FAQ = () => {
     {
       id: "data-collection",
       question: "Do you collect any data on me?",
-      answer: "We prioritize your privacy and data security. We use Supabase for secure data storage and OpenAI for AI-powered features. Your personal information is stored securely and we never sell or share it with third parties. Our service providers (Supabase and OpenAI) may collect operational data to maintain and improve their services, but you control your account data and can request deletion at any time. We only collect information necessary to provide you with community resources and event updates."
+      answer: "No, we collect zero personal data from you. Our website is a public information resource that displays community events, resources, and civic information without requiring any personal information from visitors. While our technical infrastructure uses Supabase and OpenAI services, we do not store, track, or collect any personal data about our users. You can browse all content completely anonymously."
     },
     {
       id: "account-required",
