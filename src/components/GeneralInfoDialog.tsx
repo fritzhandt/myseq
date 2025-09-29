@@ -9,11 +9,12 @@ export default function GeneralInfoDialog({ answer, onClose }: GeneralInfoDialog
   return (
     <div className="fixed bottom-6 left-4 right-4 z-50 animate-in slide-in-from-bottom-5">
       <div className="max-w-4xl mx-auto relative">
-        {/* Animated gradient glow */}
-        <div className="absolute -inset-1 bg-gradient-to-r from-primary via-purple-500 to-primary rounded-2xl blur-lg opacity-75 animate-[spin_3s_linear_infinite]" />
+        {/* Rainbow gradient glow */}
+        <div className="absolute -inset-[2px] bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 via-purple-500 to-red-500 rounded-2xl blur-md opacity-60 animate-pulse bg-[length:200%_100%]" 
+             style={{ animation: 'pulse 2s ease-in-out infinite' }} />
         
         {/* Main content */}
-        <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border-2 border-primary/20 p-6">
+        <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-6">
         <div className="flex justify-between items-start gap-4 mb-4">
           <div className="flex-1">
             <p className="text-sm md:text-base text-foreground leading-relaxed">
