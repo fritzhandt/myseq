@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { TranslatedText } from "@/components/TranslatedText";
 
 interface Photo {
   id: string;
@@ -116,10 +117,20 @@ const PhotoViewer = ({ photos, currentIndex, isOpen, onClose, onIndexChange }: P
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
               <div className="text-white max-w-2xl">
                 {currentPhoto.title && (
-                  <h3 className="text-xl font-semibold mb-2">{currentPhoto.title}</h3>
+                  <TranslatedText 
+                    contentKey={`civic_detail.photo_${currentPhoto.id}_title`}
+                    originalText={currentPhoto.title}
+                    as="h3"
+                    className="text-xl font-semibold mb-2"
+                  />
                 )}
                 {currentPhoto.description && (
-                  <p className="text-white/90">{currentPhoto.description}</p>
+                  <TranslatedText 
+                    contentKey={`civic_detail.photo_${currentPhoto.id}_description`}
+                    originalText={currentPhoto.description}
+                    as="p"
+                    className="text-white/90"
+                  />
                 )}
               </div>
             </div>
