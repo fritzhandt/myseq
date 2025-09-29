@@ -12,6 +12,7 @@ const SUPPORTED_LANGUAGES: Language[] = [
   { code: 'es', name: 'Español', flag: '🇪🇸' },
   { code: 'ht', name: 'Kreyòl', flag: '🇭🇹' },
   { code: 'he', name: 'עברית', flag: '🇮🇱' },
+  { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
 ];
 
 type TranslationContextType = {
