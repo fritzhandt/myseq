@@ -22,6 +22,7 @@ import Civics from "./pages/Civics";
 import CivicDetail from "./pages/CivicDetail";
 import CivicAuth from "./pages/CivicAuth";
 import CivicAdmin from "./pages/CivicAdmin";
+import TestTranslation from "./pages/TestTranslation";
 import NotFound from "./pages/NotFound";
 import "./index.css";
 
@@ -59,6 +60,7 @@ const App = () => (
           <Route path="/civics/:orgId" element={<CivicDetail />} />
           <Route path="/civic-auth" element={<CivicAuth />} />
           <Route path="/civic-admin" element={<CivicAdmin />} />
+          <Route path="/test-translation" element={<TestTranslation />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />
