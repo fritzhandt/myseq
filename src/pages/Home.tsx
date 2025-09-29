@@ -7,6 +7,7 @@ import SearchBar from '@/components/SearchBar';
 import Navbar from '@/components/Navbar';
 import CommunityAlertBanner from '@/components/CommunityAlertBanner';
 import UserPagination from '@/components/UserPagination';
+import { TranslatedText } from '@/components/TranslatedText';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -218,7 +219,7 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
               className="flex items-center text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Main Menu
+              <TranslatedText contentKey="back-main-menu-btn" originalText="Back to Main Menu" />
             </Button>
           </div>
         </div>
@@ -226,9 +227,11 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
       <div className="gradient-hero text-primary-foreground py-16 md:py-20 px-4 shadow-urban relative overflow-hidden">
         <HeroBackground3D />
         <div className="container mx-auto text-center relative z-10">
-          <p className="text-lg md:text-xl mb-4 text-yellow-300 font-bold font-oswald tracking-wide uppercase">Welcome</p>
+          <p className="text-lg md:text-xl mb-4 text-yellow-300 font-bold font-oswald tracking-wide uppercase">
+            <TranslatedText contentKey="welcome-text" originalText="Welcome" />
+          </p>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 drop-shadow-lg">
-            Which events are you looking for?
+            <TranslatedText contentKey="events-question" originalText="Which events are you looking for?" />
           </h1>
           {/* Mobile Dropdown */}
           <div className="block sm:hidden mb-8">
@@ -238,10 +241,10 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
               onValueChange={(value) => handleFilterChange(value === 'all' ? null : value)}
             >
               <SelectTrigger className="w-full bg-white/10 border-white/20 text-white backdrop-blur-sm">
-                <SelectValue placeholder="Select age group" />
+                <SelectValue placeholder={<TranslatedText contentKey="select-age-group-placeholder" originalText="Select age group" />} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Events</SelectItem>
+                <SelectItem value="all"><TranslatedText contentKey="all-events" originalText="All Events" /></SelectItem>
                 {ageGroups.filter(Boolean).map((ageGroup) => {
                   const IconComponent = ageGroupIcons[ageGroup as keyof typeof ageGroupIcons];
                   return (
@@ -297,7 +300,7 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
             className="inline-flex items-center text-base sm:text-lg font-medium hover:underline text-white/90 hover:text-white transition-colors"
           >
             <Calendar className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-            All Events
+            <TranslatedText contentKey="all-events-link" originalText="All Events" />
           </Link>
         </div>
       </div>
@@ -317,10 +320,10 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
               <div>
                 <h2 className="text-2xl md:text-3xl font-bold">
                   {selectedFilter && searchTags.length === 0 && !searchQuery
-                    ? `${selectedFilter} Events`
+                    ? <TranslatedText contentKey="filtered-events-title" originalText={`${selectedFilter} Events`} />
                     : searchQuery || searchTags.length > 0
-                    ? 'Search Results'
-                    : 'All Events'
+                    ? <TranslatedText contentKey="search-results-title" originalText="Search Results" />
+                    : <TranslatedText contentKey="all-events-title" originalText="All Events" />
                   }
                 </h2>
                 {(selectedFilter || searchQuery || searchTags.length > 0 || searchFilters.dateFrom || searchFilters.dateTo) && (
@@ -375,18 +378,22 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
           {loading ? (
             <div className="text-center py-12">
               <LoadingSpinner3D />
-              <p className="mt-4 text-muted-foreground">Loading events...</p>
+              <p className="mt-4 text-muted-foreground">
+                <TranslatedText contentKey="loading-events" originalText="Loading events..." />
+              </p>
             </div>
           ) : filteredEvents.length === 0 ? (
             <div className="text-center py-12">
               <Calendar className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No events found</h3>
+              <h3 className="text-xl font-semibold mb-2">
+                <TranslatedText contentKey="no-events-found" originalText="No events found" />
+              </h3>
               <p className="text-muted-foreground">
                 {searchQuery || searchTags.length > 0 || searchFilters.dateFrom || searchFilters.dateTo
-                  ? 'No events match your search criteria. Try different keywords, tags, or date ranges.'
+                  ? <TranslatedText contentKey="no-events-search-criteria" originalText="No events match your search criteria. Try different keywords, tags, or date ranges." />
                   : selectedFilter 
-                  ? `No events available for ${selectedFilter} age group.`
-                  : 'No events have been created yet.'
+                  ? <TranslatedText contentKey="no-events-age-group" originalText={`No events available for ${selectedFilter} age group.`} />
+                  : <TranslatedText contentKey="no-events-created" originalText="No events have been created yet." />
                 }
               </p>
             </div>
