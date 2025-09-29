@@ -9,7 +9,6 @@ import Navbar from "@/components/Navbar";
 import { Users, MapPin, Search, Vote, ExternalLink, Phone, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { TranslatedText } from "@/components/TranslatedText";
-import { useTranslatedText } from "@/hooks/useTranslatedText";
 
 interface CivicOrganization {
   id: string;
@@ -136,7 +135,7 @@ const Civics = () => {
             <div className="relative max-w-md mx-auto">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder={useTranslatedText("civics.search_placeholder", "Search organizations or coverage areas...", "/civics").translatedText}
+                placeholder="Search organizations or coverage areas..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -202,9 +201,12 @@ const Civics = () => {
                           as="p"
                           className="text-sm font-medium"
                         />
-                        <p className="text-sm text-muted-foreground">
-                          {useTranslatedText(`civics.org_${org.id}_coverage`, org.coverage_area, "/civics").translatedText}
-                        </p>
+                        <TranslatedText 
+                          contentKey={`civics.org_${org.id}_coverage`}
+                          originalText={org.coverage_area}
+                          as="p"
+                          className="text-sm text-muted-foreground"
+                        />
                       </div>
                     </div>
                     
@@ -219,9 +221,12 @@ const Civics = () => {
                             as="p"
                             className="text-sm font-medium"
                           />
-                          <p className="text-sm text-muted-foreground">
-                            {useTranslatedText(`civics.org_${org.id}_meeting`, org.meeting_info, "/civics").translatedText}
-                          </p>
+                          <TranslatedText 
+                            contentKey={`civics.org_${org.id}_meeting`}
+                            originalText={org.meeting_info}
+                            as="p"
+                            className="text-sm text-muted-foreground"
+                          />
                         </div>
                       </div>
                     )}
