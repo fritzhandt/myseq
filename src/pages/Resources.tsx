@@ -8,6 +8,7 @@ import ResourceCard from "@/components/ResourceCard";
 import UserPagination from "@/components/UserPagination";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { TranslatedText } from "@/components/TranslatedText";
 
 interface Resource {
   id: string;
@@ -216,7 +217,7 @@ export default function Resources() {
             className="flex items-center text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Main Menu
+            <TranslatedText contentKey="resources-back-btn" originalText="Back to Main Menu" />
           </Button>
         </div>
       </div>
@@ -224,9 +225,14 @@ export default function Resources() {
       <main className="container mx-auto px-4 py-8">
         <div className="text-center mb-8">
           <div className="flex-1">
-            <h1 className="text-4xl font-bold mb-4">Community Resources</h1>
+            <h1 className="text-4xl font-bold mb-4">
+              <TranslatedText contentKey="resources-title" originalText="Community Resources" />
+            </h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Discover local organizations and services available in your community
+              <TranslatedText 
+                contentKey="resources-subtitle" 
+                originalText="Discover local organizations and services available in your community" 
+              />
             </p>
           </div>
         </div>
@@ -238,7 +244,7 @@ export default function Resources() {
             size="sm"
             onClick={() => setSelectedCategory("")}
           >
-            All Categories
+            <TranslatedText contentKey="resources-all-categories" originalText="All Categories" />
           </Button>
           {CATEGORIES.map((category) => (
             <Button
@@ -248,7 +254,10 @@ export default function Resources() {
               onClick={() => handleCategorySelect(category)}
               className="capitalize"
             >
-              {category}
+              <TranslatedText 
+                contentKey={`category-${category.replace(/\s+/g, '-')}`} 
+                originalText={category} 
+              />
             </Button>
           ))}
         </div>
@@ -271,22 +280,32 @@ export default function Resources() {
               disabled={loading}
               className="shrink-0 px-6"
             >
-              {loading ? 'Searching...' : 'Search'}
+              <TranslatedText 
+                contentKey="resources-search-btn" 
+                originalText={loading ? 'Searching...' : 'Search'} 
+              />
             </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-2 text-center">
-            Smart search finds relevant resources. Press Enter or click Search.
+            <TranslatedText 
+              contentKey="resources-search-hint" 
+              originalText="Smart search finds relevant resources. Press Enter or click Search." 
+            />
           </p>
         </div>
 
         {/* Resources Grid */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="text-muted-foreground">Loading resources...</div>
+            <div className="text-muted-foreground">
+              <TranslatedText contentKey="resources-loading" originalText="Loading resources..." />
+            </div>
           </div>
         ) : filteredResources.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground text-lg">No resources found.</p>
+            <p className="text-muted-foreground text-lg">
+              <TranslatedText contentKey="resources-no-results" originalText="No resources found." />
+            </p>
             {(searchQuery || selectedCategory) && (
               <Button
                 variant="outline"
@@ -296,7 +315,7 @@ export default function Resources() {
                 }}
                 className="mt-4"
               >
-                Clear Filters
+                <TranslatedText contentKey="resources-clear-filters" originalText="Clear Filters" />
               </Button>
             )}
           </div>
