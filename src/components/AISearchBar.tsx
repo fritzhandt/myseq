@@ -6,15 +6,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import GeneralInfoDialog from "./GeneralInfoDialog";
 
 interface AINavigationResponse {
-  destination: string;
+  destination?: string;
   searchTerm?: string;
   category?: string;
   dateStart?: string;
   dateEnd?: string;
   employer?: string;
   location?: string;
+  answer?: string;
+  isGeneralQuery?: boolean;
   success: boolean;
   error?: string;
 }
@@ -22,6 +25,7 @@ interface AINavigationResponse {
 export default function AISearchBar() {
   const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [generalAnswer, setGeneralAnswer] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
@@ -67,6 +71,15 @@ export default function AISearchBar() {
         return;
       }
 
+      // Check if this is a general query that should show an answer
+      if (response.isGeneralQuery && response.answer) {
+        console.log('Showing general answer:', response.answer);
+        setGeneralAnswer(response.answer);
+        setQuery("");
+        return;
+      }
+
+      // Otherwise, navigate to the destination
       console.log('Navigating to:', response.destination, 'with state:', {
         searchTerm: response.searchTerm,
         category: response.category,
@@ -76,7 +89,6 @@ export default function AISearchBar() {
         location: response.location
       });
 
-      // Navigate to the destination with search parameters
       const navigationState = {
         searchTerm: response.searchTerm,
         category: response.category,
@@ -116,9 +128,10 @@ export default function AISearchBar() {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto mb-16">
-      {/* Main Search Bar */}
-      <div className="relative mb-6">
+    <>
+      <div className="max-w-4xl mx-auto mb-16">
+        {/* Main Search Bar */}
+        <div className="relative mb-6">
         <div className="flex gap-2">
           <div className="relative flex-1">
             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 font-orbitron font-black text-primary text-sm tracking-wider z-10 pointer-events-none">AI</span>
@@ -173,6 +186,15 @@ export default function AISearchBar() {
           ))}
         </div>
       </div>
-    </div>
+      </div>
+      
+      {/* General Info Dialog */}
+      {generalAnswer && (
+        <GeneralInfoDialog 
+          answer={generalAnswer} 
+          onClose={() => setGeneralAnswer(null)} 
+        />
+      )}
+    </>
   );
 }
