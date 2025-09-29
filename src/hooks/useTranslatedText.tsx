@@ -59,7 +59,7 @@ export const useTranslatedText = (
           setIsLoading(false);
         }
       }
-    }, 100); // 100ms debounce
+    }, 20); // 20ms debounce for snappier translations
 
     // Cleanup function
     return () => {

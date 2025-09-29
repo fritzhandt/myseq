@@ -40,8 +40,11 @@ const getSessionId = () => {
 
 export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentLanguage, setCurrentLanguage] = useState('en');
+  const [translationCache, setTranslationCache] = useState<{
+    [language: string]: { [contentKey: string]: string }
+  }>({});
 
-  // Load language preference on mount
+  // Load language preference and translation cache on mount
   useEffect(() => {
     const loadLanguagePreference = async () => {
       const sessionId = getSessionId();
@@ -56,6 +59,16 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
         setCurrentLanguage(data.preferred_language);
       }
     };
+
+    // Load translation cache from localStorage
+    const cachedTranslations = localStorage.getItem('translation_cache');
+    if (cachedTranslations) {
+      try {
+        setTranslationCache(JSON.parse(cachedTranslations));
+      } catch (error) {
+        console.error('Failed to load translation cache:', error);
+      }
+    }
 
     loadLanguagePreference();
   }, []);
@@ -104,6 +117,13 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
       return originalText;
     }
 
+    // Check cache first
+    const cached = translationCache[currentLanguage]?.[contentKey];
+    if (cached) {
+      return cached;
+    }
+
+    // If not in cache, fetch from network
     try {
       const { data, error } = await supabase.functions.invoke('translate-content', {
         body: {
@@ -116,7 +136,25 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
       if (error) throw error;
       
-      return data?.translated_text || originalText;
+      const translatedText = data?.translated_text || originalText;
+      
+      // Store in cache
+      setTranslationCache(prev => {
+        const updated = {
+          ...prev,
+          [currentLanguage]: {
+            ...prev[currentLanguage],
+            [contentKey]: translatedText
+          }
+        };
+        
+        // Persist to localStorage
+        localStorage.setItem('translation_cache', JSON.stringify(updated));
+        
+        return updated;
+      });
+      
+      return translatedText;
     } catch (error) {
       console.error('Translation failed:', error);
       return originalText; // Fallback to original text
