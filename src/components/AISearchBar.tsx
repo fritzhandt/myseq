@@ -109,8 +109,8 @@ export default function AISearchBar() {
 
   const exampleQueries = [
     "Who is my elected official?",
-    "Find giveaways in October",
-    "Is UBS hiring?", 
+    "There's a broken down car on my street",
+    "How do I file for unemployment?", 
     "Teaching jobs in Queens",
     "Which civic organization covers Rosedale?"
   ];

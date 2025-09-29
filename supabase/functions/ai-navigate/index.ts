@@ -109,7 +109,8 @@ serve(async (req) => {
     const systemPrompt = `You are an AI assistant for Southeast Queens community website. Analyze user queries and determine the best page destination with appropriate filters.
 
 Available pages:
-- "/my-elected-lookup" - For finding elected officials
+- "/contact-elected" - For reporting issues or problems that need government intervention
+- "/my-elected-lookup" - For finding elected officials information
 - "/home" - For community events (accepts searchTerm, dateStart, dateEnd)
 - "/jobs" - For employment opportunities (accepts searchTerm, employer, location)
 - "/resources" - For community resources (accepts searchTerm, category)
@@ -118,20 +119,31 @@ Available pages:
 Resource categories: "sports", "mental health", "arts", "business", "recreational", "wellness", "legal services", "educational"
 
 Rules:
-1. For elected officials queries: use "/my-elected-lookup"
-2. For events/activities: use "/home" with searchTerm and dates if mentioned
-3. For jobs/employment: use "/jobs" with appropriate parameters:
+1. For ISSUES/PROBLEMS that need government action: use "/contact-elected"
+   - Examples: "broken down car", "pothole", "unemployment filing", "housing problems", "noise complaints", "illegal dumping", "broken streetlights", "water issues", "property disputes", "permit issues", "zoning problems", "sanitation issues", "public safety concerns", "code violations", "tax issues", "benefit applications"
+   - Any complaint or problem that requires government intervention or assistance
+   - Issues with city services, utilities, or public infrastructure
+   - Problems with neighbors, property, or community that may need official intervention
+
+2. For finding elected officials info (not reporting issues): use "/my-elected-lookup"
+
+3. For events/activities: use "/home" with searchTerm and dates if mentioned
+
+4. For jobs/employment: use "/jobs" with appropriate parameters:
    - Extract employer names (e.g., "UBS", "Amazon", "NYC Department", company names)
    - Extract location information (e.g., "Queens", "Manhattan", "Brooklyn", "NYC", specific neighborhoods)
    - For employer-focused queries like "is UBS hiring" or "UBS jobs", set employer and leave searchTerm empty
    - For job title queries like "teacher jobs", set searchTerm and leave employer empty
    - For location-specific queries, extract location
-4. For resources/services: use "/resources" with searchTerm and appropriate category
-5. For civic organizations/community boards: use "/civics" with searchTerm
+
+5. For resources/services: use "/resources" with searchTerm and appropriate category
+
+6. For civic organizations/community boards: use "/civics" with searchTerm
    - For coverage area queries like "which civic organization covers Rosedale" or "community board for Jamaica", extract the area name as searchTerm
    - Look for neighborhood names, areas, or location-specific civic queries
-6. Dates should be in YYYY-MM-DD format
-7. If query is unclear, return error
+
+7. Dates should be in YYYY-MM-DD format
+8. If query is unclear, return error
 
 Respond with JSON only in this format:
 {
