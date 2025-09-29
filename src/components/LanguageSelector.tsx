@@ -7,20 +7,29 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useTranslation } from '@/contexts/TranslationContext';
-import { Globe } from 'lucide-react';
+import { Globe, Loader2 } from 'lucide-react';
 
 export const LanguageSelector: React.FC = () => {
-  const { currentLanguage, supportedLanguages, setLanguage } = useTranslation();
+  const { currentLanguage, supportedLanguages, isTranslating, setLanguage } = useTranslation();
 
   const currentLang = supportedLanguages.find(lang => lang.code === currentLanguage);
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="flex items-center gap-2">
-          <Globe className="h-4 w-4" />
+        <Button variant="ghost" size="sm" className="flex items-center gap-2" disabled={isTranslating}>
+          {isTranslating ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Globe className="h-4 w-4" />
+          )}
           <span className="hidden sm:inline">
-            {currentLang ? `${currentLang.flag} ${currentLang.name}` : 'Language'}
+            {isTranslating 
+              ? 'Translating...' 
+              : currentLang 
+                ? `${currentLang.flag} ${currentLang.name}` 
+                : 'Language'
+            }
           </span>
         </Button>
       </DropdownMenuTrigger>

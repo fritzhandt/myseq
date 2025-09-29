@@ -17,6 +17,7 @@ const SUPPORTED_LANGUAGES: Language[] = [
 type TranslationContextType = {
   currentLanguage: string;
   supportedLanguages: Language[];
+  isTranslating: boolean;
   setLanguage: (language: string) => void;
   translate: (
     contentKey: string,
@@ -59,6 +60,8 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
     loadLanguagePreference();
   }, []);
 
+  const [isTranslating, setIsTranslating] = useState(false);
+
   const setLanguage = async (language: string) => {
     setCurrentLanguage(language);
     
@@ -72,6 +75,21 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
       }, {
         onConflict: 'session_id'
       });
+
+    // Trigger bulk translation for non-English languages
+    if (language !== 'en') {
+      setIsTranslating(true);
+      try {
+        const { error } = await supabase.functions.invoke('bulk-translate-content');
+        if (error) {
+          console.error('Bulk translation error:', error);
+        }
+      } catch (error) {
+        console.error('Failed to trigger bulk translation:', error);
+      } finally {
+        setIsTranslating(false);
+      }
+    }
   };
 
   const translate = async (
@@ -106,6 +124,7 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
     <TranslationContext.Provider value={{
       currentLanguage,
       supportedLanguages: SUPPORTED_LANGUAGES,
+      isTranslating,
       setLanguage,
       translate
     }}>
