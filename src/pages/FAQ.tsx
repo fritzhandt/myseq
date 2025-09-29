@@ -17,17 +17,17 @@ const FAQ = () => {
     {
       id: "data-collection",
       question: "Do you collect any data on me?",
-      answer: "No, we collect zero personal data from you. Our website is a public information resource that displays community events, resources, and civic information without requiring any personal information from visitors. While our technical infrastructure uses Supabase and OpenAI services, we do not store, track, or collect any personal data about our users. You can browse all content completely anonymously."
+      answer: "No, we collect absolutely nothing about our users. No personal data, no tracking information, no IP addresses, no search queries, no usage analytics - nothing. Our website is a completely anonymous public information resource. You can browse all community events, resources, and civic information without any data collection or tracking whatsoever. We have no user accounts, no cookies for tracking, and no analytics systems monitoring your activity."
     },
     {
       id: "account-required",
       question: "Do I need an account to use this site?",
-      answer: "No account is required to browse community events, resources, and information. However, creating an account allows you to receive personalized updates, save favorite events, and access additional features like event notifications and community alerts."
+      answer: "No, and there are actually no user accounts available. Our website is designed to be a completely open, anonymous resource for community information. You can access all events, resources, and civic information without any registration or sign-up process."
     },
     {
       id: "event-updates",
       question: "How do I stay updated on community events?",
-      answer: "You can browse our events page regularly, create an account for personalized notifications, or check our community announcements. We update events frequently and highlight important community happenings on our homepage."
+      answer: "You can bookmark our events page and check back regularly, or add our website to your phone's home screen for quick access. We update events frequently and highlight important community happenings on our homepage. Since we don't collect data or offer accounts, checking the site regularly is the best way to stay informed."
     },
     {
       id: "resource-suggestions",
