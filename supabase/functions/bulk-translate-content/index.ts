@@ -170,7 +170,7 @@ ${item.original_text}`;
   } catch (error) {
     console.error('Bulk translation error:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Translation failed' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

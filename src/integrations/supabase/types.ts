@@ -1002,6 +1002,105 @@ export type Database = {
         }
         Relationships: []
       }
+      translation_queue: {
+        Row: {
+          content_key: string
+          created_at: string
+          error_message: string | null
+          id: string
+          original_text: string
+          page_path: string | null
+          processed_at: string | null
+          status: string
+          target_language: string
+        }
+        Insert: {
+          content_key: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          original_text: string
+          page_path?: string | null
+          processed_at?: string | null
+          status?: string
+          target_language: string
+        }
+        Update: {
+          content_key?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          original_text?: string
+          page_path?: string | null
+          processed_at?: string | null
+          status?: string
+          target_language?: string
+        }
+        Relationships: []
+      }
+      translations: {
+        Row: {
+          content_key: string
+          created_at: string
+          element_type: string | null
+          id: string
+          original_text: string
+          page_path: string | null
+          source_language: string
+          target_language: string
+          translated_text: string
+          updated_at: string
+        }
+        Insert: {
+          content_key: string
+          created_at?: string
+          element_type?: string | null
+          id?: string
+          original_text: string
+          page_path?: string | null
+          source_language?: string
+          target_language: string
+          translated_text: string
+          updated_at?: string
+        }
+        Update: {
+          content_key?: string
+          created_at?: string
+          element_type?: string | null
+          id?: string
+          original_text?: string
+          page_path?: string | null
+          source_language?: string
+          target_language?: string
+          translated_text?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_language_preferences: {
+        Row: {
+          created_at: string
+          id: string
+          preferred_language: string
+          session_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          preferred_language?: string
+          session_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          preferred_language?: string
+          session_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -1037,6 +1136,16 @@ export type Database = {
       archive_expired_events: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      get_pending_translations: {
+        Args: { batch_size?: number }
+        Returns: {
+          content_key: string
+          id: string
+          original_text: string
+          page_path: string
+          target_language: string
+        }[]
       }
       get_user_role: {
         Args: { user_id: string }
