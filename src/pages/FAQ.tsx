@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, HelpCircle } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import CommunityAlertBanner from '@/components/CommunityAlertBanner';
+import { TranslatedText } from '@/components/TranslatedText';
 import {
   Accordion,
   AccordionContent,
@@ -64,7 +65,9 @@ const FAQ = () => {
               className="mb-6"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Home
+              <TranslatedText contentKey="faq.back_to_home" pagePath="/faq">
+                Back to Home
+              </TranslatedText>
             </Button>
             
             <div className="text-center mb-12">
@@ -73,10 +76,22 @@ const FAQ = () => {
                   <HelpCircle className="w-8 h-8 text-primary" />
                 </div>
               </div>
-              <h1 className="text-4xl font-bold mb-4">Frequently Asked Questions</h1>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              <TranslatedText 
+                contentKey="faq.page_title" 
+                pagePath="/faq" 
+                as="h1" 
+                className="text-4xl font-bold mb-4"
+              >
+                Frequently Asked Questions
+              </TranslatedText>
+              <TranslatedText 
+                contentKey="faq.page_description" 
+                pagePath="/faq" 
+                as="p" 
+                className="text-lg text-muted-foreground max-w-2xl mx-auto"
+              >
                 Find answers to common questions about Southeast Queens Resource Center and how we serve our community.
-              </p>
+              </TranslatedText>
             </div>
 
             <div className="bg-card rounded-lg border p-6">
@@ -95,11 +110,20 @@ const FAQ = () => {
             </div>
 
             <div className="mt-8 text-center">
-              <p className="text-muted-foreground mb-4">
+              <TranslatedText 
+                contentKey="faq.need_help" 
+                pagePath="/faq" 
+                as="p" 
+                className="text-muted-foreground mb-4"
+              >
                 Don't see your question answered here?
-              </p>
+              </TranslatedText>
               <Button asChild>
-                <a href="/contact-elected">Contact Your Elected Officials</a>
+                <a href="/contact-elected">
+                  <TranslatedText contentKey="faq.contact_officials" pagePath="/faq">
+                    Contact Your Elected Officials
+                  </TranslatedText>
+                </a>
               </Button>
             </div>
           </div>

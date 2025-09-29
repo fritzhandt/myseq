@@ -15,6 +15,7 @@ import AgeGroupButton3D from '@/components/3d/AgeGroupButton3D';
 import EventCard3D from '@/components/3d/EventCard3D';
 import HeroBackground3D from '@/components/3d/HeroBackground3D';
 import LoadingSpinner3D from '@/components/3d/LoadingSpinner3D';
+import { TranslatedText } from '@/components/TranslatedText';
 
 interface Event {
   id: string;
@@ -218,7 +219,9 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
               className="flex items-center text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Main Menu
+              <TranslatedText contentKey="home.back_to_menu" pagePath="/home">
+                Back to Main Menu
+              </TranslatedText>
             </Button>
           </div>
         </div>
@@ -226,10 +229,22 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
       <div className="gradient-hero text-primary-foreground py-16 md:py-20 px-4 shadow-urban relative overflow-hidden">
         <HeroBackground3D />
         <div className="container mx-auto text-center relative z-10">
-          <p className="text-lg md:text-xl mb-4 text-yellow-300 font-bold font-oswald tracking-wide uppercase">Welcome</p>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 drop-shadow-lg">
+          <TranslatedText 
+            contentKey="home.welcome" 
+            pagePath="/home" 
+            as="p" 
+            className="text-lg md:text-xl mb-4 text-yellow-300 font-bold font-oswald tracking-wide uppercase"
+          >
+            Welcome
+          </TranslatedText>
+          <TranslatedText 
+            contentKey="home.hero_title" 
+            pagePath="/home" 
+            as="h1" 
+            className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 drop-shadow-lg"
+          >
             Which events are you looking for?
-          </h1>
+          </TranslatedText>
           {/* Mobile Dropdown */}
           <div className="block sm:hidden mb-8">
             <Select 
@@ -241,7 +256,11 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
                 <SelectValue placeholder="Select age group" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Events</SelectItem>
+                <SelectItem value="all">
+                  <TranslatedText contentKey="home.all_events" pagePath="/home">
+                    All Events
+                  </TranslatedText>
+                </SelectItem>
                 {ageGroups.filter(Boolean).map((ageGroup) => {
                   const IconComponent = ageGroupIcons[ageGroup as keyof typeof ageGroupIcons];
                   return (
@@ -297,7 +316,9 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
             className="inline-flex items-center text-base sm:text-lg font-medium hover:underline text-white/90 hover:text-white transition-colors"
           >
             <Calendar className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-            All Events
+            <TranslatedText contentKey="home.all_events" pagePath="/home">
+              All Events
+            </TranslatedText>
           </Link>
         </div>
       </div>
@@ -312,16 +333,21 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
       {/* Events Section */}
       <section id="events" className="py-12 md:py-16 px-4">
         <div className="container mx-auto">
-          <div className="mb-8">
+            <div className="mb-8">
             <div className="flex flex-col gap-4">
               <div>
                 <h2 className="text-2xl md:text-3xl font-bold">
-                  {selectedFilter && searchTags.length === 0 && !searchQuery
-                    ? `${selectedFilter} Events`
-                    : searchQuery || searchTags.length > 0
-                    ? 'Search Results'
-                    : 'All Events'
-                  }
+                  {selectedFilter && searchTags.length === 0 && !searchQuery ? (
+                    `${selectedFilter} Events`
+                  ) : searchQuery || searchTags.length > 0 ? (
+                    <TranslatedText contentKey="home.search_results" pagePath="/home">
+                      Search Results
+                    </TranslatedText>
+                  ) : (
+                    <TranslatedText contentKey="home.all_events" pagePath="/home">
+                      All Events
+                    </TranslatedText>
+                  )}
                 </h2>
                 {(selectedFilter || searchQuery || searchTags.length > 0 || searchFilters.dateFrom || searchFilters.dateTo) && (
                   <Button
@@ -339,13 +365,17 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
                     size="sm"
                     className="mt-2"
                   >
-                    Clear All Filters
+                    <TranslatedText contentKey="home.clear_all_filters" pagePath="/home">
+                      Clear All Filters
+                    </TranslatedText>
                   </Button>
                 )}
               </div>
               
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                <span className="text-sm text-muted-foreground">View:</span>
+                <TranslatedText contentKey="home.view_label" pagePath="/home" className="text-sm text-muted-foreground">
+                  View:
+                </TranslatedText>
                 <div className="flex items-center gap-2">
                   <Button
                     variant={viewMode === 'list' ? 'default' : 'outline'}
@@ -354,8 +384,16 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
                     className="text-sm"
                   >
                     <Grid className="w-4 h-4 mr-1 sm:mr-2" />
-                    <span className="hidden sm:inline">List View</span>
-                    <span className="sm:hidden">List</span>
+                    <span className="hidden sm:inline">
+                      <TranslatedText contentKey="home.list_view" pagePath="/home">
+                        List View
+                      </TranslatedText>
+                    </span>
+                    <span className="sm:hidden">
+                      <TranslatedText contentKey="home.list" pagePath="/home">
+                        List
+                      </TranslatedText>
+                    </span>
                   </Button>
                   <Button
                     variant={viewMode === 'calendar' ? 'default' : 'outline'}
@@ -364,8 +402,16 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
                     className="text-sm"
                   >
                     <CalendarDays className="w-4 h-4 mr-1 sm:mr-2" />
-                    <span className="hidden sm:inline">Calendar View</span>
-                    <span className="sm:hidden">Calendar</span>
+                    <span className="hidden sm:inline">
+                      <TranslatedText contentKey="home.calendar_view" pagePath="/home">
+                        Calendar View
+                      </TranslatedText>
+                    </span>
+                    <span className="sm:hidden">
+                      <TranslatedText contentKey="home.calendar" pagePath="/home">
+                        Calendar
+                      </TranslatedText>
+                    </span>
                   </Button>
                 </div>
               </div>
@@ -375,20 +421,34 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
           {loading ? (
             <div className="text-center py-12">
               <LoadingSpinner3D />
-              <p className="mt-4 text-muted-foreground">Loading events...</p>
+              <TranslatedText contentKey="home.loading_events" pagePath="/home" className="mt-4 text-muted-foreground">
+                Loading events...
+              </TranslatedText>
             </div>
           ) : filteredEvents.length === 0 ? (
             <div className="text-center py-12">
               <Calendar className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No events found</h3>
-              <p className="text-muted-foreground">
+              <TranslatedText 
+                contentKey="home.no_events_found" 
+                pagePath="/home" 
+                as="h3" 
+                className="text-xl font-semibold mb-2"
+              >
+                No events found
+              </TranslatedText>
+              <TranslatedText 
+                contentKey="home.no_events_message" 
+                pagePath="/home" 
+                as="p" 
+                className="text-muted-foreground"
+              >
                 {searchQuery || searchTags.length > 0 || searchFilters.dateFrom || searchFilters.dateTo
                   ? 'No events match your search criteria. Try different keywords, tags, or date ranges.'
                   : selectedFilter 
                   ? `No events available for ${selectedFilter} age group.`
                   : 'No events have been created yet.'
                 }
-              </p>
+              </TranslatedText>
             </div>
           ) : viewMode === 'calendar' ? (
             <EventCalendar events={filteredEvents} />

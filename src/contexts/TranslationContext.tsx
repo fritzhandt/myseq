@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 interface TranslationContextType {
   currentLanguage: string;
   setLanguage: (language: string) => void;
-  translate: (text: string, contentKey: string, pagePath?: string, elementType?: string) => Promise<string>;
+  translate: (text: string, contentKey: string, pagePath?: string, elementType?: string, signal?: AbortSignal) => Promise<string>;
   isTranslating: boolean;
 }
 
@@ -90,11 +90,17 @@ export const TranslationProvider: React.FC<{ children: ReactNode }> = ({ childre
     text: string, 
     contentKey: string, 
     pagePath?: string, 
-    elementType?: string
+    elementType?: string,
+    signal?: AbortSignal
   ): Promise<string> => {
     // If current language is English, return original text
     if (currentLanguage === 'en') {
       return text;
+    }
+
+    // Check if request was aborted before starting
+    if (signal?.aborted) {
+      throw new Error('Request aborted');
     }
 
     try {
@@ -110,6 +116,11 @@ export const TranslationProvider: React.FC<{ children: ReactNode }> = ({ childre
         }
       });
 
+      // Check if request was aborted after the call
+      if (signal?.aborted) {
+        throw new Error('Request aborted');
+      }
+
       if (error) {
         console.error('Translation error:', error);
         return text; // Return original text on error
@@ -117,6 +128,9 @@ export const TranslationProvider: React.FC<{ children: ReactNode }> = ({ childre
 
       return data.translated_text || text;
     } catch (error) {
+      if (signal?.aborted) {
+        throw error; // Re-throw abort errors
+      }
       console.error('Translation error:', error);
       return text; // Return original text on error
     } finally {

@@ -28,12 +28,13 @@ export const TranslatedText: React.FC<TranslatedTextProps> = ({
     elementType
   );
 
-  if (isLoading && showSkeleton) {
-    return <Skeleton className={`h-4 w-full ${className}`} />;
+  // For very short loading times, don't show skeleton to avoid flicker
+  if (isLoading && showSkeleton && children.length > 10) {
+    return <Skeleton className={`inline-block ${className}`} style={{ width: `${Math.min(children.length * 0.6, 200)}px`, height: '1.2em' }} />;
   }
 
   return (
-    <Component className={className}>
+    <Component className={className} style={{ opacity: isLoading ? 0.7 : 1, transition: 'opacity 0.2s ease' }}>
       {translatedText}
     </Component>
   );

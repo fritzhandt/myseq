@@ -122,16 +122,18 @@ serve(async (req) => {
     const data = await response.json();
     const translatedText = data.choices[0].message.content;
 
-    // Store translation in database
+    // Store translation in database with upsert to handle duplicates
     const { error: insertError } = await supabase
       .from('translations')
-      .insert({
+      .upsert({
         content_key,
         original_text,
         translated_text: translatedText,
         target_language,
         page_path,
         element_type
+      }, {
+        onConflict: 'content_key,target_language'
       });
 
     if (insertError) {
