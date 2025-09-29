@@ -147,8 +147,8 @@ ${item.original_text}`;
           } else {
             console.error(`Failed to translate to ${item.target_language}:`, await response.text());
           }
-        } catch (error) {
-          console.error(`Error translating:`, error);
+        } catch (err) {
+          console.error(`Error translating:`, err);
         }
       }));
 
@@ -167,10 +167,11 @@ ${item.original_text}`;
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
-  } catch (error) {
-    console.error('Bulk translation error:', error);
+  } catch (err) {
+    console.error('Bulk translation error:', err);
+    const errorMessage = err instanceof Error ? err.message : 'Translation failed';
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Translation failed' }),
+      JSON.stringify({ error: errorMessage }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
