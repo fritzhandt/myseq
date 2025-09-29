@@ -417,7 +417,12 @@ const CivicDetail = () => {
                           className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50"
                         >
                           <div>
-                            <h3 className="font-medium">{newsletter.title}</h3>
+                            <TranslatedText 
+                              contentKey={`civic_detail.newsletter_${newsletter.id}_title`}
+                              originalText={newsletter.title}
+                              as="h3"
+                              className="font-medium"
+                            />
                             <p className="text-sm text-muted-foreground">
                               {format(parseISO(newsletter.upload_date), 'MMM d, yyyy')}
                             </p>
@@ -474,18 +479,24 @@ const CivicDetail = () => {
                         >
                           <CardHeader className="pb-3">
                             <div className="flex items-start justify-between gap-4">
-                              <h3 className="font-semibold text-lg line-clamp-2 flex-1">
-                                {announcement.title}
-                              </h3>
+                              <TranslatedText 
+                                contentKey={`civic_detail.announcement_${announcement.id}_title`}
+                                originalText={announcement.title}
+                                as="h3"
+                                className="font-semibold text-lg line-clamp-2 flex-1"
+                              />
                               <Badge variant="outline" className="text-xs flex-shrink-0">
                                 {format(parseISO(announcement.created_at), 'MMM d')}
                               </Badge>
                             </div>
                           </CardHeader>
                           <CardContent>
-                            <p className="text-muted-foreground line-clamp-3 text-sm leading-relaxed mb-3">
-                              {announcement.content}
-                            </p>
+                            <TranslatedText 
+                              contentKey={`civic_detail.announcement_${announcement.id}_content`}
+                              originalText={announcement.content}
+                              as="p"
+                              className="text-muted-foreground line-clamp-3 text-sm leading-relaxed mb-3"
+                            />
                             
                             {/* Preview indicators */}
                             <div className="flex items-center justify-between">
@@ -551,8 +562,18 @@ const CivicDetail = () => {
                               <Users className="h-12 w-12 text-muted-foreground" />
                             </div>
                           )}
-                          <h3 className="font-semibold text-lg">{leader.name}</h3>
-                          <p className="text-muted-foreground mb-3">{leader.title}</p>
+                          <TranslatedText 
+                            contentKey={`civic_detail.leader_${leader.id}_name`}
+                            originalText={leader.name}
+                            as="h3"
+                            className="font-semibold text-lg"
+                          />
+                          <TranslatedText 
+                            contentKey={`civic_detail.leader_${leader.id}_title`}
+                            originalText={leader.title}
+                            as="p"
+                            className="text-muted-foreground mb-3"
+                          />
                           
                           {leader.contact_info && (
                             <div className="space-y-1 text-sm">
@@ -623,11 +644,19 @@ const CivicDetail = () => {
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
-                              <h3 className="font-semibold text-lg mb-1">{link.title}</h3>
+                              <TranslatedText 
+                                contentKey={`civic_detail.link_${link.id}_title`}
+                                originalText={link.title}
+                                as="h3"
+                                className="font-semibold text-lg mb-1"
+                              />
                               {link.description && (
-                                <p className="text-muted-foreground text-sm mb-3">
-                                  {link.description}
-                                </p>
+                                <TranslatedText 
+                                  contentKey={`civic_detail.link_${link.id}_description`}
+                                  originalText={link.description}
+                                  as="p"
+                                  className="text-muted-foreground text-sm mb-3"
+                                />
                               )}
                             </div>
                             <Button
@@ -690,18 +719,28 @@ const CivicDetail = () => {
                                alt={photo.title || 'Gallery photo'}
                                className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                              />
-                             {(photo.title || photo.description) && (
-                               <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                                 <div className="p-4 text-white">
-                                   {photo.title && (
-                                     <h4 className="font-semibold text-sm mb-1">{photo.title}</h4>
-                                   )}
-                                   {photo.description && (
-                                     <p className="text-xs opacity-90">{photo.description}</p>
-                                   )}
-                                 </div>
-                               </div>
-                             )}
+                              {(photo.title || photo.description) && (
+                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                                  <div className="p-4 text-white">
+                                    {photo.title && (
+                                      <TranslatedText 
+                                        contentKey={`civic_detail.photo_${photo.id}_title`}
+                                        originalText={photo.title}
+                                        as="h4"
+                                        className="font-semibold text-sm mb-1"
+                                      />
+                                    )}
+                                    {photo.description && (
+                                      <TranslatedText 
+                                        contentKey={`civic_detail.photo_${photo.id}_description`}
+                                        originalText={photo.description}
+                                        as="p"
+                                        className="text-xs opacity-90"
+                                      />
+                                    )}
+                                  </div>
+                                </div>
+                              )}
                            </div>
                          ))}
                        </div>
