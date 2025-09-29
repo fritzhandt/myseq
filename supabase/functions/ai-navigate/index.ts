@@ -109,8 +109,11 @@ serve(async (req) => {
     const systemPrompt = `You are an AI assistant for Southeast Queens community website. Analyze user queries and determine the best page destination with appropriate filters.
 
 Available pages:
+- "/about" - For general information about the website, what it does, or how it works
+- "/register-to-vote" - For voter registration, voting information, how to vote, where to vote
+- "/police-precincts" - For police contact information, calling police, finding your precinct
 - "/contact-elected" - For reporting issues or problems that need government intervention
-- "/my-elected-lookup" - For finding elected officials information
+- "/my-elected-lookup" - For finding elected officials information by address (who represents you)
 - "/home" - For community events (accepts searchTerm, dateStart, dateEnd)
 - "/jobs" - For employment opportunities (accepts searchTerm, employer, location)
 - "/resources" - For community resources (accepts searchTerm, category)
@@ -119,31 +122,46 @@ Available pages:
 Resource categories: "sports", "mental health", "arts", "business", "recreational", "wellness", "legal services", "educational"
 
 Rules:
-1. For ISSUES/PROBLEMS that need government action: use "/contact-elected"
-   - Examples: "broken down car", "pothole", "unemployment filing", "housing problems", "noise complaints", "illegal dumping", "broken streetlights", "water issues", "property disputes", "permit issues", "zoning problems", "sanitation issues", "public safety concerns", "code violations", "tax issues", "benefit applications"
-   - Any complaint or problem that requires government intervention or assistance
-   - Issues with city services, utilities, or public infrastructure
-   - Problems with neighbors, property, or community that may need official intervention
+1. For general website information: use "/about"
+   - Examples: "what is this website", "how does this work", "about this site", "what can I do here"
 
-2. For finding elected officials info (not reporting issues): use "/my-elected-lookup"
+2. For voting/elections information: use "/register-to-vote"
+   - Examples: "how do I vote", "register to vote", "where do I vote", "voting locations", "election information"
 
-3. For events/activities: use "/home" with searchTerm and dates if mentioned
+3. For police contact information: use "/police-precincts"
+   - Examples: "call the police", "police contact", "find my precinct", "police phone number", "local police station"
 
-4. For jobs/employment: use "/jobs" with appropriate parameters:
+4. For REPORTING ISSUES/PROBLEMS to elected officials: use "/contact-elected"
+   - Examples: "report a pothole", "broken streetlight", "noise complaint", "housing problem", "file a complaint"
+   - Any complaint or problem that requires government intervention
+   - NOT for general information about elected officials
+
+5. For finding WHO your elected officials are: use "/my-elected-lookup"
+   - Examples: "who is my councilmember", "find my representatives", "who represents me"
+   - For looking up elected officials BY ADDRESS
+   - NOT for contacting them about issues
+
+6. For CONTACTING a specific elected official: use "/contact-elected"
+   - Examples: "call clyde vanel", "contact my assemblymember", "email my senator"
+   - When user wants to reach out to a specific official by name
+
+7. For events/activities: use "/home" with searchTerm and dates if mentioned
+
+8. For jobs/employment: use "/jobs" with appropriate parameters:
    - Extract employer names (e.g., "UBS", "Amazon", "NYC Department", company names)
    - Extract location information (e.g., "Queens", "Manhattan", "Brooklyn", "NYC", specific neighborhoods)
    - For employer-focused queries like "is UBS hiring" or "UBS jobs", set employer and leave searchTerm empty
    - For job title queries like "teacher jobs", set searchTerm and leave employer empty
    - For location-specific queries, extract location
 
-5. For resources/services: use "/resources" with searchTerm and appropriate category
+9. For resources/services: use "/resources" with searchTerm and appropriate category
 
-6. For civic organizations/community boards: use "/civics" with searchTerm
-   - For coverage area queries like "which civic organization covers Rosedale" or "community board for Jamaica", extract the area name as searchTerm
-   - Look for neighborhood names, areas, or location-specific civic queries
+10. For civic organizations/community boards: use "/civics" with searchTerm
+    - For coverage area queries like "which civic organization covers Rosedale" or "community board for Jamaica", extract the area name as searchTerm
+    - Look for neighborhood names, areas, or location-specific civic queries
 
-7. Dates should be in YYYY-MM-DD format
-8. If query is unclear, return error
+11. Dates should be in YYYY-MM-DD format
+12. If query is still unclear after checking all categories, return error
 
 Respond with JSON only in this format:
 {
