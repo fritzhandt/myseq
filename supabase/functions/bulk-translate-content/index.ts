@@ -13,7 +13,7 @@ const openaiApiKey = Deno.env.get('OPENAI_API_KEY')!;
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-const TARGET_LANGUAGES = ['es', 'ht', 'he'];
+const TARGET_LANGUAGES = ['es', 'ht', 'he', 'hi'];
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -87,7 +87,8 @@ serve(async (req) => {
     const languageNames: Record<string, string> = {
       'es': 'Spanish',
       'ht': 'Haitian Creole (Kreyòl)',
-      'he': 'Hebrew'
+      'he': 'Hebrew',
+      'hi': 'Hindi'
     };
 
     for (let i = 0; i < translationsNeeded.length; i += batchSize) {
