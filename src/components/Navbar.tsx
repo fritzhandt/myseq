@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, Info, Users, Mail, Search, Vote, Shield, Calendar, Briefcase, Home, Building2, HelpCircle } from 'lucide-react';
 import AddToHomeButton from '@/components/AddToHomeButton';
+import { LanguageSelector } from '@/components/LanguageSelector';
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const closeMenu = () => setIsOpen(false);
@@ -18,6 +19,7 @@ const Navbar = () => {
 
           {/* Right side buttons */}
           <div className="flex items-center gap-2">
+            <LanguageSelector />
             <AddToHomeButton />
             
             {/* Hamburger Menu */}

@@ -1002,6 +1002,69 @@ export type Database = {
         }
         Relationships: []
       }
+      translations: {
+        Row: {
+          content_key: string
+          created_at: string
+          element_type: string | null
+          id: string
+          original_text: string
+          page_path: string | null
+          source_language: string
+          target_language: string
+          translated_text: string
+          updated_at: string
+        }
+        Insert: {
+          content_key: string
+          created_at?: string
+          element_type?: string | null
+          id?: string
+          original_text: string
+          page_path?: string | null
+          source_language?: string
+          target_language: string
+          translated_text: string
+          updated_at?: string
+        }
+        Update: {
+          content_key?: string
+          created_at?: string
+          element_type?: string | null
+          id?: string
+          original_text?: string
+          page_path?: string | null
+          source_language?: string
+          target_language?: string
+          translated_text?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_language_preferences: {
+        Row: {
+          created_at: string
+          id: string
+          preferred_language: string
+          session_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          preferred_language?: string
+          session_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          preferred_language?: string
+          session_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
