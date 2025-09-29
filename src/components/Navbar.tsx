@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Info, Users, Mail, Search, Vote, Shield, Calendar, Briefcase, Home, Building2 } from 'lucide-react';
+import { Menu, Info, Users, Mail, Search, Vote, Shield, Calendar, Briefcase, Home, Building2, HelpCircle } from 'lucide-react';
 import AddToHomeButton from '@/components/AddToHomeButton';
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -107,6 +107,17 @@ const Navbar = () => {
                           <Info className="w-4 h-4" />
                         </div>
                         <span>About</span>
+                      </Link>
+                      
+                      <Link 
+                        to="/faq" 
+                        className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
+                        onClick={closeMenu}
+                      >
+                        <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
+                          <HelpCircle className="w-4 h-4" />
+                        </div>
+                        <span>FAQ</span>
                       </Link>
                   
                       <Link 
