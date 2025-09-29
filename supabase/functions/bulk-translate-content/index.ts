@@ -81,9 +81,9 @@ serve(async (req) => {
       );
     }
 
-    // Process translations in batches
+    // Process translations in batches - much faster now
     let completed = 0;
-    const batchSize = 5;
+    const batchSize = 15; // Increased batch size
     const languageNames: Record<string, string> = {
       'es': 'Spanish',
       'ht': 'Haitian Creole (Kreyòl)',
@@ -151,9 +151,9 @@ ${item.original_text}`;
         }
       }));
 
-      // Small delay between batches to respect rate limits
+      // Shorter delay between batches
       if (i + batchSize < translationsNeeded.length) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 200));
       }
     }
 

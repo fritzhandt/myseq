@@ -76,19 +76,22 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
         onConflict: 'session_id'
       });
 
-    // Trigger bulk translation for non-English languages
+    // Trigger bulk translation in background for non-English languages
     if (language !== 'en') {
+      // Show loading briefly then let components load normally with cached translations
       setIsTranslating(true);
-      try {
-        const { error } = await supabase.functions.invoke('bulk-translate-content');
+      setTimeout(() => setIsTranslating(false), 2000);
+      
+      // Trigger bulk translation in background (don't wait for it)
+      supabase.functions.invoke('bulk-translate-content').then(({ data, error }) => {
         if (error) {
-          console.error('Bulk translation error:', error);
+          console.error('Background bulk translation error:', error);
+        } else {
+          console.log('Background bulk translation completed:', data);
         }
-      } catch (error) {
-        console.error('Failed to trigger bulk translation:', error);
-      } finally {
-        setIsTranslating(false);
-      }
+      });
+    } else {
+      setIsTranslating(false);
     }
   };
 
