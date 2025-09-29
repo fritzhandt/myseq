@@ -38,11 +38,15 @@ export const useTranslatedText = (
         const abortController = new AbortController();
         abortControllerRef.current = abortController;
         
+        console.log(`[Translation] Fetching translation for key: ${contentKey}, language: ${currentLanguage}`);
+        
         const result = await translate(
           contentKey,
           originalText,
           pagePath
         );
+        
+        console.log(`[Translation] Received result for key: ${contentKey}`, result.substring(0, 100));
         
         if (!abortController.signal.aborted) {
           setTranslatedText(result);
