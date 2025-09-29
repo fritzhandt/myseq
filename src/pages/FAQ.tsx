@@ -17,7 +17,7 @@ const FAQ = () => {
     {
       id: "data-collection",
       question: "Do you collect any data on me?",
-      answer: "No, we collect absolutely nothing about our users. No personal data, no tracking information, no IP addresses, no search queries, no usage analytics - nothing. Our website is a completely anonymous public information resource. You can browse all community events, resources, and civic information without any data collection or tracking whatsoever. We have no user accounts, no cookies for tracking, and no analytics systems monitoring your activity."
+      answer: "No, we collect absolutely nothing about our users. No personal data, no tracking information, no IP addresses, no search queries, no usage analytics - nothing. Our website is a completely anonymous public information resource. You can browse all community events, resources, and civic information without any data collection or tracking whatsoever. We have no user accounts, no cookies for tracking, and no analytics systems monitoring your activity. However, please note that our AI-powered features use OpenAI's services, which may collect certain information in accordance with their terms of service. You can review OpenAI's data practices at https://openai.com/policies/terms-of-use."
     },
     {
       id: "account-required",
