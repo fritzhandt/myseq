@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
-import { Loader2, Search, Calendar, TrendingUp, Globe, FileText, Users } from 'lucide-react';
+import { Loader2, Search, Calendar, TrendingUp, Globe, FileText, Users, Sparkles } from 'lucide-react';
 import { format, subDays, subWeeks, subMonths, startOfDay, endOfDay } from 'date-fns';
 
 interface PageStats {
@@ -43,6 +43,12 @@ interface TrendData {
   count: number;
 }
 
+interface AISearchStats {
+  total_searches: number;
+  general_answers: number;
+  page_redirects: number;
+}
+
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FF6B9D', '#C89EFC'];
 
 type DateRange = 'day' | 'week' | 'month' | 'custom';
@@ -72,6 +78,14 @@ export const AdminStats = () => {
   
   // Content stats
   const [contentStats, setContentStats] = useState<ContentStats[]>([]);
+  
+  // AI Search stats
+  const [aiSearchStats, setAISearchStats] = useState<AISearchStats>({ 
+    total_searches: 0, 
+    general_answers: 0, 
+    page_redirects: 0 
+  });
+  const [aiSearchTrend, setAISearchTrend] = useState<TrendData[]>([]);
 
   useEffect(() => {
     loadStats();
@@ -313,6 +327,48 @@ export const AdminStats = () => {
         setContentStats(sortedContent);
       }
 
+      // AI Search stats
+      const { count: totalSearches } = await supabase
+        .from('analytics_events')
+        .select('*', { count: 'exact', head: true })
+        .eq('event_type', 'ai_search')
+        .gte('created_at', start.toISOString())
+        .lte('created_at', end.toISOString());
+
+      const { count: generalAnswers } = await supabase
+        .from('analytics_events')
+        .select('*', { count: 'exact', head: true })
+        .eq('event_type', 'ai_general_answer')
+        .gte('created_at', start.toISOString())
+        .lte('created_at', end.toISOString());
+
+      const { count: pageRedirects } = await supabase
+        .from('analytics_events')
+        .select('*', { count: 'exact', head: true })
+        .eq('event_type', 'ai_page_redirect')
+        .gte('created_at', start.toISOString())
+        .lte('created_at', end.toISOString());
+
+      setAISearchStats({
+        total_searches: totalSearches || 0,
+        general_answers: generalAnswers || 0,
+        page_redirects: pageRedirects || 0
+      });
+
+      // AI Search trend
+      const { data: aiSearchData } = await supabase
+        .from('analytics_events')
+        .select('created_at')
+        .eq('event_type', 'ai_search')
+        .gte('created_at', start.toISOString())
+        .lte('created_at', end.toISOString())
+        .order('created_at', { ascending: true });
+
+      if (aiSearchData) {
+        const aiTrendData = processTimeSeries(aiSearchData, start, end);
+        setAISearchTrend(aiTrendData);
+      }
+
     } catch (error) {
       console.error('Error loading stats:', error);
     } finally {
@@ -420,7 +476,7 @@ export const AdminStats = () => {
       </Card>
 
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="overview" className="flex items-center gap-2">
             <TrendingUp className="h-4 w-4" />
             Overview
@@ -440,6 +496,10 @@ export const AdminStats = () => {
           <TabsTrigger value="content" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
             Content
+          </TabsTrigger>
+          <TabsTrigger value="ai-search" className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4" />
+            AI Search
           </TabsTrigger>
         </TabsList>
 
@@ -746,6 +806,108 @@ export const AdminStats = () => {
                 </>
               ) : (
                 <p className="text-muted-foreground text-center py-8">No content engagement data</p>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* AI Search Tab */}
+        <TabsContent value="ai-search" className="space-y-6">
+          <div className="grid gap-4 md:grid-cols-3">
+            <Card>
+              <CardHeader>
+                <CardTitle>Total AI Searches</CardTitle>
+                <CardDescription>All AI search queries</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">{aiSearchStats.total_searches.toLocaleString()}</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>General Answers</CardTitle>
+                <CardDescription>AI provided information</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">{aiSearchStats.general_answers.toLocaleString()}</div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  {aiSearchStats.total_searches > 0 
+                    ? `${((aiSearchStats.general_answers / aiSearchStats.total_searches) * 100).toFixed(1)}% of searches`
+                    : '0% of searches'}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Page Redirects</CardTitle>
+                <CardDescription>AI navigated to pages</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">{aiSearchStats.page_redirects.toLocaleString()}</div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  {aiSearchStats.total_searches > 0 
+                    ? `${((aiSearchStats.page_redirects / aiSearchStats.total_searches) * 100).toFixed(1)}% of searches`
+                    : '0% of searches'}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>AI Search Trend</CardTitle>
+              <CardDescription>Daily AI search usage</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {aiSearchTrend.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={aiSearchTrend}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="count" stroke="hsl(var(--primary))" strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <p className="text-muted-foreground text-center py-8">No AI search data yet</p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>AI Search Distribution</CardTitle>
+              <CardDescription>Breakdown of AI search results</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {aiSearchStats.total_searches > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={[
+                        { name: 'General Answers', value: aiSearchStats.general_answers },
+                        { name: 'Page Redirects', value: aiSearchStats.page_redirects }
+                      ]}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={(entry) => `${entry.name}: ${entry.value} (${((entry.value / aiSearchStats.total_searches) * 100).toFixed(1)}%)`}
+                      outerRadius={100}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      <Cell fill={COLORS[0]} />
+                      <Cell fill={COLORS[1]} />
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <p className="text-muted-foreground text-center py-8">No AI search data yet</p>
               )}
             </CardContent>
           </Card>

@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAnalytics } from "@/hooks/useAnalytics";
 import GeneralInfoDialog from "./GeneralInfoDialog";
 
 interface AINavigationResponse {
@@ -29,6 +30,7 @@ export default function AISearchBar() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const { trackAISearch, trackAIGeneralAnswer, trackAIPageRedirect } = useAnalytics();
 
   const MAX_QUERY_LENGTH = 500;
 
@@ -37,6 +39,10 @@ export default function AISearchBar() {
 
     console.log('Starting AI search with query:', query);
     setIsLoading(true);
+    
+    // Track AI search usage
+    trackAISearch();
+    
     try {
       console.log('Calling supabase function...');
       const { data, error } = await supabase.functions.invoke('ai-navigate', {
@@ -74,6 +80,7 @@ export default function AISearchBar() {
       // Check if this is a general query that should show an answer
       if (response.isGeneralQuery && response.answer) {
         console.log('Showing general answer:', response.answer);
+        trackAIGeneralAnswer();
         setGeneralAnswer(response.answer);
         setQuery("");
         return;
@@ -98,6 +105,7 @@ export default function AISearchBar() {
         location: response.location
       };
 
+      trackAIPageRedirect(response.destination);
       navigate(response.destination, { state: navigationState });
       setQuery("");
       

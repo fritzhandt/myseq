@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface AnalyticsEvent {
-  event_type: 'page_view' | 'tab_view' | 'content_click' | 'language_change';
+  event_type: 'page_view' | 'tab_view' | 'content_click' | 'language_change' | 'ai_search' | 'ai_general_answer' | 'ai_page_redirect';
   page_path?: string;
   civic_org_id?: string;
   tab_name?: string;
@@ -59,10 +59,32 @@ export const useAnalytics = () => {
     });
   }, [trackEvent]);
 
+  const trackAISearch = useCallback(() => {
+    trackEvent({
+      event_type: 'ai_search',
+    });
+  }, [trackEvent]);
+
+  const trackAIGeneralAnswer = useCallback(() => {
+    trackEvent({
+      event_type: 'ai_general_answer',
+    });
+  }, [trackEvent]);
+
+  const trackAIPageRedirect = useCallback((destination: string) => {
+    trackEvent({
+      event_type: 'ai_page_redirect',
+      page_path: destination,
+    });
+  }, [trackEvent]);
+
   return {
     trackPageView,
     trackTabView,
     trackContentClick,
     trackLanguageChange,
+    trackAISearch,
+    trackAIGeneralAnswer,
+    trackAIPageRedirect,
   };
 };
