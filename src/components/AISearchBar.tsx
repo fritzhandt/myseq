@@ -30,7 +30,7 @@ export default function AISearchBar() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
-  const { trackAISearch, trackAIGeneralAnswer, trackAIPageRedirect } = useAnalytics();
+  const { trackAISearch, trackAIGeneralAnswer, trackAIPageRedirect, trackAISearchFailure } = useAnalytics();
 
   const MAX_QUERY_LENGTH = 500;
 
@@ -61,6 +61,7 @@ export default function AISearchBar() {
       
       if (!response.success) {
         console.log('AI returned error:', response.error);
+        trackAISearchFailure();
         if (response.error === 'Daily search limit exceeded') {
           toast({
             title: "Daily limit reached",

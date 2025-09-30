@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
-import { Loader2, Search, Calendar, TrendingUp, Globe, FileText, Users, Zap } from 'lucide-react';
+import { Loader2, Search, Calendar, TrendingUp, Globe, FileText, Users, Zap, AlertCircle } from 'lucide-react';
 import { format, subDays, subWeeks, subMonths, startOfDay, endOfDay } from 'date-fns';
 
 interface PageStats {
@@ -47,6 +47,7 @@ interface AISearchStats {
   total_searches: number;
   general_answers: number;
   page_redirects: number;
+  failures: number;
 }
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FF6B9D', '#C89EFC'];
@@ -83,7 +84,8 @@ export const AdminStats = () => {
   const [aiSearchStats, setAISearchStats] = useState<AISearchStats>({ 
     total_searches: 0, 
     general_answers: 0, 
-    page_redirects: 0 
+    page_redirects: 0,
+    failures: 0
   });
   const [aiSearchTrend, setAISearchTrend] = useState<TrendData[]>([]);
 
@@ -349,10 +351,18 @@ export const AdminStats = () => {
         .gte('created_at', start.toISOString())
         .lte('created_at', end.toISOString());
 
+      const { count: failures } = await supabase
+        .from('analytics_events')
+        .select('*', { count: 'exact', head: true })
+        .eq('event_type', 'ai_search_failure')
+        .gte('created_at', start.toISOString())
+        .lte('created_at', end.toISOString());
+
       setAISearchStats({
         total_searches: totalSearches || 0,
         general_answers: generalAnswers || 0,
-        page_redirects: pageRedirects || 0
+        page_redirects: pageRedirects || 0,
+        failures: failures || 0
       });
 
       // AI Search trend
@@ -813,7 +823,7 @@ export const AdminStats = () => {
 
         {/* AI Search Tab */}
         <TabsContent value="ai-search" className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardHeader>
                 <CardTitle>Total AI Searches</CardTitle>
@@ -853,6 +863,24 @@ export const AdminStats = () => {
                 </p>
               </CardContent>
             </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <div>
+                  <CardTitle>Search Failures</CardTitle>
+                  <CardDescription>Failed searches</CardDescription>
+                </div>
+                <AlertCircle className="h-4 w-4 text-destructive" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">{aiSearchStats.failures.toLocaleString()}</div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  {aiSearchStats.total_searches > 0 
+                    ? `${((aiSearchStats.failures / aiSearchStats.total_searches) * 100).toFixed(1)}% failure rate`
+                    : '0% failure rate'}
+                </p>
+              </CardContent>
+            </Card>
           </div>
 
           <Card>
@@ -889,7 +917,8 @@ export const AdminStats = () => {
                     <Pie
                       data={[
                         { name: 'General Answers', value: aiSearchStats.general_answers },
-                        { name: 'Page Redirects', value: aiSearchStats.page_redirects }
+                        { name: 'Page Redirects', value: aiSearchStats.page_redirects },
+                        { name: 'Failures', value: aiSearchStats.failures }
                       ]}
                       cx="50%"
                       cy="50%"
@@ -901,6 +930,7 @@ export const AdminStats = () => {
                     >
                       <Cell fill={COLORS[0]} />
                       <Cell fill={COLORS[1]} />
+                      <Cell fill={COLORS[3]} />
                     </Pie>
                     <Tooltip />
                     <Legend />
