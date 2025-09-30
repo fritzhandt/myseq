@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
-import { Loader2, Search, Calendar, TrendingUp, Globe, FileText, Users, Sparkles } from 'lucide-react';
+import { Loader2, Search, Calendar, TrendingUp, Globe, FileText, Users, Zap } from 'lucide-react';
 import { format, subDays, subWeeks, subMonths, startOfDay, endOfDay } from 'date-fns';
 
 interface PageStats {
@@ -498,7 +498,7 @@ export const AdminStats = () => {
             Content
           </TabsTrigger>
           <TabsTrigger value="ai-search" className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4" />
+            <Zap className="h-4 w-4" />
             AI Search
           </TabsTrigger>
         </TabsList>
