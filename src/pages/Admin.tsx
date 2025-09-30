@@ -15,8 +15,6 @@ import ResourcesList from '@/components/ResourcesList';
 import CivicOrganizationsManager from '@/components/CivicOrganizationsManager';
 import JobCSVUpload from '@/components/JobCSVUpload';
 import JobReportsList from '@/components/JobReportsList';
-// Temporary comment to force rebuild
-import AgencyDocumentUpload from '@/components/AgencyDocumentUpload';
 import { PendingApprovalsManager } from '@/components/PendingApprovalsManager';
 import MyPendingSubmissions from '@/components/MyPendingSubmissions';
 import { AdminStats } from '@/components/AdminStats';
@@ -232,7 +230,7 @@ const Admin = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue={isMainAdmin ? "pending-approvals" : (isSubAdmin ? "my-submissions" : "events")} className="w-full">
-          <TabsList className={`grid w-full ${isMainAdmin ? 'grid-cols-9' : (isSubAdmin ? 'grid-cols-8' : 'grid-cols-7')} mb-8`}>
+          <TabsList className={`grid w-full ${isMainAdmin ? 'grid-cols-8' : (isSubAdmin ? 'grid-cols-7' : 'grid-cols-6')} mb-8`}>
             {isMainAdmin && (
               <TabsTrigger value="pending-approvals" className="flex items-center gap-2 relative">
                 <Clock className="h-4 w-4" />
@@ -273,10 +271,6 @@ const Admin = () => {
             <TabsTrigger value="jobs" className="flex items-center gap-2">
               <MapPin className="h-4 w-4" />
               Jobs
-            </TabsTrigger>
-            <TabsTrigger value="agencies" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Docs
             </TabsTrigger>
             {isMainAdmin && (
               <TabsTrigger value="stats" className="flex items-center gap-2">
@@ -393,18 +387,6 @@ const Admin = () => {
               </div>
               <JobCSVUpload />
               <JobReportsList />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="agencies">
-            <div className="space-y-6">
-              <div className="flex justify-between items-center">
-                <h2 className="text-3xl font-bold">Government Agency Documents</h2>
-              </div>
-              <p className="text-muted-foreground">
-                Upload PDF or Word documents containing government agency information to improve the "Solve My Issue" search functionality.
-              </p>
-              <AgencyDocumentUpload />
             </div>
           </TabsContent>
 
