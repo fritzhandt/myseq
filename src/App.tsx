@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
-import { useAISearchSuccessTracking } from "@/hooks/useAISearchSuccessTracking";
 import DefaultPage from "./pages/DefaultPage";
 import Home from "./pages/Home";
 import EventDetail from "./pages/EventDetail";
@@ -36,17 +35,10 @@ const queryClient = new QueryClient({
   },
 });
 
-// Component to initialize AI search tracking
-const AISearchTracker = () => {
-  useAISearchSuccessTracking();
-  return null;
-};
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <BrowserRouter>
-        <AISearchTracker />
         <Routes>
           <Route path="/" element={<DefaultPage />} />
           <Route path="/home" element={<Home />} />

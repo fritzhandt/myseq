@@ -60,6 +60,9 @@ verify_jwt = false
 [functions.ai-navigate]
 verify_jwt = false
 
+[functions.analytics]
+verify_jwt = false
+
 [functions.api-gateway]
 verify_jwt = false
 

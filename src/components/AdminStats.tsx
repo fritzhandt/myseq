@@ -48,8 +48,6 @@ interface AISearchStats {
   general_answers: number;
   page_redirects: number;
   failures: number;
-  successes: number;
-  unsuccessful: number;
 }
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FF6B9D', '#C89EFC'];
@@ -87,9 +85,7 @@ export const AdminStats = () => {
     total_searches: 0, 
     general_answers: 0, 
     page_redirects: 0,
-    failures: 0,
-    successes: 0,
-    unsuccessful: 0
+    failures: 0
   });
   const [aiSearchTrend, setAISearchTrend] = useState<TrendData[]>([]);
 
@@ -362,27 +358,11 @@ export const AdminStats = () => {
         .gte('created_at', start.toISOString())
         .lte('created_at', end.toISOString());
 
-      const { count: successes } = await supabase
-        .from('analytics_events')
-        .select('*', { count: 'exact', head: true })
-        .eq('event_type', 'ai_search_success')
-        .gte('created_at', start.toISOString())
-        .lte('created_at', end.toISOString());
-
-      const { count: unsuccessful } = await supabase
-        .from('analytics_events')
-        .select('*', { count: 'exact', head: true })
-        .eq('event_type', 'ai_search_unsuccessful')
-        .gte('created_at', start.toISOString())
-        .lte('created_at', end.toISOString());
-
       setAISearchStats({
         total_searches: totalSearches || 0,
         general_answers: generalAnswers || 0,
         page_redirects: pageRedirects || 0,
-        failures: failures || 0,
-        successes: successes || 0,
-        unsuccessful: unsuccessful || 0
+        failures: failures || 0
       });
 
       // AI Search trend
@@ -901,26 +881,6 @@ export const AdminStats = () => {
                 </p>
               </CardContent>
             </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <div>
-                  <CardTitle>Success Rate</CardTitle>
-                  <CardDescription>Accurate searches</CardDescription>
-                </div>
-                <TrendingUp className="h-4 w-4 text-primary" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">
-                  {(aiSearchStats.successes + aiSearchStats.unsuccessful) > 0 
-                    ? `${((aiSearchStats.successes / (aiSearchStats.successes + aiSearchStats.unsuccessful)) * 100).toFixed(1)}%`
-                    : '0%'}
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  {aiSearchStats.successes} successful / {aiSearchStats.successes + aiSearchStats.unsuccessful} resolved
-                </p>
-              </CardContent>
-            </Card>
           </div>
 
           <Card>
@@ -958,9 +918,7 @@ export const AdminStats = () => {
                       data={[
                         { name: 'General Answers', value: aiSearchStats.general_answers },
                         { name: 'Page Redirects', value: aiSearchStats.page_redirects },
-                        { name: 'Failures', value: aiSearchStats.failures },
-                        { name: 'Successful', value: aiSearchStats.successes },
-                        { name: 'Unsuccessful', value: aiSearchStats.unsuccessful }
+                        { name: 'Failures', value: aiSearchStats.failures }
                       ]}
                       cx="50%"
                       cy="50%"
@@ -973,8 +931,6 @@ export const AdminStats = () => {
                       <Cell fill={COLORS[0]} />
                       <Cell fill={COLORS[1]} />
                       <Cell fill={COLORS[3]} />
-                      <Cell fill="hsl(var(--primary))" />
-                      <Cell fill="hsl(var(--muted))" />
                     </Pie>
                     <Tooltip />
                     <Legend />

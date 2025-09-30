@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface AnalyticsEvent {
-  event_type: 'page_view' | 'tab_view' | 'content_click' | 'language_change' | 'ai_search' | 'ai_general_answer' | 'ai_page_redirect' | 'ai_search_failure' | 'ai_search_success' | 'ai_search_unsuccessful';
+  event_type: 'page_view' | 'tab_view' | 'content_click' | 'language_change' | 'ai_search' | 'ai_general_answer' | 'ai_page_redirect' | 'ai_search_failure';
   page_path?: string;
   civic_org_id?: string;
   tab_name?: string;
@@ -14,7 +14,10 @@ interface AnalyticsEvent {
 export const useAnalytics = () => {
   const trackEvent = useCallback(async (event: AnalyticsEvent) => {
     try {
-      await supabase.from('analytics_events').insert([event]);
+      // Call the analytics edge function for server-side tracking
+      await supabase.functions.invoke('analytics', {
+        body: event
+      });
     } catch (error) {
       // Silent fail - don't disrupt user experience
       console.error('Analytics tracking error:', error);
@@ -83,18 +86,6 @@ export const useAnalytics = () => {
     });
   }, [trackEvent]);
 
-  const trackAISearchSuccess = useCallback(() => {
-    trackEvent({
-      event_type: 'ai_search_success',
-    });
-  }, [trackEvent]);
-
-  const trackAISearchUnsuccessful = useCallback(() => {
-    trackEvent({
-      event_type: 'ai_search_unsuccessful',
-    });
-  }, [trackEvent]);
-
   return {
     trackPageView,
     trackTabView,
@@ -104,7 +95,5 @@ export const useAnalytics = () => {
     trackAIGeneralAnswer,
     trackAIPageRedirect,
     trackAISearchFailure,
-    trackAISearchSuccess,
-    trackAISearchUnsuccessful,
   };
 };
