@@ -542,40 +542,28 @@ export const AdminStats = () => {
         <TabsContent value="pages" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Page Views by Path</CardTitle>
-              <CardDescription>All pages visited on the site ({filteredPageStats.length} results)</CardDescription>
+              <CardTitle>Page Performance</CardTitle>
+              <CardDescription>View counts for all pages ({filteredPageStats.length} pages)</CardDescription>
             </CardHeader>
             <CardContent>
               {filteredPageStats.length > 0 ? (
-                <>
-                  <ResponsiveContainer width="100%" height={400}>
-                    <BarChart data={filteredPageStats.slice(0, 15)}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="page_path" angle={-45} textAnchor="end" height={120} />
-                      <YAxis />
-                      <Tooltip />
-                      <Bar dataKey="count" fill="hsl(var(--primary))" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                  <div className="mt-6 max-h-96 overflow-y-auto">
-                    <table className="w-full">
-                      <thead className="sticky top-0 bg-card border-b">
-                        <tr>
-                          <th className="text-left py-2 px-4">Page Path</th>
-                          <th className="text-right py-2 px-4">Views</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredPageStats.map((page, index) => (
-                          <tr key={index} className="border-b hover:bg-muted/50">
-                            <td className="py-2 px-4 text-sm">{page.page_path}</td>
-                            <td className="py-2 px-4 text-sm text-right font-medium">{page.count}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </>
+                <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                  {filteredPageStats.map((page, index) => (
+                    <Card key={index} className="bg-muted/50">
+                      <CardContent className="pt-6">
+                        <div className="flex justify-between items-start gap-4">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate mb-1">{page.page_path}</p>
+                            <p className="text-xs text-muted-foreground">Page Views</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-2xl font-bold">{page.count}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               ) : (
                 <p className="text-muted-foreground text-center py-8">No page view data</p>
               )}
@@ -588,83 +576,45 @@ export const AdminStats = () => {
           <Card>
             <CardHeader>
               <CardTitle>Civic Organizations Performance</CardTitle>
-              <CardDescription>Engagement metrics per organization ({filteredCivicStats.length} results)</CardDescription>
+              <CardDescription>Engagement metrics for each organization ({filteredCivicStats.length} organizations)</CardDescription>
             </CardHeader>
             <CardContent>
               {filteredCivicStats.length > 0 ? (
-                <>
-                  <ResponsiveContainer width="100%" height={400}>
-                    <BarChart data={filteredCivicStats.slice(0, 10)}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="civic_org_name" angle={-45} textAnchor="end" height={120} />
-                      <YAxis />
-                      <Tooltip />
-                      <Bar dataKey="page_views" fill="hsl(var(--primary))" name="Page Views" />
-                      <Bar dataKey="tab_views" fill="hsl(var(--accent))" name="Tab Views" />
-                      <Bar dataKey="content_clicks" fill="hsl(var(--secondary))" name="Content Clicks" />
-                      <Legend />
-                    </BarChart>
-                  </ResponsiveContainer>
-                  <div className="mt-6 max-h-96 overflow-y-auto">
-                    <table className="w-full">
-                      <thead className="sticky top-0 bg-card border-b">
-                        <tr>
-                          <th className="text-left py-2 px-4">Organization</th>
-                          <th className="text-right py-2 px-4">Page Views</th>
-                          <th className="text-right py-2 px-4">Tab Views</th>
-                          <th className="text-right py-2 px-4">Clicks</th>
-                          <th className="text-right py-2 px-4">Total</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredCivicStats.map((civic, index) => (
-                          <tr key={index} className="border-b hover:bg-muted/50">
-                            <td className="py-2 px-4 text-sm">{civic.civic_org_name}</td>
-                            <td className="py-2 px-4 text-sm text-right">{civic.page_views}</td>
-                            <td className="py-2 px-4 text-sm text-right">{civic.tab_views}</td>
-                            <td className="py-2 px-4 text-sm text-right">{civic.content_clicks}</td>
-                            <td className="py-2 px-4 text-sm text-right font-bold">
-                              {civic.page_views + civic.tab_views + civic.content_clicks}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </>
-              ) : (
-                <p className="text-muted-foreground text-center py-8">No civic organization data</p>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Tab Views by Organization</CardTitle>
-              <CardDescription>Most viewed tabs across all civic pages</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {tabStats.length > 0 ? (
-                <div className="max-h-96 overflow-y-auto">
-                  <table className="w-full">
-                    <thead className="sticky top-0 bg-card border-b">
-                      <tr>
-                        <th className="text-left py-2 px-4">Tab Name</th>
-                        <th className="text-right py-2 px-4">Views</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {tabStats.map((tab, index) => (
-                        <tr key={index} className="border-b hover:bg-muted/50">
-                          <td className="py-2 px-4 text-sm">{tab.tab_name}</td>
-                          <td className="py-2 px-4 text-sm text-right font-medium">{tab.count}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {filteredCivicStats.map((civic, index) => (
+                    <Card key={index} className="bg-gradient-to-br from-primary/5 to-accent/5">
+                      <CardHeader>
+                        <CardTitle className="text-lg">{civic.civic_org_name}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-muted-foreground">Page Views</span>
+                            <span className="text-xl font-bold">{civic.page_views}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-muted-foreground">Tab Views</span>
+                            <span className="text-xl font-bold">{civic.tab_views}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-muted-foreground">Content Clicks</span>
+                            <span className="text-xl font-bold">{civic.content_clicks}</span>
+                          </div>
+                          <div className="pt-3 border-t">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm font-medium">Total Engagement</span>
+                              <span className="text-2xl font-bold text-primary">
+                                {civic.page_views + civic.tab_views + civic.content_clicks}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               ) : (
-                <p className="text-muted-foreground text-center py-8">No tab view data</p>
+                <p className="text-muted-foreground text-center py-8">No civic organization data</p>
               )}
             </CardContent>
           </Card>
