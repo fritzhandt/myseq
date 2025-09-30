@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from "@/components/Navbar";
-import { Building2, LogOut, Settings, Users, FileText, Megaphone, Link, Images, Calendar } from "lucide-react";
+import { Building2, LogOut, Settings, Users, FileText, Megaphone, Link, Images, Calendar, BarChart3 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import CivicGeneralSettings from "@/components/CivicGeneralSettings";
 import CivicAnnouncementsManager from "@/components/CivicAnnouncementsManager";
@@ -14,6 +14,7 @@ import CivicLeadershipManager from "@/components/CivicLeadershipManager";
 import CivicImportantLinksManager from "@/components/CivicImportantLinksManager";
 import CivicGalleryManager from "@/components/CivicGalleryManager";
 import { CivicEventsManager } from "@/components/CivicEventsManager";
+import { CivicStats } from "@/components/CivicStats";
 
 interface CivicSession {
   orgId: string;
@@ -149,7 +150,7 @@ const CivicAdmin = () => {
 
           {/* Admin Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-7">
+            <TabsList className="grid w-full grid-cols-8">
               <TabsTrigger value="general" className="flex items-center gap-2">
                 <Settings className="h-4 w-4" />
                 General
@@ -177,6 +178,10 @@ const CivicAdmin = () => {
               <TabsTrigger value="events" className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
                 Events
+              </TabsTrigger>
+              <TabsTrigger value="stats" className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />
+                Stats
               </TabsTrigger>
             </TabsList>
 
@@ -213,6 +218,11 @@ const CivicAdmin = () => {
             {/* Events */}
             <TabsContent value="events">
               <CivicEventsManager civicOrgId={session.orgId} />
+            </TabsContent>
+
+            {/* Stats */}
+            <TabsContent value="stats">
+              <CivicStats orgId={session.orgId} />
             </TabsContent>
           </Tabs>
         </div>

@@ -14,6 +14,8 @@ import AnnouncementDialog from "@/components/AnnouncementDialog";
 import { EventCard } from "@/components/EventCard";
 import PhotoViewer from "@/components/PhotoViewer";
 import { TranslatedText } from "@/components/TranslatedText";
+import { useAnalytics } from "@/hooks/useAnalytics";
+import { useTranslation } from "@/contexts/TranslationContext";
 
 interface CivicOrganization {
   id: string;
@@ -70,6 +72,8 @@ const CivicDetail = () => {
   const { orgId } = useParams<{ orgId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { trackPageView, trackTabView, trackContentClick } = useAnalytics();
+  const { currentLanguage } = useTranslation();
   
   const [organization, setOrganization] = useState<CivicOrganization | null>(null);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -85,11 +89,20 @@ const CivicDetail = () => {
   const [selectedPDF, setSelectedPDF] = useState<{url: string; title: string} | null>(null);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
 
+  // Track page view on mount
   useEffect(() => {
     if (orgId) {
+      trackPageView(`/civics/${orgId}`, orgId, currentLanguage);
       fetchOrganizationData();
     }
   }, [orgId]);
+
+  // Track tab changes
+  useEffect(() => {
+    if (orgId && activeTab !== "general") {
+      trackTabView(activeTab, orgId);
+    }
+  }, [activeTab, orgId]);
 
   const fetchOrganizationData = async () => {
     if (!orgId) return;
@@ -190,6 +203,7 @@ const CivicDetail = () => {
   };
 
   const handleViewPDF = (newsletter: Newsletter) => {
+    trackContentClick('newsletter', newsletter.id, orgId);
     setSelectedPDF({
       url: getFileUrl(newsletter.file_path),
       title: newsletter.title
@@ -475,7 +489,10 @@ const CivicDetail = () => {
                         <Card 
                           key={announcement.id} 
                           className="cursor-pointer hover:shadow-md hover:scale-[1.02] transition-all duration-200 border-2 hover:border-primary/20"
-                          onClick={() => setSelectedAnnouncement(announcement)}
+                          onClick={() => {
+                            trackContentClick('announcement', announcement.id, orgId);
+                            setSelectedAnnouncement(announcement);
+                          }}
                         >
                           <CardHeader className="pb-3">
                             <div className="flex items-start justify-between gap-4">
@@ -662,7 +679,10 @@ const CivicDetail = () => {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => window.open(link.url, '_blank')}
+                              onClick={() => {
+                                trackContentClick('link', link.id, orgId);
+                                window.open(link.url, '_blank');
+                              }}
                               className="ml-4"
                             >
                               <TranslatedText contentKey="civic_detail.visit_link" originalText="Visit Link" />
@@ -710,6 +730,7 @@ const CivicDetail = () => {
                              key={photo.id} 
                              className="group relative overflow-hidden rounded-lg border cursor-pointer"
                              onClick={() => {
+                               trackContentClick('photo', photo.id, orgId);
                                setViewerIndex(index);
                                setViewerOpen(true);
                              }}

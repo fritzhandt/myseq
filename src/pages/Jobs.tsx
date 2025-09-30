@@ -14,6 +14,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Briefcase, MapPin, Building, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
 import { TranslatedText } from '@/components/TranslatedText';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { useTranslation } from '@/contexts/TranslationContext';
 
 interface Job {
   id: string;
@@ -43,8 +45,15 @@ export default function Jobs() {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { trackPageView } = useAnalytics();
+  const { currentLanguage } = useTranslation();
 
   const MAX_JOB_SEARCH_LENGTH = 100;
+
+  // Track page view
+  useEffect(() => {
+    trackPageView('/jobs', undefined, currentLanguage);
+  }, []);
 
   // Handle AI navigation state
   useEffect(() => {

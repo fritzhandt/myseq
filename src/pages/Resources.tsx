@@ -9,6 +9,8 @@ import UserPagination from "@/components/UserPagination";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { TranslatedText } from "@/components/TranslatedText";
+import { useAnalytics } from "@/hooks/useAnalytics";
+import { useTranslation } from "@/contexts/TranslationContext";
 
 interface Resource {
   id: string;
@@ -46,6 +48,13 @@ export default function Resources() {
   const itemsPerPage = 12;
   const location = useLocation();
   const navigate = useNavigate();
+  const { trackPageView } = useAnalytics();
+  const { currentLanguage } = useTranslation();
+
+  // Track page view
+  useEffect(() => {
+    trackPageView('/resources', undefined, currentLanguage);
+  }, []);
 
   // Handle AI navigation state 
   useEffect(() => {

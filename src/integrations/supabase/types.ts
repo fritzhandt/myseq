@@ -38,6 +38,50 @@ export type Database = {
         }
         Relationships: []
       }
+      analytics_events: {
+        Row: {
+          civic_org_id: string | null
+          content_id: string | null
+          content_type: string | null
+          created_at: string | null
+          event_type: string
+          id: string
+          language: string | null
+          page_path: string | null
+          tab_name: string | null
+        }
+        Insert: {
+          civic_org_id?: string | null
+          content_id?: string | null
+          content_type?: string | null
+          created_at?: string | null
+          event_type: string
+          id?: string
+          language?: string | null
+          page_path?: string | null
+          tab_name?: string | null
+        }
+        Update: {
+          civic_org_id?: string | null
+          content_id?: string | null
+          content_type?: string | null
+          created_at?: string | null
+          event_type?: string
+          id?: string
+          language?: string | null
+          page_path?: string | null
+          tab_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analytics_events_civic_org_id_fkey"
+            columns: ["civic_org_id"]
+            isOneToOne: false
+            referencedRelation: "civic_organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       civic_announcements: {
         Row: {
           civic_org_id: string

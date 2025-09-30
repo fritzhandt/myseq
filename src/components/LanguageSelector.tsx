@@ -8,11 +8,22 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { Globe, Loader2 } from 'lucide-react';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { useLocation } from 'react-router-dom';
 
 export const LanguageSelector: React.FC = () => {
   const { currentLanguage, supportedLanguages, isTranslating, setLanguage } = useTranslation();
+  const { trackLanguageChange } = useAnalytics();
+  const location = useLocation();
 
   const currentLang = supportedLanguages.find(lang => lang.code === currentLanguage);
+
+  const handleLanguageChange = (languageCode: string) => {
+    if (languageCode !== 'en') {
+      trackLanguageChange(languageCode, location.pathname);
+    }
+    setLanguage(languageCode);
+  };
 
   return (
     <DropdownMenu>
@@ -37,7 +48,7 @@ export const LanguageSelector: React.FC = () => {
         {supportedLanguages.map((language) => (
           <DropdownMenuItem
             key={language.code}
-            onClick={() => setLanguage(language.code)}
+            onClick={() => handleLanguageChange(language.code)}
             className={`flex items-center gap-2 ${
               currentLanguage === language.code ? 'bg-accent' : ''
             }`}

@@ -16,6 +16,8 @@ import AgeGroupButton3D from '@/components/3d/AgeGroupButton3D';
 import EventCard3D from '@/components/3d/EventCard3D';
 import HeroBackground3D from '@/components/3d/HeroBackground3D';
 import LoadingSpinner3D from '@/components/3d/LoadingSpinner3D';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { useTranslation } from '@/contexts/TranslationContext';
 
 interface Event {
   id: string;
@@ -64,6 +66,13 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
+  const { trackPageView } = useAnalytics();
+  const { currentLanguage } = useTranslation();
+
+  // Track page view
+  useEffect(() => {
+    trackPageView('/home', undefined, currentLanguage);
+  }, []);
 
   // Handle AI navigation state
   useEffect(() => {
