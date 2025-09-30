@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAnalytics } from "@/hooks/useAnalytics";
+import { useAISearchSuccessTracking } from "@/hooks/useAISearchSuccessTracking";
 import GeneralInfoDialog from "./GeneralInfoDialog";
 
 interface AINavigationResponse {
@@ -30,7 +31,8 @@ export default function AISearchBar() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
-  const { trackAISearch, trackAIGeneralAnswer, trackAIPageRedirect, trackAISearchFailure } = useAnalytics();
+  const { trackAISearch, trackAIGeneralAnswer, trackAIPageRedirect, trackAISearchFailure, trackAISearchUnsuccessful } = useAnalytics();
+  const { initializeTracking } = useAISearchSuccessTracking();
 
   const MAX_QUERY_LENGTH = 500;
 
@@ -62,6 +64,7 @@ export default function AISearchBar() {
       if (!response.success) {
         console.log('AI returned error:', response.error);
         trackAISearchFailure();
+        trackAISearchUnsuccessful(); // Failures are automatically unsuccessful
         if (response.error === 'Daily search limit exceeded') {
           toast({
             title: "Daily limit reached",
@@ -82,6 +85,7 @@ export default function AISearchBar() {
       if (response.isGeneralQuery && response.answer) {
         console.log('Showing general answer:', response.answer);
         trackAIGeneralAnswer();
+        initializeTracking('general_answer');
         setGeneralAnswer(response.answer);
         setQuery("");
         return;
@@ -107,6 +111,7 @@ export default function AISearchBar() {
       };
 
       trackAIPageRedirect();
+      initializeTracking('redirect');
       navigate(response.destination, { state: navigationState });
       setQuery("");
       

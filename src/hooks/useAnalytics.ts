@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface AnalyticsEvent {
-  event_type: 'page_view' | 'tab_view' | 'content_click' | 'language_change' | 'ai_search' | 'ai_general_answer' | 'ai_page_redirect' | 'ai_search_failure';
+  event_type: 'page_view' | 'tab_view' | 'content_click' | 'language_change' | 'ai_search' | 'ai_general_answer' | 'ai_page_redirect' | 'ai_search_failure' | 'ai_search_success' | 'ai_search_unsuccessful';
   page_path?: string;
   civic_org_id?: string;
   tab_name?: string;
@@ -83,6 +83,18 @@ export const useAnalytics = () => {
     });
   }, [trackEvent]);
 
+  const trackAISearchSuccess = useCallback(() => {
+    trackEvent({
+      event_type: 'ai_search_success',
+    });
+  }, [trackEvent]);
+
+  const trackAISearchUnsuccessful = useCallback(() => {
+    trackEvent({
+      event_type: 'ai_search_unsuccessful',
+    });
+  }, [trackEvent]);
+
   return {
     trackPageView,
     trackTabView,
@@ -92,5 +104,7 @@ export const useAnalytics = () => {
     trackAIGeneralAnswer,
     trackAIPageRedirect,
     trackAISearchFailure,
+    trackAISearchSuccess,
+    trackAISearchUnsuccessful,
   };
 };
