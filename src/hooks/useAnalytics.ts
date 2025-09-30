@@ -71,10 +71,9 @@ export const useAnalytics = () => {
     });
   }, [trackEvent]);
 
-  const trackAIPageRedirect = useCallback((destination: string) => {
+  const trackAIPageRedirect = useCallback(() => {
     trackEvent({
       event_type: 'ai_page_redirect',
-      page_path: destination,
     });
   }, [trackEvent]);
 

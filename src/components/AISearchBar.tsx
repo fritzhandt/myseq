@@ -105,7 +105,7 @@ export default function AISearchBar() {
         location: response.location
       };
 
-      trackAIPageRedirect(response.destination);
+      trackAIPageRedirect();
       navigate(response.destination, { state: navigationState });
       setQuery("");
       
