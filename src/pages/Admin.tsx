@@ -15,6 +15,7 @@ import ResourcesList from '@/components/ResourcesList';
 import CivicOrganizationsManager from '@/components/CivicOrganizationsManager';
 import JobCSVUpload from '@/components/JobCSVUpload';
 import JobReportsList from '@/components/JobReportsList';
+import AdminJobsList from '@/components/AdminJobsList';
 import { PendingApprovalsManager } from '@/components/PendingApprovalsManager';
 import MyPendingSubmissions from '@/components/MyPendingSubmissions';
 import { AdminStats } from '@/components/AdminStats';
@@ -428,8 +429,26 @@ const Admin = () => {
               <div className="flex justify-between items-center">
                 <h2 className="text-3xl font-bold">Manage Jobs</h2>
               </div>
-              <JobCSVUpload />
-              <JobReportsList />
+              
+              <Tabs defaultValue="upload" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="upload">Upload Jobs</TabsTrigger>
+                  <TabsTrigger value="manage">Manage Jobs</TabsTrigger>
+                  <TabsTrigger value="reports">Job Reports</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="upload" className="mt-4">
+                  <JobCSVUpload />
+                </TabsContent>
+
+                <TabsContent value="manage" className="mt-4">
+                  <AdminJobsList />
+                </TabsContent>
+
+                <TabsContent value="reports" className="mt-4">
+                  <JobReportsList />
+                </TabsContent>
+              </Tabs>
             </div>
           </TabsContent>
 

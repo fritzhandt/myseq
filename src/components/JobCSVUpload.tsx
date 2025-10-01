@@ -17,6 +17,8 @@ interface Job {
   position: string;
   type: string;
   applyLink: string;
+  description?: string;
+  salary?: string;
 }
 
 export default function JobCSVUpload() {
@@ -24,7 +26,8 @@ export default function JobCSVUpload() {
   const { isSubAdmin } = useUserRole();
   const [uploading, setUploading] = useState(false);
   const [previewJobs, setPreviewJobs] = useState<Job[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState('city');
+  const [selectedCategory, setSelectedCategory] = useState<string>('government');
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>('city');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const parseXLSX = (arrayBuffer: ArrayBuffer): Job[] => {
@@ -152,11 +155,12 @@ export default function JobCSVUpload() {
         employer: job.company,
         title: job.position,
         location: job.location,
-        salary: job.type, // Store job type in salary field for now
+        salary: job.salary || job.type,
         apply_info: job.applyLink,
-        description: `${job.type} position at ${job.company}`, // Generate basic description
+        description: job.description || `${job.type} position at ${job.company}`,
         is_apply_link: isValidURL(job.applyLink),
-        category: selectedCategory
+        category: selectedCategory,
+        subcategory: selectedCategory === 'government' ? selectedSubcategory : null,
       }));
 
       // Sub-admins jobs are not currently supported in pending tables
@@ -189,6 +193,8 @@ export default function JobCSVUpload() {
 
   const clearPreview = () => {
     setPreviewJobs([]);
+    setSelectedCategory('government');
+    setSelectedSubcategory('city');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -211,20 +217,36 @@ export default function JobCSVUpload() {
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="category">Job Category</Label>
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <Select value={selectedCategory} onValueChange={(value) => {
+                setSelectedCategory(value);
+                if (value !== 'government') {
+                  setSelectedSubcategory('');
+                }
+              }}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select job category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="city">City Jobs</SelectItem>
-                  <SelectItem value="state">State Jobs</SelectItem>
-                  <SelectItem value="both">Both City & State</SelectItem>
+                  <SelectItem value="government">Government</SelectItem>
+                  <SelectItem value="private_sector">Private Sector</SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-sm text-muted-foreground">
-                Choose whether these jobs should appear in City Jobs, State Jobs, or both tabs.
-              </p>
             </div>
+
+            {selectedCategory === 'government' && (
+              <div className="space-y-2">
+                <Label htmlFor="subcategory">Government Type</Label>
+                <Select value={selectedSubcategory} onValueChange={setSelectedSubcategory}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select government type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="city">City</SelectItem>
+                    <SelectItem value="state">State</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             
             <Alert>
               <AlertCircle className="h-4 w-4" />
