@@ -127,8 +127,7 @@ const ContactElected = () => {
 
   const categoryTitles = {
     legislative: 'Legislative',
-    executive: 'Executive',
-    prosecutor: 'Prosecutors'
+    executive: 'Executive'
   };
 
   // Custom category title for city legislative
