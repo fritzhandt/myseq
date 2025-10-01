@@ -197,6 +197,9 @@ export default function AISearchBar() {
             </button>
           ))}
         </div>
+        <p className="text-xs text-muted-foreground/60 italic mt-4">
+          AI results may be inaccurate. Always verify information.
+        </p>
       </div>
       </div>
       
