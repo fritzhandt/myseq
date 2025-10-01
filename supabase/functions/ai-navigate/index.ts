@@ -128,17 +128,45 @@ AVAILABLE ROUTES:
 - "/my-elected-lookup" → find your elected officials
 - "/home" → events calendar (searchTerm, dateStart, dateEnd)
 - "/jobs" → employment (searchTerm, employer, location)
-- "/resources" → services (searchTerm, category)
+- "/resources" → community services and organizations (searchTerm, category)
 - "/civics" → civic organizations/community boards (searchTerm)
+
+RESOURCE CATEGORIES (for /resources page):
+- "Recreational" → parks, recreation centers, activities, sports facilities
+- "Sports" → tennis lessons, basketball, leagues, sports programs, athletic training
+- "Wellness" → health services, fitness, medical care, clinics, hospitals
+- "Educational" → tutoring, classes, workshops, learning programs, schools
+- "Mental Health" → counseling, therapy, support groups, mental health services
+- "Arts" → music lessons, art classes, dance, theater, creative programs
+- "Business" → entrepreneurship, business development, networking, career services
+- "Legal Services" → legal aid, attorneys, immigration help, rights assistance
 
 ROUTING EXAMPLES:
 ✓ "civic organization in rosedale" → /civics + searchTerm:"rosedale"
 ✓ "events this weekend" → /home + dates
 ✓ "jobs at target" → /jobs + employer:"target"
 ✓ "who is my councilperson" → /my-elected-lookup
+✓ "where can i learn tennis" → /resources + searchTerm:"tennis" + category:"Sports"
+✓ "tennis lessons" → /resources + searchTerm:"tennis" + category:"Sports"
+✓ "basketball programs" → /resources + searchTerm:"basketball" + category:"Sports"
+✓ "mental health counseling" → /resources + searchTerm:"counseling" + category:"Mental Health"
+✓ "art classes for kids" → /resources + searchTerm:"art classes kids" + category:"Arts"
+✓ "tutoring services" → /resources + searchTerm:"tutoring" + category:"Educational"
+✓ "fitness center near me" → /resources + searchTerm:"fitness" + category:"Wellness"
+✓ "free legal help" → /resources + searchTerm:"legal help" + category:"Legal Services"
+✓ "small business support" → /resources + searchTerm:"small business" + category:"Business"
+✓ "recreation center" → /resources + searchTerm:"recreation" + category:"Recreational"
 ✗ "what rappers were born here" → NO_MATCH
 ✗ "history of jamaica" → NO_MATCH
 ✗ "famous people" → NO_MATCH
+
+KEYWORD MAPPING FOR RESOURCES:
+- "learn", "lessons", "classes", "training" → likely Sports, Arts, or Educational
+- "help", "support", "assistance" → check context for category
+- "health", "medical", "fitness", "wellness" → Wellness or Mental Health
+- "legal", "lawyer", "immigration" → Legal Services
+- "business", "entrepreneur", "career" → Business
+- "recreation", "park", "activities" → Recreational
 
 CRITICAL: Return ONLY valid JSON, no other text or explanations.
 
