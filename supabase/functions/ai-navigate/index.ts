@@ -140,9 +140,9 @@ YOUR JOB: Be aggressive. Find a route. Only give up if impossible.
 
 AVAILABLE ROUTES:
 - "/about" → about this website/platform
-- "/police-precincts" → police/precinct info
-- "/contact-elected" → report issues to government
-- "/my-elected-lookup" → find your elected officials
+- "/police-precincts" → EMERGENCIES, police stations, 911 calls, immediate danger, crimes in progress
+- "/contact-elected" → NON-EMERGENCY ISSUES: reporting problems to elected officials (illegal parking, broken infrastructure, filing for benefits, permits, licenses, government services, complaints about city services, quality of life issues)
+- "/my-elected-lookup" → find your elected officials (who represents me, councilperson lookup)
 - "/jobs" → employment (searchTerm, employer, location, category, governmentType)
 - "/resources" → community services and organizations (searchTerm, category)
 - "/business-opportunities" → business opportunities and entrepreneurship programs (searchTerm)
@@ -175,6 +175,29 @@ RESOURCE CATEGORIES (for /resources page):
 - "educational" → tutoring, classes, workshops, learning programs, schools
 
 ROUTING EXAMPLES:
+
+ISSUE REPORTING (route to /contact-elected):
+✓ "there's a broken down car on my street" → /contact-elected
+✓ "illegally parked bus" → /contact-elected
+✓ "bus parked illegally" → /contact-elected
+✓ "how do I file for unemployment" → /contact-elected
+✓ "potholes on my street" → /contact-elected
+✓ "streetlight is out" → /contact-elected
+✓ "need a permit" → /contact-elected
+✓ "complaint about trash pickup" → /contact-elected
+✓ "sidewalk needs repair" → /contact-elected
+✓ "noise complaint" → /contact-elected
+✓ "tree needs trimming" → /contact-elected
+✓ "report graffiti" → /contact-elected
+
+EMERGENCIES (route to /police-precincts):
+✓ "emergency" → /police-precincts
+✓ "need police" → /police-precincts
+✓ "911" → /police-precincts
+✓ "crime in progress" → /police-precincts
+✓ "immediate danger" → /police-precincts
+
+CIVIC & GOVERNMENT:
 ✓ "community board 12" → /civics + organizationType:"community_board" + searchTerm:"12"
 ✓ "community board meeting" → /civics + organizationType:"community_board"
 ✓ "civic organization in rosedale" → /civics + organizationType:"civic_organization" + searchTerm:"rosedale"
@@ -215,6 +238,9 @@ ROUTING EXAMPLES:
 CRITICAL RULE: When in doubt, TRY TO ROUTE. Prefer false positive over false negative.
 
 KEYWORD MAPPING:
+- "emergency", "911", "police", "crime", "danger" → /police-precincts
+- "report", "issue", "problem", "complaint", "broken", "illegally parked", "file for", "permit", "license", "pothole", "streetlight", "sidewalk", "trash", "graffiti", "noise" → /contact-elected
+- "who is my", "find my representative", "my councilperson" → /my-elected-lookup
 - "learn", "lessons", "classes", "training" → /resources category:"sports", "arts", or "educational"
 - "help", "support", "assistance" → check context for category
 - "health", "medical", "fitness", "wellness" → /resources category:"mental health/wellness" or "sports"
