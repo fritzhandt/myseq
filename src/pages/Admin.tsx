@@ -20,7 +20,7 @@ import MyPendingSubmissions from '@/components/MyPendingSubmissions';
 import { AdminStats } from '@/components/AdminStats';
 import { useToast } from '@/hooks/use-toast';
 import { useUserRole } from '@/hooks/useUserRole';
-import { Plus, Calendar, LogOut, Star, AlertTriangle, Users, MapPin, FileText, Building2, Clock, BarChart3 } from 'lucide-react';
+import { Plus, Calendar, LogOut, Star, AlertTriangle, Users, MapPin, FileText, Building2, Clock, BarChart3, Briefcase } from 'lucide-react';
 
 // Admin Panel - Role-based access control system
 const Admin = () => {
@@ -35,12 +35,14 @@ const Admin = () => {
   const [showSpecialEventForm, setShowSpecialEventForm] = useState(false);
   const [showCommunityAlertForm, setShowCommunityAlertForm] = useState(false);
   const [showResourceForm, setShowResourceForm] = useState(false);
+  const [showBusinessOpportunityForm, setShowBusinessOpportunityForm] = useState(false);
   
   // Editing states
   const [editingEvent, setEditingEvent] = useState<any>(null);
   const [editingSpecialEvent, setEditingSpecialEvent] = useState<any>(null);
   const [editingCommunityAlert, setEditingCommunityAlert] = useState<any>(null);
   const [editingResource, setEditingResource] = useState<any>(null);
+  const [editingBusinessOpportunity, setEditingBusinessOpportunity] = useState<any>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -176,6 +178,21 @@ const Admin = () => {
     setEditingResource(null);
   };
 
+  const handleCreateBusinessOpportunity = () => {
+    setEditingBusinessOpportunity(null);
+    setShowBusinessOpportunityForm(true);
+  };
+
+  const handleEditBusinessOpportunity = (opportunity: any) => {
+    setEditingBusinessOpportunity(opportunity);
+    setShowBusinessOpportunityForm(true);
+  };
+
+  const handleBusinessOpportunityFormClose = () => {
+    setShowBusinessOpportunityForm(false);
+    setEditingBusinessOpportunity(null);
+  };
+
   if (loading || roleLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -230,7 +247,7 @@ const Admin = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue={isMainAdmin ? "pending-approvals" : (isSubAdmin ? "my-submissions" : "events")} className="w-full">
-          <TabsList className={`grid w-full ${isMainAdmin ? 'grid-cols-8' : (isSubAdmin ? 'grid-cols-7' : 'grid-cols-6')} mb-8`}>
+          <TabsList className={`grid w-full ${isMainAdmin ? 'grid-cols-9' : (isSubAdmin ? 'grid-cols-8' : 'grid-cols-7')} mb-8`}>
             {isMainAdmin && (
               <TabsTrigger value="pending-approvals" className="flex items-center gap-2 relative">
                 <Clock className="h-4 w-4" />
@@ -263,6 +280,10 @@ const Admin = () => {
             <TabsTrigger value="resources" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
               Resources
+            </TabsTrigger>
+            <TabsTrigger value="business" className="flex items-center gap-2">
+              <Briefcase className="h-4 w-4" />
+              Business
             </TabsTrigger>
             <TabsTrigger value="civics" className="flex items-center gap-2">
               <Building2 className="h-4 w-4" />
@@ -372,6 +393,28 @@ const Admin = () => {
                   </Button>
                 </div>
                 <ResourcesList onEdit={handleEditResource} />
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="business">
+            {showBusinessOpportunityForm ? (
+              <ResourceForm
+                resource={editingBusinessOpportunity}
+                onClose={handleBusinessOpportunityFormClose}
+                onSave={handleBusinessOpportunityFormClose}
+                isBusinessOpportunity={true}
+              />
+            ) : (
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-3xl font-bold">Manage Business Opportunities</h2>
+                  <Button onClick={handleCreateBusinessOpportunity} size="lg">
+                    <Plus className="h-5 w-5 mr-2" />
+                    Create Business Opportunity
+                  </Button>
+                </div>
+                <ResourcesList onEdit={handleEditBusinessOpportunity} isBusinessOpportunity={true} />
               </div>
             )}
           </TabsContent>

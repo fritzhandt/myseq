@@ -14,6 +14,7 @@ import MyElectedLookup from "./pages/MyElectedLookup";
 import SpecialEvent from "./pages/SpecialEvent";
 import CommunityAlert from "./pages/CommunityAlert";
 import Resources from "./pages/Resources";
+import BusinessOpportunities from "./pages/BusinessOpportunities";
 import Jobs from "./pages/Jobs";
 import PolicePrecincts from "./pages/PolicePrecincts";
 // import SolveIssue from "@/pages/SolveIssue";
@@ -51,6 +52,7 @@ const App = () => (
           <Route path="/special-event" element={<SpecialEvent />} />
           <Route path="/community-alert/:id" element={<CommunityAlert />} />
           <Route path="/resources" element={<Resources />} />
+          <Route path="/business-opportunities" element={<BusinessOpportunities />} />
           <Route path="/jobs" element={<Jobs />} />
           {/* <Route path="/solve-issue" element={<SolveIssue />} /> */}
           <Route path="/police-precincts" element={<PolicePrecincts />} />

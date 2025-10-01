@@ -24,9 +24,10 @@ interface Resource {
 
 interface ResourcesListProps {
   onEdit: (resource: Resource) => void;
+  isBusinessOpportunity?: boolean;
 }
 
-export default function ResourcesList({ onEdit }: ResourcesListProps) {
+export default function ResourcesList({ onEdit, isBusinessOpportunity = false }: ResourcesListProps) {
   const { toast } = useToast();
   const [resources, setResources] = useState<Resource[]>([]);
   const [filteredResources, setFilteredResources] = useState<Resource[]>([]);
@@ -37,9 +38,11 @@ export default function ResourcesList({ onEdit }: ResourcesListProps) {
 
   const fetchResources = async () => {
     try {
+      const resourceType = isBusinessOpportunity ? 'business_opportunity' : 'resource';
       const { data, error } = await supabase
         .from("resources")
         .select("*")
+        .eq('type', resourceType)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -106,7 +109,7 @@ export default function ResourcesList({ onEdit }: ResourcesListProps) {
 
   useEffect(() => {
     fetchResources();
-  }, []);
+  }, [isBusinessOpportunity]);
 
   if (loading) {
     return (

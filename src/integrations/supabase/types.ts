@@ -899,6 +899,7 @@ export type Database = {
           logo_url: string | null
           organization_name: string
           phone: string | null
+          type: string
           updated_at: string
           website: string | null
         }
@@ -913,6 +914,7 @@ export type Database = {
           logo_url?: string | null
           organization_name: string
           phone?: string | null
+          type?: string
           updated_at?: string
           website?: string | null
         }
@@ -927,6 +929,7 @@ export type Database = {
           logo_url?: string | null
           organization_name?: string
           phone?: string | null
+          type?: string
           updated_at?: string
           website?: string | null
         }

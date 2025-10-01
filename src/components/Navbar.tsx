@@ -96,6 +96,17 @@ const Navbar = () => {
                       </Link>
                       
                       <Link 
+                        to="/business-opportunities" 
+                        className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
+                        onClick={closeMenu}
+                      >
+                        <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
+                          <Building2 className="w-4 h-4" />
+                        </div>
+                        <span>Business Opportunities</span>
+                      </Link>
+                      
+                      <Link 
                         to="/jobs" 
                         className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
                         onClick={closeMenu}

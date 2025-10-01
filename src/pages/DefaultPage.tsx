@@ -119,6 +119,32 @@ export default function DefaultPage() {
                 </CardContent>
               </Card>
 
+              {/* Business Opportunities Card */}
+              <Card className="group relative overflow-hidden border-2 hover:border-accent/20 transition-all duration-500 hover:shadow-2xl hover:scale-105 bg-gradient-to-br from-background to-accent/5 flex flex-col h-full">
+                <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <CardHeader className="relative z-10 pb-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-accent to-accent/70 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <Building2 className="h-8 w-8 text-white" />
+                  </div>
+                  <CardTitle className="text-2xl mb-2 group-hover:text-accent transition-colors duration-300">
+                    <TranslatedText contentKey="business-card-title" originalText="Business Opportunities" />
+                  </CardTitle>
+                  <CardDescription className="text-base leading-relaxed">
+                    <TranslatedText contentKey="business-card-description" originalText="Entrepreneurship resources and business development opportunities" />
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="relative z-10 mt-auto">
+                  <Button 
+                    className="w-full group-hover:bg-accent group-hover:text-white transition-all duration-300" 
+                    variant="outline"
+                    onClick={() => window.location.href = '/business-opportunities'}
+                  >
+                    <TranslatedText contentKey="explore-business-btn" originalText="Explore Opportunities" />
+                    <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                  </Button>
+                </CardContent>
+              </Card>
+
               {/* Jobs Card */}
               <Card className="group relative overflow-hidden border-2 hover:border-accent/20 transition-all duration-500 hover:shadow-2xl hover:scale-105 bg-gradient-to-br from-background to-accent/5 flex flex-col h-full">
                 <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>

@@ -12,7 +12,7 @@ import { TranslatedText } from "@/components/TranslatedText";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useTranslation } from "@/contexts/TranslationContext";
 
-interface Resource {
+interface BusinessOpportunity {
   id: string;
   organization_name: string;
   description: string;
@@ -25,23 +25,12 @@ interface Resource {
   categories: string[];
 }
 
-const CATEGORIES = [
-  "sports",
-  "mental health/wellness", 
-  "arts",
-  "recreational",
-  "conflict management",
-  "legal services",
-  "educational"
-];
-
-export default function Resources() {
+export default function BusinessOpportunities() {
   const { toast } = useToast();
-  const [resources, setResources] = useState<Resource[]>([]);
-  const [filteredResources, setFilteredResources] = useState<Resource[]>([]);
+  const [opportunities, setOpportunities] = useState<BusinessOpportunity[]>([]);
+  const [filteredOpportunities, setFilteredOpportunities] = useState<BusinessOpportunity[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
   const location = useLocation();
@@ -51,47 +40,39 @@ export default function Resources() {
 
   // Track page view
   useEffect(() => {
-    trackPageView('/resources', undefined, currentLanguage);
+    trackPageView('/business-opportunities', undefined, currentLanguage);
   }, []);
 
   // Handle AI navigation state 
   useEffect(() => {
     const state = location.state as any;
     if (state?.searchTerm) {
-      // Set search parameters immediately
       setSearchQuery(state.searchTerm);
-      if (state.category) setSelectedCategory(state.category);
-      
-      // Clear navigation state immediately
-      navigate(location.pathname, { replace: true });
-    } else if (state?.category) {
-      // Handle basic category navigation without search
-      setSelectedCategory(state.category);
       navigate(location.pathname, { replace: true });
     }
   }, [location.state, navigate, location.pathname]);
 
-  // Auto-trigger filter when search query or category changes
+  // Auto-trigger filter when search query changes
   useEffect(() => {
-    filterResources();
-  }, [searchQuery, selectedCategory]);
+    filterOpportunities();
+  }, [searchQuery]);
 
-  const fetchResources = async () => {
+  const fetchOpportunities = async () => {
     try {
       const { data, error } = await supabase
         .from("resources")
         .select("*")
-        .eq('type', 'resource')
+        .eq('type', 'business_opportunity')
         .order("organization_name");
 
       if (error) throw error;
-      setResources(data || []);
-      setFilteredResources(data || []);
+      setOpportunities(data || []);
+      setFilteredOpportunities(data || []);
     } catch (error) {
-      console.error("Error fetching resources:", error);
+      console.error("Error fetching business opportunities:", error);
       toast({
         title: "Error",
-        description: "Failed to fetch resources",
+        description: "Failed to fetch business opportunities",
         variant: "destructive",
       });
     } finally {
@@ -99,36 +80,25 @@ export default function Resources() {
     }
   };
 
-  const filterResources = () => {
-    let filtered = resources;
-
-    // Filter by category
-    if (selectedCategory) {
-      filtered = filtered.filter(resource =>
-        resource.categories.includes(selectedCategory)
-      );
-    }
+  const filterOpportunities = () => {
+    let filtered = opportunities;
 
     // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(resource =>
-        resource.organization_name.toLowerCase().includes(query) ||
-        resource.description.toLowerCase().includes(query) ||
-        resource.categories.some(category => category.toLowerCase().includes(query))
+      filtered = filtered.filter(opportunity =>
+        opportunity.organization_name.toLowerCase().includes(query) ||
+        opportunity.description.toLowerCase().includes(query) ||
+        opportunity.categories.some(category => category.toLowerCase().includes(query))
       );
     }
 
-    setFilteredResources(filtered);
+    setFilteredOpportunities(filtered);
     setCurrentPage(1); // Reset to first page when filters change
   };
 
   const handleSearch = () => {
-    filterResources();
-  };
-
-  const handleCategorySelect = (category: string) => {
-    setSelectedCategory(selectedCategory === category ? "" : category);
+    filterOpportunities();
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -142,20 +112,13 @@ export default function Resources() {
   };
 
   useEffect(() => {
-    fetchResources();
+    fetchOpportunities();
   }, []);
 
-  useEffect(() => {
-    if (!searchQuery.trim()) {
-      // Only auto-filter when there's no search query
-      filterResources();
-    }
-  }, [resources, selectedCategory]);
-
-  // Paginate filtered resources
-  const totalPages = Math.ceil(filteredResources.length / itemsPerPage);
+  // Paginate filtered opportunities
+  const totalPages = Math.ceil(filteredOpportunities.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedResources = filteredResources.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedOpportunities = filteredOpportunities.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div className="min-h-screen bg-background">
@@ -171,7 +134,7 @@ export default function Resources() {
             className="flex items-center text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            <TranslatedText contentKey="resources-back-btn" originalText="Back to Main Menu" />
+            <TranslatedText contentKey="business-back-btn" originalText="Back to Main Menu" />
           </Button>
         </div>
       </div>
@@ -180,40 +143,15 @@ export default function Resources() {
         <div className="text-center mb-8">
           <div className="flex-1">
             <h1 className="text-4xl font-bold mb-4">
-              <TranslatedText contentKey="resources-title" originalText="Community Resources" />
+              <TranslatedText contentKey="business-title" originalText="Business Opportunities" />
             </h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
               <TranslatedText 
-                contentKey="resources-subtitle" 
-                originalText="Discover local organizations and services available in your community" 
+                contentKey="business-subtitle" 
+                originalText="Explore business opportunities and entrepreneurship resources in your community" 
               />
             </p>
           </div>
-        </div>
-
-        {/* Category Filter Buttons */}
-        <div className="flex flex-wrap justify-center gap-2 mb-6">
-          <Button
-            variant={!selectedCategory ? "default" : "outline"}
-            size="sm"
-            onClick={() => setSelectedCategory("")}
-          >
-            <TranslatedText contentKey="resources-all-categories" originalText="All Categories" />
-          </Button>
-          {CATEGORIES.map((category) => (
-            <Button
-              key={category}
-              variant={selectedCategory === category ? "default" : "outline"}
-              size="sm"
-              onClick={() => handleCategorySelect(category)}
-              className="capitalize"
-            >
-              <TranslatedText 
-                contentKey={`category-${category.replace(/\s+/g, '-')}`} 
-                originalText={category} 
-              />
-            </Button>
-          ))}
         </div>
 
         {/* Search Bar */}
@@ -225,7 +163,7 @@ export default function Resources() {
                 value={searchQuery}
                 onChange={handleSearchChange}
                 onKeyPress={handleKeyPress}
-                placeholder="Search resources..."
+                placeholder="Search business opportunities..."
                 className="pl-10 pr-4 py-3 text-base"
               />
             </div>
@@ -235,49 +173,46 @@ export default function Resources() {
               className="shrink-0 px-6"
             >
               <TranslatedText 
-                contentKey="resources-search-btn" 
+                contentKey="business-search-btn" 
                 originalText={loading ? 'Searching...' : 'Search'} 
               />
             </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-2 text-center">
             <TranslatedText 
-              contentKey="resources-search-hint" 
-              originalText="Search finds relevant resources. Press Enter or click Search." 
+              contentKey="business-search-hint" 
+              originalText="Search finds relevant opportunities. Press Enter or click Search." 
             />
           </p>
         </div>
 
-        {/* Resources Grid */}
+        {/* Opportunities Grid */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-muted-foreground">
-              <TranslatedText contentKey="resources-loading" originalText="Loading resources..." />
+              <TranslatedText contentKey="business-loading" originalText="Loading business opportunities..." />
             </div>
           </div>
-        ) : filteredResources.length === 0 ? (
+        ) : filteredOpportunities.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground text-lg">
-              <TranslatedText contentKey="resources-no-results" originalText="No resources found." />
+              <TranslatedText contentKey="business-no-results" originalText="No business opportunities found." />
             </p>
-            {(searchQuery || selectedCategory) && (
+            {searchQuery && (
               <Button
                 variant="outline"
-                onClick={() => {
-                  setSearchQuery("");
-                  setSelectedCategory("");
-                }}
+                onClick={() => setSearchQuery("")}
                 className="mt-4"
               >
-                <TranslatedText contentKey="resources-clear-filters" originalText="Clear Filters" />
+                <TranslatedText contentKey="business-clear-filters" originalText="Clear Search" />
               </Button>
             )}
           </div>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {paginatedResources.map((resource) => (
-                <ResourceCard key={resource.id} resource={resource} />
+              {paginatedOpportunities.map((opportunity) => (
+                <ResourceCard key={opportunity.id} resource={opportunity} />
               ))}
             </div>
             
@@ -285,7 +220,7 @@ export default function Resources() {
             <UserPagination
               currentPage={currentPage}
               totalPages={totalPages}
-              totalItems={filteredResources.length}
+              totalItems={filteredOpportunities.length}
               itemsPerPage={itemsPerPage}
               onPageChange={setCurrentPage}
             />

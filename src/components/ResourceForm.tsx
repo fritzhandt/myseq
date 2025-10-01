@@ -28,20 +28,20 @@ interface ResourceFormProps {
   resource?: Resource;
   onClose: () => void;
   onSave: () => void;
+  isBusinessOpportunity?: boolean;
 }
 
 const CATEGORIES = [
   "sports",
   "mental health/wellness", 
   "arts",
-  "business",
   "recreational",
   "conflict management",
   "legal services",
   "educational"
 ];
 
-export default function ResourceForm({ resource, onClose, onSave }: ResourceFormProps) {
+export default function ResourceForm({ resource, onClose, onSave, isBusinessOpportunity = false }: ResourceFormProps) {
   const { toast } = useToast();
   const { isSubAdmin } = useUserRole();
   const [loading, setLoading] = useState(false);
@@ -332,7 +332,8 @@ export default function ResourceForm({ resource, onClose, onSave }: ResourceForm
       const dataToSave = {
         ...formData,
         logo_url: logoUrl,
-        cover_photo_url: coverPhotoUrl
+        cover_photo_url: coverPhotoUrl,
+        type: isBusinessOpportunity ? 'business_opportunity' : 'resource'
       };
 
       if (resource?.id) {
@@ -390,7 +391,10 @@ export default function ResourceForm({ resource, onClose, onSave }: ResourceForm
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>
-            {resource ? "Edit Resource" : "Create New Resource"}
+            {resource 
+              ? (isBusinessOpportunity ? "Edit Business Opportunity" : "Edit Resource")
+              : (isBusinessOpportunity ? "Create New Business Opportunity" : "Create New Resource")
+            }
           </CardTitle>
           <Button
             variant="ghost"
