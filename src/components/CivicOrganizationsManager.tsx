@@ -9,7 +9,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Eye, EyeOff, Copy, Trash2, Users, Building2, RotateCcw } from 'lucide-react';
+import { Plus, Eye, EyeOff, Copy, Trash2, Users, Building2, RotateCcw, AlertTriangle } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import bcrypt from 'bcryptjs';
 
 interface CivicOrganization {
@@ -31,6 +41,7 @@ export default function CivicOrganizationsManager() {
   const [showPasswords, setShowPasswords] = useState<{[key: string]: boolean}>({});
   const [loading, setLoading] = useState(true);
   const [resetPasswordDialog, setResetPasswordDialog] = useState<{isOpen: boolean, orgId?: string, orgName?: string, newPassword?: string}>({isOpen: false});
+  const [deleteDialog, setDeleteDialog] = useState<{isOpen: boolean, orgId?: string, orgName?: string}>({isOpen: false});
   const { toast } = useToast();
 
   // Form state
@@ -250,6 +261,33 @@ export default function CivicOrganizationsManager() {
       ...prev,
       [orgId]: !prev[orgId]
     }));
+  };
+
+  const handleDelete = async () => {
+    if (!deleteDialog.orgId) return;
+
+    try {
+      const { error } = await supabase
+        .from('civic_organizations')
+        .delete()
+        .eq('id', deleteDialog.orgId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Organization Deleted",
+        description: `${deleteDialog.orgName} has been permanently deleted`,
+      });
+
+      setDeleteDialog({ isOpen: false });
+      fetchOrganizations();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete organization",
+        variant: "destructive",
+      });
+    }
   };
 
   if (loading && organizations.length === 0) {
@@ -475,9 +513,19 @@ export default function CivicOrganizationsManager() {
                     >
                       <RotateCcw className="h-4 w-4" />
                     </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setDeleteDialog({ isOpen: true, orgId: org.id, orgName: org.name })}
+                      title="Delete Organization"
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                     <Switch
                       checked={org.is_active}
                       onCheckedChange={() => toggleActive(org.id, org.is_active)}
+                      title={org.is_active ? "Disable Organization" : "Enable Organization"}
                     />
                   </div>
                 </div>
@@ -596,6 +644,43 @@ export default function CivicOrganizationsManager() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialog.isOpen} onOpenChange={(open) => setDeleteDialog({ isOpen: open })}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+              Delete Civic Organization
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to permanently delete <strong>{deleteDialog.orgName}</strong>? 
+              This action cannot be undone and will remove all associated data including:
+              <ul className="list-disc list-inside mt-2 space-y-1">
+                <li>Organization profile and access codes</li>
+                <li>All events created by this organization</li>
+                <li>Announcements, newsletters, and gallery items</li>
+                <li>Leadership and important links data</li>
+              </ul>
+              <div className="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-200">
+                <p className="text-sm text-orange-800">
+                  <strong>Tip:</strong> If you want to temporarily hide this organization, 
+                  you can disable it using the toggle switch instead of deleting.
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              Delete Permanently
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
