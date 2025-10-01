@@ -788,6 +788,7 @@ export type Database = {
           status: string
           submitted_at: string
           submitted_by: string
+          type: string
           updated_at: string
           website: string | null
         }
@@ -808,6 +809,7 @@ export type Database = {
           status?: string
           submitted_at?: string
           submitted_by: string
+          type?: string
           updated_at?: string
           website?: string | null
         }
@@ -828,6 +830,7 @@ export type Database = {
           status?: string
           submitted_at?: string
           submitted_by?: string
+          type?: string
           updated_at?: string
           website?: string | null
         }
