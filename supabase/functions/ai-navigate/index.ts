@@ -15,6 +15,7 @@ interface NavigationResponse {
   destination?: string;
   searchTerm?: string;
   category?: string;
+  governmentType?: string;
   dateStart?: string;
   dateEnd?: string;
   employer?: string;
@@ -143,9 +144,18 @@ AVAILABLE ROUTES:
 - "/police-precincts" → police/precinct info
 - "/contact-elected" → report issues to government
 - "/my-elected-lookup" → find your elected officials
-- "/jobs" → employment (searchTerm, employer, location)
+- "/jobs" → employment (searchTerm, employer, location, category, governmentType)
 - "/resources" → community services and organizations (searchTerm, category)
 - "/civics" → civic organizations/community boards/police precinct councils (searchTerm, organizationType)
+
+JOB CATEGORIES (for /jobs page):
+- "government" → Government jobs (city and state)
+- "private_sector" → Private sector jobs
+
+GOVERNMENT JOB TYPES (for /jobs page when category is "government"):
+- "city" → City government jobs
+- "state" → State government jobs
+- "all" → Both city and state government jobs
 
 CIVIC ORGANIZATION TYPES (for /civics page):
 - "community_board" → Community Boards (CB), Community Board meetings, district boards
@@ -168,7 +178,12 @@ ROUTING EXAMPLES:
 ✓ "civic organization in rosedale" → /civics + organizationType:"civic_organization" + searchTerm:"rosedale"
 ✓ "police precinct council" → /civics + organizationType:"police_precinct_council"
 ✓ "precinct community council" → /civics + organizationType:"police_precinct_council"
-✓ "jobs at target" → /jobs + employer:"target"
+✓ "government jobs" → /jobs + category:"government" + governmentType:"all"
+✓ "city jobs" → /jobs + category:"government" + governmentType:"city"
+✓ "state jobs" → /jobs + category:"government" + governmentType:"state"
+✓ "jobs at target" → /jobs + category:"private_sector" + employer:"target"
+✓ "private sector jobs" → /jobs + category:"private_sector"
+✓ "sanitation jobs" → /jobs + category:"government" + searchTerm:"sanitation"
 ✓ "who is my councilperson" → /my-elected-lookup
 ✓ "where can i learn tennis" → /resources + searchTerm:"tennis" + category:"Sports"
 ✓ "tennis lessons" → /resources + searchTerm:"tennis" + category:"Sports"

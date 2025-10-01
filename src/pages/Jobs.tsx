@@ -40,7 +40,8 @@ export default function Jobs() {
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [activeTab, setActiveTab] = useState('city');
+  const [activeTab, setActiveTab] = useState('government');
+  const [governmentFilter, setGovernmentFilter] = useState<'all' | 'city' | 'state'>('all');
   const itemsPerPage = 10;
   const location = useLocation();
   const navigate = useNavigate();
@@ -58,11 +59,21 @@ export default function Jobs() {
   // Handle AI navigation state
   useEffect(() => {
     const state = location.state as any;
-    if ((state?.searchTerm || state?.employer || state?.location) && jobs.length > 0 && !loading) {
+    if ((state?.searchTerm || state?.employer || state?.location || state?.category || state?.governmentType) && jobs.length > 0 && !loading) {
       // Set parameters
       if (state.searchTerm) setSearchQuery(state.searchTerm);
       if (state.employer) setEmployerFilter(state.employer);
       if (state.location) setLocationFilter(state.location);
+      
+      // Handle category (government/private_sector)
+      if (state.category) {
+        setActiveTab(state.category);
+      }
+      
+      // Handle government type (city/state)
+      if (state.governmentType && state.category === 'government') {
+        setGovernmentFilter(state.governmentType);
+      }
       
       // Clear the navigation state
       navigate(location.pathname, { replace: true });
@@ -76,7 +87,7 @@ export default function Jobs() {
   useEffect(() => {
     // Apply filters automatically
     applyFilters();
-  }, [jobs, searchQuery, locationFilter, employerFilter, activeTab]);
+  }, [jobs, searchQuery, locationFilter, employerFilter, activeTab, governmentFilter]);
 
   const fetchJobs = async () => {
     try {
@@ -97,10 +108,17 @@ export default function Jobs() {
   const applyFilters = useCallback(() => {
     let filtered = [...jobs];
 
-    // Filter by category (city/state)
-    filtered = filtered.filter(job => 
-      job.category === activeTab || job.category === 'both'
-    );
+    // Filter by category (government/private_sector)
+    filtered = filtered.filter(job => job.category === activeTab);
+
+    // If in government tab, apply government type filter (city/state/both)
+    if (activeTab === 'government' && governmentFilter !== 'all') {
+      filtered = filtered.filter(job => {
+        // If job has subcategory field, use it; otherwise default to 'city' for backward compatibility
+        const subcategory = (job as any).subcategory || 'city';
+        return subcategory === governmentFilter || subcategory === 'both';
+      });
+    }
 
     // Filter by search query
     if (searchQuery.trim()) {
@@ -129,7 +147,7 @@ export default function Jobs() {
 
     setFilteredJobs(filtered);
     setCurrentPage(1);
-  }, [jobs, searchQuery, locationFilter, employerFilter, activeTab]);
+  }, [jobs, searchQuery, locationFilter, employerFilter, activeTab, governmentFilter]);
 
   const handleManualSearch = useCallback(() => {
     applyFilters();
@@ -145,14 +163,24 @@ export default function Jobs() {
     setSearchQuery('');
     setLocationFilter('all');
     setEmployerFilter('all');
+    setGovernmentFilter('all');
     // Auto-apply filters after clearing
     setTimeout(() => {
       applyFilters();
     }, 0);
   };
 
-  const uniqueLocations = [...new Set(jobs.filter(job => job.category === activeTab || job.category === 'both').map(job => job.location))];
-  const uniqueEmployers = [...new Set(jobs.filter(job => job.category === activeTab || job.category === 'both').map(job => job.employer))];
+  const filteredByCategory = jobs.filter(job => {
+    if (job.category !== activeTab) return false;
+    if (activeTab === 'government' && governmentFilter !== 'all') {
+      const subcategory = (job as any).subcategory || 'city';
+      return subcategory === governmentFilter || subcategory === 'both';
+    }
+    return true;
+  });
+  
+  const uniqueLocations = [...new Set(filteredByCategory.map(job => job.location))];
+  const uniqueEmployers = [...new Set(filteredByCategory.map(job => job.employer))];
 
   // Paginate filtered jobs
   const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
@@ -199,16 +227,46 @@ export default function Jobs() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="flex justify-center mb-6">
             <TabsList className="grid w-full max-w-md grid-cols-2">
-              <TabsTrigger value="city"><TranslatedText contentKey="jobs.city_jobs" originalText="City Jobs" /></TabsTrigger>
-              <TabsTrigger value="state"><TranslatedText contentKey="jobs.state_jobs" originalText="State Jobs" /></TabsTrigger>
+              <TabsTrigger value="government"><TranslatedText contentKey="jobs.government_jobs" originalText="Government" /></TabsTrigger>
+              <TabsTrigger value="private_sector"><TranslatedText contentKey="jobs.private_sector_jobs" originalText="Private Sector" /></TabsTrigger>
             </TabsList>
           </div>
 
-          <TabsContent value="city" className="mt-0">
+          <TabsContent value="government" className="mt-0">
             <Card className="mb-8">
               <CardContent className="p-6">
                  {/* Always visible: Job Title Search */}
                  <div className="space-y-4">
+                    {/* Government Type Filter */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        <TranslatedText contentKey="jobs.government_type" originalText="Government Type" />
+                      </label>
+                      <div className="flex gap-2">
+                        <Button
+                          variant={governmentFilter === 'all' ? 'default' : 'outline'}
+                          onClick={() => setGovernmentFilter('all')}
+                          className="flex-1"
+                        >
+                          <TranslatedText contentKey="jobs.all_types" originalText="All" />
+                        </Button>
+                        <Button
+                          variant={governmentFilter === 'city' ? 'default' : 'outline'}
+                          onClick={() => setGovernmentFilter('city')}
+                          className="flex-1"
+                        >
+                          <TranslatedText contentKey="jobs.city_jobs" originalText="City" />
+                        </Button>
+                        <Button
+                          variant={governmentFilter === 'state' ? 'default' : 'outline'}
+                          onClick={() => setGovernmentFilter('state')}
+                          className="flex-1"
+                        >
+                          <TranslatedText contentKey="jobs.state_jobs" originalText="State" />
+                        </Button>
+                      </div>
+                    </div>
+
                     <div className="space-y-2">
                       <label className="text-sm font-medium flex items-center gap-2">
                         <Briefcase className="h-4 w-4" />
@@ -319,7 +377,7 @@ export default function Jobs() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="state" className="mt-0">
+          <TabsContent value="private_sector" className="mt-0">
             <Card className="mb-8">
               <CardContent className="p-6">
                  {/* Always visible: Job Title Search */}
