@@ -59,96 +59,24 @@ export default function Jobs() {
   useEffect(() => {
     const state = location.state as any;
     if ((state?.searchTerm || state?.employer || state?.location) && jobs.length > 0 && !loading) {
-      // Set parameters first
+      // Set parameters
       if (state.searchTerm) setSearchQuery(state.searchTerm);
       if (state.employer) setEmployerFilter(state.employer);
       if (state.location) setLocationFilter(state.location);
       
-      // Auto-trigger search after state is set
-      const triggerSearch = async () => {
-        await new Promise(resolve => setTimeout(resolve, 100)); // Give time for state to update
-        
-        // Manually trigger the AI search
-        setIsSearching(true);
-        try {
-          console.log('Auto-triggering AI job search from navigation:', state.searchTerm);
-          
-          const { data, error } = await supabase.functions.invoke('ai-job-search', {
-            body: { 
-              query: state.searchTerm || '',
-              location: state.location !== 'all' ? state.location : undefined,
-              employer: state.employer !== 'all' ? state.employer : undefined,
-              category: activeTab
-            }
-          });
-
-          if (error) {
-            console.error('AI job search error:', error);
-            throw error;
-          }
-
-          if (data.success) {
-            console.log(`AI auto-search found ${data.jobs.length} matching jobs`);
-            setFilteredJobs(data.jobs || []);
-            toast({
-              title: "Search completed",
-              description: `Found ${data.jobs.length} matching jobs for "${state.searchTerm}"`,
-            });
-          } else {
-            console.error('AI job search failed:', data.error);
-            // Fallback to basic search
-            let filtered = [...jobs];
-            if (state.searchTerm) {
-              filtered = filtered.filter(job =>
-                job.title.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
-                job.description.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
-                job.employer.toLowerCase().includes(state.searchTerm.toLowerCase())
-              );
-            }
-            setFilteredJobs(filtered);
-            toast({
-              title: "Search completed",
-              description: `Found ${filtered.length} matching jobs using basic search`,
-            });
-          }
-        } catch (error) {
-          console.error('Auto AI search failed, using fallback:', error);
-          // Fallback search
-          let filtered = [...jobs];
-          if (state.searchTerm) {
-            filtered = filtered.filter(job =>
-              job.title.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
-              job.description.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
-              job.employer.toLowerCase().includes(state.searchTerm.toLowerCase())
-            );
-          }
-          setFilteredJobs(filtered);
-          toast({
-            title: "Search completed",
-            description: `Found ${filtered.length} matching jobs using fallback search`,
-          });
-        } finally {
-          setIsSearching(false);
-        }
-        
-        setCurrentPage(1);
-      };
-      
-      triggerSearch();
-      
       // Clear the navigation state
       navigate(location.pathname, { replace: true });
     }
-  }, [location.state, navigate, location.pathname, activeTab, jobs, loading, toast]);
+  }, [location.state, navigate, location.pathname, jobs, loading]);
 
   useEffect(() => {
     fetchJobs();
   }, []);
 
   useEffect(() => {
-    // Only apply basic filters automatically, not AI search
-    applyBasicFilters();
-  }, [jobs, locationFilter, employerFilter, activeTab]);
+    // Apply filters automatically
+    applyFilters();
+  }, [jobs, searchQuery, locationFilter, employerFilter, activeTab]);
 
   const fetchJobs = async () => {
     try {
@@ -166,18 +94,24 @@ export default function Jobs() {
     }
   };
 
-  const applyBasicFilters = useCallback(() => {
-    if (searchQuery) {
-      // Don't auto-filter when there's a search query - require manual search
-      return;
-    }
-    
+  const applyFilters = useCallback(() => {
     let filtered = [...jobs];
 
     // Filter by category (city/state)
     filtered = filtered.filter(job => 
       job.category === activeTab || job.category === 'both'
     );
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(job =>
+        job.title.toLowerCase().includes(query) ||
+        job.description.toLowerCase().includes(query) ||
+        job.employer.toLowerCase().includes(query) ||
+        job.location.toLowerCase().includes(query)
+      );
+    }
 
     // Filter by location
     if (locationFilter && locationFilter !== 'all') {
@@ -197,48 +131,9 @@ export default function Jobs() {
     setCurrentPage(1);
   }, [jobs, searchQuery, locationFilter, employerFilter, activeTab]);
 
-  const handleManualSearch = useCallback(async () => {
-    if (!searchQuery.trim()) {
-      // If no search query, just apply basic filters
-      applyBasicFilters();
-      return;
-    }
-
-    setIsSearching(true);
-    try {
-      console.log('Starting manual AI job search with query:', searchQuery);
-      
-      const { data, error } = await supabase.functions.invoke('ai-job-search', {
-        body: { 
-          query: searchQuery,
-          location: locationFilter !== 'all' ? locationFilter : undefined,
-          employer: employerFilter !== 'all' ? employerFilter : undefined,
-          category: activeTab
-        }
-      });
-
-      if (error) {
-        console.error('AI job search error:', error);
-        throw error;
-      }
-
-      if (data.success) {
-        console.log(`AI found ${data.jobs.length} matching jobs`);
-        setFilteredJobs(data.jobs || []);
-      } else {
-        console.error('AI job search failed:', data.error);
-        // Fallback to basic search
-        fallbackSearch();
-      }
-    } catch (error) {
-      console.error('AI search failed, using fallback:', error);
-      fallbackSearch();
-    } finally {
-      setIsSearching(false);
-    }
-    
-    setCurrentPage(1);
-  }, [searchQuery, locationFilter, employerFilter, activeTab, applyBasicFilters]);
+  const handleManualSearch = useCallback(() => {
+    applyFilters();
+  }, [applyFilters]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -246,46 +141,13 @@ export default function Jobs() {
     }
   };
 
-  const fallbackSearch = () => {
-    let filtered = [...jobs];
-
-    // Filter by category (city/state)
-    filtered = filtered.filter(job => 
-      job.category === activeTab || job.category === 'both'
-    );
-
-    // Basic text search across title, description, and employer
-    if (searchQuery) {
-      filtered = filtered.filter(job =>
-        job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.employer.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-    
-    // Apply other filters
-    if (locationFilter && locationFilter !== 'all') {
-      filtered = filtered.filter(job =>
-        job.location.toLowerCase().includes(locationFilter.toLowerCase())
-      );
-    }
-    if (employerFilter && employerFilter !== 'all') {
-      filtered = filtered.filter(job =>
-        job.employer.toLowerCase().includes(employerFilter.toLowerCase())
-      );
-    }
-    
-    setFilteredJobs(filtered);
-  };
-
-
   const clearFilters = () => {
     setSearchQuery('');
     setLocationFilter('all');
     setEmployerFilter('all');
     // Auto-apply filters after clearing
     setTimeout(() => {
-      applyBasicFilters();
+      applyFilters();
     }, 0);
   };
 
@@ -354,7 +216,7 @@ export default function Jobs() {
                       </label>
                       <div className="flex gap-2">
                         <Input
-                          placeholder="Search job title using AI"
+                          placeholder="Search job title..."
                           value={searchQuery}
                           onChange={(e) => {
                             const value = e.target.value;

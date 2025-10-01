@@ -44,7 +44,6 @@ export default function Resources() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [pendingAutoSearch, setPendingAutoSearch] = useState(false);
   const itemsPerPage = 12;
   const location = useLocation();
   const navigate = useNavigate();
@@ -64,9 +63,6 @@ export default function Resources() {
       setSearchQuery(state.searchTerm);
       if (state.category) setSelectedCategory(state.category);
       
-      // Mark that we need to auto-search once resources are loaded
-      setPendingAutoSearch(true);
-      
       // Clear navigation state immediately
       navigate(location.pathname, { replace: true });
     } else if (state?.category) {
@@ -76,13 +72,10 @@ export default function Resources() {
     }
   }, [location.state, navigate, location.pathname]);
 
-  // Auto-trigger search when resources are loaded and we have a pending search
+  // Auto-trigger filter when search query or category changes
   useEffect(() => {
-    if (pendingAutoSearch && resources.length > 0 && !loading && searchQuery) {
-      setPendingAutoSearch(false);
-      handleAISearch();
-    }
-  }, [pendingAutoSearch, resources.length, loading, searchQuery]);
+    filterResources();
+  }, [searchQuery, selectedCategory]);
 
   const fetchResources = async () => {
     try {
@@ -130,56 +123,8 @@ export default function Resources() {
     setCurrentPage(1); // Reset to first page when filters change
   };
 
-  const handleAISearch = async () => {
-    if (!searchQuery.trim()) {
-      filterResources();
-      return;
-    }
-
-    setLoading(true);
-    try {
-      console.log('Starting AI resource search with query:', searchQuery);
-      
-      const { data, error } = await supabase.functions.invoke('ai-resource-search', {
-        body: { 
-          query: searchQuery,
-          category: selectedCategory || undefined
-        }
-      });
-
-      if (error) {
-        console.error('AI resource search error:', error);
-        throw error;
-      }
-
-      if (data.success) {
-        console.log(`AI found ${data.resources.length} matching resources`);
-        setFilteredResources(data.resources || []);
-        toast({
-          title: "AI Search completed",
-          description: `Found ${data.resources.length} matching resources`,
-        });
-      } else {
-        console.error('AI resource search failed:', data.error);
-        // Fallback to basic search
-        filterResources();
-        toast({
-          title: "Search completed",
-          description: "Using basic search results",
-        });
-      }
-    } catch (error) {
-      console.error('AI search failed, using fallback:', error);
-      filterResources();
-      toast({
-        title: "Search completed",
-        description: "Using fallback search results",
-      });
-    } finally {
-      setLoading(false);
-    }
-    
-    setCurrentPage(1);
+  const handleSearch = () => {
+    filterResources();
   };
 
   const handleCategorySelect = (category: string) => {
@@ -192,7 +137,7 @@ export default function Resources() {
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      handleAISearch();
+      handleSearch();
     }
   };
 
@@ -280,12 +225,12 @@ export default function Resources() {
                 value={searchQuery}
                 onChange={handleSearchChange}
                 onKeyPress={handleKeyPress}
-                placeholder="Search resources using AI..."
+                placeholder="Search resources..."
                 className="pl-10 pr-4 py-3 text-base"
               />
             </div>
             <Button 
-              onClick={handleAISearch}
+              onClick={handleSearch}
               disabled={loading}
               className="shrink-0 px-6"
             >
@@ -298,7 +243,7 @@ export default function Resources() {
           <p className="text-xs text-muted-foreground mt-2 text-center">
             <TranslatedText 
               contentKey="resources-search-hint" 
-              originalText="Smart search finds relevant resources. Press Enter or click Search." 
+              originalText="Search finds relevant resources. Press Enter or click Search." 
             />
           </p>
         </div>
