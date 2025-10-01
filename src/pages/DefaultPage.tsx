@@ -30,15 +30,11 @@ export default function DefaultPage() {
               </div>
               
               <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent font-oswald uppercase tracking-tight">
-                <TranslatedText contentKey="hero-title-main" originalText="SOUTHEAST QUEENS" />
-                <br />
-                <span className="text-primary">
-                  <TranslatedText contentKey="hero-title-sub" originalText="Starts Here" />
-                </span>
+                <TranslatedText contentKey="hero-title-main" originalText="SOUTHEAST QUEENS INFORMATION CENTER" />
               </h1>
               
               <p className="text-xl md:text-2xl text-muted-foreground mb-0 max-w-2xl mx-auto leading-relaxed">
-                <TranslatedText contentKey="hero-description" originalText="Discover events, connect with neighbors, find opportunities, and build stronger communities in Southeast Queens" />
+                <TranslatedText contentKey="hero-description" originalText="Discover organizations, programs, resources, jobs, business opportunities, youth services, senior services, and more" />
               </p>
             </div>
           </div>
