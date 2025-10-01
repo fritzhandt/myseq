@@ -1,0 +1,42 @@
+-- Fix grammatical and formatting issues in addresses
+
+-- Fix missing commas after street addresses
+UPDATE public.resources SET address = '32 N Central Ave, Valley Stream, NY 11580', updated_at = now() WHERE organization_name = '32 North';
+UPDATE public.resources SET address = '116-30 Sutphin Boulevard, Jamaica, NY 11434', updated_at = now() WHERE organization_name = 'Acacia Network - Queens Village Committee for Mental Health for J-CAP, Inc. (J-CAP)';
+UPDATE public.resources SET address = '219-44 Jamaica Ave, Queens Village, NY 11429', updated_at = now() WHERE organization_name = 'Ace Academic and Creative Studio ';
+UPDATE public.resources SET address = '166-01 Linden Blvd, Jamaica, NY 11434', updated_at = now() WHERE organization_name = 'Allen Community Senior Citizen Centers';
+UPDATE public.resources SET address = '90-49 Springfield Blvd Suite 202, Jamaica, NY 11428', updated_at = now() WHERE organization_name = 'Angel Spa';
+UPDATE public.resources SET address = '94-32 209th St, Queens Village, NY 11429', updated_at = now() WHERE organization_name = 'Bella Luna Wellness';
+UPDATE public.resources SET address = '222-02 Merrick Blvd, Queens, NY 11413', updated_at = now() WHERE organization_name = 'Blue Seafood Restaurant';
+UPDATE public.resources SET address = '229-29 Merrick Blvd Suite 320, Laurelton, NY 11413', updated_at = now() WHERE organization_name = 'Breaking Barriers Mental Health Counseling PLLC';
+UPDATE public.resources SET address = '146 Tulip Ave, Floral Park, NY', updated_at = now() WHERE organization_name = 'Cara Mia';
+UPDATE public.resources SET address = '234-04 Merrick Blvd, Rosedale, NY 11422', updated_at = now() WHERE organization_name = 'Caribbean Soul';
+UPDATE public.resources SET address = '217-84 Hempstead Ave, Queens, NY 11429', updated_at = now() WHERE organization_name = 'Cookerz Blend';
+UPDATE public.resources SET address = '243-10 Merrick Blvd, Rosedale, NY 11422', updated_at = now() WHERE organization_name = 'Cove Restaurant';
+UPDATE public.resources SET address = '196-00 Union Turnpike, Fresh Meadows, NY 11366', updated_at = now() WHERE organization_name = 'Cunningham Tennis ';
+UPDATE public.resources SET address = '219-07 Hempstead Ave, Queens Village, NY 11429', updated_at = now() WHERE organization_name = 'Eastern Queens Boxing Club';
+UPDATE public.resources SET address = '229-02 Linden Boulevard, Cambria Heights, NY 11411', updated_at = now() WHERE organization_name = 'Good Taste Restaurant';
+UPDATE public.resources SET address = '90-04 161st St, Jamaica, NY 11432', updated_at = now() WHERE organization_name = 'Greater Jamaica Development Corporation ';
+UPDATE public.resources SET address = '89-14 Parsons Blvd, Jamaica, NY 11432', updated_at = now() WHERE organization_name = 'Greater Nexus';
+UPDATE public.resources SET address = '221-13 Jamaica Ave, Queens, NY 11428', updated_at = now() WHERE organization_name = 'Hibiscus Restaurant';
+UPDATE public.resources SET address = '211-04 Hollis Avenue, Queens Village, NY 11429', updated_at = now() WHERE organization_name = 'Hollis Avenue Senior Buddy System';
+UPDATE public.resources SET address = '9020 191st Street, Hollis, NY 11423', updated_at = now() WHERE organization_name = 'Mighty Youths';
+UPDATE public.resources SET address = '35 Verbena Ave, Floral Park, NY 11001', updated_at = now() WHERE organization_name = 'My First School Experience';
+UPDATE public.resources SET address = '220-05 Hempstead Ave, Queens Village, NY 11429', updated_at = now() WHERE organization_name = 'Netties Restaurant ';
+UPDATE public.resources SET address = '188-04 Liberty Ave, St Albans, NY 11412', updated_at = now() WHERE organization_name = 'New Deal After School ';
+UPDATE public.resources SET address = 'Merrick Blvd between 115 Ave and 116 Ave, Queens, NY', updated_at = now() WHERE organization_name = 'NYC Parks';
+UPDATE public.resources SET address = '90-27 Sutphin Blvd, Jamaica, NY 11435', updated_at = now() WHERE organization_name = 'NYC Small Business Solutions';
+UPDATE public.resources SET address = '144-06 94th Avenue, Jamaica, NY 11435', updated_at = now() WHERE organization_name = 'Queens Business Center';
+UPDATE public.resources SET address = '108-69 62nd Drive, Queens, NY 11375', updated_at = now() WHERE organization_name = 'Queens Community House ';
+UPDATE public.resources SET address = '221-10 Jamaica Ave, Queens, NY 11429', updated_at = now() WHERE organization_name = 'Queens Corporate Center';
+UPDATE public.resources SET address = '89-00 Sutphin Blvd 5th Floor, Jamaica, NY 11435', updated_at = now() WHERE organization_name = 'Queens Legal Services';
+UPDATE public.resources SET address = '218 and Linden, Cambria Heights, NY', updated_at = now() WHERE organization_name = 'Queens Public Library - Cambria Heights';
+UPDATE public.resources SET address = '177th Street & Baisley Boulevard, Jamaica, NY 11434', updated_at = now() WHERE organization_name = 'Roy Wilkins Recreation Center';
+UPDATE public.resources SET address = '144-14 232nd St, Springfield Gardens, NY 11422', updated_at = now() WHERE organization_name = 'Rosedale Jets';
+UPDATE public.resources SET address = '163-18 Jamaica Avenue, Second Floor, Jamaica, NY', updated_at = now() WHERE organization_name = 'The Child Center of NY';
+UPDATE public.resources SET address = '111-49 Lefferts Blvd, South Ozone Park, NY', updated_at = now() WHERE organization_name = 'The Figure Studio';
+UPDATE public.resources SET address = '80-45 Winchester Blvd, Queens Village, NY 11427', updated_at = now() WHERE organization_name = 'Transitional Services for New York (Mieles Respite)';
+UPDATE public.resources SET address = '157-11 Rockaway Blvd, Jamaica, NY', updated_at = now() WHERE organization_name = 'United Black Men of Queens Foundation';
+UPDATE public.resources SET address = '209-01 Jamaica Ave, Queens, NY 11429', updated_at = now() WHERE organization_name = 'Well Life Network';
+UPDATE public.resources SET address = '89-25 Parsons Blvd, Jamaica, NY 11432', updated_at = now() WHERE organization_name = 'YMCA';
+UPDATE public.resources SET address = '250-66 Jericho Turnpike, Floral Park, NY 11001', updated_at = now() WHERE organization_name = 'Lyfe Boxing';
