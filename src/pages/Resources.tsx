@@ -32,7 +32,8 @@ const CATEGORIES = [
   "recreational",
   "conflict management",
   "legal services",
-  "educational"
+  "educational",
+  "senior services"
 ];
 
 export default function Resources() {
