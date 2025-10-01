@@ -568,6 +568,7 @@ export type Database = {
           is_apply_link: boolean
           location: string
           salary: string
+          subcategory: string | null
           title: string
           updated_at: string
         }
@@ -581,6 +582,7 @@ export type Database = {
           is_apply_link?: boolean
           location: string
           salary: string
+          subcategory?: string | null
           title: string
           updated_at?: string
         }
@@ -594,6 +596,7 @@ export type Database = {
           is_apply_link?: boolean
           location?: string
           salary?: string
+          subcategory?: string | null
           title?: string
           updated_at?: string
         }
