@@ -14,7 +14,7 @@ const Navbar = () => {
           {/* Logo/Site Name */}
           <Link to="/" className="text-lg sm:text-xl font-bold text-primary">
             <span className="hidden sm:inline font-oswald text-black font-semibold uppercase">Southeast Queens Resource Center</span>
-            <span className="sm:hidden font-oswald text-black font-semibold uppercase">SEQ Resource Center</span>
+            <span className="sm:hidden font-oswald text-black font-semibold uppercase">MY SEQ</span>
           </Link>
 
           {/* Right side buttons */}
