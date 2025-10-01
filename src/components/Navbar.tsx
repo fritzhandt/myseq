@@ -39,6 +39,20 @@ const Navbar = () => {
                 <p className="text-sm text-muted-foreground mt-1">Navigate your community</p>
               </div>
 
+              {/* Register to Vote - Prominent Button */}
+              <div className="px-6 pt-6 pb-4 border-b flex-shrink-0">
+                <button 
+                  onClick={() => {
+                    window.open('https://nyovr.elections.ny.gov/', '_blank', 'noopener,noreferrer');
+                    closeMenu();
+                  }}
+                  className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-lg text-base font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 shadow-sm"
+                >
+                  <Vote className="w-5 h-5" />
+                  <span>Register to Vote</span>
+                </button>
+              </div>
+
               {/* Menu Items - Scrollable */}
               <div className="flex-1 overflow-y-auto overflow-x-hidden px-6 py-6 min-h-0">
                 <nav className="space-y-2 pb-4">
@@ -143,21 +157,8 @@ const Navbar = () => {
                         </div>
                         <span>My Elected Lookup</span>
                       </Link>
-                      
-                      <button 
-                        onClick={() => {
-                          window.open('https://nyovr.elections.ny.gov/', '_blank', 'noopener,noreferrer');
-                          closeMenu();
-                        }}
-                        className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group w-full text-left" 
-                      >
-                        <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
-                          <Vote className="w-4 h-4" />
-                        </div>
-                        <span>Register to Vote</span>
-                      </button>
                   
-                      <Link 
+                      <Link
                         to="/police-precincts" 
                         className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
                         onClick={closeMenu}
