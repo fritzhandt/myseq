@@ -58,24 +58,27 @@ export default function Resources() {
   // Handle AI navigation state 
   useEffect(() => {
     const state = location.state as any;
-    if (state?.searchTerm) {
+    if (state?.searchTerm || state?.category) {
       // Set search parameters immediately
-      setSearchQuery(state.searchTerm);
+      if (state.searchTerm) setSearchQuery(state.searchTerm);
       if (state.category) setSelectedCategory(state.category);
       
       // Clear navigation state immediately
       navigate(location.pathname, { replace: true });
-    } else if (state?.category) {
-      // Handle basic category navigation without search
-      setSelectedCategory(state.category);
-      navigate(location.pathname, { replace: true });
+      
+      // Trigger immediate filter after state is set
+      setTimeout(() => {
+        filterResources();
+      }, 0);
     }
   }, [location.state, navigate, location.pathname]);
 
   // Auto-trigger filter when search query or category changes
   useEffect(() => {
-    filterResources();
-  }, [searchQuery, selectedCategory]);
+    if (resources.length > 0) {
+      filterResources();
+    }
+  }, [searchQuery, selectedCategory, resources]);
 
   const fetchResources = async () => {
     try {

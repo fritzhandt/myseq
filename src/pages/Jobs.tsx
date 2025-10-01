@@ -77,6 +77,11 @@ export default function Jobs() {
       
       // Clear the navigation state
       navigate(location.pathname, { replace: true });
+      
+      // Trigger immediate filter after state is set
+      setTimeout(() => {
+        applyFilters();
+      }, 0);
     }
   }, [location.state, navigate, location.pathname, jobs, loading]);
 
@@ -85,8 +90,10 @@ export default function Jobs() {
   }, []);
 
   useEffect(() => {
-    // Apply filters automatically
-    applyFilters();
+    // Apply filters automatically when parameters change
+    if (jobs.length > 0) {
+      applyFilters();
+    }
   }, [jobs, searchQuery, locationFilter, employerFilter, activeTab, governmentFilter]);
 
   const fetchJobs = async () => {
