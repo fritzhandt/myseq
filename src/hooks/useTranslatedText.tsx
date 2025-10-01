@@ -30,23 +30,19 @@ export const useTranslatedText = (
       return;
     }
 
-    // Show loading state and set a debounced translation request
-    setIsLoading(true);
+    // Don't show loading state to prevent blinking
+    // Keep the previous text visible while new translation loads
     
     debounceTimeoutRef.current = setTimeout(async () => {
       try {
         const abortController = new AbortController();
         abortControllerRef.current = abortController;
         
-        console.log(`[Translation] Fetching translation for key: ${contentKey}, language: ${currentLanguage}`);
-        
         const result = await translate(
           contentKey,
           originalText,
           pagePath
         );
-        
-        console.log(`[Translation] Received result for key: ${contentKey}`, result.substring(0, 100));
         
         if (!abortController.signal.aborted) {
           setTranslatedText(result);
