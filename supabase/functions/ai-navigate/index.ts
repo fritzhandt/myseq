@@ -142,7 +142,6 @@ AVAILABLE ROUTES:
 - "/police-precincts" → police/precinct info
 - "/contact-elected" → report issues to government
 - "/my-elected-lookup" → find your elected officials
-- "/home" → events calendar (searchTerm, dateStart, dateEnd)
 - "/jobs" → employment (searchTerm, employer, location)
 - "/resources" → community services and organizations (searchTerm, category)
 - "/civics" → civic organizations/community boards (searchTerm)
@@ -159,7 +158,6 @@ RESOURCE CATEGORIES (for /resources page):
 
 ROUTING EXAMPLES:
 ✓ "civic organization in rosedale" → /civics + searchTerm:"rosedale"
-✓ "events this weekend" → /home + dates
 ✓ "jobs at target" → /jobs + employer:"target"
 ✓ "who is my councilperson" → /my-elected-lookup
 ✓ "where can i learn tennis" → /resources + searchTerm:"tennis" + category:"Sports"

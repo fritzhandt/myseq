@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import CommunityAlertBanner from "@/components/CommunityAlertBanner";
 import AISearchBar from "@/components/AISearchBar";
 import { TranslatedText } from "@/components/TranslatedText";
-import { Calendar, Users, Briefcase, ArrowRight, MapPin, Heart, HelpCircle, Building2, Landmark } from "lucide-react";
+import { Calendar, Users, Briefcase, ArrowRight, MapPin, Heart, HelpCircle, Building2, Landmark, Zap } from "lucide-react";
 
 export default function DefaultPage() {
   return (
@@ -37,9 +37,9 @@ export default function DefaultPage() {
                 <TranslatedText contentKey="hero-description" originalText="Discover organizations, programs, resources, jobs, business opportunities, youth services, senior services, and more" />
               </p>
               
-              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20 px-6 py-3 rounded-full border border-primary/30 backdrop-blur-sm animate-pulse">
-                <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-                <span className="text-sm font-semibold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent uppercase tracking-wider">
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10 px-4 py-1.5 rounded-full border border-primary/20 backdrop-blur-sm">
+                <Zap className="h-3 w-3 text-primary" />
+                <span className="text-xs font-semibold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent uppercase tracking-wider">
                   <TranslatedText contentKey="hero-powered-by" originalText="Powered by AI" />
                 </span>
               </div>
@@ -57,32 +57,7 @@ export default function DefaultPage() {
         {/* Features Section */}
         <section className="pt-4 pb-20 px-4">
           <div className="container mx-auto">
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
-              {/* Events Card */}
-              <Card className="group relative overflow-hidden border-2 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:scale-105 bg-gradient-to-br from-background to-primary/5 flex flex-col h-full">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <CardHeader className="relative z-10 pb-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/70 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                    <Calendar className="h-8 w-8 text-white" />
-                  </div>
-                  <CardTitle className="text-2xl mb-2 group-hover:text-primary transition-colors duration-300">
-                    <TranslatedText contentKey="events-card-title" originalText="Community Events" />
-                  </CardTitle>
-                  <CardDescription className="text-base leading-relaxed">
-                    <TranslatedText contentKey="events-card-description" originalText="Local happenings, town halls, and community gatherings in Southeast Queens" />
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="relative z-10 mt-auto">
-                  <Button 
-                    className="w-full group-hover:bg-primary group-hover:text-white transition-all duration-300" 
-                    variant="outline"
-                    onClick={() => window.location.href = '/home'}
-                  >
-                    <TranslatedText contentKey="discover-events-btn" originalText="Discover Events" />
-                    <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
-                  </Button>
-                </CardContent>
-              </Card>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
 
               {/* Civics Card */}
               <Card className="group relative overflow-hidden border-2 hover:border-green-500/20 transition-all duration-500 hover:shadow-2xl hover:scale-105 bg-gradient-to-br from-background to-green-500/5 flex flex-col h-full">
