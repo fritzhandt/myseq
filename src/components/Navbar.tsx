@@ -13,7 +13,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Logo/Site Name */}
           <Link to="/" className="text-lg sm:text-xl font-bold text-primary">
-            <span className="hidden sm:inline font-oswald text-black font-semibold uppercase">Southeast Queens Resource Center</span>
+            <span className="hidden sm:inline font-oswald text-black font-semibold uppercase">MYSEQ</span>
             <span className="sm:hidden font-oswald text-black font-semibold uppercase">MY SEQ</span>
           </Link>
 
@@ -34,7 +34,7 @@ const Navbar = () => {
               {/* Header */}
               <div className="px-6 py-6 border-b bg-gradient-to-r from-primary/5 to-primary/10 flex-shrink-0">
                 <h2 className="font-oswald text-xl font-semibold text-foreground uppercase tracking-wide">
-                  Southeast Queens Resource Center
+                  MYSEQ
                 </h2>
                 <p className="text-sm text-muted-foreground mt-1">Navigate your community</p>
               </div>
