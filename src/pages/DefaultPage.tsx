@@ -37,9 +37,9 @@ export default function DefaultPage() {
                 <TranslatedText contentKey="hero-description" originalText="Discover organizations, programs, resources, jobs, business opportunities, youth services, senior services, and more" />
               </p>
               
-              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10 px-4 py-1.5 rounded-full border border-primary/20 backdrop-blur-sm">
+              <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-1.5 rounded-full border border-primary/30">
                 <Zap className="h-3 w-3 text-primary" />
-                <span className="text-xs font-semibold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent uppercase tracking-wider">
+                <span className="text-xs font-semibold text-primary uppercase tracking-wider">
                   <TranslatedText contentKey="hero-powered-by" originalText="Powered by AI" />
                 </span>
               </div>
