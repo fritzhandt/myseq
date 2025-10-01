@@ -79,11 +79,13 @@ const ContactElected = () => {
       return 5;
     }
     
-    // Federal senators: Schumer first, then Gillibrand
-    if (level === 'federal' && category === 'legislative' && official.office === 'U.S. Senate') {
+    // Federal legislative: Chuck Schumer, Kirsten Gillibrand, Gregory Meeks, Grace Meng
+    if (level === 'federal' && category === 'legislative') {
       if (official.name === 'Chuck Schumer') return 0;
       if (official.name === 'Kirsten Gillibrand') return 1;
-      return 2;
+      if (official.name === 'Gregory Meeks') return 2;
+      if (official.name === 'Grace Meng') return 3;
+      return 4;
     }
     
     // State legislative: Clyde Vanel first
