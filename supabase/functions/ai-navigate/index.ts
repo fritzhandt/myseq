@@ -205,6 +205,9 @@ ROUTING EXAMPLES:
 ✓ "good restaurants" → /resources + searchTerm:"restaurant" + category:"recreational"
 ✓ "where to eat" → /resources + searchTerm:"dining" + category:"recreational"
 ✓ "best food" → /resources + searchTerm:"food" + category:"recreational"
+✗ "register to vote" → NO_MATCH (will provide menu navigation instructions in general query)
+✗ "how do i register to vote" → NO_MATCH (will provide menu navigation instructions in general query)
+✗ "voter registration" → NO_MATCH (will provide menu navigation instructions in general query)
 ✗ "what rappers were born here" → NO_MATCH (trivia, not a service)
 ✗ "history of jamaica" → NO_MATCH (historical info, not a service)
 ✗ "famous people from here" → NO_MATCH (trivia, not a service)
