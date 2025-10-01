@@ -35,18 +35,6 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
 
   return (
     <Card className="h-full hover:shadow-lg transition-shadow overflow-hidden flex flex-col">
-      {/* Cover Photo Section */}
-      {resource.cover_photo_url && (
-        <div className="relative h-48 w-full">
-          <img
-            src={resource.cover_photo_url}
-            alt={`${resource.organization_name} cover`}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-        </div>
-      )}
-
       <CardHeader className="pb-3">
         <div className="flex items-center gap-3 mb-2">
           {resource.logo_url ? (
