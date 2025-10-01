@@ -38,7 +38,12 @@ const Civics = () => {
     const state = location.state as any;
     if (state?.searchTerm) {
       setSearchQuery(state.searchTerm);
-      // Clear the navigation state
+    }
+    if (state?.organizationType) {
+      setActiveTab(state.organizationType);
+    }
+    // Clear the navigation state
+    if (state?.searchTerm || state?.organizationType) {
       navigate(location.pathname, { replace: true });
     }
   }, [location.state, navigate, location.pathname]);

@@ -21,6 +21,7 @@ interface NavigationResponse {
   location?: string;
   answer?: string;
   isGeneralQuery?: boolean;
+  organizationType?: string;
   success: boolean;
   error?: string;
 }
@@ -144,7 +145,12 @@ AVAILABLE ROUTES:
 - "/my-elected-lookup" → find your elected officials
 - "/jobs" → employment (searchTerm, employer, location)
 - "/resources" → community services and organizations (searchTerm, category)
-- "/civics" → civic organizations/community boards (searchTerm)
+- "/civics" → civic organizations/community boards/police precinct councils (searchTerm, organizationType)
+
+CIVIC ORGANIZATION TYPES (for /civics page):
+- "community_board" → Community Boards (CB), Community Board meetings, district boards
+- "civic_organization" → Civic Organizations, civic associations, neighborhood associations, local civic groups
+- "police_precinct_council" → Police Precinct Councils, community councils, precinct community meetings, police community relations
 
 RESOURCE CATEGORIES (for /resources page):
 - "Recreational" → parks, recreation centers, activities, sports facilities, restaurants, dining, food establishments
@@ -157,7 +163,11 @@ RESOURCE CATEGORIES (for /resources page):
 - "Legal Services" → legal aid, attorneys, immigration help, rights assistance
 
 ROUTING EXAMPLES:
-✓ "civic organization in rosedale" → /civics + searchTerm:"rosedale"
+✓ "community board 12" → /civics + organizationType:"community_board" + searchTerm:"12"
+✓ "community board meeting" → /civics + organizationType:"community_board"
+✓ "civic organization in rosedale" → /civics + organizationType:"civic_organization" + searchTerm:"rosedale"
+✓ "police precinct council" → /civics + organizationType:"police_precinct_council"
+✓ "precinct community council" → /civics + organizationType:"police_precinct_council"
 ✓ "jobs at target" → /jobs + employer:"target"
 ✓ "who is my councilperson" → /my-elected-lookup
 ✓ "where can i learn tennis" → /resources + searchTerm:"tennis" + category:"Sports"

@@ -19,6 +19,7 @@ interface AINavigationResponse {
   location?: string;
   answer?: string;
   isGeneralQuery?: boolean;
+  organizationType?: string;
   success: boolean;
   error?: string;
 }
@@ -94,7 +95,8 @@ export default function AISearchBar() {
         dateStart: response.dateStart,
         dateEnd: response.dateEnd,
         employer: response.employer,
-        location: response.location
+        location: response.location,
+        organizationType: response.organizationType
       });
 
       const navigationState = {
@@ -103,7 +105,8 @@ export default function AISearchBar() {
         dateStart: response.dateStart,
         dateEnd: response.dateEnd,
         employer: response.employer,
-        location: response.location
+        location: response.location,
+        organizationType: response.organizationType
       };
 
       trackAIPageRedirect();
