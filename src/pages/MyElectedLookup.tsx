@@ -88,7 +88,7 @@ const MyElectedLookup = () => {
               className="text-lg text-muted-foreground text-center mb-12"
             />
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {lookupOptions.map((option, index) => (
               <div key={index} className="bg-card p-6 rounded-lg border shadow-sm">
                 <div className="text-center mb-6">
@@ -108,18 +108,20 @@ const MyElectedLookup = () => {
                     className="text-sm text-muted-foreground mb-6"
                   />
                 </div>
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <DialogTrigger asChild>
                     <Button
                       onClick={() => handleLookupClick(option)}
-                      className="w-full"
+                      className="w-full whitespace-normal min-h-[44px]"
                       size="lg"
                     >
-                      <TranslatedText 
-                        contentKey={`my_elected_lookup.find_my_${option.title.toLowerCase()}`}
-                        originalText={`Find My ${option.title}`}
-                      />
-                      <ExternalLink className="ml-2 w-4 h-4" />
+                      <span className="flex items-center justify-center gap-2">
+                        <TranslatedText 
+                          contentKey={`my_elected_lookup.find_my_${option.title.toLowerCase()}`}
+                          originalText={`Find My ${option.title}`}
+                        />
+                        <ExternalLink className="w-4 h-4 flex-shrink-0" />
+                      </span>
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
