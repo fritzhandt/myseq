@@ -69,7 +69,17 @@ const ContactElected = () => {
 
   // Custom ordering for specific officials
   const getCustomOrder = (official: ElectedOfficial, level: string, category: string) => {
-    // Federal senators: Schumer first, then Gilibrand
+    // City executives: Eric Adams, Jumaane Williams, Brad Lander, Donovan Richards, Melinda Katz
+    if (level === 'city' && category === 'executive') {
+      if (official.name === 'Eric Adams') return 0;
+      if (official.name === 'Jumaane Williams') return 1;
+      if (official.name === 'Brad Lander') return 2;
+      if (official.name === 'Donovan Richards') return 3;
+      if (official.name === 'Melinda Katz') return 4;
+      return 5;
+    }
+    
+    // Federal senators: Schumer first, then Gillibrand
     if (level === 'federal' && category === 'legislative' && official.office === 'U.S. Senate') {
       if (official.name === 'Chuck Schumer') return 0;
       if (official.name === 'Kirsten Gillibrand') return 1;
