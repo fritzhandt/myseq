@@ -140,7 +140,6 @@ YOUR JOB: Be aggressive. Find a route. Only give up if impossible.
 
 AVAILABLE ROUTES:
 - "/about" → about this website/platform
-- "/register-to-vote" → voter registration
 - "/police-precincts" → police/precinct info
 - "/contact-elected" → report issues to government
 - "/my-elected-lookup" → find your elected officials
@@ -148,6 +147,9 @@ AVAILABLE ROUTES:
 - "/resources" → community services and organizations (searchTerm, category)
 - "/business-opportunities" → business opportunities and entrepreneurship programs (searchTerm)
 - "/civics" → civic organizations/community boards/police precinct councils (searchTerm, organizationType)
+
+TOPICS THAT SHOULD NOT BE ROUTED (answer these in general query):
+- Voter registration → Tell users to click the menu (☰) in top right and select "Register to Vote"
 
 JOB CATEGORIES (for /jobs page):
 - "government" → Government jobs (city and state)
