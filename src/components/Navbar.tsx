@@ -144,16 +144,18 @@ const Navbar = () => {
                         <span>My Elected Lookup</span>
                       </Link>
                       
-                      <Link 
-                        to="/register-to-vote" 
-                        className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
-                        onClick={closeMenu}
+                      <button 
+                        onClick={() => {
+                          window.open('https://nyovr.elections.ny.gov/', '_blank', 'noopener,noreferrer');
+                          closeMenu();
+                        }}
+                        className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group w-full text-left" 
                       >
                         <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
                           <Vote className="w-4 h-4" />
                         </div>
                         <span>Register to Vote</span>
-                      </Link>
+                      </button>
                   
                       <Link 
                         to="/police-precincts" 
