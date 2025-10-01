@@ -27,11 +27,11 @@ interface Resource {
 
 const CATEGORIES = [
   "sports",
-  "mental health", 
+  "mental health/wellness", 
   "arts",
   "business",
   "recreational",
-  "wellness",
+  "conflict management",
   "legal services",
   "educational"
 ];
