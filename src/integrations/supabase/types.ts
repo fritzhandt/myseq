@@ -283,6 +283,7 @@ export type Database = {
           meeting_address: string | null
           meeting_info: string | null
           name: string
+          organization_type: string
           password_hash: string
           updated_at: string
         }
@@ -297,6 +298,7 @@ export type Database = {
           meeting_address?: string | null
           meeting_info?: string | null
           name: string
+          organization_type?: string
           password_hash: string
           updated_at?: string
         }
@@ -311,6 +313,7 @@ export type Database = {
           meeting_address?: string | null
           meeting_info?: string | null
           name?: string
+          organization_type?: string
           password_hash?: string
           updated_at?: string
         }

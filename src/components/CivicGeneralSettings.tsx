@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Settings, Save, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -19,6 +20,7 @@ interface OrganizationData {
   contact_info: any;
   meeting_info: string;
   meeting_address: string;
+  organization_type: string;
 }
 
 const CivicGeneralSettings = ({ orgId }: CivicGeneralSettingsProps) => {
@@ -29,6 +31,7 @@ const CivicGeneralSettings = ({ orgId }: CivicGeneralSettingsProps) => {
     contact_info: {},
     meeting_info: "",
     meeting_address: "",
+    organization_type: "civic_organization",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -42,7 +45,7 @@ const CivicGeneralSettings = ({ orgId }: CivicGeneralSettingsProps) => {
     try {
       const { data, error } = await supabase
         .from('civic_organizations')
-        .select('name, description, coverage_area, contact_info, meeting_info, meeting_address')
+        .select('name, description, coverage_area, contact_info, meeting_info, meeting_address, organization_type')
         .eq('id', orgId)
         .single();
 
@@ -55,6 +58,7 @@ const CivicGeneralSettings = ({ orgId }: CivicGeneralSettingsProps) => {
         contact_info: data.contact_info || {},
         meeting_info: data.meeting_info || "",
         meeting_address: data.meeting_address || "",
+        organization_type: data.organization_type || "civic_organization",
       });
     } catch (error) {
       console.error('Error fetching organization data:', error);
@@ -81,6 +85,7 @@ const CivicGeneralSettings = ({ orgId }: CivicGeneralSettingsProps) => {
           contact_info: orgData.contact_info,
           meeting_info: orgData.meeting_info,
           meeting_address: orgData.meeting_address,
+          organization_type: orgData.organization_type,
           updated_at: new Date().toISOString(),
         })
         .eq('id', orgId);
@@ -146,6 +151,23 @@ const CivicGeneralSettings = ({ orgId }: CivicGeneralSettingsProps) => {
                 onChange={(e) => setOrgData(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="Organization name"
               />
+            </div>
+
+            <div>
+              <Label htmlFor="organization_type">Organization Type</Label>
+              <Select
+                value={orgData.organization_type}
+                onValueChange={(value) => setOrgData(prev => ({ ...prev, organization_type: value }))}
+              >
+                <SelectTrigger id="organization_type">
+                  <SelectValue placeholder="Select organization type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="community_board">Community Board</SelectItem>
+                  <SelectItem value="civic_organization">Civic Organization</SelectItem>
+                  <SelectItem value="police_precinct_council">Police Precinct Council</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div>

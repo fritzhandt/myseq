@@ -5,8 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from "@/components/Navbar";
-import { Users, MapPin, Search, Vote, ExternalLink, Phone, ArrowLeft } from "lucide-react";
+import { Users, MapPin, Search, Vote, ExternalLink, Phone, ArrowLeft, Building2, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { TranslatedText } from "@/components/TranslatedText";
 
@@ -19,6 +20,7 @@ interface CivicOrganization {
   meeting_info?: string;
   meeting_address?: string;
   created_at: string;
+  organization_type: string;
 }
 
 const Civics = () => {
@@ -26,6 +28,7 @@ const Civics = () => {
   const [filteredOrgs, setFilteredOrgs] = useState<CivicOrganization[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("community_board");
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
@@ -45,17 +48,23 @@ const Civics = () => {
   }, []);
 
   useEffect(() => {
+    // Filter by both search query and active tab
+    let filtered = organizations;
+    
+    // Filter by organization type
+    filtered = filtered.filter(org => org.organization_type === activeTab);
+    
+    // Then filter by search query
     if (searchQuery) {
-      const filtered = organizations.filter(org =>
+      filtered = filtered.filter(org =>
         org.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         org.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
         org.coverage_area.toLowerCase().includes(searchQuery.toLowerCase())
       );
-      setFilteredOrgs(filtered);
-    } else {
-      setFilteredOrgs(organizations);
     }
-  }, [searchQuery, organizations]);
+    
+    setFilteredOrgs(filtered);
+  }, [searchQuery, organizations, activeTab]);
 
   const fetchOrganizations = async () => {
     try {
@@ -129,6 +138,27 @@ const Civics = () => {
               className="text-lg text-muted-foreground max-w-2xl mx-auto"
             />
           </div>
+
+          {/* Tabs for Organization Type */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
+            <TabsList className="grid w-full grid-cols-3 max-w-2xl mx-auto">
+              <TabsTrigger value="community_board" className="flex items-center gap-2">
+                <Building2 className="h-4 w-4" />
+                <span className="hidden sm:inline">Community Boards</span>
+                <span className="sm:hidden">Boards</span>
+              </TabsTrigger>
+              <TabsTrigger value="civic_organization" className="flex items-center gap-2">
+                <Vote className="h-4 w-4" />
+                <span className="hidden sm:inline">Civic Organizations</span>
+                <span className="sm:hidden">Civic</span>
+              </TabsTrigger>
+              <TabsTrigger value="police_precinct_council" className="flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                <span className="hidden sm:inline">Police Precinct Councils</span>
+                <span className="sm:hidden">Police</span>
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
 
           {/* Search */}
           <div className="mb-8">
