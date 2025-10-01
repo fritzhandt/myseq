@@ -38,7 +38,8 @@ const CATEGORIES = [
   "recreational",
   "conflict management",
   "legal services",
-  "educational"
+  "educational",
+  "senior service"
 ];
 
 export default function ResourceForm({ resource, onClose, onSave, isBusinessOpportunity = false }: ResourceFormProps) {
