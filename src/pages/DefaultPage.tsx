@@ -33,9 +33,16 @@ export default function DefaultPage() {
                 <TranslatedText contentKey="hero-title-main" originalText="SOUTHEAST QUEENS INFORMATION CENTER" />
               </h1>
               
-              <p className="text-xl md:text-2xl text-muted-foreground mb-0 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-xl md:text-2xl text-muted-foreground mb-4 max-w-2xl mx-auto leading-relaxed">
                 <TranslatedText contentKey="hero-description" originalText="Discover organizations, programs, resources, jobs, business opportunities, youth services, senior services, and more" />
               </p>
+              
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20 px-6 py-3 rounded-full border border-primary/30 backdrop-blur-sm animate-pulse">
+                <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                <span className="text-sm font-semibold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent uppercase tracking-wider">
+                  <TranslatedText contentKey="hero-powered-by" originalText="Powered by AI" />
+                </span>
+              </div>
             </div>
           </div>
         </section>
