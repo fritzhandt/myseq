@@ -1,17 +1,30 @@
 {
-  "name": "SEQ Resource Center - Southeast Queens Community",
-  "short_name": "SEQ",
-  "description": "Discover community events, resources, and opportunities in Southeast Queens",
+  "name": "My SEQ",
+  "short_name": "My SEQ",
+  "description": "Your Southeast Queens community hub for events, resources, and opportunities",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#3b82f6",
+  "background_color": "#0a0a0a",
+  "theme_color": "#1a1a1a",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "categories": ["community", "events", "social"],
