@@ -146,6 +146,7 @@ AVAILABLE ROUTES:
 - "/my-elected-lookup" → find your elected officials
 - "/jobs" → employment (searchTerm, employer, location, category, governmentType)
 - "/resources" → community services and organizations (searchTerm, category)
+- "/business-opportunities" → business opportunities and entrepreneurship programs (searchTerm)
 - "/civics" → civic organizations/community boards/police precinct councils (searchTerm, organizationType)
 
 JOB CATEGORIES (for /jobs page):
@@ -163,14 +164,13 @@ CIVIC ORGANIZATION TYPES (for /civics page):
 - "police_precinct_council" → Police Precinct Councils, community councils, precinct community meetings, police community relations
 
 RESOURCE CATEGORIES (for /resources page):
-- "Recreational" → parks, recreation centers, activities, sports facilities, restaurants, dining, food establishments
-- "Sports" → tennis lessons, basketball, leagues, sports programs, athletic training
-- "Wellness" → health services, fitness, medical care, clinics, hospitals
-- "Educational" → tutoring, classes, workshops, learning programs, schools
-- "Mental Health" → counseling, therapy, support groups, mental health services
-- "Arts" → music lessons, art classes, dance, theater, creative programs
-- "Business" → entrepreneurship, business development, networking, career services
-- "Legal Services" → legal aid, attorneys, immigration help, rights assistance
+- "sports" → tennis lessons, basketball, leagues, sports programs, athletic training, fitness
+- "mental health/wellness" → counseling, therapy, support groups, mental health services, wellness programs
+- "arts" → music lessons, art classes, dance, theater, creative programs
+- "recreational" → parks, recreation centers, activities, community centers, restaurants, dining, food establishments
+- "conflict management" → mediation, conflict resolution, dispute resolution services
+- "legal services" → legal aid, attorneys, immigration help, rights assistance
+- "educational" → tutoring, classes, workshops, learning programs, schools
 
 ROUTING EXAMPLES:
 ✓ "community board 12" → /civics + organizationType:"community_board" + searchTerm:"12"
@@ -185,34 +185,39 @@ ROUTING EXAMPLES:
 ✓ "private sector jobs" → /jobs + category:"private_sector"
 ✓ "sanitation jobs" → /jobs + category:"government" + searchTerm:"sanitation"
 ✓ "who is my councilperson" → /my-elected-lookup
-✓ "where can i learn tennis" → /resources + searchTerm:"tennis" + category:"Sports"
-✓ "tennis lessons" → /resources + searchTerm:"tennis" + category:"Sports"
-✓ "basketball programs" → /resources + searchTerm:"basketball" + category:"Sports"
-✓ "mental health counseling" → /resources + searchTerm:"counseling" + category:"Mental Health"
-✓ "art classes for kids" → /resources + searchTerm:"art classes kids" + category:"Arts"
-✓ "tutoring services" → /resources + searchTerm:"tutoring" + category:"Educational"
-✓ "fitness center near me" → /resources + searchTerm:"fitness" + category:"Wellness"
-✓ "free legal help" → /resources + searchTerm:"legal help" + category:"Legal Services"
-✓ "small business support" → /resources + searchTerm:"small business" + category:"Business"
-✓ "recreation center" → /resources + searchTerm:"recreation" + category:"Recreational"
-✓ "restaurants in southeast queens" → /resources + searchTerm:"restaurant" + category:"Recreational"
-✓ "good restaurants" → /resources + searchTerm:"restaurant" + category:"Recreational"
-✓ "where to eat" → /resources + searchTerm:"dining" + category:"Recreational"
-✓ "best food" → /resources + searchTerm:"food" + category:"Recreational"
+✓ "where can i learn tennis" → /resources + searchTerm:"tennis" + category:"sports"
+✓ "tennis lessons" → /resources + searchTerm:"tennis" + category:"sports"
+✓ "basketball programs" → /resources + searchTerm:"basketball" + category:"sports"
+✓ "mental health counseling" → /resources + searchTerm:"counseling" + category:"mental health/wellness"
+✓ "art classes for kids" → /resources + searchTerm:"art classes kids" + category:"arts"
+✓ "tutoring services" → /resources + searchTerm:"tutoring" + category:"educational"
+✓ "fitness center near me" → /resources + searchTerm:"fitness" + category:"sports"
+✓ "free legal help" → /resources + searchTerm:"legal help" + category:"legal services"
+✓ "conflict resolution" → /resources + searchTerm:"conflict" + category:"conflict management"
+✓ "business opportunities" → /business-opportunities
+✓ "small business support" → /business-opportunities + searchTerm:"small business"
+✓ "entrepreneurship programs" → /business-opportunities + searchTerm:"entrepreneurship"
+✓ "start a business" → /business-opportunities + searchTerm:"start business"
+✓ "recreation center" → /resources + searchTerm:"recreation" + category:"recreational"
+✓ "restaurants in southeast queens" → /resources + searchTerm:"restaurant" + category:"recreational"
+✓ "good restaurants" → /resources + searchTerm:"restaurant" + category:"recreational"
+✓ "where to eat" → /resources + searchTerm:"dining" + category:"recreational"
+✓ "best food" → /resources + searchTerm:"food" + category:"recreational"
 ✗ "what rappers were born here" → NO_MATCH (trivia, not a service)
 ✗ "history of jamaica" → NO_MATCH (historical info, not a service)
 ✗ "famous people from here" → NO_MATCH (trivia, not a service)
 
 CRITICAL RULE: When in doubt, TRY TO ROUTE. Prefer false positive over false negative.
 
-KEYWORD MAPPING FOR RESOURCES:
-- "learn", "lessons", "classes", "training" → likely Sports, Arts, or Educational
+KEYWORD MAPPING:
+- "learn", "lessons", "classes", "training" → /resources category:"sports", "arts", or "educational"
 - "help", "support", "assistance" → check context for category
-- "health", "medical", "fitness", "wellness" → Wellness or Mental Health
-- "legal", "lawyer", "immigration" → Legal Services
-- "business", "entrepreneur", "career" → Business
-- "recreation", "park", "activities" → Recreational
-- "restaurant", "dining", "food", "eat", "cuisine" → Recreational
+- "health", "medical", "fitness", "wellness" → /resources category:"mental health/wellness" or "sports"
+- "legal", "lawyer", "immigration" → /resources category:"legal services"
+- "business", "entrepreneur", "career", "startup", "small business" → /business-opportunities
+- "recreation", "park", "activities" → /resources category:"recreational"
+- "restaurant", "dining", "food", "eat", "cuisine" → /resources category:"recreational"
+- "conflict", "mediation", "dispute" → /resources category:"conflict management"
 
 CRITICAL: Return ONLY valid JSON, no other text or explanations.
 
