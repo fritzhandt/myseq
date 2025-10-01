@@ -88,10 +88,17 @@ const ContactElected = () => {
       return 4;
     }
     
-    // State legislative: Clyde Vanel first
+    // State legislative: Comrie, Sanders, Liu, Stavisky, Vanel, Hyndman, Anderson, Cook
     if (level === 'state' && category === 'legislative') {
-      if (official.name === 'Clyde Vanel') return 0;
-      return 1;
+      if (official.name === 'Leroy Comrie') return 0;
+      if (official.name === 'James Sanders Jr.') return 1;
+      if (official.name === 'John Liu') return 2;
+      if (official.name === 'Toby Ann Stavisky') return 3;
+      if (official.name === 'Clyde Vanel') return 4;
+      if (official.name === 'Alicia Hyndman') return 5;
+      if (official.name === 'Khaleel Anderson') return 6;
+      if (official.name === 'Vivian Cook') return 7;
+      return 8;
     }
     
     return 0;
