@@ -72,8 +72,12 @@ export default function ResourcesList({ onEdit, isBusinessOpportunity = false }:
       (resource.phone && resource.phone.includes(searchTerm))
     );
     setFilteredResources(filtered);
-    setCurrentPage(1); // Reset to first page when searching
   }, [searchTerm, resources]);
+
+  // Reset to first page only when search term changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   // Paginate filtered resources
   const totalPages = Math.ceil(filteredResources.length / itemsPerPage);
