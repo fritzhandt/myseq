@@ -132,7 +132,7 @@ AVAILABLE ROUTES:
 - "/civics" → civic organizations/community boards (searchTerm)
 
 RESOURCE CATEGORIES (for /resources page):
-- "Recreational" → parks, recreation centers, activities, sports facilities
+- "Recreational" → parks, recreation centers, activities, sports facilities, restaurants, dining, food establishments
 - "Sports" → tennis lessons, basketball, leagues, sports programs, athletic training
 - "Wellness" → health services, fitness, medical care, clinics, hospitals
 - "Educational" → tutoring, classes, workshops, learning programs, schools
@@ -156,6 +156,10 @@ ROUTING EXAMPLES:
 ✓ "free legal help" → /resources + searchTerm:"legal help" + category:"Legal Services"
 ✓ "small business support" → /resources + searchTerm:"small business" + category:"Business"
 ✓ "recreation center" → /resources + searchTerm:"recreation" + category:"Recreational"
+✓ "restaurants in southeast queens" → /resources + searchTerm:"restaurant" + category:"Recreational"
+✓ "good restaurants" → /resources + searchTerm:"restaurant" + category:"Recreational"
+✓ "where to eat" → /resources + searchTerm:"dining" + category:"Recreational"
+✓ "best food" → /resources + searchTerm:"food" + category:"Recreational"
 ✗ "what rappers were born here" → NO_MATCH
 ✗ "history of jamaica" → NO_MATCH
 ✗ "famous people" → NO_MATCH
@@ -167,6 +171,7 @@ KEYWORD MAPPING FOR RESOURCES:
 - "legal", "lawyer", "immigration" → Legal Services
 - "business", "entrepreneur", "career" → Business
 - "recreation", "park", "activities" → Recreational
+- "restaurant", "dining", "food", "eat", "cuisine" → Recreational
 
 CRITICAL: Return ONLY valid JSON, no other text or explanations.
 
