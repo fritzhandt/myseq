@@ -244,12 +244,6 @@ export default function Resources() {
               />
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground mt-2 text-center">
-            <TranslatedText 
-              contentKey="resources-search-hint" 
-              originalText="Search finds relevant resources. Press Enter or click Search." 
-            />
-          </p>
         </div>
 
         {/* Resources Grid */}

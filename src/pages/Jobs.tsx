@@ -309,12 +309,6 @@ export default function Jobs() {
                           />
                         </Button>
                       </div>
-                      <TranslatedText 
-                        contentKey="jobs.search_hint" 
-                        originalText="Smart search matches similar job titles. Press Enter or click Search."
-                        as="p"
-                        className="text-xs text-muted-foreground"
-                      />
                     </div>
 
                   {/* Advanced Search Toggle Button - only visible on mobile */}
@@ -424,12 +418,6 @@ export default function Jobs() {
                           />
                         </Button>
                       </div>
-                      <TranslatedText 
-                        contentKey="jobs.search_hint" 
-                        originalText="Smart search matches similar job titles. Press Enter or click Search."
-                        as="p"
-                        className="text-xs text-muted-foreground"
-                      />
                     </div>
 
                   {/* Advanced Search Toggle Button - only visible on mobile */}
