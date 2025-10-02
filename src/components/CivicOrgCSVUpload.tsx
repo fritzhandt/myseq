@@ -26,7 +26,12 @@ interface GeneratedCredentials {
   password: string;
 }
 
-export default function CivicOrgCSVUpload({ onUploadComplete }: { onUploadComplete?: () => void }) {
+interface CivicOrgCSVUploadProps {
+  onUploadComplete?: () => void;
+  organizationType?: string;
+}
+
+export default function CivicOrgCSVUpload({ onUploadComplete, organizationType = 'civic_organization' }: CivicOrgCSVUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [previewOrgs, setPreviewOrgs] = useState<CivicOrgRow[]>([]);
   const [generatedCredentials, setGeneratedCredentials] = useState<GeneratedCredentials[]>([]);
@@ -229,7 +234,7 @@ export default function CivicOrgCSVUpload({ onUploadComplete }: { onUploadComple
               phone: org.phone || null,
               website: ensureProtocol(org.website)
             },
-            organization_type: org.organization_type || 'civic_organization',
+            organization_type: organizationType,
             is_active: true
           };
         })

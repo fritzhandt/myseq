@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Eye, EyeOff, Copy, Trash2, Users, Building2, RotateCcw, AlertTriangle, Pencil, Download } from 'lucide-react';
+import { Plus, Eye, EyeOff, Copy, Trash2, Users, Building2, RotateCcw, AlertTriangle, Pencil, Download, Shield } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,6 +20,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import bcrypt from 'bcryptjs';
 import CivicOrgCSVUpload from './CivicOrgCSVUpload';
 
@@ -34,6 +35,7 @@ interface CivicOrganization {
   contact_info: any;
   is_active: boolean;
   created_at: string;
+  organization_type: string;
 }
 
 export default function CivicOrganizationsManager() {
@@ -403,10 +405,10 @@ export default function CivicOrganizationsManager() {
         <div>
           <h2 className="text-3xl font-bold flex items-center gap-2">
             <Building2 className="h-8 w-8" />
-            Civic Organizations
+            Civic Organizations Management
           </h2>
           <p className="text-muted-foreground mt-2">
-            Create and manage access codes for civic organizations to log into their admin panels.
+            Manage civic organizations, community boards, and police councils.
           </p>
         </div>
         
@@ -415,8 +417,28 @@ export default function CivicOrganizationsManager() {
             <Download className="h-5 w-5 mr-2" />
             Export Access Codes
           </Button>
-          
-          <Dialog open={isCreating} onOpenChange={(open) => {
+        </div>
+      </div>
+
+      <Tabs defaultValue="civic" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="civic" className="flex items-center gap-2">
+            <Building2 className="h-4 w-4" />
+            Civic Organizations
+          </TabsTrigger>
+          <TabsTrigger value="community-boards" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            Community Boards
+          </TabsTrigger>
+          <TabsTrigger value="police-councils" className="flex items-center gap-2">
+            <Shield className="h-4 w-4" />
+            Police Councils
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="civic" className="space-y-6 mt-6">
+          <div className="flex justify-end">
+            <Dialog open={isCreating} onOpenChange={(open) => {
             setIsCreating(open);
             if (!open) {
               setEditingOrg(null);
@@ -595,29 +617,28 @@ export default function CivicOrganizationsManager() {
               </div>
             </form>
           </DialogContent>
-        </Dialog>
-        </div>
-      </div>
+            </Dialog>
+          </div>
 
-      <CivicOrgCSVUpload onUploadComplete={fetchOrganizations} />
+          <CivicOrgCSVUpload onUploadComplete={fetchOrganizations} />
 
-      <div className="grid gap-4">
-        {organizations.length === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <Users className="h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No civic organizations yet</h3>
-              <p className="text-muted-foreground text-center mb-4">
-                Create your first civic organization to get started.
-              </p>
-              <Button onClick={() => setIsCreating(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Create First Organization
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          organizations.map((org) => (
+          <div className="grid gap-4">
+            {organizations.filter(org => org.organization_type === 'civic_organization').length === 0 ? (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <Building2 className="h-12 w-12 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No civic organizations yet</h3>
+                  <p className="text-muted-foreground text-center mb-4">
+                    Create your first civic organization or upload via CSV.
+                  </p>
+                  <Button onClick={() => setIsCreating(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create First Organization
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              organizations.filter(org => org.organization_type === 'civic_organization').map((org) => (
             <Card key={org.id} className={org.is_active ? "" : "opacity-60"}>
               <CardHeader>
                 <div className="flex justify-between items-start">
@@ -729,10 +750,292 @@ export default function CivicOrganizationsManager() {
                   Created: {new Date(org.created_at).toLocaleDateString()}
                 </div>
               </CardContent>
-            </Card>
-          ))
-        )}
-      </div>
+                </Card>
+              ))
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="community-boards" className="space-y-6 mt-6">
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold">Community Board CSV Upload</h3>
+            <p className="text-sm text-muted-foreground">
+              Upload a CSV file with community board information. The system will automatically set the organization type to "community_board".
+            </p>
+            <CivicOrgCSVUpload onUploadComplete={fetchOrganizations} organizationType="community_board" />
+          </div>
+
+          <div className="grid gap-4">
+            {organizations.filter(org => org.organization_type === 'community_board').length === 0 ? (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <Users className="h-12 w-12 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No community boards yet</h3>
+                  <p className="text-muted-foreground text-center mb-4">
+                    Upload a CSV file to add community boards.
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              organizations.filter(org => org.organization_type === 'community_board').map((org) => (
+                <Card key={org.id} className={org.is_active ? "" : "opacity-60"}>
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          {org.name}
+                          {!org.is_active && <Badge variant="secondary">Inactive</Badge>}
+                          <Badge variant="outline">Community Board</Badge>
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Coverage: {org.coverage_area}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleEdit(org)}
+                          title="Edit Organization"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => resetPassword(org.id, org.name)}
+                          title="Reset Password"
+                        >
+                          <RotateCcw className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setDeleteDialog({ isOpen: true, orgId: org.id, orgName: org.name })}
+                          title="Delete Organization"
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                        <Switch
+                          checked={org.is_active}
+                          onCheckedChange={() => toggleActive(org.id, org.is_active)}
+                          title={org.is_active ? "Disable Organization" : "Enable Organization"}
+                        />
+                      </div>
+                    </div>
+                  </CardHeader>
+                  
+                  <CardContent className="space-y-4">
+                    {org.description && (
+                      <p className="text-sm text-muted-foreground">{org.description}</p>
+                    )}
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">Access Code</Label>
+                        <div className="flex items-center gap-2">
+                          <code className="bg-muted px-3 py-2 rounded text-lg font-mono">
+                            {org.access_code}
+                          </code>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => copyToClipboard(org.access_code, 'Access code')}
+                          >
+                            <Copy className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">Admin URL</Label>
+                        <div className="flex items-center gap-2">
+                          <code className="bg-muted px-3 py-2 rounded text-sm font-mono flex-1">
+                            /civic-auth?code={org.access_code}
+                          </code>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => copyToClipboard(`${window.location.origin}/civic-auth?code=${org.access_code}`, 'Admin URL')}
+                          >
+                            <Copy className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {(org.meeting_info || org.meeting_address) && (
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">Meeting Information</Label>
+                        <div className="text-sm text-muted-foreground">
+                          {org.meeting_info && <div>Schedule: {org.meeting_info}</div>}
+                          {org.meeting_address && <div>Location: {org.meeting_address}</div>}
+                        </div>
+                      </div>
+                    )}
+
+                    {(org.contact_info?.email || org.contact_info?.phone || org.contact_info?.website) && (
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">Contact Information</Label>
+                        <div className="text-sm text-muted-foreground space-y-1">
+                          {org.contact_info.email && <div>Email: {org.contact_info.email}</div>}
+                          {org.contact_info.phone && <div>Phone: {org.contact_info.phone}</div>}
+                          {org.contact_info.website && <div>Website: {org.contact_info.website}</div>}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="text-xs text-muted-foreground pt-2 border-t">
+                      Created: {new Date(org.created_at).toLocaleDateString()}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="police-councils" className="space-y-6 mt-6">
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold">Police Council CSV Upload</h3>
+            <p className="text-sm text-muted-foreground">
+              Upload a CSV file with police council information. The system will automatically set the organization type to "police_council".
+            </p>
+            <CivicOrgCSVUpload onUploadComplete={fetchOrganizations} organizationType="police_council" />
+          </div>
+
+          <div className="grid gap-4">
+            {organizations.filter(org => org.organization_type === 'police_council').length === 0 ? (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <Shield className="h-12 w-12 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No police councils yet</h3>
+                  <p className="text-muted-foreground text-center mb-4">
+                    Upload a CSV file to add police councils.
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              organizations.filter(org => org.organization_type === 'police_council').map((org) => (
+                <Card key={org.id} className={org.is_active ? "" : "opacity-60"}>
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          {org.name}
+                          {!org.is_active && <Badge variant="secondary">Inactive</Badge>}
+                          <Badge variant="outline">Police Council</Badge>
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Coverage: {org.coverage_area}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleEdit(org)}
+                          title="Edit Organization"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => resetPassword(org.id, org.name)}
+                          title="Reset Password"
+                        >
+                          <RotateCcw className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setDeleteDialog({ isOpen: true, orgId: org.id, orgName: org.name })}
+                          title="Delete Organization"
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                        <Switch
+                          checked={org.is_active}
+                          onCheckedChange={() => toggleActive(org.id, org.is_active)}
+                          title={org.is_active ? "Disable Organization" : "Enable Organization"}
+                        />
+                      </div>
+                    </div>
+                  </CardHeader>
+                  
+                  <CardContent className="space-y-4">
+                    {org.description && (
+                      <p className="text-sm text-muted-foreground">{org.description}</p>
+                    )}
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">Access Code</Label>
+                        <div className="flex items-center gap-2">
+                          <code className="bg-muted px-3 py-2 rounded text-lg font-mono">
+                            {org.access_code}
+                          </code>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => copyToClipboard(org.access_code, 'Access code')}
+                          >
+                            <Copy className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">Admin URL</Label>
+                        <div className="flex items-center gap-2">
+                          <code className="bg-muted px-3 py-2 rounded text-sm font-mono flex-1">
+                            /civic-auth?code={org.access_code}
+                          </code>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => copyToClipboard(`${window.location.origin}/civic-auth?code=${org.access_code}`, 'Admin URL')}
+                          >
+                            <Copy className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {(org.meeting_info || org.meeting_address) && (
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">Meeting Information</Label>
+                        <div className="text-sm text-muted-foreground">
+                          {org.meeting_info && <div>Schedule: {org.meeting_info}</div>}
+                          {org.meeting_address && <div>Location: {org.meeting_address}</div>}
+                        </div>
+                      </div>
+                    )}
+
+                    {(org.contact_info?.email || org.contact_info?.phone || org.contact_info?.website) && (
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">Contact Information</Label>
+                        <div className="text-sm text-muted-foreground space-y-1">
+                          {org.contact_info.email && <div>Email: {org.contact_info.email}</div>}
+                          {org.contact_info.phone && <div>Phone: {org.contact_info.phone}</div>}
+                          {org.contact_info.website && <div>Website: {org.contact_info.website}</div>}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="text-xs text-muted-foreground pt-2 border-t">
+                      Created: {new Date(org.created_at).toLocaleDateString()}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
 
       {/* Reset Password Dialog */}
       <Dialog open={resetPasswordDialog.isOpen} onOpenChange={(open) => setResetPasswordDialog({isOpen: open})}>
