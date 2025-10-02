@@ -190,7 +190,7 @@ const Navbar = () => {
                       </Link>
                       
                       <a 
-                        href="mailto:district33@nyassembly.gov"
+                        href="mailto:district33@nyassembly.gov?subject=MY%20SEQ%20SUPPORT/INQUIRY"
                         className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
                         onClick={closeMenu}
                       >
