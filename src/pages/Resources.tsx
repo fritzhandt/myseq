@@ -26,6 +26,9 @@ interface Resource {
 }
 
 const CATEGORIES = [
+  "environment",
+  "youth",
+  "community resources",
   "sports",
   "mental health/wellness", 
   "arts",
