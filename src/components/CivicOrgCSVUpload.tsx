@@ -211,6 +211,7 @@ export default function CivicOrgCSVUpload({ onUploadComplete, organizationType =
     setUploading(true);
 
     try {
+      console.log('Starting import with organization type:', organizationType);
       const credentials: { accessCode: string; password: string; name: string }[] = [];
       
       const orgsToInsert = await Promise.all(
@@ -221,7 +222,7 @@ export default function CivicOrgCSVUpload({ onUploadComplete, organizationType =
 
           credentials.push({ accessCode, password, name: org.name });
 
-          return {
+          const orgData = {
             name: org.name,
             description: org.description,
             coverage_area: org.coverage_area,
@@ -237,14 +238,29 @@ export default function CivicOrgCSVUpload({ onUploadComplete, organizationType =
             organization_type: organizationType,
             is_active: true
           };
+
+          console.log('Org data to insert:', orgData);
+          return orgData;
         })
       );
+
+      console.log('Total orgs to insert:', orgsToInsert.length);
+      console.log('Sample org:', orgsToInsert[0]);
 
       const { error } = await supabase
         .from('civic_organizations')
         .insert(orgsToInsert);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase insert error:', error);
+        console.error('Error details:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
+        throw error;
+      }
 
       // Display credentials to user
       const credentialsText = credentials.map(c => 
