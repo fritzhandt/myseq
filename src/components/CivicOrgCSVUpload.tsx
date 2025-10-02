@@ -50,40 +50,64 @@ export default function CivicOrgCSVUpload({ onUploadComplete }: { onUploadComple
     const data = XLSX.utils.sheet_to_json(worksheet);
 
     return data.map((row: any) => ({
-      name: row.name || row.Name || '',
-      description: row.description || row.Description || '',
-      coverage_area: row.coverage_area || row['Coverage Area'] || row.area || '',
-      meeting_info: row.meeting_info || row['Meeting Info'] || row.meeting || '',
-      meeting_address: row.meeting_address || row['Meeting Address'] || row.address || '',
-      email: row.email || row.Email || '',
-      phone: row.phone || row.Phone || '',
-      website: row.website || row.Website || '',
-      organization_type: row.organization_type || row['Organization Type'] || 'civic_organization'
+      name: row.name || row.Name || row.organization_name || row['Organization Name'] || '',
+      description: row.description || row.Description || row.desc || row.Desc || '',
+      coverage_area: row.coverage_area || row['Coverage Area'] || row.area || row.Area || row.coverage || row.Coverage || '',
+      meeting_info: row.meeting_info || row['Meeting Info'] || row.meeting || row.Meeting || row.meeting_schedule || row['Meeting Schedule'] || null,
+      meeting_address: row.meeting_address || row['Meeting Address'] || row.address || row.Address || row.location || row.Location || null,
+      email: row.email || row.Email || row.contact_email || row['Contact Email'] || null,
+      phone: row.phone || row.Phone || row.telephone || row.Telephone || row['Phone Number'] || null,
+      website: row.website || row.Website || row.url || row.URL || row.web || row.Web || null,
+      organization_type: row.organization_type || row['Organization Type'] || row.type || row.Type || 'civic_organization'
     }));
   };
 
   const parseCSV = (text: string): CivicOrgRow[] => {
+    // Split lines but keep quoted content together
     const lines = text.split('\n').filter(line => line.trim());
-    const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/['"]/g, ''));
+    
+    // Parse CSV line properly handling quotes and commas
+    const parseLine = (line: string): string[] => {
+      const result: string[] = [];
+      let current = '';
+      let inQuotes = false;
+      
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          result.push(current.trim());
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      result.push(current.trim());
+      return result;
+    };
+
+    const headers = parseLine(lines[0]).map(h => h.toLowerCase().replace(/['"]/g, '').trim());
     
     return lines.slice(1).map(line => {
-      const values = line.split(',').map(v => v.trim().replace(/['"]/g, ''));
+      const values = parseLine(line).map(v => v.replace(/^["']|["']$/g, '').trim());
       const obj: any = {};
       
       headers.forEach((header, index) => {
-        obj[header] = values[index] || '';
+        obj[header] = values[index] && values[index] !== '' ? values[index] : null;
       });
 
       return {
-        name: obj.name || '',
-        description: obj.description || '',
-        coverage_area: obj.coverage_area || obj['coverage area'] || obj.area || '',
-        meeting_info: obj.meeting_info || obj['meeting info'] || obj.meeting || '',
-        meeting_address: obj.meeting_address || obj['meeting address'] || obj.address || '',
-        email: obj.email || '',
-        phone: obj.phone || '',
-        website: obj.website || '',
-        organization_type: obj.organization_type || obj['organization type'] || 'civic_organization'
+        name: obj.name || obj.organization_name || '',
+        description: obj.description || obj.desc || '',
+        coverage_area: obj.coverage_area || obj['coverage area'] || obj.area || obj.coverage || '',
+        meeting_info: obj.meeting_info || obj['meeting info'] || obj.meeting || obj.meeting_schedule || null,
+        meeting_address: obj.meeting_address || obj['meeting address'] || obj.address || obj.location || null,
+        email: obj.email || obj['contact email'] || obj.contact_email || null,
+        phone: obj.phone || obj.telephone || obj['phone number'] || null,
+        website: obj.website || obj.url || obj.web || null,
+        organization_type: obj.organization_type || obj['organization type'] || obj.type || 'civic_organization'
       };
     });
   };
@@ -162,9 +186,9 @@ export default function CivicOrgCSVUpload({ onUploadComplete }: { onUploadComple
             access_code: accessCode,
             password_hash: passwordHash,
             contact_info: {
-              email: org.email || '',
-              phone: org.phone || '',
-              website: org.website || ''
+              email: org.email || null,
+              phone: org.phone || null,
+              website: org.website || null
             },
             organization_type: org.organization_type || 'civic_organization',
             is_active: true
@@ -243,12 +267,19 @@ export default function CivicOrgCSVUpload({ onUploadComplete }: { onUploadComple
 
           <Alert>
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              <strong>Required columns:</strong> name, description, coverage_area
-              <br />
-              <strong>Optional columns:</strong> meeting_info, meeting_address, email, phone, website, organization_type
-              <br />
-              Access codes and passwords will be auto-generated for each organization.
+            <AlertDescription className="space-y-2">
+              <div>
+                <strong>Required columns:</strong> name, description, coverage_area
+              </div>
+              <div>
+                <strong>Optional columns:</strong> meeting_info, meeting_address, email, phone, website, organization_type
+              </div>
+              <div className="text-xs text-muted-foreground mt-2">
+                Column names are case-insensitive. Alternative names supported: "organization_name" for name, "area" for coverage_area, etc.
+              </div>
+              <div className="text-xs">
+                Access codes and passwords will be auto-generated for each organization.
+              </div>
             </AlertDescription>
           </Alert>
         </CardContent>
@@ -270,16 +301,22 @@ export default function CivicOrgCSVUpload({ onUploadComplete }: { onUploadComple
                     <th className="p-2 text-left">Name</th>
                     <th className="p-2 text-left">Description</th>
                     <th className="p-2 text-left">Coverage Area</th>
+                    <th className="p-2 text-left">Email</th>
+                    <th className="p-2 text-left">Phone</th>
+                    <th className="p-2 text-left">Meeting</th>
                     <th className="p-2 text-left">Type</th>
                   </tr>
                 </thead>
                 <tbody>
                   {previewOrgs.slice(0, 10).map((org, index) => (
                     <tr key={index} className="border-t">
-                      <td className="p-2">{org.name}</td>
-                      <td className="p-2">{org.description.substring(0, 50)}...</td>
+                      <td className="p-2 font-medium">{org.name}</td>
+                      <td className="p-2 text-muted-foreground">{org.description.substring(0, 40)}...</td>
                       <td className="p-2">{org.coverage_area}</td>
-                      <td className="p-2">{org.organization_type}</td>
+                      <td className="p-2 text-xs">{org.email || <span className="text-muted-foreground italic">-</span>}</td>
+                      <td className="p-2 text-xs">{org.phone || <span className="text-muted-foreground italic">-</span>}</td>
+                      <td className="p-2 text-xs">{org.meeting_info || <span className="text-muted-foreground italic">-</span>}</td>
+                      <td className="p-2 text-xs">{org.organization_type}</td>
                     </tr>
                   ))}
                 </tbody>
