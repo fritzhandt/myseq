@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import CommunityAlertBanner from "@/components/CommunityAlertBanner";
 import AISearchBar from "@/components/AISearchBar";
 import { TranslatedText } from "@/components/TranslatedText";
-import { Calendar, Users, Briefcase, ArrowRight, MapPin, Heart, HelpCircle, Building2, Landmark, Zap } from "lucide-react";
+import { Calendar, Users, Briefcase, ArrowRight, MapPin, Heart, HelpCircle, Building2, Landmark, Zap, Instagram } from "lucide-react";
 
 export default function DefaultPage() {
   return (
@@ -193,6 +193,21 @@ export default function DefaultPage() {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </div>
+          </div>
+        </section>
+
+        {/* Footer with Instagram */}
+        <section className="py-8 px-4 border-t border-border/50">
+          <div className="container mx-auto flex justify-center">
+            <a
+              href="https://www.instagram.com/yourpage"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:from-pink-600 hover:to-purple-700 transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg"
+            >
+              <Instagram className="h-5 w-5" />
+              <span className="font-medium">Follow us on Instagram</span>
+            </a>
           </div>
         </section>
       </main>
