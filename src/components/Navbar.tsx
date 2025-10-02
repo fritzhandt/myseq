@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Menu, Info, Users, Mail, Search, Vote, Shield, Calendar, Briefcase, Home, Building2, HelpCircle, Instagram } from 'lucide-react';
+import { Menu, Info, Users, Mail, Search, Vote, Shield, Calendar, Briefcase, Home, Building2, HelpCircle, Instagram, ExternalLink } from 'lucide-react';
 import AddToHomeButton from '@/components/AddToHomeButton';
 import { LanguageSelector } from '@/components/LanguageSelector';
 const Navbar = () => {
@@ -212,28 +212,33 @@ const Navbar = () => {
       
       {/* Register to Vote Dialog */}
       <AlertDialog open={showVoteDialog} onOpenChange={setShowVoteDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-md">
           <AlertDialogHeader>
-            <AlertDialogTitle>Leaving MY SEQ</AlertDialogTitle>
-            <AlertDialogDescription className="space-y-3">
-              <p>
-                You are about to visit an official New York State government website. Your usage on that site is subject to their terms and conditions.
+            <AlertDialogTitle className="text-center text-xl">Leaving This Site</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-4 text-center">
+              <p className="text-muted-foreground">
+                This link is taking you to an official government website:
               </p>
-              <p>
-                On this page, you'll have the option to register to vote in person, by mail, or online. The page will provide you with all the information needed to register in the way that works best for you.
+              <p className="font-semibold text-primary break-all">
+                https://elections.ny.gov/voter-registration-process
+              </p>
+              <p className="text-muted-foreground">
+                This is an official government website maintained by the respective office. On this page, you'll have the option to register to vote in person, by mail, or online. The page will provide you with all the information needed to register in the way that works best for you.
               </p>
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogFooter className="flex-col gap-2 sm:flex-col">
             <AlertDialogAction
               onClick={() => {
                 window.open('https://elections.ny.gov/voter-registration-process', '_blank', 'noopener,noreferrer');
                 closeMenu();
               }}
+              className="w-full bg-primary hover:bg-primary/90"
             >
-              Continue
+              Continue to External Site
+              <ExternalLink className="ml-2 h-4 w-4" />
             </AlertDialogAction>
+            <AlertDialogCancel className="w-full mt-0">Cancel</AlertDialogCancel>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
