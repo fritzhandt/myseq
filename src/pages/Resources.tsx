@@ -29,6 +29,7 @@ const CATEGORIES = [
   "arts",
   "community resources",
   "conflict management",
+  "cultural",
   "educational",
   "environment",
   "legal services",
