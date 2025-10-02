@@ -25,19 +25,23 @@ interface Resource {
   categories: string[];
 }
 
-const CATEGORIES = [
+// Main categories that don't have subcategories
+const MAIN_CATEGORIES = [
   "Arts",
-  "Community Resources",
-  "Conflict Management",
-  "Cultural",
   "Educational",
-  "Environment",
   "Food",
-  "Legal Services",
   "Mental Health/Wellness",
   "Senior Services",
   "Social",
-  "Sports",
+  "Sports"
+];
+
+// Community Resources subcategories
+const COMMUNITY_SUBCATEGORIES = [
+  "Environment",
+  "Conflict Management",
+  "Cultural",
+  "Legal Services",
   "Youth"
 ];
 
@@ -48,6 +52,7 @@ export default function Resources() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [showCommunitySubcategories, setShowCommunitySubcategories] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
   const location = useLocation();
@@ -201,28 +206,81 @@ export default function Resources() {
         </div>
 
         {/* Category Filter Buttons */}
-        <div className="flex flex-wrap justify-center gap-2 mb-6">
-          <Button
-            variant={!selectedCategory ? "default" : "outline"}
-            size="sm"
-            onClick={() => setSelectedCategory("")}
-          >
-            <TranslatedText contentKey="resources-all-categories" originalText="All Categories" />
-          </Button>
-          {CATEGORIES.map((category) => (
+        <div className="max-w-5xl mx-auto mb-6 space-y-3">
+          {/* All Categories Button */}
+          <div className="flex justify-center">
             <Button
-              key={category}
-              variant={selectedCategory === category ? "default" : "outline"}
+              variant={!selectedCategory ? "default" : "outline"}
               size="sm"
-              onClick={() => handleCategorySelect(category)}
+              onClick={() => {
+                setSelectedCategory("");
+                setShowCommunitySubcategories(false);
+              }}
+            >
+              <TranslatedText contentKey="resources-all-categories" originalText="All Categories" />
+            </Button>
+          </div>
+
+          {/* Main Categories */}
+          <div className="flex flex-wrap justify-center gap-2">
+            {MAIN_CATEGORIES.map((category) => (
+              <Button
+                key={category}
+                variant={selectedCategory === category ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  handleCategorySelect(category);
+                  setShowCommunitySubcategories(false);
+                }}
+                className="capitalize"
+              >
+                <TranslatedText 
+                  contentKey={`category-${category.replace(/\s+/g, '-')}`} 
+                  originalText={category} 
+                />
+              </Button>
+            ))}
+          </div>
+
+          {/* Community Resources with Subcategories */}
+          <div className="flex flex-col items-center gap-2">
+            <Button
+              variant={COMMUNITY_SUBCATEGORIES.includes(selectedCategory) || showCommunitySubcategories ? "default" : "outline"}
+              size="sm"
+              onClick={() => {
+                setShowCommunitySubcategories(!showCommunitySubcategories);
+                if (!showCommunitySubcategories) {
+                  setSelectedCategory("");
+                }
+              }}
               className="capitalize"
             >
               <TranslatedText 
-                contentKey={`category-${category.replace(/\s+/g, '-')}`} 
-                originalText={category} 
+                contentKey="category-community-resources" 
+                originalText="Community Resources" 
               />
             </Button>
-          ))}
+            
+            {/* Subcategories */}
+            {showCommunitySubcategories && (
+              <div className="flex flex-wrap justify-center gap-2 pl-4">
+                {COMMUNITY_SUBCATEGORIES.map((subcategory) => (
+                  <Button
+                    key={subcategory}
+                    variant={selectedCategory === subcategory ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handleCategorySelect(subcategory)}
+                    className="capitalize text-sm"
+                  >
+                    <TranslatedText 
+                      contentKey={`category-${subcategory.replace(/\s+/g, '-')}`} 
+                      originalText={subcategory} 
+                    />
+                  </Button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Search Bar */}
