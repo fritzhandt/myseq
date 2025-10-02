@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Eye, EyeOff, Copy, Trash2, Users, Building2, RotateCcw, AlertTriangle } from 'lucide-react';
+import { Plus, Eye, EyeOff, Copy, Trash2, Users, Building2, RotateCcw, AlertTriangle, Pencil } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,6 +39,7 @@ interface CivicOrganization {
 export default function CivicOrganizationsManager() {
   const [organizations, setOrganizations] = useState<CivicOrganization[]>([]);
   const [isCreating, setIsCreating] = useState(false);
+  const [editingOrg, setEditingOrg] = useState<CivicOrganization | null>(null);
   const [showPasswords, setShowPasswords] = useState<{[key: string]: boolean}>({});
   const [loading, setLoading] = useState(true);
   const [resetPasswordDialog, setResetPasswordDialog] = useState<{isOpen: boolean, orgId?: string, orgName?: string, newPassword?: string}>({isOpen: false});
@@ -112,7 +113,7 @@ export default function CivicOrganizationsManager() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.access_code || !formData.password || !formData.coverage_area) {
+    if (!formData.name || !formData.access_code || !formData.coverage_area) {
       toast({
         title: "Error",
         description: "Please fill in all required fields",
@@ -123,10 +124,6 @@ export default function CivicOrganizationsManager() {
 
     try {
       setLoading(true);
-      
-      // Hash the password
-      const saltRounds = 12;
-      const password_hash = await bcrypt.hash(formData.password, saltRounds);
 
       const contact_info = {
         email: formData.email || null,
@@ -134,26 +131,71 @@ export default function CivicOrganizationsManager() {
         website: formData.website || null
       };
 
-      const { error } = await supabase
-        .from('civic_organizations')
-        .insert([{
+      if (editingOrg) {
+        // Update existing organization
+        const updateData: any = {
           name: formData.name,
           description: formData.description,
           access_code: formData.access_code,
-          password_hash,
           coverage_area: formData.coverage_area,
           meeting_info: formData.meeting_info || null,
           meeting_address: formData.meeting_address || null,
           contact_info,
           is_active: formData.is_active
-        }]);
+        };
 
-      if (error) throw error;
+        // Only hash and update password if a new one was provided
+        if (formData.password) {
+          const saltRounds = 12;
+          updateData.password_hash = await bcrypt.hash(formData.password, saltRounds);
+        }
 
-      toast({
-        title: "Success",
-        description: "Civic organization created successfully!",
-      });
+        const { error } = await supabase
+          .from('civic_organizations')
+          .update(updateData)
+          .eq('id', editingOrg.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Success",
+          description: "Civic organization updated successfully!",
+        });
+      } else {
+        // Create new organization
+        if (!formData.password) {
+          toast({
+            title: "Error",
+            description: "Password is required for new organizations",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        const saltRounds = 12;
+        const password_hash = await bcrypt.hash(formData.password, saltRounds);
+
+        const { error } = await supabase
+          .from('civic_organizations')
+          .insert([{
+            name: formData.name,
+            description: formData.description,
+            access_code: formData.access_code,
+            password_hash,
+            coverage_area: formData.coverage_area,
+            meeting_info: formData.meeting_info || null,
+            meeting_address: formData.meeting_address || null,
+            contact_info,
+            is_active: formData.is_active
+          }]);
+
+        if (error) throw error;
+
+        toast({
+          title: "Success",
+          description: "Civic organization created successfully!",
+        });
+      }
 
       // Reset form
       setFormData({
@@ -170,6 +212,7 @@ export default function CivicOrganizationsManager() {
         is_active: true
       });
       setIsCreating(false);
+      setEditingOrg(null);
       fetchOrganizations();
     } catch (error: any) {
       toast({
@@ -180,6 +223,24 @@ export default function CivicOrganizationsManager() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEdit = (org: CivicOrganization) => {
+    setFormData({
+      name: org.name,
+      description: org.description,
+      access_code: org.access_code,
+      password: '', // Don't populate password for security
+      coverage_area: org.coverage_area,
+      meeting_info: org.meeting_info || '',
+      meeting_address: org.meeting_address || '',
+      email: org.contact_info?.email || '',
+      phone: org.contact_info?.phone || '',
+      website: org.contact_info?.website || '',
+      is_active: org.is_active
+    });
+    setEditingOrg(org);
+    setIsCreating(true);
   };
 
   const toggleActive = async (id: string, currentStatus: boolean) => {
@@ -315,7 +376,25 @@ export default function CivicOrganizationsManager() {
           </p>
         </div>
         
-        <Dialog open={isCreating} onOpenChange={setIsCreating}>
+        <Dialog open={isCreating} onOpenChange={(open) => {
+          setIsCreating(open);
+          if (!open) {
+            setEditingOrg(null);
+            setFormData({
+              name: '',
+              description: '',
+              access_code: '',
+              password: '',
+              coverage_area: '',
+              meeting_info: '',
+              meeting_address: '',
+              email: '',
+              phone: '',
+              website: '',
+              is_active: true
+            });
+          }
+        }}>
           <DialogTrigger asChild>
             <Button size="lg">
               <Plus className="h-5 w-5 mr-2" />
@@ -325,7 +404,7 @@ export default function CivicOrganizationsManager() {
           
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Create New Civic Organization</DialogTitle>
+              <DialogTitle>{editingOrg ? 'Edit' : 'Create New'} Civic Organization</DialogTitle>
             </DialogHeader>
             
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -382,15 +461,15 @@ export default function CivicOrganizationsManager() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password *</Label>
+                  <Label htmlFor="password">Password {editingOrg ? '(leave blank to keep current)' : '*'}</Label>
                   <div className="flex gap-2">
                     <Input
                       id="password"
                       type="text"
                       value={formData.password}
                       onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                      placeholder="Password"
-                      required
+                      placeholder={editingOrg ? "Leave blank to keep current password" : "Password"}
+                      required={!editingOrg}
                     />
                     <Button type="button" onClick={generatePassword} variant="outline">
                       Generate
@@ -464,11 +543,14 @@ export default function CivicOrganizationsManager() {
               </div>
 
               <div className="flex justify-end gap-2 pt-4">
-                <Button type="button" variant="outline" onClick={() => setIsCreating(false)}>
+                <Button type="button" variant="outline" onClick={() => {
+                  setIsCreating(false);
+                  setEditingOrg(null);
+                }}>
                   Cancel
                 </Button>
                 <Button type="submit" disabled={loading}>
-                  {loading ? "Creating..." : "Create Organization"}
+                  {loading ? (editingOrg ? "Updating..." : "Creating...") : (editingOrg ? "Update Organization" : "Create Organization")}
                 </Button>
               </div>
             </form>
@@ -508,6 +590,14 @@ export default function CivicOrganizationsManager() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleEdit(org)}
+                      title="Edit Organization"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
                     <Button
                       size="sm"
                       variant="outline"
