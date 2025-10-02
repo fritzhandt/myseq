@@ -358,8 +358,8 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
           description: "Resource updated successfully",
         });
         
-        // Don't close the form after editing - allow multiple edits
-        onSave();
+        // Don't call onSave() or onClose() - keep form open for multiple edits
+        // User can click Cancel to go back to the list
       } else {
         // New resources: sub-admins go to pending table, others go directly to main table
         const tableName = isSubAdmin ? 'pending_resources' : 'resources';
