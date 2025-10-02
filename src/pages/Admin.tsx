@@ -182,6 +182,11 @@ const Admin = () => {
   const handleResourceFormClose = () => {
     setShowResourceForm(false);
     setEditingResource(null);
+  };
+
+  const handleResourceFormSave = () => {
+    setShowResourceForm(false);
+    setEditingResource(null);
     setResourceRefreshTrigger(prev => prev + 1); // Trigger refresh without resetting page
   };
 
@@ -196,6 +201,11 @@ const Admin = () => {
   };
 
   const handleBusinessOpportunityFormClose = () => {
+    setShowBusinessOpportunityForm(false);
+    setEditingBusinessOpportunity(null);
+  };
+
+  const handleBusinessOpportunityFormSave = () => {
     setShowBusinessOpportunityForm(false);
     setEditingBusinessOpportunity(null);
     setBusinessRefreshTrigger(prev => prev + 1); // Trigger refresh without resetting page
@@ -389,7 +399,7 @@ const Admin = () => {
               <ResourceForm
                 resource={editingResource}
                 onClose={handleResourceFormClose}
-                onSave={handleResourceFormClose}
+                onSave={handleResourceFormSave}
               />
             ) : (
               <div className="space-y-6">
@@ -424,7 +434,7 @@ const Admin = () => {
               <ResourceForm
                 resource={editingBusinessOpportunity}
                 onClose={handleBusinessOpportunityFormClose}
-                onSave={handleBusinessOpportunityFormClose}
+                onSave={handleBusinessOpportunityFormSave}
                 isBusinessOpportunity={true}
               />
             ) : (
