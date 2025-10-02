@@ -391,7 +391,7 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="resources">
-            <div className={showResourceForm ? "block" : "hidden"}>
+            <div className={showResourceForm ? "block" : "hidden"} key={editingResource?.id || 'new'}>
               <ResourceForm
                 resource={editingResource}
                 onClose={handleResourceFormClose}
@@ -427,7 +427,7 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="business">
-            <div className={showBusinessOpportunityForm ? "block" : "hidden"}>
+            <div className={showBusinessOpportunityForm ? "block" : "hidden"} key={editingBusinessOpportunity?.id || 'new'}>
               <ResourceForm
                 resource={editingBusinessOpportunity}
                 onClose={handleBusinessOpportunityFormClose}
