@@ -18,17 +18,12 @@ const FAQ = () => {
     {
       id: "data-collection",
       question: <TranslatedText contentKey="faq-data-collection-q" originalText="Do you collect any data on me?" />,
-      answer: <TranslatedText contentKey="faq-data-collection-a" originalText="No, we collect absolutely nothing about our users. No personal data, no tracking information, no IP addresses, no search queries, no usage analytics - nothing. Our website is a completely anonymous public information resource. You can browse all community events, resources, and civic information without any data collection or tracking whatsoever. We have no user accounts, no cookies for tracking, and no analytics systems monitoring your activity. However, please note that our AI-powered features use OpenAI's services, which may collect certain information in accordance with their terms of service. You can review OpenAI's data practices at https://openai.com/policies/terms-of-use." />
+      answer: <TranslatedText contentKey="faq-data-collection-a" originalText="No, we collect absolutely nothing about our users. No personal data, no tracking information, no IP addresses, no search queries, no usage analytics - nothing. Our website is a completely anonymous public information resource. You can browse all community resources and civic information without any data collection or tracking whatsoever. We have no user accounts, no cookies for tracking, and no analytics systems monitoring your activity. However, please note that our AI-powered features use OpenAI's services, which may collect certain information in accordance with their terms of service. You can review OpenAI's data practices at https://openai.com/policies/terms-of-use." />
     },
     {
       id: "account-required",
       question: <TranslatedText contentKey="faq-account-required-q" originalText="Do I need an account to use this site?" />,
-      answer: <TranslatedText contentKey="faq-account-required-a" originalText="No, and there are actually no user accounts available. Our website is designed to be a completely open, anonymous resource for community information. You can access all events, resources, and civic information without any registration or sign-up process." />
-    },
-    {
-      id: "event-updates",
-      question: <TranslatedText contentKey="faq-event-updates-q" originalText="How do I stay updated on community events?" />,
-      answer: <TranslatedText contentKey="faq-event-updates-a" originalText="You can bookmark our events page and check back regularly, or add our website to your phone's home screen for quick access. We update events frequently and highlight important community happenings on our homepage. Since we don't collect data or offer accounts, checking the site regularly is the best way to stay informed." />
+      answer: <TranslatedText contentKey="faq-account-required-a" originalText="No, and there are actually no user accounts available. Our website is designed to be a completely open, anonymous resource for community information. You can access all resources and civic information without any registration or sign-up process." />
     },
     {
       id: "resource-suggestions", 
@@ -48,7 +43,7 @@ const FAQ = () => {
     {
       id: "information-accuracy",
       question: <TranslatedText contentKey="faq-information-accuracy-q" originalText="How do I know the information is accurate and up-to-date?" />,
-      answer: <TranslatedText contentKey="faq-information-accuracy-a" originalText="Our platform is built and managed by your local elected officials who work directly with community organizations to ensure accuracy. Event and resource information is regularly updated, but we recommend verifying details directly with organizations for the most current information." />
+      answer: <TranslatedText contentKey="faq-information-accuracy-a" originalText="Our platform is built and managed by your local elected officials who work directly with community organizations to ensure accuracy. Resource information is regularly updated, but we recommend verifying details directly with organizations for the most current information." />
     }
   ];
 
