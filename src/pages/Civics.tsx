@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from "@/components/Navbar";
-import { Users, MapPin, Search, Vote, ExternalLink, Phone, ArrowLeft, Building2, Shield } from "lucide-react";
+import { Users, MapPin, Search, Vote, ExternalLink, Phone, ArrowLeft, Building2, Shield, Globe } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { TranslatedText } from "@/components/TranslatedText";
 
@@ -278,6 +278,30 @@ const Civics = () => {
                             className="text-sm font-medium"
                           />
                           <p className="text-sm text-muted-foreground">{org.contact_info.phone}</p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Website */}
+                    {org.contact_info?.website && (
+                      <div className="flex items-start gap-2">
+                        <Globe className="h-4 w-4 mt-0.5 text-orange-600 flex-shrink-0" />
+                        <div>
+                          <TranslatedText 
+                            contentKey="civics.website_label" 
+                            originalText="Website"
+                            as="p"
+                            className="text-sm font-medium"
+                          />
+                          <a 
+                            href={org.contact_info.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-sm text-muted-foreground hover:text-green-600 underline break-all"
+                          >
+                            {org.contact_info.website.replace(/^https?:\/\//, '')}
+                          </a>
                         </div>
                       </div>
                     )}
