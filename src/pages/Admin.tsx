@@ -31,6 +31,8 @@ const Admin = () => {
   const { userRole, loading: roleLoading, isMainAdmin, isSubAdmin, hasAdminAccess } = useUserRole();
   const [loading, setLoading] = useState(true);
   const [pendingCount, setPendingCount] = useState(0);
+  const [resourcesRefresh, setResourcesRefresh] = useState(0);
+  const [businessRefresh, setBusinessRefresh] = useState(0);
   
   // Form visibility states
   const [showEventForm, setShowEventForm] = useState(false);
@@ -183,7 +185,7 @@ const Admin = () => {
   const handleResourceFormSave = () => {
     setShowResourceForm(false);
     setEditingResource(null);
-    // Don't trigger refresh - user stays on same page
+    setResourcesRefresh(prev => prev + 1); // Trigger refresh
   };
 
   const handleCreateBusinessOpportunity = () => {
@@ -204,7 +206,7 @@ const Admin = () => {
   const handleBusinessOpportunityFormSave = () => {
     setShowBusinessOpportunityForm(false);
     setEditingBusinessOpportunity(null);
-    // Don't trigger refresh - user stays on same page
+    setBusinessRefresh(prev => prev + 1); // Trigger refresh
   };
 
   if (loading || roleLoading) {
@@ -419,7 +421,7 @@ const Admin = () => {
                   </TabsContent>
 
                   <TabsContent value="manage" className="mt-4">
-                    <ResourcesList onEdit={handleEditResource} />
+                    <ResourcesList onEdit={handleEditResource} refreshTrigger={resourcesRefresh} />
                   </TabsContent>
                 </Tabs>
               </div>
@@ -456,7 +458,7 @@ const Admin = () => {
                   </TabsContent>
 
                   <TabsContent value="manage" className="mt-4">
-                    <ResourcesList onEdit={handleEditBusinessOpportunity} isBusinessOpportunity={true} />
+                    <ResourcesList onEdit={handleEditBusinessOpportunity} isBusinessOpportunity={true} refreshTrigger={businessRefresh} />
                   </TabsContent>
                 </Tabs>
               </div>
