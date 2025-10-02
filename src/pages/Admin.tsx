@@ -391,13 +391,14 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="resources">
-            {showResourceForm ? (
+            <div className={showResourceForm ? "block" : "hidden"}>
               <ResourceForm
                 resource={editingResource}
                 onClose={handleResourceFormClose}
                 onSave={handleResourceFormSave}
               />
-            ) : (
+            </div>
+            <div className={showResourceForm ? "hidden" : "block"}>
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
                   <h2 className="text-3xl font-bold">Manage Programs & Services</h2>
@@ -422,18 +423,19 @@ const Admin = () => {
                   </TabsContent>
                 </Tabs>
               </div>
-            )}
+            </div>
           </TabsContent>
 
           <TabsContent value="business">
-            {showBusinessOpportunityForm ? (
+            <div className={showBusinessOpportunityForm ? "block" : "hidden"}>
               <ResourceForm
                 resource={editingBusinessOpportunity}
                 onClose={handleBusinessOpportunityFormClose}
                 onSave={handleBusinessOpportunityFormSave}
                 isBusinessOpportunity={true}
               />
-            ) : (
+            </div>
+            <div className={showBusinessOpportunityForm ? "hidden" : "block"}>
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
                   <h2 className="text-3xl font-bold">Manage Business Opportunities</h2>
@@ -458,7 +460,7 @@ const Admin = () => {
                   </TabsContent>
                 </Tabs>
               </div>
-            )}
+            </div>
           </TabsContent>
 
           <TabsContent value="civics">
