@@ -131,13 +131,19 @@ export default function AISearchBar() {
     }
   };
 
-  const exampleQueries = [
-    "Who is my elected official?",
-    "There's a broken down car on my street",
-    "How do I file for unemployment?", 
-    "Teaching jobs in Queens",
-    "Which civic organization covers Rosedale?"
-  ];
+  const exampleQueries = isMobile 
+    ? [
+        "Who is my elected official?",
+        "Teaching jobs in Queens",
+        "Find civic organizations"
+      ]
+    : [
+        "Who is my elected official?",
+        "There's a broken down car on my street",
+        "How do I file for unemployment?", 
+        "Teaching jobs in Queens",
+        "Which civic organization covers Rosedale?"
+      ];
 
   return (
     <>
@@ -163,20 +169,20 @@ export default function AISearchBar() {
               }}
               onKeyPress={handleKeyPress}
               placeholder={isMobile ? "Ask me anything..." : "Ask me anything about Southeast Queens..."}
-              className="pl-12 pr-4 py-6 text-lg bg-background/80 backdrop-blur-sm border-2 border-primary/20 focus:border-primary/40 rounded-2xl shadow-card"
+              className={`pl-12 pr-4 ${isMobile ? 'py-4 text-base' : 'py-6 text-lg'} bg-background/80 backdrop-blur-sm border-2 border-primary/20 focus:border-primary/40 rounded-2xl shadow-card`}
               disabled={isLoading}
             />
           </div>
           <Button
             onClick={handleSearch}
             disabled={!query.trim() || isLoading}
-            size="lg"
-            className="px-8 py-6 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white rounded-2xl shadow-card"
+            size={isMobile ? "default" : "lg"}
+            className={`${isMobile ? 'px-4 py-4' : 'px-8 py-6'} bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white rounded-2xl shadow-card`}
           >
             {isLoading ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
+              <Loader2 className={isMobile ? "h-4 w-4" : "h-5 w-5"} animate-spin />
             ) : (
-              <Sparkles className="h-5 w-5" />
+              <Sparkles className={isMobile ? "h-4 w-4" : "h-5 w-5"} />
             )}
           </Button>
         </div>
@@ -184,20 +190,20 @@ export default function AISearchBar() {
 
       {/* Example Queries */}
       <div className="text-center">
-        <p className="text-sm text-muted-foreground mb-3">Try asking:</p>
+        <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground mb-3`}>Try asking:</p>
         <div className="flex flex-wrap gap-2 justify-center">
           {exampleQueries.map((example, index) => (
             <button
               key={index}
               onClick={() => setQuery(example)}
-              className="px-3 py-1 text-xs bg-primary/10 text-primary rounded-full hover:bg-primary/20 transition-colors duration-200"
+              className={`${isMobile ? 'px-2 py-1 text-[10px]' : 'px-3 py-1 text-xs'} bg-primary/10 text-primary rounded-full hover:bg-primary/20 transition-colors duration-200 whitespace-nowrap`}
               disabled={isLoading}
             >
               "{example}"
             </button>
           ))}
         </div>
-        <p className="text-xs text-muted-foreground/60 italic mt-4">
+        <p className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-muted-foreground/60 italic mt-4`}>
           AI results may be inaccurate. Always verify information.
         </p>
       </div>
