@@ -157,7 +157,7 @@ const Civics = () => {
                 <span className="hidden sm:inline">Civic Organizations</span>
                 <span className="sm:hidden">Civic</span>
               </TabsTrigger>
-              <TabsTrigger value="police_precinct_council" className="flex items-center gap-2">
+              <TabsTrigger value="police_council" className="flex items-center gap-2">
                 <Shield className="h-4 w-4" />
                 <span className="hidden sm:inline">Police Precinct Councils</span>
                 <span className="sm:hidden">Police</span>
