@@ -187,7 +187,7 @@ const Admin = () => {
   const handleResourceFormSave = () => {
     setShowResourceForm(false);
     setEditingResource(null);
-    setResourceRefreshTrigger(prev => prev + 1); // Trigger refresh without resetting page
+    // Don't trigger refresh - user stays on same page
   };
 
   const handleCreateBusinessOpportunity = () => {
@@ -208,7 +208,7 @@ const Admin = () => {
   const handleBusinessOpportunityFormSave = () => {
     setShowBusinessOpportunityForm(false);
     setEditingBusinessOpportunity(null);
-    setBusinessRefreshTrigger(prev => prev + 1); // Trigger refresh without resetting page
+    // Don't trigger refresh - user stays on same page
   };
 
   if (loading || roleLoading) {
