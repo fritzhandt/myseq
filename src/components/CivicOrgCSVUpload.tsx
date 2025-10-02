@@ -172,6 +172,16 @@ export default function CivicOrgCSVUpload({ onUploadComplete }: { onUploadComple
     }
   };
 
+  const ensureProtocol = (url: string | null | undefined): string | null => {
+    if (!url) return null;
+    const trimmedUrl = url.trim();
+    if (!trimmedUrl) return null;
+    if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
+      return trimmedUrl;
+    }
+    return `https://${trimmedUrl}`;
+  };
+
   const handleImportOrgs = async () => {
     if (previewOrgs.length === 0) {
       toast({
@@ -206,7 +216,7 @@ export default function CivicOrgCSVUpload({ onUploadComplete }: { onUploadComple
             contact_info: {
               email: org.email || null,
               phone: org.phone || null,
-              website: org.website || null
+              website: ensureProtocol(org.website)
             },
             organization_type: org.organization_type || 'civic_organization',
             is_active: true
