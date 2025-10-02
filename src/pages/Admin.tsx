@@ -281,7 +281,7 @@ const Admin = () => {
             </TabsTrigger>
             <TabsTrigger value="resources" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
-              Resources
+              Programs
             </TabsTrigger>
             <TabsTrigger value="business" className="flex items-center gap-2">
               <Briefcase className="h-4 w-4" />
@@ -388,17 +388,17 @@ const Admin = () => {
             ) : (
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-3xl font-bold">Manage Resources & Programs</h2>
+                  <h2 className="text-3xl font-bold">Manage Programs & Services</h2>
                   <Button onClick={handleCreateResource} size="lg">
                     <Plus className="h-5 w-5 mr-2" />
-                    Create New Resource/Program
+                    Create New Program/Service
                   </Button>
                 </div>
                 
                 <Tabs defaultValue="upload" className="w-full">
                   <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="upload">Upload Resources/Programs</TabsTrigger>
-                    <TabsTrigger value="manage">Manage Resources/Programs</TabsTrigger>
+                    <TabsTrigger value="upload">Upload Programs/Services</TabsTrigger>
+                    <TabsTrigger value="manage">Manage Programs/Services</TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="upload" className="mt-4">
