@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Info, Users, Mail, Search, Vote, Shield, Calendar, Briefcase, Home, Building2, HelpCircle } from 'lucide-react';
+import { Menu, Info, Users, Mail, Search, Vote, Shield, Calendar, Briefcase, Home, Building2, HelpCircle, Instagram } from 'lucide-react';
 import AddToHomeButton from '@/components/AddToHomeButton';
 import { LanguageSelector } from '@/components/LanguageSelector';
 const Navbar = () => {
@@ -19,6 +19,15 @@ const Navbar = () => {
 
           {/* Right side buttons */}
           <div className="flex items-center gap-2">
+            <a
+              href="https://www.instagram.com/yourpage"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:flex items-center justify-center h-9 w-9 rounded-md hover:bg-accent transition-colors"
+              aria-label="Follow us on Instagram"
+            >
+              <Instagram className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+            </a>
             <LanguageSelector />
             <AddToHomeButton />
             
