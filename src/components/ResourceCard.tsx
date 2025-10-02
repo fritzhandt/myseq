@@ -52,16 +52,18 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
           )}
           <CardTitle className="text-lg">{resource.organization_name}</CardTitle>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {resource.categories.map((category) => (
-            <Badge key={category} variant="secondary" className="capitalize text-xs">
-              <TranslatedText 
-                contentKey={`category-${category.replace(/\s+/g, '-')}`} 
-                originalText={category} 
-              />
-            </Badge>
-          ))}
-        </div>
+        {resource.categories.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {resource.categories.map((category) => (
+              <Badge key={category} variant="secondary" className="capitalize text-xs">
+                <TranslatedText 
+                  contentKey={`category-${category.replace(/\s+/g, '-')}`} 
+                  originalText={category} 
+                />
+              </Badge>
+            ))}
+          </div>
+        )}
       </CardHeader>
 
       <CardContent className="flex-1 flex flex-col">
