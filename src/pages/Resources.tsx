@@ -29,7 +29,6 @@ interface Resource {
 const MAIN_CATEGORIES = [
   "Arts",
   "Educational",
-  "Food",
   "Mental Health/Wellness",
   "Senior Services",
   "Social",
@@ -41,6 +40,7 @@ const COMMUNITY_SUBCATEGORIES = [
   "Environment",
   "Conflict Management",
   "Cultural",
+  "Food",
   "Legal Services",
   "Youth"
 ];
