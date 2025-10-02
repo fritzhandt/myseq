@@ -113,7 +113,7 @@ const ResourceCSVUpload = ({ onUploadComplete, defaultType = 'resource' }: Resou
       }
 
       setPreviewResources(resources);
-      toast.success(`Parsed ${resources.length} resources from file`);
+      toast.success(`Parsed ${resources.length} ${defaultType === 'business_opportunity' ? 'opportunities' : 'programs/services'} from file`);
     } catch (error) {
       console.error('Error parsing file:', error);
       toast.error('Failed to parse file. Please check the format.');
@@ -158,7 +158,7 @@ const ResourceCSVUpload = ({ onUploadComplete, defaultType = 'resource' }: Resou
 
       if (error) throw error;
 
-      toast.success(`Successfully imported ${processedResources.length} resources`);
+      toast.success(`Successfully imported ${processedResources.length} ${defaultType === 'business_opportunity' ? 'opportunities' : 'programs/services'}`);
       clearPreview();
       onUploadComplete?.();
     } catch (error) {
@@ -182,10 +182,10 @@ const ResourceCSVUpload = ({ onUploadComplete, defaultType = 'resource' }: Resou
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileSpreadsheet className="h-5 w-5" />
-            Bulk Upload {defaultType === 'business_opportunity' ? 'Business Opportunities' : 'Resources'}
+            Bulk Upload {defaultType === 'business_opportunity' ? 'Business Opportunities' : 'Programs and Services'}
           </CardTitle>
           <CardDescription>
-            Upload a CSV or XLSX file to add multiple {defaultType === 'business_opportunity' ? 'business opportunities' : 'resources'} at once
+            Upload a CSV or XLSX file to add multiple {defaultType === 'business_opportunity' ? 'business opportunities' : 'programs and services'} at once
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
