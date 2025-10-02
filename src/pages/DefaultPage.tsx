@@ -101,7 +101,7 @@ export default function DefaultPage() {
                     <Users className="h-8 w-8 text-white" />
                   </div>
                   <CardTitle className="text-2xl mb-2 group-hover:text-primary transition-colors duration-300">
-                    <TranslatedText contentKey="resources-card-title" originalText="Community Resources" />
+                    <TranslatedText contentKey="resources-card-title" originalText="Resources & Programs" />
                   </CardTitle>
                   <CardDescription className="text-base leading-relaxed">
                     <TranslatedText contentKey="resources-card-description" originalText="Local organizations, services, and support networks for our community" />

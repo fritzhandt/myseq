@@ -184,7 +184,7 @@ export default function Resources() {
         <div className="text-center mb-8">
           <div className="flex-1">
             <h1 className="text-4xl font-bold mb-4">
-              <TranslatedText contentKey="resources-title" originalText="Community Resources" />
+              <TranslatedText contentKey="resources-title" originalText="Resources & Programs" />
             </h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
               <TranslatedText 
