@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Menu, Info, Users, Mail, Search, Vote, Shield, Calendar, Briefcase, Home, Building2, HelpCircle, Instagram } from 'lucide-react';
 import AddToHomeButton from '@/components/AddToHomeButton';
 import { LanguageSelector } from '@/components/LanguageSelector';
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showVoteDialog, setShowVoteDialog] = useState(false);
   const closeMenu = () => setIsOpen(false);
   return <nav className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
@@ -52,8 +54,7 @@ const Navbar = () => {
               <div className="px-6 pt-6 pb-4 border-b flex-shrink-0">
                 <button 
                   onClick={() => {
-                    window.open('https://nyovr.elections.ny.gov/', '_blank', 'noopener,noreferrer');
-                    closeMenu();
+                    setShowVoteDialog(true);
                   }}
                   className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-lg text-base font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 shadow-sm"
                 >
@@ -208,6 +209,34 @@ const Navbar = () => {
           </div>
         </div>
       </div>
+      
+      {/* Register to Vote Dialog */}
+      <AlertDialog open={showVoteDialog} onOpenChange={setShowVoteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Leaving MY SEQ</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3">
+              <p>
+                You are about to visit an official New York State government website. Your usage on that site is subject to their terms and conditions.
+              </p>
+              <p>
+                On this page, you'll have the option to register to vote online or through the mail. The page will provide you with all the information needed to register in the way that works best for you.
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                window.open('https://elections.ny.gov/voter-registration-process', '_blank', 'noopener,noreferrer');
+                closeMenu();
+              }}
+            >
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </nav>;
 };
 export default Navbar;
