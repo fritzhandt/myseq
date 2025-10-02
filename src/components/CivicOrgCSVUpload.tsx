@@ -355,13 +355,13 @@ export default function CivicOrgCSVUpload({ onUploadComplete }: { onUploadComple
             <AlertCircle className="h-4 w-4" />
             <AlertDescription className="space-y-2">
               <div>
-                <strong>Required columns:</strong> name, description, coverage_area
+                <strong>Required columns:</strong> name, description, coverage_area, website
               </div>
               <div>
-                <strong>Optional columns:</strong> meeting_info, meeting_address, email, phone, website, organization_type
+                <strong>Optional columns:</strong> meeting_info, meeting_address, email, phone, organization_type
               </div>
               <div className="text-xs text-muted-foreground mt-2">
-                Column names are case-insensitive. Alternative names supported: "organization_name" for name, "area" for coverage_area, etc.
+                Column names are case-insensitive. Alternative names supported: "organization_name" for name, "area" for coverage_area, "url" or "web" for website, etc.
               </div>
               <div className="text-xs">
                 Access codes and passwords will be auto-generated for each organization.
@@ -387,6 +387,7 @@ export default function CivicOrgCSVUpload({ onUploadComplete }: { onUploadComple
                     <th className="p-2 text-left">Name</th>
                     <th className="p-2 text-left">Description</th>
                     <th className="p-2 text-left">Coverage Area</th>
+                    <th className="p-2 text-left">Website</th>
                     <th className="p-2 text-left">Email</th>
                     <th className="p-2 text-left">Phone</th>
                     <th className="p-2 text-left">Meeting</th>
@@ -405,6 +406,15 @@ export default function CivicOrgCSVUpload({ onUploadComplete }: { onUploadComple
                         )}
                       </td>
                       <td className="p-2">{org.coverage_area}</td>
+                      <td className="p-2 text-xs">
+                        {org.website ? (
+                          <a href={org.website.startsWith('http') ? org.website : `https://${org.website}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline break-all">
+                            {org.website.replace(/^https?:\/\//, '').substring(0, 20)}...
+                          </a>
+                        ) : (
+                          <span className="text-destructive font-semibold">MISSING</span>
+                        )}
+                      </td>
                       <td className="p-2 text-xs">{org.email || <span className="text-muted-foreground italic">-</span>}</td>
                       <td className="p-2 text-xs">{org.phone || <span className="text-muted-foreground italic">-</span>}</td>
                       <td className="p-2 text-xs">{org.meeting_info || <span className="text-muted-foreground italic">-</span>}</td>
