@@ -26,18 +26,18 @@ interface Resource {
 }
 
 const CATEGORIES = [
-  "arts",
-  "community resources",
-  "conflict management",
-  "cultural",
-  "educational",
-  "environment",
-  "legal services",
-  "mental health/wellness",
-  "recreational",
-  "senior services",
-  "sports",
-  "youth"
+  "Arts",
+  "Community Resources",
+  "Conflict Management",
+  "Cultural",
+  "Educational",
+  "Environment",
+  "Legal Services",
+  "Mental Health/Wellness",
+  "Recreational",
+  "Senior Services",
+  "Sports",
+  "Youth"
 ];
 
 export default function Resources() {
