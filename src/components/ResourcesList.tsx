@@ -25,10 +25,9 @@ interface Resource {
 interface ResourcesListProps {
   onEdit: (resource: Resource) => void;
   isBusinessOpportunity?: boolean;
-  refreshTrigger?: number; // Add trigger to refresh without resetting page
 }
 
-export default function ResourcesList({ onEdit, isBusinessOpportunity = false, refreshTrigger }: ResourcesListProps) {
+export default function ResourcesList({ onEdit, isBusinessOpportunity = false }: ResourcesListProps) {
   const { toast } = useToast();
   const [resources, setResources] = useState<Resource[]>([]);
   const [filteredResources, setFilteredResources] = useState<Resource[]>([]);
@@ -114,7 +113,7 @@ export default function ResourcesList({ onEdit, isBusinessOpportunity = false, r
 
   useEffect(() => {
     fetchResources();
-  }, [isBusinessOpportunity, refreshTrigger]); // Add refreshTrigger as dependency
+  }, [isBusinessOpportunity]); // Only fetch when switching between resources and business opportunities
 
   if (loading) {
     return (

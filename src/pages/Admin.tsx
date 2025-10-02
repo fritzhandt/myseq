@@ -45,10 +45,6 @@ const Admin = () => {
   const [editingCommunityAlert, setEditingCommunityAlert] = useState<any>(null);
   const [editingResource, setEditingResource] = useState<any>(null);
   const [editingBusinessOpportunity, setEditingBusinessOpportunity] = useState<any>(null);
-  
-  // Refresh triggers to update lists without resetting pagination
-  const [resourceRefreshTrigger, setResourceRefreshTrigger] = useState(0);
-  const [businessRefreshTrigger, setBusinessRefreshTrigger] = useState(0);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -422,7 +418,7 @@ const Admin = () => {
                   </TabsContent>
 
                   <TabsContent value="manage" className="mt-4">
-                    <ResourcesList onEdit={handleEditResource} refreshTrigger={resourceRefreshTrigger} />
+                    <ResourcesList onEdit={handleEditResource} />
                   </TabsContent>
                 </Tabs>
               </div>
@@ -458,7 +454,7 @@ const Admin = () => {
                   </TabsContent>
 
                   <TabsContent value="manage" className="mt-4">
-                    <ResourcesList onEdit={handleEditBusinessOpportunity} isBusinessOpportunity={true} refreshTrigger={businessRefreshTrigger} />
+                    <ResourcesList onEdit={handleEditBusinessOpportunity} isBusinessOpportunity={true} />
                   </TabsContent>
                 </Tabs>
               </div>
