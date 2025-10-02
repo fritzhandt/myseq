@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Navbar from "@/components/Navbar";
 import { ArrowLeft, MapPin, Clock, Phone, Mail, Globe, Users, Calendar, FileText, Image, Link, Images } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -16,6 +17,7 @@ import PhotoViewer from "@/components/PhotoViewer";
 import { TranslatedText } from "@/components/TranslatedText";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useTranslation } from "@/contexts/TranslationContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface CivicOrganization {
   id: string;
@@ -74,6 +76,7 @@ const CivicDetail = () => {
   const { toast } = useToast();
   const { trackPageView, trackTabView, trackContentClick } = useAnalytics();
   const { currentLanguage } = useTranslation();
+  const isMobile = useIsMobile();
   
   const [organization, setOrganization] = useState<CivicOrganization | null>(null);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -278,15 +281,46 @@ const CivicDetail = () => {
 
           {/* Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-7">
-              <TabsTrigger value="general"><TranslatedText contentKey="civic_detail.tab_general" originalText="General Info" /></TabsTrigger>
-              <TabsTrigger value="newsletters"><TranslatedText contentKey="civic_detail.tab_newsletter" originalText="Newsletter" /></TabsTrigger>
-              <TabsTrigger value="announcements"><TranslatedText contentKey="civic_detail.tab_announcements" originalText="Announcements" /></TabsTrigger>
-              <TabsTrigger value="leadership"><TranslatedText contentKey="civic_detail.tab_leadership" originalText="Leadership" /></TabsTrigger>
-              <TabsTrigger value="links"><TranslatedText contentKey="civic_detail.tab_links" originalText="Important Links" /></TabsTrigger>
-              <TabsTrigger value="gallery"><TranslatedText contentKey="civic_detail.tab_gallery" originalText="Gallery" /></TabsTrigger>
-              <TabsTrigger value="events"><TranslatedText contentKey="civic_detail.tab_events" originalText="Events" /></TabsTrigger>
-            </TabsList>
+            {isMobile ? (
+              <Select value={activeTab} onValueChange={setActiveTab}>
+                <SelectTrigger className="w-full mb-4">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="general">
+                    <TranslatedText contentKey="civic_detail.tab_general" originalText="General Info" />
+                  </SelectItem>
+                  <SelectItem value="newsletters">
+                    <TranslatedText contentKey="civic_detail.tab_newsletter" originalText="Newsletter" />
+                  </SelectItem>
+                  <SelectItem value="announcements">
+                    <TranslatedText contentKey="civic_detail.tab_announcements" originalText="Announcements" />
+                  </SelectItem>
+                  <SelectItem value="leadership">
+                    <TranslatedText contentKey="civic_detail.tab_leadership" originalText="Leadership" />
+                  </SelectItem>
+                  <SelectItem value="links">
+                    <TranslatedText contentKey="civic_detail.tab_links" originalText="Important Links" />
+                  </SelectItem>
+                  <SelectItem value="gallery">
+                    <TranslatedText contentKey="civic_detail.tab_gallery" originalText="Gallery" />
+                  </SelectItem>
+                  <SelectItem value="events">
+                    <TranslatedText contentKey="civic_detail.tab_events" originalText="Events" />
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            ) : (
+              <TabsList className="grid w-full grid-cols-7">
+                <TabsTrigger value="general"><TranslatedText contentKey="civic_detail.tab_general" originalText="General Info" /></TabsTrigger>
+                <TabsTrigger value="newsletters"><TranslatedText contentKey="civic_detail.tab_newsletter" originalText="Newsletter" /></TabsTrigger>
+                <TabsTrigger value="announcements"><TranslatedText contentKey="civic_detail.tab_announcements" originalText="Announcements" /></TabsTrigger>
+                <TabsTrigger value="leadership"><TranslatedText contentKey="civic_detail.tab_leadership" originalText="Leadership" /></TabsTrigger>
+                <TabsTrigger value="links"><TranslatedText contentKey="civic_detail.tab_links" originalText="Important Links" /></TabsTrigger>
+                <TabsTrigger value="gallery"><TranslatedText contentKey="civic_detail.tab_gallery" originalText="Gallery" /></TabsTrigger>
+                <TabsTrigger value="events"><TranslatedText contentKey="civic_detail.tab_events" originalText="Events" /></TabsTrigger>
+              </TabsList>
+            )}
 
             {/* General Information */}
             <TabsContent value="general" className="space-y-6">
