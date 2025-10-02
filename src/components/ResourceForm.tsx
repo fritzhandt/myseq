@@ -32,14 +32,17 @@ interface ResourceFormProps {
 }
 
 const CATEGORIES = [
-  "sports",
-  "mental health/wellness", 
   "arts",
-  "recreational",
+  "community resources",
   "conflict management",
-  "legal services",
   "educational",
-  "senior service"
+  "environment",
+  "legal services",
+  "mental health/wellness",
+  "recreational",
+  "senior services",
+  "sports",
+  "youth"
 ];
 
 export default function ResourceForm({ resource, onClose, onSave, isBusinessOpportunity = false }: ResourceFormProps) {
