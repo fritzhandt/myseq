@@ -87,14 +87,14 @@ export default function ResourcesList({ onEdit, isBusinessOpportunity = false, r
     const filtered = resources.filter((resource) =>
       resource.organization_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       resource.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      resource.categories.some(category => 
+      (!isBusinessOpportunity && resource.categories.some(category => 
         category.toLowerCase().includes(searchTerm.toLowerCase())
-      ) ||
+      )) ||
       (resource.email && resource.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (resource.phone && resource.phone.includes(searchTerm))
     );
     setFilteredResources(filtered);
-  }, [searchTerm, resources]);
+  }, [searchTerm, resources, isBusinessOpportunity]);
 
   // Reset to first page only when search term changes
   useEffect(() => {
@@ -212,8 +212,8 @@ export default function ResourcesList({ onEdit, isBusinessOpportunity = false, r
 
   return (
     <div className="space-y-4">
-      {/* Bulk Actions Bar */}
-      {selectedIds.size > 0 && (
+      {/* Bulk Actions Bar - Only show for resources, not business opportunities */}
+      {!isBusinessOpportunity && selectedIds.size > 0 && (
         <Card className="bg-primary/5 border-primary/20">
           <CardContent className="py-4">
             <div className="flex items-center gap-4">
@@ -282,8 +282,8 @@ export default function ResourcesList({ onEdit, isBusinessOpportunity = false, r
         </div>
       ) : (
         <>
-          {/* Select All Checkbox */}
-          {paginatedResources.length > 0 && (
+          {/* Select All Checkbox - Hide for business opportunities */}
+          {!isBusinessOpportunity && paginatedResources.length > 0 && (
             <div className="flex items-center gap-2 px-2 py-2 border-b">
               <Checkbox
                 checked={selectedIds.size === paginatedResources.length && paginatedResources.length > 0}
@@ -299,20 +299,24 @@ export default function ResourcesList({ onEdit, isBusinessOpportunity = false, r
           <Card key={resource.id}>
             <CardHeader className="flex flex-row items-start justify-between space-y-0">
               <div className="flex items-start gap-3 flex-1">
-                <Checkbox
-                  checked={selectedIds.has(resource.id)}
-                  onCheckedChange={() => toggleSelect(resource.id)}
-                  className="mt-1"
-                />
+                {!isBusinessOpportunity && (
+                  <Checkbox
+                    checked={selectedIds.has(resource.id)}
+                    onCheckedChange={() => toggleSelect(resource.id)}
+                    className="mt-1"
+                  />
+                )}
                 <div className="flex-1">
                   <CardTitle className="text-lg">{resource.organization_name}</CardTitle>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {resource.categories.map((category) => (
-                      <Badge key={category} variant="secondary" className="capitalize">
-                        {category}
-                      </Badge>
-                    ))}
-                  </div>
+                  {!isBusinessOpportunity && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {resource.categories.map((category) => (
+                        <Badge key={category} variant="secondary" className="capitalize">
+                          {category}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
               {resource.logo_url && (
