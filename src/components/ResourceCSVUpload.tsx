@@ -113,7 +113,7 @@ const ResourceCSVUpload = ({ onUploadComplete, defaultType = 'resource' }: Resou
       }
 
       setPreviewResources(resources);
-      toast.success(`Parsed ${resources.length} ${defaultType === 'business_opportunity' ? 'opportunities' : 'programs/services'} from file`);
+      toast.success(`Parsed ${resources.length} ${defaultType === 'business_opportunity' ? 'opportunities' : 'resources/programs'} from file`);
     } catch (error) {
       console.error('Error parsing file:', error);
       toast.error('Failed to parse file. Please check the format.');
@@ -158,7 +158,7 @@ const ResourceCSVUpload = ({ onUploadComplete, defaultType = 'resource' }: Resou
 
       if (error) throw error;
 
-      toast.success(`Successfully imported ${processedResources.length} ${defaultType === 'business_opportunity' ? 'opportunities' : 'programs/services'}`);
+      toast.success(`Successfully imported ${processedResources.length} ${defaultType === 'business_opportunity' ? 'opportunities' : 'resources/programs'}`);
       clearPreview();
       onUploadComplete?.();
     } catch (error) {
@@ -182,10 +182,10 @@ const ResourceCSVUpload = ({ onUploadComplete, defaultType = 'resource' }: Resou
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileSpreadsheet className="h-5 w-5" />
-            Bulk Upload {defaultType === 'business_opportunity' ? 'Business Opportunities' : 'Programs and Services'}
+            Bulk Upload {defaultType === 'business_opportunity' ? 'Business Opportunities' : 'Resources & Programs'}
           </CardTitle>
           <CardDescription>
-            Upload a CSV or XLSX file to add multiple {defaultType === 'business_opportunity' ? 'business opportunities' : 'programs and services'} at once
+            Upload a CSV or XLSX file to add multiple {defaultType === 'business_opportunity' ? 'business opportunities' : 'resources & programs'} at once
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
