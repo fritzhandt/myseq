@@ -38,7 +38,7 @@ const FAQ = () => {
     {
       id: "technical-issues",
       question: <TranslatedText contentKey="faq-technical-issues-q" originalText="What should I do if I encounter technical issues?" />,
-      answer: <TranslatedText contentKey="faq-technical-issues-a" originalText="If you experience any technical problems with the website, please contact your local elected officials through our contact page. We work to resolve issues quickly to ensure you have the best experience accessing community information." />
+      answer: <TranslatedText contentKey="faq-technical-issues-a" originalText="If you experience any technical problems with the website, please use the 'Contact Us' button at the bottom of this page. We work to resolve issues quickly to ensure you have the best experience accessing community information." />
     },
     {
       id: "information-accuracy",
