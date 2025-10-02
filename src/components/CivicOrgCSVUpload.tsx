@@ -98,17 +98,24 @@ export default function CivicOrgCSVUpload({ onUploadComplete }: { onUploadComple
         obj[header] = values[index] && values[index] !== '' ? values[index] : null;
       });
 
-      return {
-        name: obj.name || obj.organization_name || '',
-        description: obj.description || obj.desc || '',
-        coverage_area: obj.coverage_area || obj['coverage area'] || obj.area || obj.coverage || '',
-        meeting_info: obj.meeting_info || obj['meeting info'] || obj.meeting || obj.meeting_schedule || null,
+      const result = {
+        name: obj.name || obj.organization_name || obj['organization name'] || '',
+        description: obj.description || obj.desc || obj.details || obj.about || '',
+        coverage_area: obj.coverage_area || obj['coverage area'] || obj.area || obj.coverage || obj.service_area || obj['service area'] || '',
+        meeting_info: obj.meeting_info || obj['meeting info'] || obj.meeting || obj.meeting_schedule || obj['meeting schedule'] || null,
         meeting_address: obj.meeting_address || obj['meeting address'] || obj.address || obj.location || null,
-        email: obj.email || obj['contact email'] || obj.contact_email || null,
-        phone: obj.phone || obj.telephone || obj['phone number'] || null,
-        website: obj.website || obj.url || obj.web || null,
-        organization_type: obj.organization_type || obj['organization type'] || obj.type || 'civic_organization'
+        email: obj.email || obj['contact email'] || obj.contact_email || obj['e-mail'] || null,
+        phone: obj.phone || obj.telephone || obj['phone number'] || obj.tel || null,
+        website: obj.website || obj.url || obj.web || obj.site || null,
+        organization_type: obj.organization_type || obj['organization type'] || obj.type || obj.category || 'civic_organization'
       };
+      
+      // Log if description is missing for debugging
+      if (!result.description) {
+        console.warn('Missing description for org:', result.name, 'Available fields:', Object.keys(obj));
+      }
+      
+      return result;
     });
   };
 
@@ -138,6 +145,10 @@ export default function CivicOrgCSVUpload({ onUploadComplete }: { onUploadComple
         orgs = parseXLSX(arrayBuffer);
       }
 
+      // Log parsed data for debugging
+      console.log('Parsed organizations:', orgs);
+      console.log('Sample org data:', orgs[0]);
+      
       setPreviewOrgs(orgs);
       
       toast({
@@ -311,7 +322,13 @@ export default function CivicOrgCSVUpload({ onUploadComplete }: { onUploadComple
                   {previewOrgs.slice(0, 10).map((org, index) => (
                     <tr key={index} className="border-t">
                       <td className="p-2 font-medium">{org.name}</td>
-                      <td className="p-2 text-muted-foreground">{org.description.substring(0, 40)}...</td>
+                      <td className="p-2 text-muted-foreground">
+                        {org.description ? (
+                          org.description.length > 40 ? `${org.description.substring(0, 40)}...` : org.description
+                        ) : (
+                          <span className="text-destructive font-semibold">MISSING</span>
+                        )}
+                      </td>
                       <td className="p-2">{org.coverage_area}</td>
                       <td className="p-2 text-xs">{org.email || <span className="text-muted-foreground italic">-</span>}</td>
                       <td className="p-2 text-xs">{org.phone || <span className="text-muted-foreground italic">-</span>}</td>
