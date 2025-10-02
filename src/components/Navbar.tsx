@@ -220,7 +220,7 @@ const Navbar = () => {
                 You are about to visit an official New York State government website. Your usage on that site is subject to their terms and conditions.
               </p>
               <p>
-                On this page, you'll have the option to register to vote online or through the mail. The page will provide you with all the information needed to register in the way that works best for you.
+                On this page, you'll have the option to register to vote in person, by mail, or online. The page will provide you with all the information needed to register in the way that works best for you.
               </p>
             </AlertDialogDescription>
           </AlertDialogHeader>
