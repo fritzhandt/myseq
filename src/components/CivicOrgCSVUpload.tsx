@@ -56,17 +56,23 @@ export default function CivicOrgCSVUpload({ onUploadComplete }: { onUploadComple
     const worksheet = workbook.Sheets[sheetName];
     const data = XLSX.utils.sheet_to_json(worksheet);
 
-    return data.map((row: any) => ({
-      name: row.name || row.Name || row.organization_name || row['Organization Name'] || '',
-      description: row.description || row.Description || row['Brief Description'] || row['brief description'] || row.desc || row.Desc || '',
-      coverage_area: row.coverage_area || row['Coverage Area'] || row.area || row.Area || row.coverage || row.Coverage || '',
-      meeting_info: row.meeting_info || row['Meeting Info'] || row.meeting || row.Meeting || row.meeting_schedule || row['Meeting Schedule'] || null,
-      meeting_address: row.meeting_address || row['Meeting Address'] || row.address || row.Address || row.location || row.Location || null,
-      email: row.email || row.Email || row.contact_email || row['Contact Email'] || null,
-      phone: row.phone || row.Phone || row.telephone || row.Telephone || row['Phone Number'] || null,
-      website: row.website || row.url || row.URL || row.web || row.Web || null,
-      organization_type: row.organization_type || row['Organization Type'] || row.type || row.Type || 'civic_organization'
-    }));
+    return data.map((row: any) => {
+      const parsed = {
+        name: row.name || row.Name || row.organization_name || row['Organization Name'] || '',
+        description: row.description || row.Description || row['Brief Description'] || row['brief description'] || row.desc || row.Desc || '',
+        coverage_area: row.coverage_area || row['Coverage Area'] || row.area || row.Area || row.coverage || row.Coverage || '',
+        meeting_info: row.meeting_info || row['Meeting Info'] || row.meeting || row.Meeting || row.meeting_schedule || row['Meeting Schedule'] || null,
+        meeting_address: row.meeting_address || row['Meeting Address'] || row.address || row.Address || row.location || row.Location || null,
+        email: row.email || row.Email || row.contact_email || row['Contact Email'] || null,
+        phone: row.phone || row.Phone || row.telephone || row.Telephone || row['Phone Number'] || null,
+        website: row.website || row.Website || row.url || row.URL || row.web || row.Web || row.site || row.Site || null,
+        organization_type: row.organization_type || row['Organization Type'] || row.type || row.Type || 'civic_organization'
+      };
+      
+      console.log('XLSX Parsed org:', parsed.name, 'Website:', parsed.website, 'Raw row keys:', Object.keys(row));
+      
+      return parsed;
+    });
   };
 
   const parseCSV = (text: string): CivicOrgRow[] => {
@@ -113,14 +119,19 @@ export default function CivicOrgCSVUpload({ onUploadComplete }: { onUploadComple
         meeting_address: obj.meeting_address || obj['meeting address'] || obj.address || obj.location || null,
         email: obj.email || obj['contact email'] || obj.contact_email || obj['e-mail'] || null,
         phone: obj.phone || obj.telephone || obj['phone number'] || obj.tel || null,
-        website: obj.website || obj.url || obj.web || obj.site || null,
+        website: obj.website || obj.Website || obj.url || obj.URL || obj.web || obj.Web || obj.site || obj.Site || null,
         organization_type: obj.organization_type || obj['organization type'] || obj.type || obj.category || 'civic_organization'
       };
       
-      // Log if description is missing for debugging
+      // Log parsing details for debugging
       if (!result.description) {
         console.warn('Missing description for org:', result.name, 'Available fields:', Object.keys(obj));
       }
+      if (!result.website) {
+        console.warn('Missing website for org:', result.name, 'Available fields:', Object.keys(obj));
+      }
+      
+      console.log('Parsed org:', result.name, 'Website:', result.website);
       
       return result;
     });
