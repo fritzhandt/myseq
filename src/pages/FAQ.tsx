@@ -28,7 +28,7 @@ const FAQ = () => {
     {
       id: "resource-suggestions", 
       question: <TranslatedText contentKey="faq-resource-suggestions-q" originalText="Can I suggest new resources to be added?" />,
-      answer: <TranslatedText contentKey="faq-resource-suggestions-a" originalText="Yes! We welcome community input. You can contact your elected officials through our 'Contact Your Elected' page to suggest new resources, programs, or services that would benefit Southeast Queens residents." />
+      answer: <TranslatedText contentKey="faq-resource-suggestions-a" originalText="Yes! We welcome community input. You can use the 'Contact Us' button at the bottom of this page to suggest new resources, programs, or services that would benefit Southeast Queens residents." />
     },
     {
       id: "mobile-app",
