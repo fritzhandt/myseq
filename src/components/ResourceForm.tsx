@@ -304,8 +304,7 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
       return;
     }
 
-    // Only validate categories for resources, not business opportunities
-    if (!isBusinessOpportunity && formData.categories.length === 0) {
+    if (formData.categories.length === 0) {
       toast({
         title: "Error", 
         description: "Please select at least one category",
@@ -341,7 +340,7 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
         website: formData.website,
         logo_url: logoUrl,
         cover_photo_url: coverPhotoUrl,
-        categories: isBusinessOpportunity ? [] : formData.categories, // Empty array for business opportunities
+        categories: formData.categories,
         type: isBusinessOpportunity ? 'business_opportunity' : 'resource'
       };
 
@@ -686,26 +685,24 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
               </div>
             </div>
 
-            {!isBusinessOpportunity && (
-              <div>
-                <Label>Category *</Label>
-                <Select 
-                  value={formData.category || ""} 
-                  onValueChange={handleCategoryChange}
-                >
-                  <SelectTrigger className="mt-2">
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CATEGORIES.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
+            <div>
+              <Label>Category *</Label>
+              <Select 
+                value={formData.category || ""} 
+                onValueChange={handleCategoryChange}
+              >
+                <SelectTrigger className="mt-2">
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {CATEGORIES.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
             <div className="flex gap-2 pt-4">
               <Button type="submit" disabled={loading || uploadingLogo || uploadingCover || removingBackgroundLogo || removingBackgroundCover}>
