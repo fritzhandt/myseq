@@ -33,7 +33,7 @@ export default function DefaultPage() {
                 <TranslatedText contentKey="hero-title-main" originalText="SOUTHEAST QUEENS INFORMATION CENTER" />
               </h1>
               
-              <p className="text-xl md:text-2xl text-muted-foreground mb-4 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-base md:text-2xl text-muted-foreground mb-4 max-w-2xl mx-auto leading-tight md:leading-relaxed">
                 <TranslatedText contentKey="hero-description" originalText="Discover organizations, programs, resources, jobs, business opportunities, youth services, senior services, and more" />
               </p>
               
