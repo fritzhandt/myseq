@@ -188,6 +188,17 @@ const Navbar = () => {
                         </div>
                         <span>Police Precincts</span>
                       </Link>
+                      
+                      <a 
+                        href="mailto:district33@nyassembly.gov"
+                        className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group" 
+                        onClick={closeMenu}
+                      >
+                        <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
+                          <Mail className="w-4 h-4" />
+                        </div>
+                        <span>Contact Us</span>
+                      </a>
                     </div>
                   </div>
                 </nav>

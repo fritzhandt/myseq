@@ -97,8 +97,8 @@ const FAQ = () => {
                 <TranslatedText contentKey="dont-see-question" originalText="Don't see your question answered here?" />
               </p>
               <Button asChild>
-                <a href="/contact-elected">
-                  <TranslatedText contentKey="contact-elected-officials-btn" originalText="Contact Your Elected Officials" />
+                <a href="mailto:district33@nyassembly.gov">
+                  <TranslatedText contentKey="contact-us-btn" originalText="Contact Us" />
                 </a>
               </Button>
             </div>
