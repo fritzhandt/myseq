@@ -395,7 +395,7 @@ const Admin = () => {
                   </Button>
                 </div>
                 
-                <Tabs defaultValue="upload" className="w-full">
+                <Tabs defaultValue="manage" className="w-full">
                   <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="upload">Upload Programs/Services</TabsTrigger>
                     <TabsTrigger value="manage">Manage Programs/Services</TabsTrigger>

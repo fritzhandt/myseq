@@ -355,6 +355,9 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
           title: "Success",
           description: "Resource updated successfully",
         });
+        
+        // Don't close the form after editing - allow multiple edits
+        onSave();
       } else {
         // New resources: sub-admins go to pending table, others go directly to main table
         const tableName = isSubAdmin ? 'pending_resources' : 'resources';
@@ -374,10 +377,11 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
             ? "Resource submitted for approval! You'll be notified once it's reviewed."
             : "Resource created successfully",
         });
+        
+        // Close the form after creating new resource
+        onSave();
+        onClose();
       }
-
-      onSave();
-      onClose();
     } catch (error) {
       console.error("Error saving resource:", error);
       toast({
