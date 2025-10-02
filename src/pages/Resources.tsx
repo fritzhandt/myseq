@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, ArrowLeft } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Search, ArrowLeft, ChevronDown, Palette, GraduationCap, Heart, Users, Trophy, Leaf, Scale, Globe, UtensilsCrossed, Gavel, Baby } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import ResourceCard from "@/components/ResourceCard";
 import UserPagination from "@/components/UserPagination";
@@ -25,24 +26,24 @@ interface Resource {
   categories: string[];
 }
 
-// Main categories that don't have subcategories
+// Main categories with icons
 const MAIN_CATEGORIES = [
-  "Arts",
-  "Educational",
-  "Mental Health/Wellness",
-  "Senior Services",
-  "Social",
-  "Sports"
+  { name: "Arts", icon: Palette },
+  { name: "Educational", icon: GraduationCap },
+  { name: "Mental Health/Wellness", icon: Heart },
+  { name: "Senior Services", icon: Users },
+  { name: "Social", icon: Users },
+  { name: "Sports", icon: Trophy }
 ];
 
-// Community Resources subcategories
+// Community Resources subcategories with icons
 const COMMUNITY_SUBCATEGORIES = [
-  "Environment",
-  "Conflict Management",
-  "Cultural",
-  "Food",
-  "Legal Services",
-  "Youth"
+  { name: "Environment", icon: Leaf },
+  { name: "Conflict Management", icon: Scale },
+  { name: "Cultural", icon: Globe },
+  { name: "Food", icon: UtensilsCrossed },
+  { name: "Legal Services", icon: Gavel },
+  { name: "Youth", icon: Baby }
 ];
 
 export default function Resources() {
@@ -205,83 +206,105 @@ export default function Resources() {
           </div>
         </div>
 
-        {/* Category Filter Buttons */}
-        <div className="max-w-5xl mx-auto mb-6 space-y-3">
-          {/* All Categories Button */}
-          <div className="flex justify-center">
-            <Button
-              variant={!selectedCategory ? "default" : "outline"}
-              size="sm"
-              onClick={() => {
-                setSelectedCategory("");
-                setShowCommunitySubcategories(false);
-              }}
-            >
-              <TranslatedText contentKey="resources-all-categories" originalText="All Categories" />
-            </Button>
-          </div>
-
-          {/* Main Categories */}
-          <div className="flex flex-wrap justify-center gap-2">
-            {MAIN_CATEGORIES.map((category) => (
+        {/* Category Filter Navigation */}
+        <Card className="max-w-6xl mx-auto mb-8 p-6 shadow-lg">
+          <div className="space-y-6">
+            {/* All Categories Button */}
+            <div className="flex justify-center">
               <Button
-                key={category}
-                variant={selectedCategory === category ? "default" : "outline"}
-                size="sm"
+                variant={!selectedCategory ? "default" : "outline"}
+                size="lg"
                 onClick={() => {
-                  handleCategorySelect(category);
+                  setSelectedCategory("");
                   setShowCommunitySubcategories(false);
                 }}
-                className="capitalize"
+                className="min-w-[180px]"
               >
-                <TranslatedText 
-                  contentKey={`category-${category.replace(/\s+/g, '-')}`} 
-                  originalText={category} 
-                />
+                <TranslatedText contentKey="resources-all-categories" originalText="All Categories" />
               </Button>
-            ))}
-          </div>
+            </div>
 
-          {/* Community Resources with Subcategories */}
-          <div className="flex flex-col items-center gap-2">
-            <Button
-              variant={COMMUNITY_SUBCATEGORIES.includes(selectedCategory) || showCommunitySubcategories ? "default" : "outline"}
-              size="sm"
-              onClick={() => {
-                setShowCommunitySubcategories(!showCommunitySubcategories);
-                if (!showCommunitySubcategories) {
-                  setSelectedCategory("");
-                }
-              }}
-              className="capitalize"
-            >
-              <TranslatedText 
-                contentKey="category-community-resources" 
-                originalText="Community Resources" 
-              />
-            </Button>
-            
-            {/* Subcategories */}
-            {showCommunitySubcategories && (
-              <div className="flex flex-wrap justify-center gap-2 pl-4">
-                {COMMUNITY_SUBCATEGORIES.map((subcategory) => (
-                  <Button
-                    key={subcategory}
-                    variant={selectedCategory === subcategory ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => handleCategorySelect(subcategory)}
-                    className="capitalize text-sm"
-                  >
-                    <TranslatedText 
-                      contentKey={`category-${subcategory.replace(/\s+/g, '-')}`} 
-                      originalText={subcategory} 
-                    />
-                  </Button>
-                ))}
+            {/* Main Categories Grid */}
+            <div>
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3 text-center">
+                Categories
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                {MAIN_CATEGORIES.map((category) => {
+                  const Icon = category.icon;
+                  return (
+                    <Button
+                      key={category.name}
+                      variant={selectedCategory === category.name ? "default" : "outline"}
+                      size="lg"
+                      onClick={() => {
+                        handleCategorySelect(category.name);
+                        setShowCommunitySubcategories(false);
+                      }}
+                      className="h-auto py-4 flex flex-col items-center gap-2"
+                    >
+                      <Icon className="h-5 w-5" />
+                      <span className="text-xs text-center leading-tight">
+                        <TranslatedText 
+                          contentKey={`category-${category.name.replace(/\s+/g, '-')}`} 
+                          originalText={category.name} 
+                        />
+                      </span>
+                    </Button>
+                  );
+                })}
               </div>
-            )}
+            </div>
+
+            {/* Community Resources Section */}
+            <div className="border-t pt-6">
+              <Button
+                variant={COMMUNITY_SUBCATEGORIES.some(s => s.name === selectedCategory) || showCommunitySubcategories ? "default" : "outline"}
+                size="lg"
+                onClick={() => {
+                  setShowCommunitySubcategories(!showCommunitySubcategories);
+                  if (!showCommunitySubcategories) {
+                    setSelectedCategory("");
+                  }
+                }}
+                className="w-full md:w-auto min-w-[240px] mx-auto flex items-center justify-center gap-2"
+              >
+                <Users className="h-5 w-5" />
+                <TranslatedText 
+                  contentKey="category-community-resources" 
+                  originalText="Community Resources" 
+                />
+                <ChevronDown className={`h-4 w-4 transition-transform ${showCommunitySubcategories ? 'rotate-180' : ''}`} />
+              </Button>
+              
+              {/* Subcategories Grid */}
+              {showCommunitySubcategories && (
+                <div className="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                  {COMMUNITY_SUBCATEGORIES.map((subcategory) => {
+                    const Icon = subcategory.icon;
+                    return (
+                      <Button
+                        key={subcategory.name}
+                        variant={selectedCategory === subcategory.name ? "default" : "outline"}
+                        size="lg"
+                        onClick={() => handleCategorySelect(subcategory.name)}
+                        className="h-auto py-4 flex flex-col items-center gap-2"
+                      >
+                        <Icon className="h-5 w-5" />
+                        <span className="text-xs text-center leading-tight">
+                          <TranslatedText 
+                            contentKey={`category-${subcategory.name.replace(/\s+/g, '-')}`} 
+                            originalText={subcategory.name} 
+                          />
+                        </span>
+                      </Button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        </Card>
 
         {/* Search Bar */}
         <div className="max-w-2xl mx-auto mb-8">
