@@ -32,10 +32,11 @@ const CATEGORIES = [
   "Cultural",
   "Educational",
   "Environment",
+  "Food",
   "Legal Services",
   "Mental Health/Wellness",
-  "Recreational",
   "Senior Services",
+  "Social",
   "Sports",
   "Youth"
 ];
