@@ -21,6 +21,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import bcrypt from 'bcryptjs';
+import CivicOrgCSVUpload from './CivicOrgCSVUpload';
 
 interface CivicOrganization {
   id: string;
@@ -474,6 +475,8 @@ export default function CivicOrganizationsManager() {
           </DialogContent>
         </Dialog>
       </div>
+
+      <CivicOrgCSVUpload onUploadComplete={fetchOrganizations} />
 
       <div className="grid gap-4">
         {organizations.length === 0 ? (
