@@ -7,6 +7,24 @@ import { Edit, Trash2, ExternalLink, Phone, Mail, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import AdminPagination from "./AdminPagination";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+
+const CATEGORIES = [
+  "Arts",
+  "Community Resources",
+  "Conflict Management",
+  "Cultural",
+  "Educational",
+  "Environment",
+  "Food",
+  "Legal Services",
+  "Mental Health/Wellness",
+  "Senior Services",
+  "Social",
+  "Sports",
+  "Youth"
+];
 
 interface Resource {
   id: string;
@@ -34,6 +52,9 @@ export default function ResourcesList({ onEdit, isBusinessOpportunity = false }:
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkCategory, setBulkCategory] = useState("");
+  const [bulkUpdating, setBulkUpdating] = useState(false);
   const itemsPerPage = 10;
 
   const fetchResources = async () => {
@@ -111,6 +132,71 @@ export default function ResourcesList({ onEdit, isBusinessOpportunity = false }:
     }
   };
 
+  const toggleSelectAll = () => {
+    if (selectedIds.size === paginatedResources.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(paginatedResources.map(r => r.id)));
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const handleBulkCategoryUpdate = async () => {
+    if (!bulkCategory || selectedIds.size === 0) {
+      toast({
+        title: "Error",
+        description: "Please select a category and at least one organization",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setBulkUpdating(true);
+
+    try {
+      const updatePromises = Array.from(selectedIds).map(id =>
+        supabase
+          .from("resources")
+          .update({ categories: [bulkCategory], updated_at: new Date().toISOString() })
+          .eq("id", id)
+      );
+
+      const results = await Promise.all(updatePromises);
+      const errors = results.filter(r => r.error);
+
+      if (errors.length > 0) {
+        throw new Error(`Failed to update ${errors.length} organizations`);
+      }
+
+      toast({
+        title: "Success",
+        description: `Updated ${selectedIds.size} organization(s) to ${bulkCategory} category`,
+      });
+
+      setSelectedIds(new Set());
+      setBulkCategory("");
+      fetchResources();
+    } catch (error) {
+      console.error("Error bulk updating:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update some organizations",
+        variant: "destructive",
+      });
+    } finally {
+      setBulkUpdating(false);
+    }
+  };
+
   useEffect(() => {
     fetchResources();
   }, [isBusinessOpportunity]); // Only fetch when switching between resources and business opportunities
@@ -125,6 +211,45 @@ export default function ResourcesList({ onEdit, isBusinessOpportunity = false }:
 
   return (
     <div className="space-y-4">
+      {/* Bulk Actions Bar */}
+      {selectedIds.size > 0 && (
+        <Card className="bg-primary/5 border-primary/20">
+          <CardContent className="py-4">
+            <div className="flex items-center gap-4">
+              <span className="text-sm font-medium">
+                {selectedIds.size} selected
+              </span>
+              <Select value={bulkCategory} onValueChange={setBulkCategory}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Change category to..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {CATEGORIES.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button 
+                onClick={handleBulkCategoryUpdate}
+                disabled={!bulkCategory || bulkUpdating}
+                size="sm"
+              >
+                {bulkUpdating ? "Updating..." : "Update Categories"}
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => setSelectedIds(new Set())}
+                size="sm"
+              >
+                Clear Selection
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Search Bar */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -156,17 +281,37 @@ export default function ResourcesList({ onEdit, isBusinessOpportunity = false }:
         </div>
       ) : (
         <>
+          {/* Select All Checkbox */}
+          {paginatedResources.length > 0 && (
+            <div className="flex items-center gap-2 px-2 py-2 border-b">
+              <Checkbox
+                checked={selectedIds.size === paginatedResources.length && paginatedResources.length > 0}
+                onCheckedChange={toggleSelectAll}
+              />
+              <span className="text-sm text-muted-foreground">
+                Select all on this page
+              </span>
+            </div>
+          )}
+
           {paginatedResources.map((resource) => (
           <Card key={resource.id}>
             <CardHeader className="flex flex-row items-start justify-between space-y-0">
-              <div className="flex-1">
-                <CardTitle className="text-lg">{resource.organization_name}</CardTitle>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {resource.categories.map((category) => (
-                    <Badge key={category} variant="secondary" className="capitalize">
-                      {category}
-                    </Badge>
-                  ))}
+              <div className="flex items-start gap-3 flex-1">
+                <Checkbox
+                  checked={selectedIds.has(resource.id)}
+                  onCheckedChange={() => toggleSelect(resource.id)}
+                  className="mt-1"
+                />
+                <div className="flex-1">
+                  <CardTitle className="text-lg">{resource.organization_name}</CardTitle>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {resource.categories.map((category) => (
+                      <Badge key={category} variant="secondary" className="capitalize">
+                        {category}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               </div>
               {resource.logo_url && (
