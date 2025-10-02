@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Eye, EyeOff, Copy, Trash2, Users, Building2, RotateCcw, AlertTriangle, Pencil } from 'lucide-react';
+import { Plus, Eye, EyeOff, Copy, Trash2, Users, Building2, RotateCcw, AlertTriangle, Pencil, Download } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -243,6 +243,40 @@ export default function CivicOrganizationsManager() {
     setIsCreating(true);
   };
 
+  const exportAccessCodes = () => {
+    if (organizations.length === 0) {
+      toast({
+        title: "No organizations to export",
+        description: "Create organizations first",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Create CSV content with organization names and access codes
+    const csvHeader = 'Organization Name,Access Code,Coverage Area,Admin URL\n';
+    const csvRows = organizations.map(org => 
+      `"${org.name}","${org.access_code}","${org.coverage_area}","${window.location.origin}/civic-auth?code=${org.access_code}"`
+    ).join('\n');
+    const csvContent = csvHeader + csvRows;
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `civic_organizations_access_codes_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast({
+      title: "Access codes exported",
+      description: "CSV file has been downloaded. Note: Passwords are not included for security reasons."
+    });
+  };
+
   const toggleActive = async (id: string, currentStatus: boolean) => {
     try {
       const { error } = await supabase
@@ -376,31 +410,37 @@ export default function CivicOrganizationsManager() {
           </p>
         </div>
         
-        <Dialog open={isCreating} onOpenChange={(open) => {
-          setIsCreating(open);
-          if (!open) {
-            setEditingOrg(null);
-            setFormData({
-              name: '',
-              description: '',
-              access_code: '',
-              password: '',
-              coverage_area: '',
-              meeting_info: '',
-              meeting_address: '',
-              email: '',
-              phone: '',
-              website: '',
-              is_active: true
-            });
-          }
-        }}>
-          <DialogTrigger asChild>
-            <Button size="lg">
-              <Plus className="h-5 w-5 mr-2" />
-              Create Organization
-            </Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <Button onClick={exportAccessCodes} variant="outline" size="lg">
+            <Download className="h-5 w-5 mr-2" />
+            Export Access Codes
+          </Button>
+          
+          <Dialog open={isCreating} onOpenChange={(open) => {
+            setIsCreating(open);
+            if (!open) {
+              setEditingOrg(null);
+              setFormData({
+                name: '',
+                description: '',
+                access_code: '',
+                password: '',
+                coverage_area: '',
+                meeting_info: '',
+                meeting_address: '',
+                email: '',
+                phone: '',
+                website: '',
+                is_active: true
+              });
+            }
+          }}>
+            <DialogTrigger asChild>
+              <Button size="lg">
+                <Plus className="h-5 w-5 mr-2" />
+                Create Organization
+              </Button>
+            </DialogTrigger>
           
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
@@ -556,6 +596,7 @@ export default function CivicOrganizationsManager() {
             </form>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       <CivicOrgCSVUpload onUploadComplete={fetchOrganizations} />

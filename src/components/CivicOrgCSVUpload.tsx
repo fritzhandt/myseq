@@ -20,9 +20,16 @@ interface CivicOrgRow {
   organization_type?: string;
 }
 
+interface GeneratedCredentials {
+  name: string;
+  accessCode: string;
+  password: string;
+}
+
 export default function CivicOrgCSVUpload({ onUploadComplete }: { onUploadComplete?: () => void }) {
   const [uploading, setUploading] = useState(false);
   const [previewOrgs, setPreviewOrgs] = useState<CivicOrgRow[]>([]);
+  const [generatedCredentials, setGeneratedCredentials] = useState<GeneratedCredentials[]>([]);
   const { toast } = useToast();
 
   const generateAccessCode = () => {
@@ -220,9 +227,13 @@ export default function CivicOrgCSVUpload({ onUploadComplete }: { onUploadComple
 
       console.log('Generated Credentials:\n', credentialsText);
 
+      // Store credentials for export
+      setGeneratedCredentials(credentials);
+
       toast({
         title: "Organizations imported successfully",
-        description: `${orgsToInsert.length} organizations created. Check console for credentials.`
+        description: `${orgsToInsert.length} organizations created. Click Export Credentials to download.`,
+        duration: 10000,
       });
 
       clearPreview();
@@ -245,8 +256,62 @@ export default function CivicOrgCSVUpload({ onUploadComplete }: { onUploadComple
     if (fileInput) fileInput.value = '';
   };
 
+  const exportCredentials = () => {
+    if (generatedCredentials.length === 0) {
+      toast({
+        title: "No credentials to export",
+        description: "Import organizations first to generate credentials",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Create CSV content
+    const csvHeader = 'Organization Name,Access Code,Password\n';
+    const csvRows = generatedCredentials.map(cred => 
+      `"${cred.name}","${cred.accessCode}","${cred.password}"`
+    ).join('\n');
+    const csvContent = csvHeader + csvRows;
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `civic_org_credentials_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast({
+      title: "Credentials exported",
+      description: "CSV file has been downloaded"
+    });
+  };
+
   return (
     <div className="space-y-4">
+      {generatedCredentials.length > 0 && (
+        <Alert className="border-green-200 bg-green-50">
+          <AlertCircle className="h-4 w-4 text-green-600" />
+          <AlertDescription className="flex items-center justify-between">
+            <span className="text-green-800">
+              {generatedCredentials.length} organizations created with credentials
+            </span>
+            <Button 
+              onClick={exportCredentials}
+              size="sm"
+              variant="outline"
+              className="ml-4"
+            >
+              <Upload className="mr-2 h-4 w-4" />
+              Export Credentials CSV
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+      
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
