@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -62,11 +62,8 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
   const [coverPreviewUrl, setCoverPreviewUrl] = useState<string | null>(resource?.cover_photo_url || null);
   const [isDragOverLogo, setIsDragOverLogo] = useState(false);
   const [isDragOverCover, setIsDragOverCover] = useState(false);
-  const [autoSaving, setAutoSaving] = useState(false);
-  const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const logoFileInputRef = useRef<HTMLInputElement>(null);
   const coverFileInputRef = useRef<HTMLInputElement>(null);
-  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   const [formData, setFormData] = useState<Resource>({
     organization_name: resource?.organization_name || "",
@@ -88,90 +85,6 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
       categories: [category] // Store as array for database
     }));
   };
-
-  // Autosave function for existing resources
-  const autoSave = useCallback(async () => {
-    // Only autosave for existing resources, not new ones
-    if (!resource?.id) return;
-    
-    // Don't save if required fields are empty
-    if (!formData.organization_name.trim() || !formData.description.trim() || formData.categories.length === 0) {
-      return;
-    }
-
-    setAutoSaving(true);
-
-    try {
-      let logoUrl = formData.logo_url;
-      let coverPhotoUrl = formData.cover_photo_url;
-
-      // Upload logo image if a new file is selected
-      if (selectedLogoFile) {
-        logoUrl = await uploadImage(selectedLogoFile);
-        setSelectedLogoFile(null); // Clear after upload
-      }
-
-      // Upload cover photo if a new file is selected
-      if (selectedCoverFile) {
-        coverPhotoUrl = await uploadImage(selectedCoverFile);
-        setSelectedCoverFile(null); // Clear after upload
-      }
-
-      const dataToSave = {
-        organization_name: formData.organization_name,
-        description: formData.description,
-        phone: formData.phone,
-        email: formData.email,
-        address: formData.address,
-        website: formData.website,
-        logo_url: logoUrl,
-        cover_photo_url: coverPhotoUrl,
-        categories: formData.categories,
-        type: isBusinessOpportunity ? 'business_opportunity' : 'resource'
-      };
-
-      const { error } = await supabase
-        .from("resources")
-        .update(dataToSave)
-        .eq("id", resource.id);
-
-      if (error) throw error;
-
-      setLastSaved(new Date());
-    } catch (error) {
-      console.error("Autosave error:", error);
-      toast({
-        title: "Autosave failed",
-        description: "Your changes could not be saved automatically",
-        variant: "destructive",
-      });
-    } finally {
-      setAutoSaving(false);
-    }
-  }, [resource?.id, formData, selectedLogoFile, selectedCoverFile, isBusinessOpportunity, toast]);
-
-  // Debounced autosave on formData changes
-  useEffect(() => {
-    // Only setup autosave for existing resources
-    if (!resource?.id) return;
-
-    // Clear existing timeout
-    if (autoSaveTimeoutRef.current) {
-      clearTimeout(autoSaveTimeoutRef.current);
-    }
-
-    // Set new timeout for autosave (2 seconds after last change)
-    autoSaveTimeoutRef.current = setTimeout(() => {
-      autoSave();
-    }, 2000);
-
-    // Cleanup
-    return () => {
-      if (autoSaveTimeoutRef.current) {
-        clearTimeout(autoSaveTimeoutRef.current);
-      }
-    };
-  }, [formData, autoSave, resource?.id]);
 
   const handleLogoFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -445,8 +358,8 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
           description: "Resource updated successfully",
         });
         
-        // Don't call onSave() or onClose() - keep form open for multiple edits
-        // User can click Cancel to go back to the list
+        onSave();
+        onClose();
       } else {
         // New resources: sub-admins go to pending table, others go directly to main table
         const tableName = isSubAdmin ? 'pending_resources' : 'resources';
@@ -489,31 +402,12 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <CardHeader className="flex flex-row items-center justify-between">
-          <div className="flex flex-col gap-1">
-            <CardTitle>
-              {resource 
-                ? (isBusinessOpportunity ? "Edit Business Opportunity" : "Edit Resource")
-                : (isBusinessOpportunity ? "Create New Business Opportunity" : "Create New Resource")
-              }
-            </CardTitle>
-            {resource?.id && (
-              <div className="text-sm text-muted-foreground">
-                {autoSaving ? (
-                  <span className="flex items-center gap-2">
-                    <span className="inline-block w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
-                    Saving...
-                  </span>
-                ) : lastSaved ? (
-                  <span className="flex items-center gap-2">
-                    <span className="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
-                    Saved {new Date(lastSaved).toLocaleTimeString()}
-                  </span>
-                ) : (
-                  <span>Autosave enabled</span>
-                )}
-              </div>
-            )}
-          </div>
+          <CardTitle>
+            {resource 
+              ? (isBusinessOpportunity ? "Edit Business Opportunity" : "Edit Resource")
+              : (isBusinessOpportunity ? "Create New Business Opportunity" : "Create New Resource")
+            }
+          </CardTitle>
           <Button
             variant="ghost"
             size="icon"
@@ -811,16 +705,14 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
             </div>
 
             <div className="flex gap-2 pt-4">
-              {!resource?.id && (
-                <Button type="submit" disabled={loading || uploadingLogo || uploadingCover || removingBackgroundLogo || removingBackgroundCover}>
-                  {loading || uploadingLogo || uploadingCover
-                    ? "Creating..." 
-                    : "Create Resource"
-                  }
-                </Button>
-              )}
+              <Button type="submit" disabled={loading || uploadingLogo || uploadingCover || removingBackgroundLogo || removingBackgroundCover}>
+                {loading || uploadingLogo || uploadingCover
+                  ? (resource?.id ? "Saving..." : "Creating...")
+                  : (resource?.id ? "Save Changes" : "Create Resource")
+                }
+              </Button>
               <Button type="button" variant="outline" onClick={onClose} disabled={loading || uploadingLogo || uploadingCover || removingBackgroundLogo || removingBackgroundCover}>
-                {resource?.id ? "Close" : "Cancel"}
+                Cancel
               </Button>
             </div>
           </form>
