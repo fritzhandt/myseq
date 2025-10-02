@@ -430,7 +430,21 @@ const Admin = () => {
                     Create Business Opportunity
                   </Button>
                 </div>
-                <ResourcesList onEdit={handleEditBusinessOpportunity} isBusinessOpportunity={true} />
+                
+                <Tabs defaultValue="upload" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="upload">Upload Opportunities</TabsTrigger>
+                    <TabsTrigger value="manage">Manage Opportunities</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="upload" className="mt-4">
+                    <ResourceCSVUpload defaultType="business_opportunity" />
+                  </TabsContent>
+
+                  <TabsContent value="manage" className="mt-4">
+                    <ResourcesList onEdit={handleEditBusinessOpportunity} isBusinessOpportunity={true} />
+                  </TabsContent>
+                </Tabs>
               </div>
             )}
           </TabsContent>

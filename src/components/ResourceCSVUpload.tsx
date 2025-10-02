@@ -20,9 +20,10 @@ interface ResourceRow {
 
 interface ResourceCSVUploadProps {
   onUploadComplete?: () => void;
+  defaultType?: 'resource' | 'business_opportunity';
 }
 
-const ResourceCSVUpload = ({ onUploadComplete }: ResourceCSVUploadProps) => {
+const ResourceCSVUpload = ({ onUploadComplete, defaultType = 'resource' }: ResourceCSVUploadProps) => {
   const [uploading, setUploading] = useState(false);
   const [previewResources, setPreviewResources] = useState<ResourceRow[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -146,7 +147,7 @@ const ResourceCSVUpload = ({ onUploadComplete }: ResourceCSVUploadProps) => {
         email: resource.email || null,
         phone: resource.phone || null,
         address: resource.address || null,
-        type: resource.type || 'resource',
+        type: resource.type || defaultType,
         logo_url: null,
         cover_photo_url: null,
       }));
@@ -181,10 +182,10 @@ const ResourceCSVUpload = ({ onUploadComplete }: ResourceCSVUploadProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileSpreadsheet className="h-5 w-5" />
-            Bulk Upload Resources
+            Bulk Upload {defaultType === 'business_opportunity' ? 'Business Opportunities' : 'Resources'}
           </CardTitle>
           <CardDescription>
-            Upload a CSV or XLSX file to add multiple resources at once
+            Upload a CSV or XLSX file to add multiple {defaultType === 'business_opportunity' ? 'business opportunities' : 'resources'} at once
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
