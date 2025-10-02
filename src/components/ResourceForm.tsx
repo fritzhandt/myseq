@@ -332,9 +332,15 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
       }
 
       const dataToSave = {
-        ...formData,
+        organization_name: formData.organization_name,
+        description: formData.description,
+        phone: formData.phone,
+        email: formData.email,
+        address: formData.address,
+        website: formData.website,
         logo_url: logoUrl,
         cover_photo_url: coverPhotoUrl,
+        categories: formData.categories, // Only send the array
         type: isBusinessOpportunity ? 'business_opportunity' : 'resource'
       };
 
