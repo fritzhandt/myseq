@@ -51,13 +51,13 @@ export default function CivicOrgCSVUpload({ onUploadComplete }: { onUploadComple
 
     return data.map((row: any) => ({
       name: row.name || row.Name || row.organization_name || row['Organization Name'] || '',
-      description: row.description || row.Description || row.desc || row.Desc || '',
+      description: row.description || row.Description || row['Brief Description'] || row['brief description'] || row.desc || row.Desc || '',
       coverage_area: row.coverage_area || row['Coverage Area'] || row.area || row.Area || row.coverage || row.Coverage || '',
       meeting_info: row.meeting_info || row['Meeting Info'] || row.meeting || row.Meeting || row.meeting_schedule || row['Meeting Schedule'] || null,
       meeting_address: row.meeting_address || row['Meeting Address'] || row.address || row.Address || row.location || row.Location || null,
       email: row.email || row.Email || row.contact_email || row['Contact Email'] || null,
       phone: row.phone || row.Phone || row.telephone || row.Telephone || row['Phone Number'] || null,
-      website: row.website || row.Website || row.url || row.URL || row.web || row.Web || null,
+      website: row.website || row.url || row.URL || row.web || row.Web || null,
       organization_type: row.organization_type || row['Organization Type'] || row.type || row.Type || 'civic_organization'
     }));
   };
@@ -100,7 +100,7 @@ export default function CivicOrgCSVUpload({ onUploadComplete }: { onUploadComple
 
       const result = {
         name: obj.name || obj.organization_name || obj['organization name'] || '',
-        description: obj.description || obj.desc || obj.details || obj.about || '',
+        description: obj.description || obj['brief description'] || obj.desc || obj.details || obj.about || '',
         coverage_area: obj.coverage_area || obj['coverage area'] || obj.area || obj.coverage || obj.service_area || obj['service area'] || '',
         meeting_info: obj.meeting_info || obj['meeting info'] || obj.meeting || obj.meeting_schedule || obj['meeting schedule'] || null,
         meeting_address: obj.meeting_address || obj['meeting address'] || obj.address || obj.location || null,
