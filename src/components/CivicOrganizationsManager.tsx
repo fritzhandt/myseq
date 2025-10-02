@@ -41,6 +41,7 @@ interface CivicOrganization {
 export default function CivicOrganizationsManager() {
   const [organizations, setOrganizations] = useState<CivicOrganization[]>([]);
   const [isCreating, setIsCreating] = useState(false);
+  const [creatingOrgType, setCreatingOrgType] = useState<string>('civic_organization');
   const [editingOrg, setEditingOrg] = useState<CivicOrganization | null>(null);
   const [showPasswords, setShowPasswords] = useState<{[key: string]: boolean}>({});
   const [loading, setLoading] = useState(true);
@@ -60,7 +61,8 @@ export default function CivicOrganizationsManager() {
     email: '',
     phone: '',
     website: '',
-    is_active: true
+    is_active: true,
+    organization_type: 'civic_organization'
   });
 
   const fetchOrganizations = async () => {
@@ -143,7 +145,8 @@ export default function CivicOrganizationsManager() {
           meeting_info: formData.meeting_info || null,
           meeting_address: formData.meeting_address || null,
           contact_info,
-          is_active: formData.is_active
+          is_active: formData.is_active,
+          organization_type: formData.organization_type
         };
 
         // Only hash and update password if a new one was provided
@@ -188,7 +191,8 @@ export default function CivicOrganizationsManager() {
             meeting_info: formData.meeting_info || null,
             meeting_address: formData.meeting_address || null,
             contact_info,
-            is_active: formData.is_active
+            is_active: formData.is_active,
+            organization_type: formData.organization_type
           }]);
 
         if (error) throw error;
@@ -211,7 +215,8 @@ export default function CivicOrganizationsManager() {
         email: '',
         phone: '',
         website: '',
-        is_active: true
+        is_active: true,
+        organization_type: 'civic_organization'
       });
       setIsCreating(false);
       setEditingOrg(null);
@@ -239,9 +244,11 @@ export default function CivicOrganizationsManager() {
       email: org.contact_info?.email || '',
       phone: org.contact_info?.phone || '',
       website: org.contact_info?.website || '',
-      is_active: org.is_active
+      is_active: org.is_active,
+      organization_type: org.organization_type
     });
     setEditingOrg(org);
+    setCreatingOrgType(org.organization_type);
     setIsCreating(true);
   };
 
@@ -388,6 +395,26 @@ export default function CivicOrganizationsManager() {
     }
   };
 
+  const handleCreateNew = (orgType: string) => {
+    setCreatingOrgType(orgType);
+    setFormData({
+      name: '',
+      description: '',
+      access_code: '',
+      password: '',
+      coverage_area: '',
+      meeting_info: '',
+      meeting_address: '',
+      email: '',
+      phone: '',
+      website: '',
+      is_active: true,
+      organization_type: orgType
+    });
+    setEditingOrg(null);
+    setIsCreating(true);
+  };
+
   if (loading && organizations.length === 0) {
     return (
       <div className="flex items-center justify-center py-8">
@@ -438,36 +465,42 @@ export default function CivicOrganizationsManager() {
 
         <TabsContent value="civic" className="space-y-6 mt-6">
           <div className="flex justify-end">
-            <Dialog open={isCreating} onOpenChange={(open) => {
-            setIsCreating(open);
-            if (!open) {
-              setEditingOrg(null);
-              setFormData({
-                name: '',
-                description: '',
-                access_code: '',
-                password: '',
-                coverage_area: '',
-                meeting_info: '',
-                meeting_address: '',
-                email: '',
-                phone: '',
-                website: '',
-                is_active: true
-              });
-            }
-          }}>
-            <DialogTrigger asChild>
-              <Button size="lg">
-                <Plus className="h-5 w-5 mr-2" />
-                Create Organization
-              </Button>
-            </DialogTrigger>
-          
-          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>{editingOrg ? 'Edit' : 'Create New'} Civic Organization</DialogTitle>
-            </DialogHeader>
+            <Button size="lg" onClick={() => handleCreateNew('civic_organization')}>
+              <Plus className="h-5 w-5 mr-2" />
+              Create Organization
+            </Button>
+          </div>
+
+          <Dialog open={isCreating} onOpenChange={(open) => {
+              setIsCreating(open);
+              if (!open) {
+                setEditingOrg(null);
+                setFormData({
+                  name: '',
+                  description: '',
+                  access_code: '',
+                  password: '',
+                  coverage_area: '',
+                  meeting_info: '',
+                  meeting_address: '',
+                  email: '',
+                  phone: '',
+                  website: '',
+                  is_active: true,
+                  organization_type: 'civic_organization'
+                });
+              }
+            }}>
+            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>
+                  {editingOrg ? 'Edit' : 'Create New'} {
+                    creatingOrgType === 'community_board' ? 'Community Board' :
+                    creatingOrgType === 'police_council' ? 'Police Council' :
+                    'Civic Organization'
+                  }
+                </DialogTitle>
+              </DialogHeader>
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -616,9 +649,8 @@ export default function CivicOrganizationsManager() {
                 </Button>
               </div>
             </form>
-          </DialogContent>
-            </Dialog>
-          </div>
+            </DialogContent>
+          </Dialog>
 
           <CivicOrgCSVUpload onUploadComplete={fetchOrganizations} />
 
@@ -631,7 +663,7 @@ export default function CivicOrganizationsManager() {
                   <p className="text-muted-foreground text-center mb-4">
                     Create your first civic organization or upload via CSV.
                   </p>
-                  <Button onClick={() => setIsCreating(true)}>
+                  <Button onClick={() => handleCreateNew('civic_organization')}>
                     <Plus className="h-4 w-4 mr-2" />
                     Create First Organization
                   </Button>
@@ -757,13 +789,20 @@ export default function CivicOrganizationsManager() {
         </TabsContent>
 
         <TabsContent value="community-boards" className="space-y-6 mt-6">
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold">Community Board CSV Upload</h3>
-            <p className="text-sm text-muted-foreground">
-              Upload a CSV file with community board information. The system will automatically set the organization type to "community_board".
-            </p>
-            <CivicOrgCSVUpload onUploadComplete={fetchOrganizations} organizationType="community_board" />
+          <div className="flex justify-between items-center">
+            <div className="space-y-1">
+              <h3 className="text-xl font-semibold">Community Boards</h3>
+              <p className="text-sm text-muted-foreground">
+                Upload a CSV file or create individual community boards.
+              </p>
+            </div>
+            <Button size="lg" onClick={() => handleCreateNew('community_board')}>
+              <Plus className="h-5 w-5 mr-2" />
+              Create Community Board
+            </Button>
           </div>
+          
+          <CivicOrgCSVUpload onUploadComplete={fetchOrganizations} organizationType="community_board" />
 
           <div className="grid gap-4">
             {organizations.filter(org => org.organization_type === 'community_board').length === 0 ? (
@@ -772,8 +811,12 @@ export default function CivicOrganizationsManager() {
                   <Users className="h-12 w-12 text-muted-foreground mb-4" />
                   <h3 className="text-lg font-semibold mb-2">No community boards yet</h3>
                   <p className="text-muted-foreground text-center mb-4">
-                    Upload a CSV file to add community boards.
+                    Upload a CSV file or create a community board individually.
                   </p>
+                  <Button onClick={() => handleCreateNew('community_board')}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create First Community Board
+                  </Button>
                 </CardContent>
               </Card>
             ) : (
@@ -897,13 +940,20 @@ export default function CivicOrganizationsManager() {
         </TabsContent>
 
         <TabsContent value="police-councils" className="space-y-6 mt-6">
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold">Police Council CSV Upload</h3>
-            <p className="text-sm text-muted-foreground">
-              Upload a CSV file with police council information. The system will automatically set the organization type to "police_council".
-            </p>
-            <CivicOrgCSVUpload onUploadComplete={fetchOrganizations} organizationType="police_council" />
+          <div className="flex justify-between items-center">
+            <div className="space-y-1">
+              <h3 className="text-xl font-semibold">Police Councils</h3>
+              <p className="text-sm text-muted-foreground">
+                Upload a CSV file or create individual police councils.
+              </p>
+            </div>
+            <Button size="lg" onClick={() => handleCreateNew('police_council')}>
+              <Plus className="h-5 w-5 mr-2" />
+              Create Police Council
+            </Button>
           </div>
+          
+          <CivicOrgCSVUpload onUploadComplete={fetchOrganizations} organizationType="police_council" />
 
           <div className="grid gap-4">
             {organizations.filter(org => org.organization_type === 'police_council').length === 0 ? (
@@ -912,8 +962,12 @@ export default function CivicOrganizationsManager() {
                   <Shield className="h-12 w-12 text-muted-foreground mb-4" />
                   <h3 className="text-lg font-semibold mb-2">No police councils yet</h3>
                   <p className="text-muted-foreground text-center mb-4">
-                    Upload a CSV file to add police councils.
+                    Upload a CSV file or create a police council individually.
                   </p>
+                  <Button onClick={() => handleCreateNew('police_council')}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create First Police Council
+                  </Button>
                 </CardContent>
               </Card>
             ) : (
