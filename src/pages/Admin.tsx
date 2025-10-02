@@ -16,6 +16,7 @@ import CivicOrganizationsManager from '@/components/CivicOrganizationsManager';
 import JobCSVUpload from '@/components/JobCSVUpload';
 import JobReportsList from '@/components/JobReportsList';
 import AdminJobsList from '@/components/AdminJobsList';
+import ResourceCSVUpload from '@/components/ResourceCSVUpload';
 import { PendingApprovalsManager } from '@/components/PendingApprovalsManager';
 import MyPendingSubmissions from '@/components/MyPendingSubmissions';
 import { AdminStats } from '@/components/AdminStats';
@@ -393,7 +394,21 @@ const Admin = () => {
                     Create New Resource
                   </Button>
                 </div>
-                <ResourcesList onEdit={handleEditResource} />
+                
+                <Tabs defaultValue="upload" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="upload">Upload Resources</TabsTrigger>
+                    <TabsTrigger value="manage">Manage Resources</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="upload" className="mt-4">
+                    <ResourceCSVUpload />
+                  </TabsContent>
+
+                  <TabsContent value="manage" className="mt-4">
+                    <ResourcesList onEdit={handleEditResource} />
+                  </TabsContent>
+                </Tabs>
               </div>
             )}
           </TabsContent>
