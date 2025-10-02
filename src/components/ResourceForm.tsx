@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -21,7 +21,8 @@ interface Resource {
   website?: string;
   logo_url?: string;
   cover_photo_url?: string;
-  categories: string[];
+  categories: string[]; // Still array for database compatibility
+  category?: string; // Single category for form
 }
 
 interface ResourceFormProps {
@@ -74,20 +75,15 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
     logo_url: resource?.logo_url || "",
     cover_photo_url: resource?.cover_photo_url || "",
     categories: resource?.categories || [],
+    category: resource?.categories?.[0] || "", // Single category
   });
 
-  const handleCategoryChange = (category: string, checked: boolean) => {
-    if (checked) {
-      setFormData(prev => ({
-        ...prev,
-        categories: [...prev.categories, category]
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        categories: prev.categories.filter(c => c !== category)
-      }));
-    }
+  const handleCategoryChange = (category: string) => {
+    setFormData(prev => ({
+      ...prev,
+      category: category,
+      categories: [category] // Store as array for database
+    }));
   };
 
   const handleLogoFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -684,23 +680,22 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
             </div>
 
             <div>
-              <Label>Categories *</Label>
-              <div className="grid grid-cols-2 gap-3 mt-2">
-                {CATEGORIES.map((category) => (
-                  <div key={category} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={category}
-                      checked={formData.categories.includes(category)}
-                      onCheckedChange={(checked) =>
-                        handleCategoryChange(category, checked as boolean)
-                      }
-                    />
-                    <Label htmlFor={category} className="capitalize">
+              <Label>Category *</Label>
+              <Select 
+                value={formData.category || ""} 
+                onValueChange={handleCategoryChange}
+              >
+                <SelectTrigger className="mt-2">
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {CATEGORIES.map((category) => (
+                    <SelectItem key={category} value={category}>
                       {category}
-                    </Label>
-                  </div>
-                ))}
-              </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="flex gap-2 pt-4">
