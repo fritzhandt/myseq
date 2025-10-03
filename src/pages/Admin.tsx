@@ -251,7 +251,7 @@ const Admin = () => {
             <div className="flex gap-2">
               <Button onClick={() => navigate('/')} variant="outline">
                 <Calendar className="h-4 w-4 mr-2" />
-                View Events
+                Home
               </Button>
               <Button onClick={handleSignOut} variant="outline">
                 <LogOut className="h-4 w-4 mr-2" />
