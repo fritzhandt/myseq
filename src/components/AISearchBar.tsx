@@ -66,7 +66,7 @@ export default function AISearchBar() {
         if (response.error === 'Daily search limit exceeded') {
           toast({
             title: "Daily limit reached",
-            description: "Our AI needs a break! You've reached the daily limit of 1,000 searches. Come back tomorrow to use AI search, or navigate the site manually.",
+            description: "Our AI needs a break today! Come back tomorrow to use AI search, or navigate the site manually.",
             variant: "destructive"
           });
         } else {
