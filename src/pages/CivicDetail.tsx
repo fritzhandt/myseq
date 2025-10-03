@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Navbar from "@/components/Navbar";
+import AdminPagination from "@/components/AdminPagination";
 import { ArrowLeft, MapPin, Clock, Phone, Mail, Globe, Users, Calendar, FileText, Image, Link, Images } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format, parseISO } from "date-fns";
@@ -91,6 +92,13 @@ const CivicDetail = () => {
   const [viewerIndex, setViewerIndex] = useState(0);
   const [selectedPDF, setSelectedPDF] = useState<{url: string; title: string} | null>(null);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
+  
+  // Pagination states
+  const [announcementsPage, setAnnouncementsPage] = useState(1);
+  const [newslettersPage, setNewslettersPage] = useState(1);
+  const [galleryPage, setGalleryPage] = useState(1);
+  const [eventsPage, setEventsPage] = useState(1);
+  const itemsPerPage = 6;
 
   // Track page view on mount
   useEffect(() => {
@@ -212,6 +220,24 @@ const CivicDetail = () => {
       title: newsletter.title
     });
   };
+
+  // Pagination calculations
+  const paginatedAnnouncements = announcements.slice(
+    (announcementsPage - 1) * itemsPerPage,
+    announcementsPage * itemsPerPage
+  );
+  const paginatedNewsletters = newsletters.slice(
+    (newslettersPage - 1) * itemsPerPage,
+    newslettersPage * itemsPerPage
+  );
+  const paginatedGallery = galleryPhotos.slice(
+    (galleryPage - 1) * itemsPerPage,
+    galleryPage * itemsPerPage
+  );
+  const paginatedEvents = civicEvents.slice(
+    (eventsPage - 1) * itemsPerPage,
+    eventsPage * itemsPerPage
+  );
 
   if (loading) {
     return (
@@ -458,8 +484,9 @@ const CivicDetail = () => {
                       />
                     </div>
                   ) : (
-                    <div className="space-y-4">
-                      {newsletters.map((newsletter) => (
+                    <>
+                      <div className="space-y-4">
+                        {paginatedNewsletters.map((newsletter) => (
                         <div 
                           key={newsletter.id}
                           className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50"
@@ -484,8 +511,21 @@ const CivicDetail = () => {
                             <TranslatedText contentKey="civic_detail.view_pdf" originalText="View PDF" />
                           </Button>
                         </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                      
+                      {newsletters.length > itemsPerPage && (
+                        <div className="mt-6">
+                          <AdminPagination
+                            currentPage={newslettersPage}
+                            totalPages={Math.ceil(newsletters.length / itemsPerPage)}
+                            totalItems={newsletters.length}
+                            itemsPerPage={itemsPerPage}
+                            onPageChange={setNewslettersPage}
+                          />
+                        </div>
+                      )}
+                    </>
                   )}
                 </CardContent>
               </Card>
@@ -518,8 +558,9 @@ const CivicDetail = () => {
                       />
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 gap-4">
-                      {announcements.map((announcement) => (
+                    <>
+                      <div className="grid grid-cols-1 gap-4">
+                        {paginatedAnnouncements.map((announcement) => (
                         <Card 
                           key={announcement.id} 
                           className="cursor-pointer hover:shadow-md hover:scale-[1.02] transition-all duration-200 border-2 hover:border-primary/20"
@@ -565,8 +606,21 @@ const CivicDetail = () => {
                             </div>
                           </CardContent>
                         </Card>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                      
+                      {announcements.length > itemsPerPage && (
+                        <div className="mt-6">
+                          <AdminPagination
+                            currentPage={announcementsPage}
+                            totalPages={Math.ceil(announcements.length / itemsPerPage)}
+                            totalItems={announcements.length}
+                            itemsPerPage={itemsPerPage}
+                            onPageChange={setAnnouncementsPage}
+                          />
+                        </div>
+                      )}
+                    </>
                   )}
                 </CardContent>
               </Card>
@@ -759,7 +813,7 @@ const CivicDetail = () => {
                    ) : (
                      <>
                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                         {galleryPhotos.map((photo, index) => (
+                         {paginatedGallery.map((photo, index) => (
                            <div 
                              key={photo.id} 
                              className="group relative overflow-hidden rounded-lg border cursor-pointer"
@@ -799,6 +853,18 @@ const CivicDetail = () => {
                            </div>
                          ))}
                        </div>
+
+                       {galleryPhotos.length > itemsPerPage && (
+                         <div className="mt-6">
+                           <AdminPagination
+                             currentPage={galleryPage}
+                             totalPages={Math.ceil(galleryPhotos.length / itemsPerPage)}
+                             totalItems={galleryPhotos.length}
+                             itemsPerPage={itemsPerPage}
+                             onPageChange={setGalleryPage}
+                           />
+                         </div>
+                       )}
 
                        <PhotoViewer
                          photos={galleryPhotos}
@@ -840,11 +906,25 @@ const CivicDetail = () => {
                       />
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {civicEvents.map((event) => (
-                        <EventCard key={event.id} event={event} />
-                      ))}
-                    </div>
+                    <>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {paginatedEvents.map((event) => (
+                          <EventCard key={event.id} event={event} />
+                        ))}
+                      </div>
+                      
+                      {civicEvents.length > itemsPerPage && (
+                        <div className="mt-6">
+                          <AdminPagination
+                            currentPage={eventsPage}
+                            totalPages={Math.ceil(civicEvents.length / itemsPerPage)}
+                            totalItems={civicEvents.length}
+                            itemsPerPage={itemsPerPage}
+                            onPageChange={setEventsPage}
+                          />
+                        </div>
+                      )}
+                    </>
                   )}
                 </CardContent>
               </Card>

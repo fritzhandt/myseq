@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from "@/components/Navbar";
+import AdminPagination from "@/components/AdminPagination";
 import { Users, MapPin, Search, Vote, ExternalLink, Phone, ArrowLeft, Building2, Shield, Globe } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { TranslatedText } from "@/components/TranslatedText";
@@ -29,6 +30,8 @@ const Civics = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("community_board");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 9;
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
@@ -68,6 +71,7 @@ const Civics = () => {
     }
     
     setFilteredOrgs(filtered);
+    setCurrentPage(1); // Reset to first page when filters change
   }, [searchQuery, organizations, activeTab]);
 
   const fetchOrganizations = async () => {
@@ -105,6 +109,12 @@ const Civics = () => {
   const handleOrgClick = (orgId: string) => {
     navigate(`/civics/${orgId}`);
   };
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredOrgs.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedOrgs = filteredOrgs.slice(startIndex, endIndex);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
@@ -211,7 +221,7 @@ const Civics = () => {
                 />
               </div>
             ) : (
-              filteredOrgs.map((org) => (
+              paginatedOrgs.map((org) => (
                 <Card 
                   key={org.id} 
                   className="group cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105 border-2 hover:border-green-500/20 flex flex-col"
@@ -320,6 +330,19 @@ const Civics = () => {
               ))
             )}
           </div>
+
+          {/* Pagination */}
+          {!loading && filteredOrgs.length > itemsPerPage && (
+            <div className="mt-8">
+              <AdminPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={filteredOrgs.length}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          )}
 
           {/* Admin Access */}
           <div className="text-center mt-12 pt-8 border-t">
