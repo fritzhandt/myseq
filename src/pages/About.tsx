@@ -24,24 +24,15 @@ const About = () => {
               <TranslatedText contentKey="back-to-home-btn" originalText="Back to Home" />
             </Button>
             <h1 className="text-4xl font-bold mb-8 text-center">
-              <TranslatedText contentKey="about-page-title" originalText="About Southeast Queens Community Resource Center" />
+              <TranslatedText contentKey="about-page-title" originalText="About My SEQ" />
             </h1>
           
           <div className="prose prose-lg max-w-none">
             <p className="text-lg mb-6 text-muted-foreground">
-              <TranslatedText contentKey="about-intro" originalText="Southeast Queens Community Resource Center is your one-stop shop for discovering and participating in all the happenings across Southeast Queens. From family-friendly activities to cultural celebrations, this platform makes it easy to stay connected, informed, and engaged." />
+              <TranslatedText contentKey="about-intro" originalText="My SEQ is your one-stop shop for discovering community resources, business opportunities, jobs, and information on your elected officials, civics and police precincts." />
             </p>
             
-            <div className="grid md:grid-cols-2 gap-8 mb-8">
-              <div className="bg-card p-6 rounded-lg border">
-                <h2 className="text-2xl font-semibold mb-4">
-                  <TranslatedText contentKey="our-mission-title" originalText="Our Mission" />
-                </h2>
-                <p className="text-muted-foreground">
-                  <TranslatedText contentKey="our-mission-text" originalText="To serve as the central hub for Southeast Queens residents by connecting neighbors with local events, fostering civic engagement, and strengthening community pride." />
-                </p>
-              </div>
-              
+            <div className="mb-8">
               <div className="bg-card p-6 rounded-lg border">
                 <h2 className="text-2xl font-semibold mb-4">
                   <TranslatedText contentKey="what-we-do-title" originalText="What We Do" />
@@ -51,7 +42,7 @@ const About = () => {
                   <Link to="/contact-elected" className="text-primary hover:text-primary/80 underline underline-offset-4">
                     <TranslatedText contentKey="local-elected-officials-link" originalText="local elected officials" />
                   </Link>
-                  <TranslatedText contentKey="what-we-do-text-2" originalText=", Southeast Queens Community Resource Center brings together everything you need to know about what's happening in your neighborhood. We highlight events for all ages—youth programs, senior activities, cultural festivals, and more—so everyone has a chance to get involved and make lasting connections." />
+                  <TranslatedText contentKey="what-we-do-text-2" originalText=", My SEQ brings together everything you need to know about Southeast Queens, powered by artificial intelligence. We highlight the most important information, and make use AI to make it as easy as possible to get the information you need." />
                 </p>
               </div>
             </div>
@@ -61,7 +52,14 @@ const About = () => {
                 <TranslatedText contentKey="get-involved-title" originalText="Get Involved" />
               </h2>
               <p className="text-muted-foreground">
-                <TranslatedText contentKey="get-involved-text" originalText="Explore events, meet your neighbors, and engage with your representatives right here in Southeast Queens. Whether you're attending your first community gathering or looking for ways to volunteer, this site is designed to keep you informed and involved in shaping the future of our community." />
+                <TranslatedText contentKey="get-involved-text" originalText="Have resources, jobs, suggestions to better My SEQ, or other opportunities? Let us know by contacting us " />
+                <a 
+                  href="mailto:district33@nyassembly.gov?subject=MY%20SEQ%20SUPPORT/INQUIRY" 
+                  className="text-primary hover:text-primary/80 underline underline-offset-4"
+                >
+                  <TranslatedText contentKey="get-involved-link" originalText="here" />
+                </a>
+                <TranslatedText contentKey="get-involved-text-end" originalText="." />
               </p>
             </div>
           </div>
