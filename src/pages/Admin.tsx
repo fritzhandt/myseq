@@ -22,8 +22,7 @@ import MyPendingSubmissions from '@/components/MyPendingSubmissions';
 import { AdminStats } from '@/components/AdminStats';
 import { useToast } from '@/hooks/use-toast';
 import { useUserRole } from '@/hooks/useUserRole';
-import { AdminUsersList } from '@/components/AdminUsersList';
-import { Plus, Calendar, LogOut, Star, AlertTriangle, Users, MapPin, FileText, Building2, Clock, BarChart3, Briefcase, UserCog } from 'lucide-react';
+import { Plus, Calendar, LogOut, Star, AlertTriangle, Users, MapPin, FileText, Building2, Clock, BarChart3, Briefcase } from 'lucide-react';
 
 // Admin Panel - Role-based access control system
 const Admin = () => {
@@ -264,7 +263,7 @@ const Admin = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue={isMainAdmin ? "pending-approvals" : (isSubAdmin ? "my-submissions" : "events")} className="w-full">
-          <TabsList className={`grid w-full ${isMainAdmin ? 'grid-cols-10' : (isSubAdmin ? 'grid-cols-8' : 'grid-cols-7')} mb-8`}>
+          <TabsList className={`grid w-full ${isMainAdmin ? 'grid-cols-9' : (isSubAdmin ? 'grid-cols-8' : 'grid-cols-7')} mb-8`}>
             {isMainAdmin && (
               <TabsTrigger value="pending-approvals" className="flex items-center gap-2 relative">
                 <Clock className="h-4 w-4" />
@@ -311,16 +310,10 @@ const Admin = () => {
               Jobs
             </TabsTrigger>
             {isMainAdmin && (
-              <>
-                <TabsTrigger value="stats" className="flex items-center gap-2">
-                  <BarChart3 className="h-4 w-4" />
-                  Stats
-                </TabsTrigger>
-                <TabsTrigger value="admins" className="flex items-center gap-2">
-                  <UserCog className="h-4 w-4" />
-                  Admins
-                </TabsTrigger>
-              </>
+              <TabsTrigger value="stats" className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />
+                Stats
+              </TabsTrigger>
             )}
           </TabsList>
 
@@ -505,24 +498,15 @@ const Admin = () => {
           </TabsContent>
 
           {isMainAdmin && (
-            <>
-              <TabsContent value="stats">
-                <div className="space-y-6">
-                  <div className="flex justify-between items-center">
-                    <h2 className="text-3xl font-bold">Site Analytics</h2>
-                    <p className="text-sm text-muted-foreground">Anonymous usage statistics</p>
-                  </div>
-                  <AdminStats />
+            <TabsContent value="stats">
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-3xl font-bold">Site Analytics</h2>
+                  <p className="text-sm text-muted-foreground">Anonymous usage statistics</p>
                 </div>
-              </TabsContent>
-              
-              <TabsContent value="admins">
-                <div className="space-y-6">
-                  <h2 className="text-3xl font-bold">Manage Admin Users</h2>
-                  <AdminUsersList />
-                </div>
-              </TabsContent>
-            </>
+                <AdminStats />
+              </div>
+            </TabsContent>
           )}
         </Tabs>
       </div>

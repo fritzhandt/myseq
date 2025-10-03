@@ -23,7 +23,6 @@ import CivicAuth from "./pages/CivicAuth";
 import CivicAdmin from "./pages/CivicAdmin";
 import TestTranslation from "./pages/TestTranslation";
 import NotFound from "./pages/NotFound";
-import AcceptInvite from "./pages/AcceptInvite";
 import "./index.css";
 
 const queryClient = new QueryClient({
@@ -46,7 +45,6 @@ const App = () => (
           <Route path="/about" element={<About />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/auth" element={<Auth />} />
-          <Route path="/accept-invite" element={<AcceptInvite />} />
           <Route path="/contact-elected" element={<ContactElected />} />
           <Route path="/my-elected-lookup" element={<MyElectedLookup />} />
           <Route path="/special-event" element={<SpecialEvent />} />
