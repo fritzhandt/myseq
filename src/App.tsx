@@ -8,6 +8,7 @@ import Admin from "./pages/Admin";
 import About from "./pages/About";
 import FAQ from "./pages/FAQ";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import ContactElected from "./pages/ContactElected";
 import MyElectedLookup from "./pages/MyElectedLookup";
 import SpecialEvent from "./pages/SpecialEvent";
@@ -45,6 +46,7 @@ const App = () => (
           <Route path="/about" element={<About />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/contact-elected" element={<ContactElected />} />
           <Route path="/my-elected-lookup" element={<MyElectedLookup />} />
           <Route path="/special-event" element={<SpecialEvent />} />
