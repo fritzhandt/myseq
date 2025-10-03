@@ -214,7 +214,7 @@ const Civics = () => {
               filteredOrgs.map((org) => (
                 <Card 
                   key={org.id} 
-                  className="group cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105 border-2 hover:border-green-500/20"
+                  className="group cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105 border-2 hover:border-green-500/20 flex flex-col"
                 >
                   <CardHeader>
                     <CardTitle className="flex items-start justify-between gap-2">
@@ -224,7 +224,8 @@ const Civics = () => {
                       <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-green-600 transition-colors flex-shrink-0" />
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-4 flex-1 flex flex-col">{/* Content wrapper for flex growth */}
+                    <div className="flex-1 space-y-4">
                     {/* Coverage Area */}
                     <div className="flex items-start gap-2">
                       <MapPin className="h-4 w-4 mt-0.5 text-green-600 flex-shrink-0" />
@@ -304,10 +305,11 @@ const Civics = () => {
                         </div>
                       </div>
                     )}
+                    </div>
                     
                     {/* View Page Button */}
                     <Button 
-                      className="w-full mt-4"
+                      className="w-full mt-auto"
                       variant="outline"
                       onClick={() => handleOrgClick(org.id)}
                     >
