@@ -90,8 +90,8 @@ export const AdminUsersList = () => {
 
       if (error) {
         // Handle rate limit errors specifically
-        if (error.message?.includes('only request this after')) {
-          throw new Error('Please wait a few seconds before sending another invite');
+        if (error.message?.includes('rate limit') || error.message?.includes('only request this after')) {
+          throw new Error('⏱️ Please wait at least 60 seconds between sending invites (Supabase security rate limit)');
         }
         throw error;
       }
