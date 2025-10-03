@@ -26,9 +26,9 @@ const Auth = () => {
     };
     checkAuth();
 
-    // Listen for auth changes
+    // Listen for auth changes - only redirect on SIGNED_IN event
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
+      if (event === 'SIGNED_IN' && session) {
         navigate('/admin');
       }
     });
