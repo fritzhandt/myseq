@@ -77,6 +77,8 @@ export const AdminUsersList = () => {
       return;
     }
 
+    if (inviting) return; // Prevent multiple rapid clicks
+
     setInviting(true);
     try {
       const { data, error } = await supabase.functions.invoke('invite-admin', {
@@ -86,7 +88,13 @@ export const AdminUsersList = () => {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        // Handle rate limit errors specifically
+        if (error.message?.includes('only request this after')) {
+          throw new Error('Please wait a few seconds before sending another invite');
+        }
+        throw error;
+      }
 
       toast({
         title: "Success",
