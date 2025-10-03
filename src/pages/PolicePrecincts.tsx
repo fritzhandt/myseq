@@ -77,7 +77,7 @@ export default function PolicePrecincts() {
 
         <div className="grid gap-6 md:grid-cols-2">
           {precincts.map((precinct) => (
-            <Card key={precinct.number} className="hover:shadow-lg transition-shadow duration-300">
+            <Card key={precinct.number} className="hover:shadow-lg transition-shadow duration-300 flex flex-col">
               <CardHeader>
                 <CardTitle className="text-2xl font-bold text-primary">
                   <TranslatedText 
@@ -92,37 +92,39 @@ export default function PolicePrecincts() {
                   />
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <MapPin className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
-                  <div className="flex-1">
-                    <p className="font-medium text-foreground mb-2">
-                      <TranslatedText contentKey="police_precincts.coverage_area" originalText="Coverage Area" />
-                    </p>
-                    <p className="text-muted-foreground mb-3">{precinct.coverageArea}</p>
-                    <p className="font-medium text-foreground mt-3">
-                      <TranslatedText contentKey="police_precincts.address" originalText="Address" />
-                    </p>
-                    <p className="text-muted-foreground">{precinct.address}</p>
+              <CardContent className="space-y-4 flex-1 flex flex-col">
+                <div className="flex-1 space-y-4">
+                  <div className="flex items-start gap-3">
+                    <MapPin className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="font-medium text-foreground mb-2">
+                        <TranslatedText contentKey="police_precincts.coverage_area" originalText="Coverage Area" />
+                      </p>
+                      <p className="text-muted-foreground mb-3">{precinct.coverageArea}</p>
+                      <p className="font-medium text-foreground mt-3">
+                        <TranslatedText contentKey="police_precincts.address" originalText="Address" />
+                      </p>
+                      <p className="text-muted-foreground">{precinct.address}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <Phone className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                    <div>
+                      <p className="font-medium text-foreground">
+                        <TranslatedText contentKey="police_precincts.phone_community_affairs" originalText="Phone (Community Affairs - Non-Emergency)" />
+                      </p>
+                      <a 
+                        href={`tel:${precinct.phone}`}
+                        className="text-primary hover:underline"
+                      >
+                        {precinct.phone}
+                      </a>
+                    </div>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-3">
-                  <Phone className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                  <div>
-                    <p className="font-medium text-foreground">
-                      <TranslatedText contentKey="police_precincts.phone_community_affairs" originalText="Phone (Community Affairs - Non-Emergency)" />
-                    </p>
-                    <a 
-                      href={`tel:${precinct.phone}`}
-                      className="text-primary hover:underline"
-                    >
-                      {precinct.phone}
-                    </a>
-                  </div>
-                </div>
-                
-                <div className="pt-4 border-t">
+                <div className="pt-4 border-t mt-auto">
                   <p className="text-sm text-muted-foreground mb-3">
                     <strong>
                       <TranslatedText 
