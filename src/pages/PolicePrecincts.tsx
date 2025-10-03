@@ -3,37 +3,41 @@ import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import CommunityAlertBanner from "@/components/CommunityAlertBanner";
 import { useNavigate } from "react-router-dom";
-import { Phone, MapPin, Clock } from "lucide-react";
+import { Phone, MapPin } from "lucide-react";
 import { TranslatedText } from "@/components/TranslatedText";
 
 const precincts = [
   {
     number: "103",
-    address: "168-02 91st Avenue, Jamaica, NY 11432",
-    phone: "(718) 657-8181",
-    commandingOfficer: "Deputy Inspector",
-    hours: "24 Hours"
+    coverageArea: "Downtown Jamaica Business District, Hollis Park Gardens, Hollis, Lakewood, and Jamaica",
+    address: "168-02 91st Ave, Jamaica, NY, 11432-5229",
+    phone: "(718) 657-8195",
+    commandingOfficer: "Deputy Inspector Ralph A. Clement",
+    website: "https://www.nyc.gov/site/nypd/bureaus/patrol/precincts/103rd-precinct.page"
   },
   {
     number: "105",
-    address: "92-08 222nd Street, Queens Village, NY 11428",
-    phone: "(718) 776-9090",
-    commandingOfficer: "Deputy Inspector",
-    hours: "24 Hours"
+    coverageArea: "Queens Village, Cambria Heights, Bellerose, Glen Oaks, Floral Park, and Bellaire",
+    address: "92-08 222nd Street, Queens Village, NY, 11428-1474",
+    phone: "(718) 776-9176",
+    commandingOfficer: "Captain Douglas Moodie",
+    website: "https://www.nyc.gov/site/nypd/bureaus/patrol/precincts/105th-precinct.page"
   },
   {
     number: "113",
-    address: "167-02 Baisley Boulevard, Jamaica, NY 11434",
-    phone: "(718) 712-7733",
-    commandingOfficer: "Deputy Inspector",
-    hours: "24 Hours"
+    coverageArea: "Southeastern area of Jamaica, Queens, along with St. Albans, Hollis, S. Ozone Park, and Rochdale",
+    address: "167-02 Baisley Blvd., Jamaica, NY, 11434-2511",
+    phone: "(718) 712-1627",
+    commandingOfficer: "Deputy Inspector Sean Claxton",
+    website: "https://www.nyc.gov/site/nypd/bureaus/patrol/precincts/113th-precinct.page"
   },
   {
     number: "116",
-    address: "92-24 Rockaway Beach Boulevard, Rockaway Beach, NY 11693",
-    phone: "(718) 318-4200",
-    commandingOfficer: "Deputy Inspector",
-    hours: "24 Hours"
+    coverageArea: "Springfield Gardens, Brookville, Laurelton, and Rosedale",
+    address: "244-04 North Conduit Avenue, Queens, NY 11422",
+    phone: "(718) 610-4162",
+    commandingOfficer: "Deputy Inspector Jean Sony Beauvoir",
+    website: "https://www.nyc.gov/site/nypd/bureaus/patrol/precincts/116th-precinct.page"
   }
 ];
 
@@ -91,8 +95,12 @@ export default function PolicePrecincts() {
               <CardContent className="space-y-4">
                 <div className="flex items-start gap-3">
                   <MapPin className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="font-medium text-foreground">
+                  <div className="flex-1">
+                    <p className="font-medium text-foreground mb-2">
+                      <TranslatedText contentKey="police_precincts.coverage_area" originalText="Coverage Area" />
+                    </p>
+                    <p className="text-muted-foreground mb-3">{precinct.coverageArea}</p>
+                    <p className="font-medium text-foreground mt-3">
                       <TranslatedText contentKey="police_precincts.address" originalText="Address" />
                     </p>
                     <p className="text-muted-foreground">{precinct.address}</p>
@@ -103,7 +111,7 @@ export default function PolicePrecincts() {
                   <Phone className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                   <div>
                     <p className="font-medium text-foreground">
-                      <TranslatedText contentKey="police_precincts.phone" originalText="Phone" />
+                      <TranslatedText contentKey="police_precincts.phone_community_affairs" originalText="Phone (Community Affairs - Non-Emergency)" />
                     </p>
                     <a 
                       href={`tel:${precinct.phone}`}
@@ -114,33 +122,25 @@ export default function PolicePrecincts() {
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-3">
-                  <Clock className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                  <div>
-                    <p className="font-medium text-foreground">
-                      <TranslatedText contentKey="police_precincts.hours" originalText="Hours" />
-                    </p>
-                    <p className="text-muted-foreground">
-                      <TranslatedText 
-                        contentKey="police_precincts.24_hours"
-                        originalText={precinct.hours}
-                      />
-                    </p>
-                  </div>
-                </div>
-                
                 <div className="pt-4 border-t">
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground mb-3">
                     <strong>
                       <TranslatedText 
                         contentKey="police_precincts.commanding_officer"
                         originalText="Commanding Officer:"
                       />
-                    </strong> <TranslatedText 
-                      contentKey="police_precincts.deputy_inspector"
-                      originalText={precinct.commandingOfficer}
-                    />
+                    </strong> {precinct.commandingOfficer}
                   </p>
+                  <Button
+                    variant="default"
+                    className="w-full"
+                    onClick={() => window.open(precinct.website, '_blank')}
+                  >
+                    <TranslatedText 
+                      contentKey="police_precincts.more_information"
+                      originalText="More Information"
+                    />
+                  </Button>
                 </div>
               </CardContent>
             </Card>
