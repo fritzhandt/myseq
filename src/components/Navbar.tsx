@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Menu, Info, Users, Mail, Search, Vote, Shield, Calendar, Briefcase, Home, Building2, HelpCircle, Instagram, ExternalLink } from 'lucide-react';
+import { Menu, Info, Users, Mail, Search, Vote, Shield, Calendar, Briefcase, Home, Building2, HelpCircle, Instagram, ExternalLink, Landmark } from 'lucide-react';
 import AddToHomeButton from '@/components/AddToHomeButton';
 import { LanguageSelector } from '@/components/LanguageSelector';
 const Navbar = () => {
@@ -91,7 +91,7 @@ const Navbar = () => {
                         <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
                           <Users className="w-4 h-4" />
                         </div>
-                        <span>Community Resources</span>
+                        <span>Programs & Services</span>
                       </Link>
                       
                       <Link 
@@ -100,7 +100,7 @@ const Navbar = () => {
                         onClick={closeMenu}
                       >
                         <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
-                          <Building2 className="w-4 h-4" />
+                          <Landmark className="w-4 h-4" />
                         </div>
                         <span>Civic Organizations</span>
                       </Link>
