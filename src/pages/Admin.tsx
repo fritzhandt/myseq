@@ -263,7 +263,7 @@ const Admin = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue={isMainAdmin ? "pending-approvals" : (isSubAdmin ? "my-submissions" : "events")} className="w-full">
-          <TabsList className={`grid w-full ${isMainAdmin ? 'grid-cols-9' : (isSubAdmin ? 'grid-cols-8' : 'grid-cols-7')} mb-8`}>
+          <TabsList className={`grid w-full ${isMainAdmin ? 'grid-cols-9' : (isSubAdmin ? 'grid-cols-6' : 'grid-cols-7')} mb-8`}>
             {isMainAdmin && (
               <TabsTrigger value="pending-approvals" className="flex items-center gap-2 relative">
                 <Clock className="h-4 w-4" />
@@ -281,14 +281,18 @@ const Admin = () => {
                 My Submissions
               </TabsTrigger>
             )}
-            <TabsTrigger value="events" className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              Events
-            </TabsTrigger>
-            <TabsTrigger value="special-events" className="flex items-center gap-2">
-              <Star className="h-4 w-4" />
-              Special
-            </TabsTrigger>
+            {isMainAdmin && (
+              <TabsTrigger value="events" className="flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                Events
+              </TabsTrigger>
+            )}
+            {isMainAdmin && (
+              <TabsTrigger value="special-events" className="flex items-center gap-2">
+                <Star className="h-4 w-4" />
+                Special
+              </TabsTrigger>
+            )}
             <TabsTrigger value="community-alerts" className="flex items-center gap-2">
               <AlertTriangle className="h-4 w-4" />
               Alerts
@@ -329,47 +333,51 @@ const Admin = () => {
             </TabsContent>
           )}
 
-          <TabsContent value="events">
-            {showEventForm ? (
-              <EventForm
-                event={editingEvent}
-                onClose={handleEventFormClose}
-                onSave={handleEventFormClose}
-              />
-            ) : (
-              <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-3xl font-bold">Manage Events</h2>
-                  <Button onClick={handleCreateEvent} size="lg">
-                    <Plus className="h-5 w-5 mr-2" />
-                    Create New Event
-                  </Button>
+          {isMainAdmin && (
+            <TabsContent value="events">
+              {showEventForm ? (
+                <EventForm
+                  event={editingEvent}
+                  onClose={handleEventFormClose}
+                  onSave={handleEventFormClose}
+                />
+              ) : (
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-3xl font-bold">Manage Events</h2>
+                    <Button onClick={handleCreateEvent} size="lg">
+                      <Plus className="h-5 w-5 mr-2" />
+                      Create New Event
+                    </Button>
+                  </div>
+                  <EventList onEditEvent={handleEditEvent} />
                 </div>
-                <EventList onEditEvent={handleEditEvent} />
-              </div>
-            )}
-          </TabsContent>
+              )}
+            </TabsContent>
+          )}
 
-          <TabsContent value="special-events">
-            {showSpecialEventForm ? (
-              <SpecialEventForm
-                specialEvent={editingSpecialEvent}
-                onClose={handleSpecialEventFormClose}
-                onSave={handleSpecialEventFormClose}
-              />
-            ) : (
-              <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-3xl font-bold">Manage Special Events</h2>
-                  <Button onClick={handleCreateSpecialEvent} size="lg">
-                    <Plus className="h-5 w-5 mr-2" />
-                    Create Special Event
-                  </Button>
+          {isMainAdmin && (
+            <TabsContent value="special-events">
+              {showSpecialEventForm ? (
+                <SpecialEventForm
+                  specialEvent={editingSpecialEvent}
+                  onClose={handleSpecialEventFormClose}
+                  onSave={handleSpecialEventFormClose}
+                />
+              ) : (
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-3xl font-bold">Manage Special Events</h2>
+                    <Button onClick={handleCreateSpecialEvent} size="lg">
+                      <Plus className="h-5 w-5 mr-2" />
+                      Create Special Event
+                    </Button>
+                  </div>
+                  <SpecialEventsList onEditSpecialEvent={handleEditSpecialEvent} />
                 </div>
-                <SpecialEventsList onEditSpecialEvent={handleEditSpecialEvent} />
-              </div>
-            )}
-          </TabsContent>
+              )}
+            </TabsContent>
+          )}
 
           <TabsContent value="community-alerts">
             {showCommunityAlertForm ? (
