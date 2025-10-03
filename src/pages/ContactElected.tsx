@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -32,6 +32,7 @@ const ContactElected = () => {
   const [expandedOfficials, setExpandedOfficials] = useState<{ [key: string]: boolean }>({});
   const [officials, setOfficials] = useState<ElectedOfficial[]>([]);
   const [loading, setLoading] = useState(true);
+  const [guidanceOpen, setGuidanceOpen] = useState(true);
 
   const toggleOfficial = (id: string) => {
     setExpandedOfficials(prev => ({
@@ -220,6 +221,57 @@ const ContactElected = () => {
                   originalText="Find My Specific Representatives"
                 />
               </Button>
+            </div>
+
+            {/* Who Should I Contact Guidance */}
+            <div className="max-w-3xl mx-auto mb-12">
+              <Collapsible open={guidanceOpen} onOpenChange={setGuidanceOpen}>
+                <Card className="border-primary/20 shadow-lg animate-fade-in" style={{ boxShadow: '0 0 20px rgba(var(--primary), 0.2)' }}>
+                  <CollapsibleTrigger asChild>
+                    <CardHeader className="cursor-pointer hover:bg-muted/30 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-xl">
+                          <TranslatedText 
+                            contentKey="contact_elected.who_should_i_contact"
+                            originalText="Who should I contact?"
+                          />
+                        </CardTitle>
+                        {guidanceOpen ? (
+                          <ChevronUp className="w-5 h-5 text-primary" />
+                        ) : (
+                          <ChevronDown className="w-5 h-5 text-primary" />
+                        )}
+                      </div>
+                    </CardHeader>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <CardContent className="space-y-4">
+                      <p className="text-muted-foreground">
+                        <TranslatedText 
+                          contentKey="contact_elected.guidance_text_1"
+                          originalText="Most day-to-day problems are handled locally, so we recommend reaching out to your local elected officials first. If it turns out you need federal help, your local offices will point you in the right direction."
+                        />
+                      </p>
+                      <p className="text-muted-foreground">
+                        <TranslatedText 
+                          contentKey="contact_elected.guidance_text_2"
+                          originalText="For emergencies, dial 911. For non-emergency and other police related matters, please use the"
+                        />{' '}
+                        <Link to="/police-precincts" className="text-primary hover:underline font-medium">
+                          <TranslatedText 
+                            contentKey="contact_elected.police_precincts_link"
+                            originalText="Police Precincts"
+                          />
+                        </Link>{' '}
+                        <TranslatedText 
+                          contentKey="contact_elected.guidance_text_3"
+                          originalText="page for more information."
+                        />
+                      </p>
+                    </CardContent>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
             </div>
 
             {levelOrder.map((level) => {
