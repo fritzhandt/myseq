@@ -90,8 +90,8 @@ const MyElectedLookup = () => {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {lookupOptions.map((option, index) => (
-              <div key={index} className="bg-card p-6 rounded-lg border shadow-sm">
-                <div className="text-center mb-6">
+              <div key={index} className="bg-card p-6 rounded-lg border shadow-sm flex flex-col">
+                <div className="text-center mb-6 flex-1">
                   <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 text-primary">
                     {option.icon}
                   </div>
