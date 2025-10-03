@@ -20,9 +20,8 @@ const AcceptInvite = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Extract email from token or error parameters
-    const token = searchParams.get("token");
     const tokenHash = searchParams.get("token_hash");
+    const type = searchParams.get("type");
     const errorDescription = searchParams.get("error_description");
     
     if (errorDescription) {
@@ -34,7 +33,16 @@ const AcceptInvite = () => {
       return;
     }
 
-    // For invite flows, Supabase includes the email in the URL
+    if (!tokenHash || type !== 'recovery') {
+      toast({
+        title: "Invalid link",
+        description: "This invite link is invalid or has expired",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Extract email from URL parameter
     const emailParam = searchParams.get("email");
     if (emailParam) {
       setEmail(decodeURIComponent(emailParam));
@@ -77,17 +85,17 @@ const AcceptInvite = () => {
       const tokenHash = searchParams.get("token_hash");
       const type = searchParams.get("type");
 
-      if (!tokenHash) {
+      if (!tokenHash || type !== 'recovery') {
         throw new Error("Invalid invite link");
       }
 
-      // Verify the OTP token and update the user's password
-      const { error } = await supabase.auth.verifyOtp({
+      // Verify the recovery token
+      const { error: verifyError } = await supabase.auth.verifyOtp({
         token_hash: tokenHash,
-        type: type as any || 'invite',
+        type: 'recovery',
       });
 
-      if (error) throw error;
+      if (verifyError) throw verifyError;
 
       // Update the password
       const { error: updateError } = await supabase.auth.updateUser({
@@ -98,7 +106,7 @@ const AcceptInvite = () => {
 
       toast({
         title: "Success",
-        description: "Your account has been activated",
+        description: "Your admin account has been activated",
       });
 
       navigate("/admin");
@@ -106,7 +114,7 @@ const AcceptInvite = () => {
       console.error("Error accepting invite:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to accept invite",
+        description: error.message || "Failed to set password",
         variant: "destructive",
       });
     } finally {
