@@ -20,33 +20,28 @@ const AcceptInvite = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const tokenHash = searchParams.get("token_hash");
-    const type = searchParams.get("type");
-    const errorDescription = searchParams.get("error_description");
-    
-    if (errorDescription) {
-      toast({
-        title: "Invalid invite link",
-        description: errorDescription,
-        variant: "destructive",
-      });
-      return;
-    }
+    const checkAuthStatus = async () => {
+      // Check if user is already authenticated (Supabase auto-verifies recovery tokens)
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.user) {
+        // User is already logged in, just need to set email
+        setEmail(session.user.email || "");
+        return;
+      }
 
-    if (!tokenHash || type !== 'recovery') {
-      toast({
-        title: "Invalid link",
-        description: "This invite link is invalid or has expired",
-        variant: "destructive",
-      });
-      return;
-    }
+      // If not authenticated, check for errors in URL
+      const errorDescription = searchParams.get("error_description");
+      if (errorDescription) {
+        toast({
+          title: "Invalid invite link",
+          description: errorDescription,
+          variant: "destructive",
+        });
+      }
+    };
 
-    // Extract email from URL parameter
-    const emailParam = searchParams.get("email");
-    if (emailParam) {
-      setEmail(decodeURIComponent(emailParam));
-    }
+    checkAuthStatus();
   }, [searchParams, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -55,7 +50,7 @@ const AcceptInvite = () => {
     if (!email) {
       toast({
         title: "Error",
-        description: "Email not found in invite link",
+        description: "Email not found. Please use the invite link from your email.",
         variant: "destructive",
       });
       return;
@@ -82,22 +77,7 @@ const AcceptInvite = () => {
     setLoading(true);
 
     try {
-      const tokenHash = searchParams.get("token_hash");
-      const type = searchParams.get("type");
-
-      if (!tokenHash || type !== 'recovery') {
-        throw new Error("Invalid invite link");
-      }
-
-      // Verify the recovery token
-      const { error: verifyError } = await supabase.auth.verifyOtp({
-        token_hash: tokenHash,
-        type: 'recovery',
-      });
-
-      if (verifyError) throw verifyError;
-
-      // Update the password
+      // Update the password (user is already authenticated by Supabase)
       const { error: updateError } = await supabase.auth.updateUser({
         password: password,
       });
