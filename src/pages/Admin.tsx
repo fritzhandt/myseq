@@ -20,9 +20,10 @@ import ResourceCSVUpload from '@/components/ResourceCSVUpload';
 import { PendingApprovalsManager } from '@/components/PendingApprovalsManager';
 import MyPendingSubmissions from '@/components/MyPendingSubmissions';
 import { AdminStats } from '@/components/AdminStats';
+import ProfileSettings from '@/components/ProfileSettings';
 import { useToast } from '@/hooks/use-toast';
 import { useUserRole } from '@/hooks/useUserRole';
-import { Plus, Calendar, LogOut, Star, AlertTriangle, Users, MapPin, FileText, Building2, Clock, BarChart3, Briefcase } from 'lucide-react';
+import { Plus, Calendar, LogOut, Star, AlertTriangle, Users, MapPin, FileText, Building2, Clock, BarChart3, Briefcase, User } from 'lucide-react';
 
 // Admin Panel - Role-based access control system
 const Admin = () => {
@@ -263,7 +264,7 @@ const Admin = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue={isMainAdmin ? "pending-approvals" : (isSubAdmin ? "my-submissions" : "events")} className="w-full">
-          <TabsList className={`grid w-full ${isMainAdmin ? 'grid-cols-9' : (isSubAdmin ? 'grid-cols-6' : 'grid-cols-7')} mb-8`}>
+          <TabsList className={`grid w-full ${isMainAdmin ? 'grid-cols-9' : (isSubAdmin ? 'grid-cols-7' : 'grid-cols-7')} mb-8`}>
             {isMainAdmin && (
               <TabsTrigger value="pending-approvals" className="flex items-center gap-2 relative">
                 <Clock className="h-4 w-4" />
@@ -279,6 +280,12 @@ const Admin = () => {
               <TabsTrigger value="my-submissions" className="flex items-center gap-2">
                 <FileText className="h-4 w-4" />
                 My Submissions
+              </TabsTrigger>
+            )}
+            {isSubAdmin && (
+              <TabsTrigger value="profile" className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Profile
               </TabsTrigger>
             )}
             {isMainAdmin && (
@@ -330,6 +337,12 @@ const Admin = () => {
           {isSubAdmin && (
             <TabsContent value="my-submissions" className="space-y-4">
               <MyPendingSubmissions />
+            </TabsContent>
+          )}
+
+          {isSubAdmin && (
+            <TabsContent value="profile" className="space-y-4">
+              <ProfileSettings />
             </TabsContent>
           )}
 

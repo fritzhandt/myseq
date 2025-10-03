@@ -138,9 +138,26 @@ const CommunityAlertForm = ({ alert, onClose, onSave }: CommunityAlertFormProps)
       } else {
         // New alerts: sub-admins go to pending table, others go directly to main table
         const tableName = isSubAdmin ? 'pending_community_alerts' : 'community_alerts';
-        const insertData = isSubAdmin 
-          ? { ...formData, submitted_by: (await supabase.auth.getUser()).data.user?.id }
-          : formData;
+        let insertData;
+        
+        if (isSubAdmin) {
+          const userData = await supabase.auth.getUser();
+          // Fetch profile info
+          const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('full_name, phone_number')
+            .eq('user_id', userData.data.user?.id)
+            .maybeSingle();
+            
+          insertData = { 
+            ...formData, 
+            submitted_by: userData.data.user?.id,
+            submitter_name: profile?.full_name || null,
+            submitter_phone: profile?.phone_number || null
+          };
+        } else {
+          insertData = formData;
+        }
 
         const { error } = await supabase
           .from(tableName)

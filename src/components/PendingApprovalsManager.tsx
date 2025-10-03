@@ -336,10 +336,22 @@ export const PendingApprovalsManager = () => {
   const renderItemDetails = (item: PendingItem) => {
     const data = item.data;
     
+    // Show submitter info if available
+    const submitterInfo = (data.submitter_name || data.submitter_phone) && (
+      <div className="bg-muted p-3 rounded-lg mb-4">
+        <Label className="font-semibold">Submitted by</Label>
+        <p className="text-sm">
+          {data.submitter_name || 'Unknown'} 
+          {data.submitter_phone && <span className="text-muted-foreground ml-2">({data.submitter_phone})</span>}
+        </p>
+      </div>
+    );
+    
     switch (item.type) {
       case 'event':
         return (
           <div className="space-y-4">
+            {submitterInfo}
             <div>
               <Label className="font-semibold">Title</Label>
               <p className="text-sm">{data.title}</p>
@@ -367,6 +379,7 @@ export const PendingApprovalsManager = () => {
       case 'resource':
         return (
           <div className="space-y-4">
+            {submitterInfo}
             <div>
               <Label className="font-semibold">Organization</Label>
               <p className="text-sm">{data.organization_name}</p>
@@ -390,6 +403,7 @@ export const PendingApprovalsManager = () => {
       case 'community_alert':
         return (
           <div className="space-y-4">
+            {submitterInfo}
             <div>
               <Label className="font-semibold">Title</Label>
               <p className="text-sm">{data.title}</p>
@@ -407,6 +421,7 @@ export const PendingApprovalsManager = () => {
       case 'special_event':
         return (
           <div className="space-y-4">
+            {submitterInfo}
             <div>
               <Label className="font-semibold">Title</Label>
               <p className="text-sm">{data.title}</p>
@@ -430,6 +445,7 @@ export const PendingApprovalsManager = () => {
       case 'resource_modification':
         return (
           <div className="space-y-4">
+            {submitterInfo}
             <div className="bg-blue-50 dark:bg-blue-950 p-3 rounded-lg">
               <Label className="font-semibold text-blue-900 dark:text-blue-100">Action</Label>
               <p className="text-sm text-blue-800 dark:text-blue-200 capitalize">{item.action}</p>
@@ -482,6 +498,7 @@ export const PendingApprovalsManager = () => {
       case 'job_modification':
         return (
           <div className="space-y-4">
+            {submitterInfo}
             <div className="bg-blue-50 dark:bg-blue-950 p-3 rounded-lg">
               <Label className="font-semibold text-blue-900 dark:text-blue-100">Action</Label>
               <p className="text-sm text-blue-800 dark:text-blue-200 capitalize">{item.action}</p>
@@ -524,6 +541,7 @@ export const PendingApprovalsManager = () => {
       case 'civic_modification':
         return (
           <div className="space-y-4">
+            {submitterInfo}
             <div className="bg-blue-50 dark:bg-blue-950 p-3 rounded-lg">
               <Label className="font-semibold text-blue-900 dark:text-blue-100">Action</Label>
               <p className="text-sm text-blue-800 dark:text-blue-200 capitalize">{item.action?.replace('_', ' ')}</p>

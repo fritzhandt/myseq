@@ -172,9 +172,26 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
       } else {
         // New events: sub-admins go to pending table, others go directly to main table
         const tableName = isSubAdmin ? 'pending_events' : 'events';
-        const insertData = isSubAdmin 
-          ? { ...eventData, submitted_by: (await supabase.auth.getUser()).data.user?.id }
-          : eventData;
+        let insertData;
+        
+        if (isSubAdmin) {
+          const userData = await supabase.auth.getUser();
+          // Fetch profile info
+          const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('full_name, phone_number')
+            .eq('user_id', userData.data.user?.id)
+            .maybeSingle();
+            
+          insertData = { 
+            ...eventData, 
+            submitted_by: userData.data.user?.id,
+            submitter_name: profile?.full_name || null,
+            submitter_phone: profile?.phone_number || null
+          };
+        } else {
+          insertData = eventData;
+        }
         
         const { error } = await supabase
           .from(tableName)

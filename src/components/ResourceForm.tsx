@@ -351,13 +351,22 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
           const { data: { user } } = await supabase.auth.getUser();
           if (!user) throw new Error('Not authenticated');
 
+          // Fetch profile info
+          const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('full_name, phone_number')
+            .eq('user_id', user.id)
+            .maybeSingle();
+
           const { error } = await supabase
             .from("pending_resource_modifications")
             .insert({
               resource_id: resource.id,
               action: 'edit',
               modified_data: dataToSave,
-              submitted_by: user.id
+              submitted_by: user.id,
+              submitter_name: profile?.full_name || null,
+              submitter_phone: profile?.phone_number || null
             });
 
           if (error) throw error;

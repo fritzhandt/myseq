@@ -645,6 +645,8 @@ export type Database = {
           status: string
           submitted_at: string
           submitted_by: string
+          submitter_name: string | null
+          submitter_phone: string | null
           updated_at: string
         }
         Insert: {
@@ -659,6 +661,8 @@ export type Database = {
           status?: string
           submitted_at?: string
           submitted_by: string
+          submitter_name?: string | null
+          submitter_phone?: string | null
           updated_at?: string
         }
         Update: {
@@ -673,6 +677,8 @@ export type Database = {
           status?: string
           submitted_at?: string
           submitted_by?: string
+          submitter_name?: string | null
+          submitter_phone?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -699,6 +705,8 @@ export type Database = {
           status: string
           submitted_at: string
           submitted_by: string
+          submitter_name: string | null
+          submitter_phone: string | null
           title: string
           updated_at: string
         }
@@ -715,6 +723,8 @@ export type Database = {
           status?: string
           submitted_at?: string
           submitted_by: string
+          submitter_name?: string | null
+          submitter_phone?: string | null
           title: string
           updated_at?: string
         }
@@ -731,6 +741,8 @@ export type Database = {
           status?: string
           submitted_at?: string
           submitted_by?: string
+          submitter_name?: string | null
+          submitter_phone?: string | null
           title?: string
           updated_at?: string
         }
@@ -761,6 +773,8 @@ export type Database = {
           status: string
           submitted_at: string
           submitted_by: string
+          submitter_name: string | null
+          submitter_phone: string | null
           tags: string[] | null
           title: string
           updated_at: string
@@ -789,6 +803,8 @@ export type Database = {
           status?: string
           submitted_at?: string
           submitted_by: string
+          submitter_name?: string | null
+          submitter_phone?: string | null
           tags?: string[] | null
           title: string
           updated_at?: string
@@ -817,6 +833,8 @@ export type Database = {
           status?: string
           submitted_at?: string
           submitted_by?: string
+          submitter_name?: string | null
+          submitter_phone?: string | null
           tags?: string[] | null
           title?: string
           updated_at?: string
@@ -836,6 +854,8 @@ export type Database = {
           status: string
           submitted_at: string
           submitted_by: string
+          submitter_name: string | null
+          submitter_phone: string | null
           updated_at: string
         }
         Insert: {
@@ -850,6 +870,8 @@ export type Database = {
           status?: string
           submitted_at?: string
           submitted_by: string
+          submitter_name?: string | null
+          submitter_phone?: string | null
           updated_at?: string
         }
         Update: {
@@ -864,6 +886,8 @@ export type Database = {
           status?: string
           submitted_at?: string
           submitted_by?: string
+          submitter_name?: string | null
+          submitter_phone?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -889,6 +913,8 @@ export type Database = {
           status: string
           submitted_at: string
           submitted_by: string
+          submitter_name: string | null
+          submitter_phone: string | null
           updated_at: string
         }
         Insert: {
@@ -903,6 +929,8 @@ export type Database = {
           status?: string
           submitted_at?: string
           submitted_by: string
+          submitter_name?: string | null
+          submitter_phone?: string | null
           updated_at?: string
         }
         Update: {
@@ -917,6 +945,8 @@ export type Database = {
           status?: string
           submitted_at?: string
           submitted_by?: string
+          submitter_name?: string | null
+          submitter_phone?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -947,6 +977,8 @@ export type Database = {
           status: string
           submitted_at: string
           submitted_by: string
+          submitter_name: string | null
+          submitter_phone: string | null
           type: string
           updated_at: string
           website: string | null
@@ -968,6 +1000,8 @@ export type Database = {
           status?: string
           submitted_at?: string
           submitted_by: string
+          submitter_name?: string | null
+          submitter_phone?: string | null
           type?: string
           updated_at?: string
           website?: string | null
@@ -989,6 +1023,8 @@ export type Database = {
           status?: string
           submitted_at?: string
           submitted_by?: string
+          submitter_name?: string | null
+          submitter_phone?: string | null
           type?: string
           updated_at?: string
           website?: string | null
@@ -1009,6 +1045,8 @@ export type Database = {
           status: string
           submitted_at: string
           submitted_by: string
+          submitter_name: string | null
+          submitter_phone: string | null
           title: string
           type: string
           updated_at: string
@@ -1026,6 +1064,8 @@ export type Database = {
           status?: string
           submitted_at?: string
           submitted_by: string
+          submitter_name?: string | null
+          submitter_phone?: string | null
           title: string
           type: string
           updated_at?: string
@@ -1043,6 +1083,8 @@ export type Database = {
           status?: string
           submitted_at?: string
           submitted_by?: string
+          submitter_name?: string | null
+          submitter_phone?: string | null
           title?: string
           type?: string
           updated_at?: string
@@ -1313,6 +1355,33 @@ export type Database = {
           preferred_language?: string
           session_id?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      user_profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+          phone_number: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone_number?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone_number?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

@@ -331,9 +331,19 @@ const SpecialEventForm = ({ specialEvent, onClose, onSave }: SpecialEventFormPro
       } else {
         // New special events: sub-admins go to pending table, others go directly to main table
         if (isSubAdmin) {
+          const userData = await supabase.auth.getUser();
+          // Fetch profile info
+          const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('full_name, phone_number')
+            .eq('user_id', userData.data.user?.id)
+            .maybeSingle();
+            
           const pendingData = { 
             ...specialEventData, 
-            submitted_by: (await supabase.auth.getUser()).data.user?.id 
+            submitted_by: userData.data.user?.id,
+            submitter_name: profile?.full_name || null,
+            submitter_phone: profile?.phone_number || null
           };
           const { data, error } = await supabase
             .from('pending_special_events')

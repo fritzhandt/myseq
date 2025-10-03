@@ -85,13 +85,22 @@ export default function AdminJobsList() {
         const job = [...governmentJobs, ...privateSectorJobs].find(j => j.id === deleteJobId);
         if (!job) throw new Error('Job not found');
 
+        // Fetch profile info
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('full_name, phone_number')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
         const { error } = await supabase
           .from("pending_job_modifications")
           .insert({
             job_id: deleteJobId,
             action: 'delete',
             modified_data: job,
-            submitted_by: user.id
+            submitted_by: user.id,
+            submitter_name: profile?.full_name || null,
+            submitter_phone: profile?.phone_number || null
           });
 
         if (error) throw error;

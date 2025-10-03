@@ -161,13 +161,22 @@ export default function CivicOrganizationsManager() {
 
         // Sub-admins create pending modification request
         if (isSubAdmin) {
+          // Fetch profile info
+          const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('full_name, phone_number')
+            .eq('user_id', user.id)
+            .maybeSingle();
+
           const { error } = await supabase
             .from('pending_civic_modifications')
             .insert({
               civic_org_id: editingOrg.id,
               action: 'edit',
               modified_data: updateData,
-              submitted_by: user.id
+              submitted_by: user.id,
+              submitter_name: profile?.full_name || null,
+              submitter_phone: profile?.phone_number || null
             });
 
           if (error) throw error;
@@ -320,13 +329,22 @@ export default function CivicOrganizationsManager() {
         const org = organizations.find(o => o.id === id);
         if (!org) throw new Error('Organization not found');
 
+        // Fetch profile info
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('full_name, phone_number')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
         const { error } = await supabase
           .from('pending_civic_modifications')
           .insert({
             civic_org_id: id,
             action: 'deactivate',
             modified_data: { is_active: !currentStatus },
-            submitted_by: user.id
+            submitted_by: user.id,
+            submitter_name: profile?.full_name || null,
+            submitter_phone: profile?.phone_number || null
           });
 
         if (error) throw error;
@@ -386,13 +404,22 @@ export default function CivicOrganizationsManager() {
 
       // Sub-admins create pending modification request
       if (isSubAdmin) {
+        // Fetch profile info
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('full_name, phone_number')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
         const { error } = await supabase
           .from('pending_civic_modifications')
           .insert({
             civic_org_id: orgId,
             action: 'password_change',
             modified_data: { password_hash },
-            submitted_by: user.id
+            submitted_by: user.id,
+            submitter_name: profile?.full_name || null,
+            submitter_phone: profile?.phone_number || null
           });
 
         if (error) throw error;
@@ -452,13 +479,22 @@ export default function CivicOrganizationsManager() {
         const org = organizations.find(o => o.id === deleteDialog.orgId);
         if (!org) throw new Error('Organization not found');
 
+        // Fetch profile info
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('full_name, phone_number')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
         const { error } = await supabase
           .from('pending_civic_modifications')
           .insert({
             civic_org_id: deleteDialog.orgId,
             action: 'delete',
             modified_data: org,
-            submitted_by: user.id
+            submitted_by: user.id,
+            submitter_name: profile?.full_name || null,
+            submitter_phone: profile?.phone_number || null
           });
 
         if (error) throw error;
