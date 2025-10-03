@@ -28,7 +28,7 @@ const About = () => {
             </h1>
           
           <div className="prose prose-lg max-w-none">
-            <p className="text-lg mb-6 text-muted-foreground">
+            <p className="text-lg mb-6 text-muted-foreground text-center">
               <TranslatedText contentKey="about-intro" originalText="My SEQ is your one-stop shop for discovering community resources, business opportunities, jobs, and information on your elected officials, civics and police precincts." />
             </p>
             
