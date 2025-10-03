@@ -53,19 +53,18 @@ const Civics = () => {
   }, []);
 
   useEffect(() => {
-    // Filter by both search query and active tab
     let filtered = organizations;
     
-    // Filter by organization type
-    filtered = filtered.filter(org => org.organization_type === activeTab);
-    
-    // Then filter by search query
     if (searchQuery) {
+      // When searching, show all results regardless of tab
       filtered = filtered.filter(org =>
         org.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         org.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
         org.coverage_area.toLowerCase().includes(searchQuery.toLowerCase())
       );
+    } else {
+      // When not searching, filter by organization type
+      filtered = filtered.filter(org => org.organization_type === activeTab);
     }
     
     setFilteredOrgs(filtered);
