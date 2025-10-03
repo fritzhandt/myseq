@@ -6,10 +6,11 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Menu, Info, Users, Mail, Search, Vote, Shield, Calendar, Briefcase, Home, Building2, HelpCircle, Instagram, ExternalLink, Landmark } from 'lucide-react';
 import AddToHomeButton from '@/components/AddToHomeButton';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { useNavbar } from '@/contexts/NavbarContext';
+
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isOpen, closeMenu, toggleMenu } = useNavbar();
   const [showVoteDialog, setShowVoteDialog] = useState(false);
-  const closeMenu = () => setIsOpen(false);
   return <nav className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-14 sm:h-16">
@@ -34,7 +35,7 @@ const Navbar = () => {
             <AddToHomeButton />
             
             {/* Hamburger Menu */}
-            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <Sheet open={isOpen} onOpenChange={toggleMenu}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10">
                   <Menu className="h-5 w-5 sm:h-6 sm:w-6" />

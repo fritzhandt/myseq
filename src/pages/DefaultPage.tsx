@@ -4,9 +4,12 @@ import Navbar from "@/components/Navbar";
 import CommunityAlertBanner from "@/components/CommunityAlertBanner";
 import AISearchBar from "@/components/AISearchBar";
 import { TranslatedText } from "@/components/TranslatedText";
-import { Calendar, Users, Briefcase, ArrowRight, MapPin, Heart, HelpCircle, Building2, Landmark, Zap } from "lucide-react";
+import { useNavbar } from "@/contexts/NavbarContext";
+import { Calendar, Users, Briefcase, ArrowRight, MapPin, Heart, HelpCircle, Building2, Landmark, Zap, Info } from "lucide-react";
 
 export default function DefaultPage() {
+  const { openMenu } = useNavbar();
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       <Navbar />
@@ -166,6 +169,31 @@ export default function DefaultPage() {
                     onClick={() => window.location.href = '/jobs'}
                   >
                     <TranslatedText contentKey="find-opportunities-btn" originalText="Find Opportunities" />
+                    <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* More Information Card */}
+              <Card className="group relative overflow-hidden border-2 hover:border-blue-500/20 transition-all duration-500 hover:shadow-2xl hover:scale-105 bg-gradient-to-br from-background to-blue-500/5 flex flex-col h-full cursor-pointer" onClick={openMenu}>
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <CardHeader className="relative z-10 pb-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <Info className="h-8 w-8 text-white" />
+                  </div>
+                  <CardTitle className="text-2xl mb-2 group-hover:text-blue-600 transition-colors duration-300">
+                    <TranslatedText contentKey="more-info-card-title" originalText="More Information" />
+                  </CardTitle>
+                  <CardDescription className="text-base leading-relaxed">
+                    <TranslatedText contentKey="more-info-card-description" originalText="Get information on your elected officials, police precincts, and more!" />
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="relative z-10 mt-auto">
+                  <Button 
+                    className="w-full group-hover:bg-blue-600 group-hover:text-white transition-all duration-300" 
+                    variant="outline"
+                  >
+                    <TranslatedText contentKey="explore-more-btn" originalText="Explore More" />
                     <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                   </Button>
                 </CardContent>
