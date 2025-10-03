@@ -368,8 +368,7 @@ const CivicDetail = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Contact Information */}
                     <div>
-                      <h3 className="font-semibold mb-3 flex items-center gap-2">
-                        <Phone className="h-4 w-4" />
+                      <h3 className="font-semibold mb-3">
                         <TranslatedText contentKey="civic_detail.contact_title" originalText="Contact Information" />
                       </h3>
                       <div className="space-y-2 text-sm">
@@ -408,8 +407,7 @@ const CivicDetail = () => {
                     {/* Meeting Information */}
                     {(organization.meeting_info || organization.meeting_address) && (
                       <div>
-                        <h3 className="font-semibold mb-3 flex items-center gap-2">
-                          <Calendar className="h-4 w-4" />
+                        <h3 className="font-semibold mb-3">
                           <TranslatedText contentKey="civic_detail.meeting_title" originalText="Meeting Information" />
                         </h3>
                         <div className="space-y-2 text-sm">
