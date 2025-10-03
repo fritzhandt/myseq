@@ -43,12 +43,6 @@ const MyElectedLookup = () => {
       description: "Find your U.S. House of Representatives member",
       url: "https://www.house.gov/representatives/find-your-representative",
       icon: <Search className="w-6 h-6" />
-    },
-    {
-      title: "Register to Vote",
-      description: "Register to vote in New York State",
-      url: "https://nyovr.elections.ny.gov/",
-      icon: <Search className="w-6 h-6" />
     }
   ];
 
@@ -94,7 +88,7 @@ const MyElectedLookup = () => {
               className="text-lg text-muted-foreground text-center mb-12"
             />
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {lookupOptions.map((option, index) => (
               <div key={index} className="bg-card p-6 rounded-lg border shadow-sm">
                 <div className="text-center mb-6">
