@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Image, Calendar } from "lucide-react";
 import { format, parseISO } from "date-fns";
+import PhotoViewer from "./PhotoViewer";
 
 interface Announcement {
   id: string;
@@ -18,9 +20,20 @@ interface AnnouncementDialogProps {
 }
 
 const AnnouncementDialog = ({ announcement, isOpen, onClose }: AnnouncementDialogProps) => {
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [viewerIndex, setViewerIndex] = useState(0);
+  
   if (!announcement) return null;
 
+  // Convert photo URLs to the format expected by PhotoViewer
+  const photos = announcement.photos?.map((url, index) => ({
+    id: `${announcement.id}-photo-${index}`,
+    photo_url: url,
+    title: announcement.title
+  })) || [];
+
   return (
+    <>
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -54,12 +67,18 @@ const AnnouncementDialog = ({ announcement, isOpen, onClose }: AnnouncementDialo
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {announcement.photos.map((photoUrl, index) => (
-                  <div key={index} className="relative group">
+                  <div 
+                    key={index} 
+                    className="relative group cursor-pointer"
+                    onClick={() => {
+                      setViewerIndex(index);
+                      setViewerOpen(true);
+                    }}
+                  >
                     <img
                       src={photoUrl}
                       alt={`Announcement photo ${index + 1}`}
-                      className="w-full h-48 object-cover rounded-lg border cursor-pointer hover:opacity-90 transition-opacity shadow-sm"
-                      onClick={() => window.open(photoUrl, '_blank')}
+                      className="w-full h-48 object-cover rounded-lg border hover:opacity-90 transition-opacity shadow-sm"
                     />
                     <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200 rounded-lg flex items-center justify-center">
                       <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity text-sm font-medium">
@@ -74,6 +93,15 @@ const AnnouncementDialog = ({ announcement, isOpen, onClose }: AnnouncementDialo
         </div>
       </DialogContent>
     </Dialog>
+    
+    <PhotoViewer
+      photos={photos}
+      currentIndex={viewerIndex}
+      isOpen={viewerOpen}
+      onClose={() => setViewerOpen(false)}
+      onIndexChange={setViewerIndex}
+    />
+    </>
   );
 };
 
