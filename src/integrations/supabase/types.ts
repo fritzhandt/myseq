@@ -632,6 +632,59 @@ export type Database = {
         }
         Relationships: []
       }
+      pending_civic_modifications: {
+        Row: {
+          action: string
+          civic_org_id: string
+          created_at: string
+          id: string
+          modified_data: Json
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string
+          submitted_by: string
+          updated_at: string
+        }
+        Insert: {
+          action: string
+          civic_org_id: string
+          created_at?: string
+          id?: string
+          modified_data?: Json
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+          submitted_by: string
+          updated_at?: string
+        }
+        Update: {
+          action?: string
+          civic_org_id?: string
+          created_at?: string
+          id?: string
+          modified_data?: Json
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+          submitted_by?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pending_civic_modifications_civic_org_id_fkey"
+            columns: ["civic_org_id"]
+            isOneToOne: false
+            referencedRelation: "civic_organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pending_community_alerts: {
         Row: {
           created_at: string
@@ -769,6 +822,112 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      pending_job_modifications: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          job_id: string
+          modified_data: Json
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string
+          submitted_by: string
+          updated_at: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          job_id: string
+          modified_data?: Json
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+          submitted_by: string
+          updated_at?: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          job_id?: string
+          modified_data?: Json
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+          submitted_by?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pending_job_modifications_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pending_resource_modifications: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          modified_data: Json
+          resource_id: string
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string
+          submitted_by: string
+          updated_at: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          modified_data?: Json
+          resource_id: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+          submitted_by: string
+          updated_at?: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          modified_data?: Json
+          resource_id?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+          submitted_by?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pending_resource_modifications_resource_id_fkey"
+            columns: ["resource_id"]
+            isOneToOne: false
+            referencedRelation: "resources"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pending_resources: {
         Row: {

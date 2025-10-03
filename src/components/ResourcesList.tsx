@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import AdminPagination from "./AdminPagination";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useUserRole } from "@/hooks/useUserRole";
 
 const CATEGORIES = [
   "Arts",
@@ -48,6 +49,7 @@ interface ResourcesListProps {
 
 export default function ResourcesList({ onEdit, isBusinessOpportunity = false, refreshTrigger = 0 }: ResourcesListProps) {
   const { toast } = useToast();
+  const { isSubAdmin, isMainAdmin } = useUserRole();
   const [resources, setResources] = useState<Resource[]>([]);
   const [filteredResources, setFilteredResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
@@ -110,17 +112,43 @@ export default function ResourcesList({ onEdit, isBusinessOpportunity = false, r
     if (!confirm("Are you sure you want to delete this resource?")) return;
 
     try {
-      const { error } = await supabase
-        .from("resources")
-        .delete()
-        .eq("id", id);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
 
-      if (error) throw error;
+      // Sub-admins create pending modification request
+      if (isSubAdmin) {
+        const resource = resources.find(r => r.id === id);
+        if (!resource) throw new Error('Resource not found');
 
-      toast({
-        title: "Success",
-        description: "Resource deleted successfully",
-      });
+        const { error } = await supabase
+          .from("pending_resource_modifications")
+          .insert({
+            resource_id: id,
+            action: 'delete',
+            modified_data: resource,
+            submitted_by: user.id
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: "Request Submitted",
+          description: "Your delete request has been submitted for approval",
+        });
+      } else {
+        // Main admins delete directly
+        const { error } = await supabase
+          .from("resources")
+          .delete()
+          .eq("id", id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Success",
+          description: "Resource deleted successfully",
+        });
+      }
       
       fetchResources();
     } catch (error) {
@@ -382,10 +410,44 @@ export default function ResourcesList({ onEdit, isBusinessOpportunity = false, r
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => onEdit(resource)}
+                  onClick={async () => {
+                    if (isSubAdmin) {
+                      // Sub-admins create pending modification request
+                      try {
+                        const { data: { user } } = await supabase.auth.getUser();
+                        if (!user) throw new Error('Not authenticated');
+
+                        const { error } = await supabase
+                          .from("pending_resource_modifications")
+                          .insert({
+                            resource_id: resource.id,
+                            action: 'edit',
+                            modified_data: resource,
+                            submitted_by: user.id
+                          });
+
+                        if (error) throw error;
+
+                        toast({
+                          title: "Request Submitted",
+                          description: "Edit request submitted. Once approved, you can make changes.",
+                        });
+                      } catch (error) {
+                        console.error("Error submitting edit request:", error);
+                        toast({
+                          title: "Error",
+                          description: "Failed to submit edit request",
+                          variant: "destructive",
+                        });
+                      }
+                    } else {
+                      // Main admins can edit directly
+                      onEdit(resource);
+                    }
+                  }}
                 >
                   <Edit className="h-4 w-4 mr-2" />
-                  Edit
+                  {isSubAdmin ? 'Request Edit' : 'Edit'}
                 </Button>
                 <Button
                   variant="outline"
@@ -393,7 +455,7 @@ export default function ResourcesList({ onEdit, isBusinessOpportunity = false, r
                   onClick={() => handleDelete(resource.id)}
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
-                  Delete
+                  {isSubAdmin ? 'Request Delete' : 'Delete'}
                 </Button>
               </div>
             </CardContent>

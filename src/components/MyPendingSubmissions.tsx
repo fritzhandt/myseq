@@ -10,11 +10,12 @@ import { format } from 'date-fns';
 interface PendingItem {
   id: string;
   title: string;
-  type: 'event' | 'special_event' | 'community_alert' | 'resource';
+  type: 'event' | 'special_event' | 'community_alert' | 'resource' | 'resource_modification' | 'job_modification' | 'civic_modification';
   status: string;
   submitted_at: string;
   reviewed_at?: string;
   review_notes?: string;
+  action?: 'edit' | 'delete' | 'deactivate' | 'password_change';
   data: any;
 }
 
@@ -28,7 +29,15 @@ const MyPendingSubmissions = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const [eventsRes, specialEventsRes, alertsRes, resourcesRes] = await Promise.all([
+      const [
+        eventsRes, 
+        specialEventsRes, 
+        alertsRes, 
+        resourcesRes, 
+        resourceModsRes,
+        jobModsRes,
+        civicModsRes
+      ] = await Promise.all([
         supabase
           .from('pending_events')
           .select('*')
@@ -50,6 +59,24 @@ const MyPendingSubmissions = () => {
         supabase
           .from('pending_resources')
           .select('*')
+          .eq('submitted_by', user.id)
+          .order('submitted_at', { ascending: false }),
+        
+        supabase
+          .from('pending_resource_modifications')
+          .select('*, resources(organization_name)')
+          .eq('submitted_by', user.id)
+          .order('submitted_at', { ascending: false }),
+        
+        supabase
+          .from('pending_job_modifications')
+          .select('*, jobs(title)')
+          .eq('submitted_by', user.id)
+          .order('submitted_at', { ascending: false }),
+        
+        supabase
+          .from('pending_civic_modifications')
+          .select('*, civic_organizations(name)')
           .eq('submitted_by', user.id)
           .order('submitted_at', { ascending: false })
       ]);
@@ -120,6 +147,57 @@ const MyPendingSubmissions = () => {
         });
       }
 
+      // Process resource modifications
+      if (resourceModsRes.data) {
+        resourceModsRes.data.forEach(item => {
+          items.push({
+            id: item.id,
+            title: `${item.action.toUpperCase()}: ${item.resources?.organization_name || 'Resource'}`,
+            type: 'resource_modification',
+            action: item.action,
+            status: item.status,
+            submitted_at: item.submitted_at,
+            reviewed_at: item.reviewed_at,
+            review_notes: item.review_notes,
+            data: item
+          });
+        });
+      }
+
+      // Process job modifications
+      if (jobModsRes.data) {
+        jobModsRes.data.forEach(item => {
+          items.push({
+            id: item.id,
+            title: `${item.action.toUpperCase()}: ${item.jobs?.title || 'Job'}`,
+            type: 'job_modification',
+            action: item.action,
+            status: item.status,
+            submitted_at: item.submitted_at,
+            reviewed_at: item.reviewed_at,
+            review_notes: item.review_notes,
+            data: item
+          });
+        });
+      }
+
+      // Process civic modifications
+      if (civicModsRes.data) {
+        civicModsRes.data.forEach(item => {
+          items.push({
+            id: item.id,
+            title: `${item.action.toUpperCase()}: ${item.civic_organizations?.name || 'Civic Org'}`,
+            type: 'civic_modification',
+            action: item.action,
+            status: item.status,
+            submitted_at: item.submitted_at,
+            reviewed_at: item.reviewed_at,
+            review_notes: item.review_notes,
+            data: item
+          });
+        });
+      }
+
       // Sort all items by submission date
       items.sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime());
       
@@ -177,6 +255,12 @@ const MyPendingSubmissions = () => {
         return 'Community Alert';
       case 'resource':
         return 'Resource';
+      case 'resource_modification':
+        return 'Resource Modification';
+      case 'job_modification':
+        return 'Job Modification';
+      case 'civic_modification':
+        return 'Civic Modification';
       default:
         return 'Item';
     }

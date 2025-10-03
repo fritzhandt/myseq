@@ -17,8 +17,10 @@ interface PendingItem {
   submitted_by: string;
   submitted_at: string;
   status: 'pending' | 'approved' | 'rejected';
-  type: 'event' | 'resource' | 'community_alert' | 'special_event';
+  type: 'event' | 'resource' | 'community_alert' | 'special_event' | 'resource_modification' | 'job_modification' | 'civic_modification';
   data: any;
+  action?: 'edit' | 'delete' | 'deactivate' | 'password_change';
+  original_id?: string;
 }
 
 export const PendingApprovalsManager = () => {
@@ -33,11 +35,22 @@ export const PendingApprovalsManager = () => {
     setLoading(true);
     try {
       // Fetch all pending items from different tables
-      const [eventsResult, resourcesResult, alertsResult, specialEventsResult] = await Promise.all([
+      const [
+        eventsResult, 
+        resourcesResult, 
+        alertsResult, 
+        specialEventsResult,
+        resourceModsResult,
+        jobModsResult,
+        civicModsResult
+      ] = await Promise.all([
         supabase.from('pending_events').select('*').eq('status', 'pending'),
         supabase.from('pending_resources').select('*').eq('status', 'pending'),
         supabase.from('pending_community_alerts').select('*').eq('status', 'pending'),
-        supabase.from('pending_special_events').select('*').eq('status', 'pending')
+        supabase.from('pending_special_events').select('*').eq('status', 'pending'),
+        supabase.from('pending_resource_modifications').select('*, resources(organization_name)').eq('status', 'pending'),
+        supabase.from('pending_job_modifications').select('*, jobs(title)').eq('status', 'pending'),
+        supabase.from('pending_civic_modifications').select('*, civic_organizations(name)').eq('status', 'pending')
       ]);
 
       const items: PendingItem[] = [
@@ -76,6 +89,39 @@ export const PendingApprovalsManager = () => {
           status: 'pending' as const,
           type: 'special_event' as const,
           data: item
+        })),
+        ...(resourceModsResult.data || []).map(item => ({
+          id: item.id,
+          title: `${item.action.toUpperCase()}: ${item.resources?.organization_name || 'Resource'}`,
+          submitted_by: item.submitted_by,
+          submitted_at: item.submitted_at,
+          status: 'pending' as const,
+          type: 'resource_modification' as const,
+          action: item.action,
+          original_id: item.resource_id,
+          data: item
+        })),
+        ...(jobModsResult.data || []).map(item => ({
+          id: item.id,
+          title: `${item.action.toUpperCase()}: ${item.jobs?.title || 'Job'}`,
+          submitted_by: item.submitted_by,
+          submitted_at: item.submitted_at,
+          status: 'pending' as const,
+          type: 'job_modification' as const,
+          action: item.action,
+          original_id: item.job_id,
+          data: item
+        })),
+        ...(civicModsResult.data || []).map(item => ({
+          id: item.id,
+          title: `${item.action.toUpperCase()}: ${item.civic_organizations?.name || 'Civic Org'}`,
+          submitted_by: item.submitted_by,
+          submitted_at: item.submitted_at,
+          status: 'pending' as const,
+          type: 'civic_modification' as const,
+          action: item.action,
+          original_id: item.civic_org_id,
+          data: item
         }))
       ];
 
@@ -105,8 +151,6 @@ export const PendingApprovalsManager = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Move to main table based on type
-      let insertResult;
       const reviewData = {
         status: 'approved',
         reviewed_by: user.id,
@@ -114,72 +158,104 @@ export const PendingApprovalsManager = () => {
         review_notes: reviewNotes
       };
 
-      if (item.type === 'event') {
-        insertResult = await supabase.from('events').insert({
-          title: item.data.title,
-          description: item.data.description,
-          location: item.data.location,
-          event_date: item.data.event_date,
-          event_time: item.data.event_time,
-          cover_photo_url: item.data.cover_photo_url,
-          additional_images: item.data.additional_images,
-          tags: item.data.tags,
-          age_group: item.data.age_group,
-          elected_officials: item.data.elected_officials,
-          registration_link: item.data.registration_link,
-          registration_email: item.data.registration_email,
-          registration_phone: item.data.registration_phone,
-          registration_notes: item.data.registration_notes,
-          office_address: item.data.office_address,
-          is_public: item.data.is_public,
-          civic_org_id: item.data.civic_org_id
-        });
-      } else if (item.type === 'resource') {
-        insertResult = await supabase.from('resources').insert({
-          organization_name: item.data.organization_name,
-          description: item.data.description,
-          website: item.data.website,
-          phone: item.data.phone,
-          email: item.data.email,
-          address: item.data.address,
-          logo_url: item.data.logo_url,
-          cover_photo_url: item.data.cover_photo_url,
-          categories: item.data.categories
-        });
-      } else if (item.type === 'community_alert') {
-        insertResult = await supabase.from('community_alerts').insert({
-          title: item.data.title,
-          short_description: item.data.short_description,
-          long_description: item.data.long_description,
-          photos: item.data.photos,
-          is_active: item.data.is_active
-        });
-      } else if (item.type === 'special_event') {
-        insertResult = await supabase.from('special_events').insert({
-          title: item.data.title,
-          description: item.data.description,
-          type: item.data.type,
-          start_date: item.data.start_date,
-          end_date: item.data.end_date,
-          is_active: item.data.is_active
-        });
+      // Handle modification types (edit/delete)
+      if (item.type === 'resource_modification') {
+        if (item.action === 'delete') {
+          await supabase.from('resources').delete().eq('id', item.original_id);
+        } else if (item.action === 'edit') {
+          await supabase.from('resources').update(item.data.modified_data).eq('id', item.original_id);
+        }
+        await supabase.from('pending_resource_modifications').update(reviewData).eq('id', item.id);
+      } else if (item.type === 'job_modification') {
+        if (item.action === 'delete') {
+          await supabase.from('jobs').delete().eq('id', item.original_id);
+        } else if (item.action === 'edit') {
+          await supabase.from('jobs').update(item.data.modified_data).eq('id', item.original_id);
+        }
+        await supabase.from('pending_job_modifications').update(reviewData).eq('id', item.id);
+      } else if (item.type === 'civic_modification') {
+        if (item.action === 'delete') {
+          await supabase.from('civic_organizations').delete().eq('id', item.original_id);
+        } else if (item.action === 'edit') {
+          await supabase.from('civic_organizations').update(item.data.modified_data).eq('id', item.original_id);
+        } else if (item.action === 'deactivate') {
+          await supabase.from('civic_organizations').update(item.data.modified_data).eq('id', item.original_id);
+        } else if (item.action === 'password_change') {
+          await supabase.from('civic_organizations').update(item.data.modified_data).eq('id', item.original_id);
+        }
+        await supabase.from('pending_civic_modifications').update(reviewData).eq('id', item.id);
+      } else {
+        // Handle new item creation (existing code)
+        let insertResult;
+
+        if (item.type === 'event') {
+          insertResult = await supabase.from('events').insert({
+            title: item.data.title,
+            description: item.data.description,
+            location: item.data.location,
+            event_date: item.data.event_date,
+            event_time: item.data.event_time,
+            cover_photo_url: item.data.cover_photo_url,
+            additional_images: item.data.additional_images,
+            tags: item.data.tags,
+            age_group: item.data.age_group,
+            elected_officials: item.data.elected_officials,
+            registration_link: item.data.registration_link,
+            registration_email: item.data.registration_email,
+            registration_phone: item.data.registration_phone,
+            registration_notes: item.data.registration_notes,
+            office_address: item.data.office_address,
+            is_public: item.data.is_public,
+            civic_org_id: item.data.civic_org_id
+          });
+        } else if (item.type === 'resource') {
+          insertResult = await supabase.from('resources').insert({
+            organization_name: item.data.organization_name,
+            description: item.data.description,
+            website: item.data.website,
+            phone: item.data.phone,
+            email: item.data.email,
+            address: item.data.address,
+            logo_url: item.data.logo_url,
+            cover_photo_url: item.data.cover_photo_url,
+            categories: item.data.categories,
+            type: item.data.type
+          });
+        } else if (item.type === 'community_alert') {
+          insertResult = await supabase.from('community_alerts').insert({
+            title: item.data.title,
+            short_description: item.data.short_description,
+            long_description: item.data.long_description,
+            photos: item.data.photos,
+            is_active: item.data.is_active
+          });
+        } else if (item.type === 'special_event') {
+          insertResult = await supabase.from('special_events').insert({
+            title: item.data.title,
+            description: item.data.description,
+            type: item.data.type,
+            start_date: item.data.start_date,
+            end_date: item.data.end_date,
+            is_active: item.data.is_active
+          });
+        }
+
+        if (insertResult?.error) throw insertResult.error;
+
+        // Update pending item status
+        let updateError;
+        if (item.type === 'event') {
+          ({ error: updateError } = await supabase.from('pending_events').update(reviewData).eq('id', item.id));
+        } else if (item.type === 'resource') {
+          ({ error: updateError } = await supabase.from('pending_resources').update(reviewData).eq('id', item.id));
+        } else if (item.type === 'community_alert') {
+          ({ error: updateError } = await supabase.from('pending_community_alerts').update(reviewData).eq('id', item.id));
+        } else if (item.type === 'special_event') {
+          ({ error: updateError } = await supabase.from('pending_special_events').update(reviewData).eq('id', item.id));
+        }
+
+        if (updateError) throw updateError;
       }
-
-      if (insertResult?.error) throw insertResult.error;
-
-      // Update pending item status
-      let updateError;
-      if (item.type === 'event') {
-        ({ error: updateError } = await supabase.from('pending_events').update(reviewData).eq('id', item.id));
-      } else if (item.type === 'resource') {
-        ({ error: updateError } = await supabase.from('pending_resources').update(reviewData).eq('id', item.id));
-      } else if (item.type === 'community_alert') {
-        ({ error: updateError } = await supabase.from('pending_community_alerts').update(reviewData).eq('id', item.id));
-      } else if (item.type === 'special_event') {
-        ({ error: updateError } = await supabase.from('pending_special_events').update(reviewData).eq('id', item.id));
-      }
-
-      if (updateError) throw updateError;
 
       toast({
         title: "Success",
@@ -223,6 +299,12 @@ export const PendingApprovalsManager = () => {
         ({ error } = await supabase.from('pending_community_alerts').update(rejectData).eq('id', item.id));
       } else if (item.type === 'special_event') {
         ({ error } = await supabase.from('pending_special_events').update(rejectData).eq('id', item.id));
+      } else if (item.type === 'resource_modification') {
+        ({ error } = await supabase.from('pending_resource_modifications').update(rejectData).eq('id', item.id));
+      } else if (item.type === 'job_modification') {
+        ({ error } = await supabase.from('pending_job_modifications').update(rejectData).eq('id', item.id));
+      } else if (item.type === 'civic_modification') {
+        ({ error } = await supabase.from('pending_civic_modifications').update(rejectData).eq('id', item.id));
       }
 
       if (error) throw error;

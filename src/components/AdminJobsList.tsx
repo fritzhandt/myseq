@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Trash2, Building2, MapPin } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useUserRole } from '@/hooks/useUserRole';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,6 +34,7 @@ export default function AdminJobsList() {
   const [loading, setLoading] = useState(true);
   const [deleteJobId, setDeleteJobId] = useState<string | null>(null);
   const { toast } = useToast();
+  const { isSubAdmin, isMainAdmin } = useUserRole();
 
   const fetchJobs = async () => {
     try {
@@ -75,17 +77,43 @@ export default function AdminJobsList() {
     if (!deleteJobId) return;
 
     try {
-      const { error } = await supabase
-        .from('jobs')
-        .delete()
-        .eq('id', deleteJobId);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
 
-      if (error) throw error;
+      // Sub-admins create pending modification request
+      if (isSubAdmin) {
+        const job = [...governmentJobs, ...privateSectorJobs].find(j => j.id === deleteJobId);
+        if (!job) throw new Error('Job not found');
 
-      toast({
-        title: "Success",
-        description: "Job deleted successfully",
-      });
+        const { error } = await supabase
+          .from("pending_job_modifications")
+          .insert({
+            job_id: deleteJobId,
+            action: 'delete',
+            modified_data: job,
+            submitted_by: user.id
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: "Request Submitted",
+          description: "Your delete request has been submitted for approval",
+        });
+      } else {
+        // Main admins delete directly
+        const { error } = await supabase
+          .from('jobs')
+          .delete()
+          .eq('id', deleteJobId);
+
+        if (error) throw error;
+
+        toast({
+          title: "Success",
+          description: "Job deleted successfully",
+        });
+      }
 
       fetchJobs();
     } catch (error) {

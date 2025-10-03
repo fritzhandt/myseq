@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Eye, EyeOff, Copy, Trash2, Users, Building2, RotateCcw, AlertTriangle, Pencil, Download, Shield } from 'lucide-react';
+import { useUserRole } from '@/hooks/useUserRole';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -48,6 +49,7 @@ export default function CivicOrganizationsManager() {
   const [resetPasswordDialog, setResetPasswordDialog] = useState<{isOpen: boolean, orgId?: string, orgName?: string, newPassword?: string}>({isOpen: false});
   const [deleteDialog, setDeleteDialog] = useState<{isOpen: boolean, orgId?: string, orgName?: string}>({isOpen: false});
   const { toast } = useToast();
+  const { isSubAdmin, isMainAdmin } = useUserRole();
 
   // Form state
   const [formData, setFormData] = useState({
@@ -128,6 +130,8 @@ export default function CivicOrganizationsManager() {
 
     try {
       setLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
 
       const contact_info = {
         email: formData.email || null,
@@ -155,17 +159,37 @@ export default function CivicOrganizationsManager() {
           updateData.password_hash = await bcrypt.hash(formData.password, saltRounds);
         }
 
-        const { error } = await supabase
-          .from('civic_organizations')
-          .update(updateData)
-          .eq('id', editingOrg.id);
+        // Sub-admins create pending modification request
+        if (isSubAdmin) {
+          const { error } = await supabase
+            .from('pending_civic_modifications')
+            .insert({
+              civic_org_id: editingOrg.id,
+              action: 'edit',
+              modified_data: updateData,
+              submitted_by: user.id
+            });
 
-        if (error) throw error;
+          if (error) throw error;
 
-        toast({
-          title: "Success",
-          description: "Civic organization updated successfully!",
-        });
+          toast({
+            title: "Request Submitted",
+            description: "Your edit request has been submitted for approval",
+          });
+        } else {
+          // Main admins update directly
+          const { error } = await supabase
+            .from('civic_organizations')
+            .update(updateData)
+            .eq('id', editingOrg.id);
+
+          if (error) throw error;
+
+          toast({
+            title: "Success",
+            description: "Civic organization updated successfully!",
+          });
+        }
       } else {
         // Create new organization
         if (!formData.password) {
@@ -288,17 +312,43 @@ export default function CivicOrganizationsManager() {
 
   const toggleActive = async (id: string, currentStatus: boolean) => {
     try {
-      const { error } = await supabase
-        .from('civic_organizations')
-        .update({ is_active: !currentStatus })
-        .eq('id', id);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
 
-      if (error) throw error;
+      // Sub-admins create pending modification request
+      if (isSubAdmin) {
+        const org = organizations.find(o => o.id === id);
+        if (!org) throw new Error('Organization not found');
 
-      toast({
-        title: "Success",
-        description: `Organization ${!currentStatus ? 'activated' : 'deactivated'}`,
-      });
+        const { error } = await supabase
+          .from('pending_civic_modifications')
+          .insert({
+            civic_org_id: id,
+            action: 'deactivate',
+            modified_data: { is_active: !currentStatus },
+            submitted_by: user.id
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: "Request Submitted",
+          description: "Your status change request has been submitted for approval",
+        });
+      } else {
+        // Main admins update directly
+        const { error } = await supabase
+          .from('civic_organizations')
+          .update({ is_active: !currentStatus })
+          .eq('id', id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Success",
+          description: `Organization ${!currentStatus ? 'activated' : 'deactivated'}`,
+        });
+      }
       
       fetchOrganizations();
     } catch (error: any) {
@@ -320,6 +370,9 @@ export default function CivicOrganizationsManager() {
 
   const resetPassword = async (orgId: string, orgName: string) => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
       // Generate new password
       const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
       let newPassword = '';
@@ -331,26 +384,45 @@ export default function CivicOrganizationsManager() {
       const saltRounds = 12;
       const password_hash = await bcrypt.hash(newPassword, saltRounds);
 
-      // Update in database
-      const { error } = await supabase
-        .from('civic_organizations')
-        .update({ password_hash })
-        .eq('id', orgId);
+      // Sub-admins create pending modification request
+      if (isSubAdmin) {
+        const { error } = await supabase
+          .from('pending_civic_modifications')
+          .insert({
+            civic_org_id: orgId,
+            action: 'password_change',
+            modified_data: { password_hash },
+            submitted_by: user.id
+          });
 
-      if (error) throw error;
+        if (error) throw error;
 
-      // Show success dialog with new password
-      setResetPasswordDialog({
-        isOpen: true,
-        orgId,
-        orgName,
-        newPassword
-      });
+        toast({
+          title: "Request Submitted",
+          description: "Password reset request submitted for approval",
+        });
+      } else {
+        // Main admins update directly
+        const { error } = await supabase
+          .from('civic_organizations')
+          .update({ password_hash })
+          .eq('id', orgId);
 
-      toast({
-        title: "Password Reset",
-        description: `New password generated for ${orgName}`,
-      });
+        if (error) throw error;
+
+        // Show success dialog with new password
+        setResetPasswordDialog({
+          isOpen: true,
+          orgId,
+          orgName,
+          newPassword
+        });
+
+        toast({
+          title: "Password Reset",
+          description: `New password generated for ${orgName}`,
+        });
+      }
 
     } catch (error: any) {
       toast({
@@ -372,17 +444,43 @@ export default function CivicOrganizationsManager() {
     if (!deleteDialog.orgId) return;
 
     try {
-      const { error } = await supabase
-        .from('civic_organizations')
-        .delete()
-        .eq('id', deleteDialog.orgId);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
 
-      if (error) throw error;
+      // Sub-admins create pending modification request
+      if (isSubAdmin) {
+        const org = organizations.find(o => o.id === deleteDialog.orgId);
+        if (!org) throw new Error('Organization not found');
 
-      toast({
-        title: "Organization Deleted",
-        description: `${deleteDialog.orgName} has been permanently deleted`,
-      });
+        const { error } = await supabase
+          .from('pending_civic_modifications')
+          .insert({
+            civic_org_id: deleteDialog.orgId,
+            action: 'delete',
+            modified_data: org,
+            submitted_by: user.id
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: "Request Submitted",
+          description: "Delete request submitted for approval",
+        });
+      } else {
+        // Main admins delete directly
+        const { error } = await supabase
+          .from('civic_organizations')
+          .delete()
+          .eq('id', deleteDialog.orgId);
+
+        if (error) throw error;
+
+        toast({
+          title: "Organization Deleted",
+          description: `${deleteDialog.orgName} has been permanently deleted`,
+        });
+      }
 
       setDeleteDialog({ isOpen: false });
       fetchOrganizations();
