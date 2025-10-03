@@ -206,7 +206,7 @@ const ContactElected = () => {
               />
               <TranslatedText 
                 contentKey="contact_elected.subtitle"
-                originalText="Reach out to your representatives to share your thoughts, concerns, and ideas. Your voice matters in shaping the policies that affect Southeast Queens."
+                originalText="Facing a federal, state, or city issue? Want to voice your concerns? Contact your elected representative and get help immediately."
                 as="p"
                 className="text-lg text-muted-foreground max-w-3xl mx-auto mb-6"
               />
