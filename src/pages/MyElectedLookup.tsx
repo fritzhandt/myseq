@@ -112,16 +112,14 @@ const MyElectedLookup = () => {
                   <DialogTrigger asChild>
                     <Button
                       onClick={() => handleLookupClick(option)}
-                      className="w-full whitespace-normal min-h-[44px]"
+                      className="w-full h-11"
                       size="lg"
                     >
-                      <span className="flex items-center justify-center gap-2">
-                        <TranslatedText 
-                          contentKey={`my_elected_lookup.find_my_${option.title.toLowerCase()}`}
-                          originalText={`Find My ${option.title}`}
-                        />
-                        <ExternalLink className="w-4 h-4 flex-shrink-0" />
-                      </span>
+                      <TranslatedText 
+                        contentKey="my_elected_lookup.search_button"
+                        originalText="Search"
+                      />
+                      <ExternalLink className="ml-2 w-4 h-4" />
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
