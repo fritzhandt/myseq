@@ -94,10 +94,13 @@ serve(async (req) => {
 
     console.log('Role inserted successfully');
 
-    // Generate password reset link
+    // Generate password reset link with redirect to accept-invite page
     const { data: resetData, error: resetError } = await supabaseAdmin.auth.admin.generateLink({
       type: 'recovery',
       email: email,
+      options: {
+        redirectTo: 'https://myseq.nyc/accept-invite'
+      }
     });
 
     if (resetError) {
