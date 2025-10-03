@@ -42,6 +42,51 @@ serve(async (req) => {
       });
     }
 
+    // Initialize Supabase client for rate limiting
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Check daily usage
+    const { data: usageData, error: usageError } = await supabase
+      .from('ai_search_usage')
+      .select('search_count')
+      .eq('search_date', today)
+      .single();
+
+    if (usageError && usageError.code !== 'PGRST116') {
+      console.error('Error checking usage:', usageError);
+      return new Response(JSON.stringify({
+        success: false,
+        error: "Service temporarily unavailable"
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500
+      });
+    }
+
+    const currentCount = usageData?.search_count || 0;
+    if (currentCount >= 300) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: "Daily search limit exceeded"
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 429
+      });
+    }
+
+    // Increment usage
+    if (usageData) {
+      await supabase
+        .from('ai_search_usage')
+        .update({ search_count: currentCount + 1 })
+        .eq('search_date', today);
+    } else {
+      await supabase
+        .from('ai_search_usage')
+        .insert({ search_date: today, search_count: 1 });
+    }
+
     if (!openAIApiKey) {
       console.error('OpenAI API key not found');
       return new Response(JSON.stringify({
@@ -53,10 +98,7 @@ serve(async (req) => {
       });
     }
 
-    // Initialize Supabase client
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    // First, get all resources from the database
+    // Get all resources from the database
     let resourcesQuery = supabase
       .from('resources')
       .select('*');

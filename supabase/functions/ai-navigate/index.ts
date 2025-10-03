@@ -74,7 +74,7 @@ serve(async (req) => {
     const currentCount = usageData?.search_count || 0;
     console.log('Current daily search count:', currentCount);
 
-    if (currentCount >= 1000) {
+    if (currentCount >= 300) {
       console.log('Daily search limit exceeded');
       return new Response(JSON.stringify({
         success: false,
