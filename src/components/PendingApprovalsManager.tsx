@@ -427,6 +427,168 @@ export const PendingApprovalsManager = () => {
             </div>
           </div>
         );
+      case 'resource_modification':
+        return (
+          <div className="space-y-4">
+            <div className="bg-blue-50 dark:bg-blue-950 p-3 rounded-lg">
+              <Label className="font-semibold text-blue-900 dark:text-blue-100">Action</Label>
+              <p className="text-sm text-blue-800 dark:text-blue-200 capitalize">{item.action}</p>
+            </div>
+            {item.action === 'edit' && data.modified_data && (
+              <>
+                <div>
+                  <Label className="font-semibold">Organization Name</Label>
+                  <p className="text-sm">{data.modified_data.organization_name}</p>
+                </div>
+                <div>
+                  <Label className="font-semibold">Description</Label>
+                  <p className="text-sm">{data.modified_data.description}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="font-semibold">Phone</Label>
+                    <p className="text-sm">{data.modified_data.phone || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <Label className="font-semibold">Email</Label>
+                    <p className="text-sm">{data.modified_data.email || 'N/A'}</p>
+                  </div>
+                </div>
+                <div>
+                  <Label className="font-semibold">Website</Label>
+                  <p className="text-sm">{data.modified_data.website || 'N/A'}</p>
+                </div>
+                {data.modified_data.categories && data.modified_data.categories.length > 0 && (
+                  <div>
+                    <Label className="font-semibold">Categories</Label>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {data.modified_data.categories.map((cat: string, idx: number) => (
+                        <Badge key={idx} variant="secondary">{cat}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+            {item.action === 'delete' && (
+              <div className="bg-red-50 dark:bg-red-950 p-3 rounded-lg">
+                <p className="text-sm text-red-800 dark:text-red-200">
+                  This will permanently delete the resource: <strong>{data.modified_data?.organization_name || 'Unknown'}</strong>
+                </p>
+              </div>
+            )}
+          </div>
+        );
+      case 'job_modification':
+        return (
+          <div className="space-y-4">
+            <div className="bg-blue-50 dark:bg-blue-950 p-3 rounded-lg">
+              <Label className="font-semibold text-blue-900 dark:text-blue-100">Action</Label>
+              <p className="text-sm text-blue-800 dark:text-blue-200 capitalize">{item.action}</p>
+            </div>
+            {item.action === 'edit' && data.modified_data && (
+              <>
+                <div>
+                  <Label className="font-semibold">Job Title</Label>
+                  <p className="text-sm">{data.modified_data.title}</p>
+                </div>
+                <div>
+                  <Label className="font-semibold">Employer</Label>
+                  <p className="text-sm">{data.modified_data.employer}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="font-semibold">Location</Label>
+                    <p className="text-sm">{data.modified_data.location}</p>
+                  </div>
+                  <div>
+                    <Label className="font-semibold">Salary</Label>
+                    <p className="text-sm">{data.modified_data.salary}</p>
+                  </div>
+                </div>
+                <div>
+                  <Label className="font-semibold">Description</Label>
+                  <p className="text-sm">{data.modified_data.description}</p>
+                </div>
+              </>
+            )}
+            {item.action === 'delete' && (
+              <div className="bg-red-50 dark:bg-red-950 p-3 rounded-lg">
+                <p className="text-sm text-red-800 dark:text-red-200">
+                  This will permanently delete the job posting: <strong>{data.modified_data?.title || 'Unknown'}</strong>
+                </p>
+              </div>
+            )}
+          </div>
+        );
+      case 'civic_modification':
+        return (
+          <div className="space-y-4">
+            <div className="bg-blue-50 dark:bg-blue-950 p-3 rounded-lg">
+              <Label className="font-semibold text-blue-900 dark:text-blue-100">Action</Label>
+              <p className="text-sm text-blue-800 dark:text-blue-200 capitalize">{item.action?.replace('_', ' ')}</p>
+            </div>
+            {item.action === 'edit' && data.modified_data && (
+              <>
+                <div>
+                  <Label className="font-semibold">Organization Name</Label>
+                  <p className="text-sm">{data.modified_data.name}</p>
+                </div>
+                <div>
+                  <Label className="font-semibold">Description</Label>
+                  <p className="text-sm">{data.modified_data.description}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="font-semibold">Access Code</Label>
+                    <p className="text-sm font-mono">{data.modified_data.access_code}</p>
+                  </div>
+                  <div>
+                    <Label className="font-semibold">Coverage Area</Label>
+                    <p className="text-sm">{data.modified_data.coverage_area}</p>
+                  </div>
+                </div>
+                {data.modified_data.meeting_info && (
+                  <div>
+                    <Label className="font-semibold">Meeting Info</Label>
+                    <p className="text-sm">{data.modified_data.meeting_info}</p>
+                  </div>
+                )}
+                {data.modified_data.contact_info && (
+                  <div>
+                    <Label className="font-semibold">Contact Information</Label>
+                    <div className="text-sm space-y-1 mt-1">
+                      {data.modified_data.contact_info.email && <p>Email: {data.modified_data.contact_info.email}</p>}
+                      {data.modified_data.contact_info.phone && <p>Phone: {data.modified_data.contact_info.phone}</p>}
+                      {data.modified_data.contact_info.website && <p>Website: {data.modified_data.contact_info.website}</p>}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+            {item.action === 'delete' && (
+              <div className="bg-red-50 dark:bg-red-950 p-3 rounded-lg">
+                <p className="text-sm text-red-800 dark:text-red-200">
+                  This will permanently delete the civic organization: <strong>{data.modified_data?.name || 'Unknown'}</strong>
+                </p>
+              </div>
+            )}
+            {item.action === 'deactivate' && (
+              <div className="bg-yellow-50 dark:bg-yellow-950 p-3 rounded-lg">
+                <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                  This will {data.modified_data?.is_active ? 'activate' : 'deactivate'} the civic organization
+                </p>
+              </div>
+            )}
+            {item.action === 'password_change' && (
+              <div className="bg-yellow-50 dark:bg-yellow-950 p-3 rounded-lg">
+                <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                  This will reset the password for the civic organization
+                </p>
+              </div>
+            )}
+          </div>
+        );
       default:
         return <p>Unknown item type</p>;
     }
