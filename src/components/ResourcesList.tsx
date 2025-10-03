@@ -410,44 +410,10 @@ export default function ResourcesList({ onEdit, isBusinessOpportunity = false, r
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={async () => {
-                    if (isSubAdmin) {
-                      // Sub-admins create pending modification request
-                      try {
-                        const { data: { user } } = await supabase.auth.getUser();
-                        if (!user) throw new Error('Not authenticated');
-
-                        const { error } = await supabase
-                          .from("pending_resource_modifications")
-                          .insert({
-                            resource_id: resource.id,
-                            action: 'edit',
-                            modified_data: resource,
-                            submitted_by: user.id
-                          });
-
-                        if (error) throw error;
-
-                        toast({
-                          title: "Request Submitted",
-                          description: "Edit request submitted. Once approved, you can make changes.",
-                        });
-                      } catch (error) {
-                        console.error("Error submitting edit request:", error);
-                        toast({
-                          title: "Error",
-                          description: "Failed to submit edit request",
-                          variant: "destructive",
-                        });
-                      }
-                    } else {
-                      // Main admins can edit directly
-                      onEdit(resource);
-                    }
-                  }}
+                  onClick={() => onEdit(resource)}
                 >
                   <Edit className="h-4 w-4 mr-2" />
-                  {isSubAdmin ? 'Request Edit' : 'Edit'}
+                  Edit
                 </Button>
                 <Button
                   variant="outline"

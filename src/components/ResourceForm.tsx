@@ -346,18 +346,40 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
       };
 
       if (resource?.id) {
-        // Updates always go to main table regardless of role
-        const { error } = await supabase
-          .from("resources")
-          .update(dataToSave)
-          .eq("id", resource.id);
+        // Sub-admins editing: create pending modification request
+        if (isSubAdmin) {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) throw new Error('Not authenticated');
 
-        if (error) throw error;
+          const { error } = await supabase
+            .from("pending_resource_modifications")
+            .insert({
+              resource_id: resource.id,
+              action: 'edit',
+              modified_data: dataToSave,
+              submitted_by: user.id
+            });
 
-        toast({
-          title: "Success",
-          description: "Resource updated successfully",
-        });
+          if (error) throw error;
+
+          toast({
+            title: "Request Submitted",
+            description: "Your edit request has been submitted for approval",
+          });
+        } else {
+          // Main admins update directly
+          const { error } = await supabase
+            .from("resources")
+            .update(dataToSave)
+            .eq("id", resource.id);
+
+          if (error) throw error;
+
+          toast({
+            title: "Success",
+            description: "Resource updated successfully",
+          });
+        }
         
         onSave();
         onClose();
