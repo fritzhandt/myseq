@@ -151,8 +151,8 @@ YOUR JOB: Be aggressive. Find a route. Only give up if impossible.
 AVAILABLE ROUTES:
 - "/about" → about this website/platform
 - "/police-precincts" → EMERGENCIES, police stations, 911 calls, immediate danger, crimes in progress
-- "/contact-elected" → NON-EMERGENCY ISSUES: reporting problems to elected officials (illegal parking, broken infrastructure, filing for benefits, permits, licenses, government services, complaints about city services, quality of life issues)
-- "/my-elected-lookup" → find your elected officials (who represents me, councilperson lookup)
+- "/contact-elected" → contacting elected officials (how to contact, get in touch with, call, visit, email elected officials; reporting problems to elected officials; illegal parking, broken infrastructure, filing for benefits, permits, licenses, government services, complaints about city services, quality of life issues)
+- "/my-elected-lookup" → ONLY for looking up WHO your elected officials are (who represents me, who is my councilperson, find my representative)
 - "/jobs" → employment (searchTerm, employer, location, category, governmentType)
 - "/resources" → community services and organizations (searchTerm, category)
 - "/business-opportunities" → business opportunities and entrepreneurship programs (searchTerm)
@@ -249,8 +249,8 @@ CRITICAL RULE: When in doubt, TRY TO ROUTE. Prefer false positive over false neg
 
 KEYWORD MAPPING:
 - "emergency", "911", "police", "crime", "danger" → /police-precincts
-- "report", "issue", "problem", "complaint", "broken", "illegally parked", "file for", "permit", "license", "pothole", "streetlight", "sidewalk", "trash", "graffiti", "noise" → /contact-elected
-- "who is my", "find my representative", "my councilperson" → /my-elected-lookup
+- "contact", "get in touch", "reach", "call", "visit", "email", "phone", "report", "issue", "problem", "complaint", "broken", "illegally parked", "file for", "permit", "license", "pothole", "streetlight", "sidewalk", "trash", "graffiti", "noise" → /contact-elected
+- "who is my", "find my representative", "my councilperson", "who represents" → /my-elected-lookup (ONLY for identifying officials, NOT for contacting them)
 - "learn", "lessons", "classes", "training" → /resources category:"sports", "arts", or "educational"
 - "help", "support", "assistance" → check context for category
 - "health", "medical", "fitness", "wellness" → /resources category:"mental health/wellness" or "sports"
