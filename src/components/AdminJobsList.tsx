@@ -3,7 +3,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Trash2, Building2, MapPin, Edit, Ban } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Trash2, Building2, MapPin, Edit, Ban, Search } from 'lucide-react';
+import AdminPagination from './AdminPagination';
 import { useToast } from '@/hooks/use-toast';
 import JobEditDialog from './JobEditDialog';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -36,9 +38,17 @@ interface Job {
 export default function AdminJobsList() {
   const [governmentJobs, setGovernmentJobs] = useState<Job[]>([]);
   const [privateSectorJobs, setPrivateSectorJobs] = useState<Job[]>([]);
+  const [filteredGovJobs, setFilteredGovJobs] = useState<Job[]>([]);
+  const [filteredPrivateJobs, setFilteredPrivateJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteJobId, setDeleteJobId] = useState<string | null>(null);
   const [editJob, setEditJob] = useState<Job | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentGovPage, setCurrentGovPage] = useState(1);
+  const [currentPrivatePage, setCurrentPrivatePage] = useState(1);
+  const [currentCityPage, setCurrentCityPage] = useState(1);
+  const [currentStatePage, setCurrentStatePage] = useState(1);
+  const itemsPerPage = 10;
   const { toast } = useToast();
   const { isSubAdmin, isMainAdmin } = useUserRole();
 
@@ -78,6 +88,23 @@ export default function AdminJobsList() {
   useEffect(() => {
     fetchJobs();
   }, []);
+
+  // Filter jobs based on search term
+  useEffect(() => {
+    const filterJobs = (jobs: Job[]) => jobs.filter(job =>
+      job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      job.employer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      job.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      job.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    
+    setFilteredGovJobs(filterJobs(governmentJobs));
+    setFilteredPrivateJobs(filterJobs(privateSectorJobs));
+    setCurrentGovPage(1);
+    setCurrentPrivatePage(1);
+    setCurrentCityPage(1);
+    setCurrentStatePage(1);
+  }, [searchTerm, governmentJobs, privateSectorJobs]);
 
   const handleDelete = async () => {
     if (!deleteJobId) return;
@@ -275,15 +302,42 @@ export default function AdminJobsList() {
     );
   }
 
-  const cityJobs = governmentJobs.filter(job => job.subcategory === 'city');
-  const stateJobs = governmentJobs.filter(job => job.subcategory === 'state');
+  const cityJobs = filteredGovJobs.filter(job => job.subcategory === 'city');
+  const stateJobs = filteredGovJobs.filter(job => job.subcategory === 'state');
+
+  // Pagination calculations
+  const cityTotalPages = Math.ceil(cityJobs.length / itemsPerPage);
+  const stateTotalPages = Math.ceil(stateJobs.length / itemsPerPage);
+  const privateTotalPages = Math.ceil(filteredPrivateJobs.length / itemsPerPage);
+
+  const paginatedCityJobs = cityJobs.slice((currentCityPage - 1) * itemsPerPage, currentCityPage * itemsPerPage);
+  const paginatedStateJobs = stateJobs.slice((currentStatePage - 1) * itemsPerPage, currentStatePage * itemsPerPage);
+  const paginatedPrivateJobs = filteredPrivateJobs.slice((currentPrivatePage - 1) * itemsPerPage, currentPrivatePage * itemsPerPage);
 
   return (
     <>
+      {/* Search Bar */}
+      <div className="mb-6">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Input
+            placeholder="Search jobs by title, employer, location, or description..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        {searchTerm && (
+          <div className="text-sm text-muted-foreground mt-2">
+            Found {filteredGovJobs.length + filteredPrivateJobs.length} job{filteredGovJobs.length + filteredPrivateJobs.length === 1 ? '' : 's'} matching "{searchTerm}"
+          </div>
+        )}
+      </div>
+
       <Tabs defaultValue="government" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="government">Government Jobs ({governmentJobs.length})</TabsTrigger>
-          <TabsTrigger value="private">Private Sector ({privateSectorJobs.length})</TabsTrigger>
+          <TabsTrigger value="government">Government Jobs ({filteredGovJobs.length})</TabsTrigger>
+          <TabsTrigger value="private">Private Sector ({filteredPrivateJobs.length})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="government" className="space-y-4">
@@ -297,11 +351,22 @@ export default function AdminJobsList() {
               {cityJobs.length === 0 ? (
                 <Card>
                   <CardContent className="pt-6 text-center text-muted-foreground">
-                    No city jobs found
+                    {searchTerm ? 'No city jobs match your search' : 'No city jobs found'}
                   </CardContent>
                 </Card>
               ) : (
-                cityJobs.map(job => <JobCard key={job.id} job={job} />)
+                <>
+                  {paginatedCityJobs.map(job => <JobCard key={job.id} job={job} />)}
+                  {cityJobs.length > itemsPerPage && (
+                    <AdminPagination
+                      currentPage={currentCityPage}
+                      totalPages={cityTotalPages}
+                      totalItems={cityJobs.length}
+                      itemsPerPage={itemsPerPage}
+                      onPageChange={setCurrentCityPage}
+                    />
+                  )}
+                </>
               )}
             </TabsContent>
 
@@ -309,25 +374,47 @@ export default function AdminJobsList() {
               {stateJobs.length === 0 ? (
                 <Card>
                   <CardContent className="pt-6 text-center text-muted-foreground">
-                    No state jobs found
+                    {searchTerm ? 'No state jobs match your search' : 'No state jobs found'}
                   </CardContent>
                 </Card>
               ) : (
-                stateJobs.map(job => <JobCard key={job.id} job={job} />)
+                <>
+                  {paginatedStateJobs.map(job => <JobCard key={job.id} job={job} />)}
+                  {stateJobs.length > itemsPerPage && (
+                    <AdminPagination
+                      currentPage={currentStatePage}
+                      totalPages={stateTotalPages}
+                      totalItems={stateJobs.length}
+                      itemsPerPage={itemsPerPage}
+                      onPageChange={setCurrentStatePage}
+                    />
+                  )}
+                </>
               )}
             </TabsContent>
           </Tabs>
         </TabsContent>
 
         <TabsContent value="private" className="space-y-4">
-          {privateSectorJobs.length === 0 ? (
+          {filteredPrivateJobs.length === 0 ? (
             <Card>
               <CardContent className="pt-6 text-center text-muted-foreground">
-                No private sector jobs found
+                {searchTerm ? 'No private sector jobs match your search' : 'No private sector jobs found'}
               </CardContent>
             </Card>
           ) : (
-            privateSectorJobs.map(job => <JobCard key={job.id} job={job} />)
+            <>
+              {paginatedPrivateJobs.map(job => <JobCard key={job.id} job={job} />)}
+              {filteredPrivateJobs.length > itemsPerPage && (
+                <AdminPagination
+                  currentPage={currentPrivatePage}
+                  totalPages={privateTotalPages}
+                  totalItems={filteredPrivateJobs.length}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={setCurrentPrivatePage}
+                />
+              )}
+            </>
           )}
         </TabsContent>
       </Tabs>

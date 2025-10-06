@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Edit, Trash2, Eye } from 'lucide-react';
+import { Edit, Trash2, Eye, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AdminPagination from './AdminPagination';
 
@@ -24,7 +25,9 @@ interface CommunityAlertsListProps {
 
 const CommunityAlertsList = ({ onEditAlert }: CommunityAlertsListProps) => {
   const [alerts, setAlerts] = useState<CommunityAlert[]>([]);
+  const [filteredAlerts, setFilteredAlerts] = useState<CommunityAlert[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const { toast } = useToast();
@@ -47,10 +50,21 @@ const CommunityAlertsList = ({ onEditAlert }: CommunityAlertsListProps) => {
     setLoading(false);
   };
 
-  // Paginate alerts
-  const totalPages = Math.ceil(alerts.length / itemsPerPage);
+  // Filter alerts based on search term
+  useEffect(() => {
+    const filtered = alerts.filter(alert =>
+      alert.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      alert.short_description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      alert.long_description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredAlerts(filtered);
+    setCurrentPage(1);
+  }, [searchTerm, alerts]);
+
+  // Paginate filtered alerts
+  const totalPages = Math.ceil(filteredAlerts.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedAlerts = alerts.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedAlerts = filteredAlerts.slice(startIndex, startIndex + itemsPerPage);
 
   useEffect(() => {
     fetchAlerts();
@@ -123,18 +137,38 @@ const CommunityAlertsList = ({ onEditAlert }: CommunityAlertsListProps) => {
     );
   }
 
-  if (alerts.length === 0) {
-    return (
-      <Card>
-        <CardContent className="flex items-center justify-center py-8">
-          <p className="text-muted-foreground">No community alerts found.</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <div className="space-y-4">
+      {/* Search Bar */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+        <Input
+          placeholder="Search community alerts by title or description..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-10"
+        />
+      </div>
+      {searchTerm && (
+        <div className="text-sm text-muted-foreground">
+          Found {filteredAlerts.length} alert{filteredAlerts.length === 1 ? '' : 's'} matching "{searchTerm}"
+        </div>
+      )}
+
+      {filteredAlerts.length === 0 && searchTerm ? (
+        <Card>
+          <CardContent className="flex items-center justify-center py-8">
+            <p className="text-muted-foreground">No alerts match your search criteria.</p>
+          </CardContent>
+        </Card>
+      ) : filteredAlerts.length === 0 ? (
+        <Card>
+          <CardContent className="flex items-center justify-center py-8">
+            <p className="text-muted-foreground">No community alerts found.</p>
+          </CardContent>
+        </Card>
+      ) : null}
+
       {paginatedAlerts.map((alert) => (
         <Card key={alert.id}>
           <CardHeader>
@@ -220,11 +254,11 @@ const CommunityAlertsList = ({ onEditAlert }: CommunityAlertsListProps) => {
       ))}
       
       {/* Pagination */}
-      {alerts.length > 0 && (
+      {filteredAlerts.length > itemsPerPage && (
         <AdminPagination
           currentPage={currentPage}
           totalPages={totalPages}
-          totalItems={alerts.length}
+          totalItems={filteredAlerts.length}
           itemsPerPage={itemsPerPage}
           onPageChange={setCurrentPage}
         />

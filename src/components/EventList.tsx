@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Calendar, MapPin, Clock, Edit, Trash2, Users } from 'lucide-react';
+import { Calendar, MapPin, Clock, Edit, Trash2, Users, Search } from 'lucide-react';
 import AdminPagination from './AdminPagination';
 
 interface Event {
@@ -25,7 +26,9 @@ interface EventListProps {
 
 export const EventList = ({ onEditEvent }: EventListProps) => {
   const [events, setEvents] = useState<Event[]>([]);
+  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
   const { toast } = useToast();
@@ -33,6 +36,19 @@ export const EventList = ({ onEditEvent }: EventListProps) => {
   useEffect(() => {
     fetchEvents();
   }, []);
+
+  // Filter events based on search term
+  useEffect(() => {
+    const filtered = events.filter(event =>
+      event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      event.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      event.age_group.some(group => group.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      event.elected_officials.some(official => official.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+    setFilteredEvents(filtered);
+    setCurrentPage(1);
+  }, [searchTerm, events]);
 
   const fetchEvents = async () => {
     try {
@@ -55,10 +71,10 @@ export const EventList = ({ onEditEvent }: EventListProps) => {
     }
   };
 
-  // Paginate events
-  const totalPages = Math.ceil(events.length / itemsPerPage);
+  // Paginate filtered events
+  const totalPages = Math.ceil(filteredEvents.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedEvents = events.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedEvents = filteredEvents.slice(startIndex, startIndex + itemsPerPage);
 
   const handleDelete = async (eventId: string) => {
     if (!confirm('Are you sure you want to delete this event?')) return;
@@ -127,6 +143,22 @@ export const EventList = ({ onEditEvent }: EventListProps) => {
 
   return (
     <div className="space-y-4">
+      {/* Search Bar */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+        <Input
+          placeholder="Search events by title, description, location, age group, or officials..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-10"
+        />
+      </div>
+      {searchTerm && (
+        <div className="text-sm text-muted-foreground">
+          Found {filteredEvents.length} event{filteredEvents.length === 1 ? '' : 's'} matching "{searchTerm}"
+        </div>
+      )}
+
       {paginatedEvents.map((event) => (
         <Card key={event.id} className="shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="pb-4">
@@ -209,13 +241,15 @@ export const EventList = ({ onEditEvent }: EventListProps) => {
       ))}
       
       {/* Pagination */}
-      <AdminPagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalItems={events.length}
-        itemsPerPage={itemsPerPage}
-        onPageChange={setCurrentPage}
-      />
+      {filteredEvents.length > itemsPerPage && (
+        <AdminPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={filteredEvents.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+        />
+      )}
     </div>
   );
 };

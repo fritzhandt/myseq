@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Pencil, Trash2, Calendar, Eye, EyeOff } from 'lucide-react';
+import { Pencil, Trash2, Calendar, Eye, EyeOff, Search } from 'lucide-react';
 import { format } from 'date-fns';
 import AdminPagination from './AdminPagination';
 
@@ -25,7 +26,9 @@ interface SpecialEventsListProps {
 
 const SpecialEventsList = ({ onEditSpecialEvent }: SpecialEventsListProps) => {
   const [specialEvents, setSpecialEvents] = useState<SpecialEvent[]>([]);
+  const [filteredEvents, setFilteredEvents] = useState<SpecialEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const { toast } = useToast();
@@ -33,6 +36,16 @@ const SpecialEventsList = ({ onEditSpecialEvent }: SpecialEventsListProps) => {
   useEffect(() => {
     fetchSpecialEvents();
   }, []);
+
+  // Filter special events based on search term
+  useEffect(() => {
+    const filtered = specialEvents.filter(event =>
+      event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (event.description && event.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+    setFilteredEvents(filtered);
+    setCurrentPage(1);
+  }, [searchTerm, specialEvents]);
 
   const fetchSpecialEvents = async () => {
     try {
@@ -58,10 +71,10 @@ const SpecialEventsList = ({ onEditSpecialEvent }: SpecialEventsListProps) => {
     }
   };
 
-  // Paginate special events
-  const totalPages = Math.ceil(specialEvents.length / itemsPerPage);
+  // Paginate filtered special events
+  const totalPages = Math.ceil(filteredEvents.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedSpecialEvents = specialEvents.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedSpecialEvents = filteredEvents.slice(startIndex, startIndex + itemsPerPage);
 
   const handleToggleActive = async (specialEvent: SpecialEvent) => {
     try {
@@ -125,7 +138,23 @@ const SpecialEventsList = ({ onEditSpecialEvent }: SpecialEventsListProps) => {
 
   return (
     <div className="space-y-4">
-      {specialEvents.length === 0 ? (
+      {/* Search Bar */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+        <Input
+          placeholder="Search special events by title or description..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-10"
+        />
+      </div>
+      {searchTerm && (
+        <div className="text-sm text-muted-foreground">
+          Found {filteredEvents.length} special event{filteredEvents.length === 1 ? '' : 's'} matching "{searchTerm}"
+        </div>
+      )}
+
+      {filteredEvents.length === 0 && !searchTerm ? (
         <Card>
           <CardContent className="pt-6">
             <div className="text-center py-8">
@@ -134,6 +163,14 @@ const SpecialEventsList = ({ onEditSpecialEvent }: SpecialEventsListProps) => {
               <p className="text-muted-foreground">
                 Create your first special event to get started.
               </p>
+            </div>
+          </CardContent>
+        </Card>
+      ) : filteredEvents.length === 0 && searchTerm ? (
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-center py-8 text-muted-foreground">
+              No special events match your search criteria.
             </div>
           </CardContent>
         </Card>
@@ -198,13 +235,15 @@ const SpecialEventsList = ({ onEditSpecialEvent }: SpecialEventsListProps) => {
           ))}
           
           {/* Pagination */}
-          <AdminPagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            totalItems={specialEvents.length}
-            itemsPerPage={itemsPerPage}
-            onPageChange={setCurrentPage}
-          />
+          {filteredEvents.length > itemsPerPage && (
+            <AdminPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={filteredEvents.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+            />
+          )}
         </>
       )}
     </div>

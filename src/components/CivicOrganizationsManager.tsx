@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Eye, EyeOff, Copy, Trash2, Users, Building2, RotateCcw, AlertTriangle, Pencil, Download, Shield } from 'lucide-react';
+import { Plus, Eye, EyeOff, Copy, Trash2, Users, Building2, RotateCcw, AlertTriangle, Pencil, Download, Shield, Search } from 'lucide-react';
 import { useUserRole } from '@/hooks/useUserRole';
 import {
   AlertDialog,
@@ -41,11 +41,13 @@ interface CivicOrganization {
 
 export default function CivicOrganizationsManager() {
   const [organizations, setOrganizations] = useState<CivicOrganization[]>([]);
+  const [filteredOrgs, setFilteredOrgs] = useState<CivicOrganization[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   const [creatingOrgType, setCreatingOrgType] = useState<string>('civic_organization');
   const [editingOrg, setEditingOrg] = useState<CivicOrganization | null>(null);
   const [showPasswords, setShowPasswords] = useState<{[key: string]: boolean}>({});
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
   const [resetPasswordDialog, setResetPasswordDialog] = useState<{isOpen: boolean, orgId?: string, orgName?: string, newPassword?: string}>({isOpen: false});
   const [deleteDialog, setDeleteDialog] = useState<{isOpen: boolean, orgId?: string, orgName?: string}>({isOpen: false});
   const { toast } = useToast();
@@ -90,6 +92,17 @@ export default function CivicOrganizationsManager() {
   useEffect(() => {
     fetchOrganizations();
   }, []);
+
+  // Filter organizations based on search term
+  useEffect(() => {
+    const filtered = organizations.filter(org =>
+      org.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      org.coverage_area.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      org.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      org.access_code.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredOrgs(filtered);
+  }, [searchTerm, organizations]);
 
   const generateAccessCode = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -598,7 +611,18 @@ export default function CivicOrganizationsManager() {
         </TabsList>
 
         <TabsContent value="civic" className="space-y-6 mt-6">
-          <div className="flex justify-end">
+          <div className="flex justify-between items-center gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                <Input
+                  placeholder="Search organizations by name, coverage area, or access code..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
             <Button size="lg" onClick={() => handleCreateNew('civic_organization')}>
               <Plus className="h-5 w-5 mr-2" />
               Create Organization
@@ -788,8 +812,14 @@ export default function CivicOrganizationsManager() {
 
           <CivicOrgCSVUpload onUploadComplete={fetchOrganizations} />
 
+          {searchTerm && (
+            <div className="text-sm text-muted-foreground">
+              Found {filteredOrgs.filter(org => org.organization_type === 'civic_organization').length} civic organization{filteredOrgs.filter(org => org.organization_type === 'civic_organization').length === 1 ? '' : 's'} matching "{searchTerm}"
+            </div>
+          )}
+
           <div className="grid gap-4">
-            {organizations.filter(org => org.organization_type === 'civic_organization').length === 0 ? (
+            {filteredOrgs.filter(org => org.organization_type === 'civic_organization').length === 0 && !searchTerm ? (
               <Card>
                 <CardContent className="flex flex-col items-center justify-center py-12">
                   <Building2 className="h-12 w-12 text-muted-foreground mb-4" />
@@ -803,8 +833,14 @@ export default function CivicOrganizationsManager() {
                   </Button>
                 </CardContent>
               </Card>
+            ) : filteredOrgs.filter(org => org.organization_type === 'civic_organization').length === 0 && searchTerm ? (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <p className="text-muted-foreground">No civic organizations match your search criteria.</p>
+                </CardContent>
+              </Card>
             ) : (
-              organizations.filter(org => org.organization_type === 'civic_organization').map((org) => (
+              filteredOrgs.filter(org => org.organization_type === 'civic_organization').map((org) => (
             <Card key={org.id} className={org.is_active ? "" : "opacity-60"}>
               <CardHeader>
                 <div className="flex justify-between items-start">
@@ -939,7 +975,7 @@ export default function CivicOrganizationsManager() {
           <CivicOrgCSVUpload onUploadComplete={fetchOrganizations} organizationType="community_board" />
 
           <div className="grid gap-4">
-            {organizations.filter(org => org.organization_type === 'community_board').length === 0 ? (
+            {filteredOrgs.filter(org => org.organization_type === 'community_board').length === 0 && !searchTerm ? (
               <Card>
                 <CardContent className="flex flex-col items-center justify-center py-12">
                   <Users className="h-12 w-12 text-muted-foreground mb-4" />
@@ -953,8 +989,14 @@ export default function CivicOrganizationsManager() {
                   </Button>
                 </CardContent>
               </Card>
+            ) : filteredOrgs.filter(org => org.organization_type === 'community_board').length === 0 && searchTerm ? (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <p className="text-muted-foreground">No community boards match your search criteria.</p>
+                </CardContent>
+              </Card>
             ) : (
-              organizations.filter(org => org.organization_type === 'community_board').map((org) => (
+              filteredOrgs.filter(org => org.organization_type === 'community_board').map((org) => (
                 <Card key={org.id} className={org.is_active ? "" : "opacity-60"}>
                   <CardHeader>
                     <div className="flex justify-between items-start">
@@ -1090,7 +1132,7 @@ export default function CivicOrganizationsManager() {
           <CivicOrgCSVUpload onUploadComplete={fetchOrganizations} organizationType="police_council" />
 
           <div className="grid gap-4">
-            {organizations.filter(org => org.organization_type === 'police_council').length === 0 ? (
+            {filteredOrgs.filter(org => org.organization_type === 'police_council').length === 0 && !searchTerm ? (
               <Card>
                 <CardContent className="flex flex-col items-center justify-center py-12">
                   <Shield className="h-12 w-12 text-muted-foreground mb-4" />
@@ -1104,8 +1146,14 @@ export default function CivicOrganizationsManager() {
                   </Button>
                 </CardContent>
               </Card>
+            ) : filteredOrgs.filter(org => org.organization_type === 'police_council').length === 0 && searchTerm ? (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <p className="text-muted-foreground">No police councils match your search criteria.</p>
+                </CardContent>
+              </Card>
             ) : (
-              organizations.filter(org => org.organization_type === 'police_council').map((org) => (
+              filteredOrgs.filter(org => org.organization_type === 'police_council').map((org) => (
                 <Card key={org.id} className={org.is_active ? "" : "opacity-60"}>
                   <CardHeader>
                     <div className="flex justify-between items-start">

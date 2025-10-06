@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, Building, MapPin, Trash2, Check } from 'lucide-react';
+import { AlertTriangle, Building, MapPin, Trash2, Check, Search } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import AdminPagination from './AdminPagination';
 
 interface JobReport {
   id: string;
@@ -24,8 +26,12 @@ interface JobReport {
 
 export default function JobReportsList() {
   const [reports, setReports] = useState<JobReport[]>([]);
+  const [filteredReports, setFilteredReports] = useState<JobReport[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
   const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
+  const itemsPerPage = 10;
   const { toast } = useToast();
 
   const fetchReports = async () => {
@@ -66,6 +72,24 @@ export default function JobReportsList() {
   useEffect(() => {
     fetchReports();
   }, []);
+
+  // Filter reports based on search term
+  useEffect(() => {
+    const filtered = reports.filter(report =>
+      report.jobs.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      report.jobs.employer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      report.jobs.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      report.reason.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (report.description && report.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+    setFilteredReports(filtered);
+    setCurrentPage(1);
+  }, [searchTerm, reports]);
+
+  // Paginate filtered reports
+  const totalPages = Math.ceil(filteredReports.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedReports = filteredReports.slice(startIndex, startIndex + itemsPerPage);
 
   const handleRemoveJob = async (reportId: string, jobId: string) => {
     setProcessingIds(prev => new Set([...prev, reportId]));
@@ -171,12 +195,31 @@ export default function JobReportsList() {
           Job Reports ({reports.length})
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        {reports.length === 0 ? (
+      <CardContent className="space-y-4">
+        {/* Search Bar */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Input
+            placeholder="Search reports by job title, employer, location, or reason..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        {searchTerm && (
+          <div className="text-sm text-muted-foreground">
+            Found {filteredReports.length} report{filteredReports.length === 1 ? '' : 's'} matching "{searchTerm}"
+          </div>
+        )}
+
+        {filteredReports.length === 0 && searchTerm ? (
+          <p className="text-muted-foreground text-center py-4">No reports match your search criteria.</p>
+        ) : filteredReports.length === 0 ? (
           <p className="text-muted-foreground">No reports to review.</p>
         ) : (
-          <div className="space-y-4">
-            {reports.map((report) => (
+          <>
+            <div className="space-y-4">
+              {paginatedReports.map((report) => (
               <Card key={report.id} className="border-l-4 border-l-orange-500">
                 <CardContent className="p-4">
                   <div className="flex justify-between items-start gap-4">
@@ -235,8 +278,20 @@ export default function JobReportsList() {
                   </div>
                 </CardContent>
               </Card>
-            ))}
-          </div>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {filteredReports.length > itemsPerPage && (
+              <AdminPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={filteredReports.length}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+              />
+            )}
+          </>
         )}
       </CardContent>
     </Card>
