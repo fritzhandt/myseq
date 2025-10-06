@@ -245,19 +245,19 @@ export default function Jobs() {
               <TabsList className="relative grid w-full max-w-2xl grid-cols-3 bg-card border-2 border-primary/30 rounded-xl p-1.5 shadow-lg">
                 <TabsTrigger 
                   value="government" 
-                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary/90 data-[state=active]:text-primary-foreground data-[state=active]:shadow-md rounded-lg font-semibold transition-all duration-200"
+                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md rounded-lg font-semibold transition-all duration-200"
                 >
                   Government
                 </TabsTrigger>
                 <TabsTrigger 
                   value="private_sector" 
-                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary/90 data-[state=active]:text-primary-foreground data-[state=active]:shadow-md rounded-lg font-semibold transition-all duration-200"
+                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md rounded-lg font-semibold transition-all duration-200"
                 >
                   Private Sector
                 </TabsTrigger>
                 <TabsTrigger 
                   value="internships" 
-                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary/90 data-[state=active]:text-primary-foreground data-[state=active]:shadow-md rounded-lg font-semibold transition-all duration-200"
+                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md rounded-lg font-semibold transition-all duration-200"
                 >
                   Internships
                 </TabsTrigger>
