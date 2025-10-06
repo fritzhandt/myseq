@@ -3,13 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2, ExternalLink, Phone, Mail, Search } from "lucide-react";
+import { Edit, Trash2, ExternalLink, Phone, Mail, Search, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import AdminPagination from "./AdminPagination";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useUserRole } from "@/hooks/useUserRole";
+import * as XLSX from 'xlsx';
 
 const CATEGORIES = [
   "Arts",
@@ -188,6 +189,40 @@ export default function ResourcesList({ onEdit, isBusinessOpportunity = false, r
     setSelectedIds(newSelected);
   };
 
+  const handleDownloadCSV = () => {
+    // Prepare data for export
+    const exportData = resources.map(resource => ({
+      id: resource.id,
+      organization_name: resource.organization_name,
+      description: resource.description,
+      categories: resource.categories.join(', '),
+      website: resource.website || '',
+      email: resource.email || '',
+      phone: resource.phone || '',
+      address: resource.address || '',
+      type: isBusinessOpportunity ? 'business_opportunity' : 'resource',
+    }));
+
+    // Create worksheet
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    
+    // Create workbook
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, isBusinessOpportunity ? 'Business Opportunities' : 'Resources');
+
+    // Generate file name with timestamp
+    const timestamp = new Date().toISOString().split('T')[0];
+    const filename = `${isBusinessOpportunity ? 'business_opportunities' : 'resources'}_${timestamp}.xlsx`;
+
+    // Download
+    XLSX.writeFile(workbook, filename);
+    
+    toast({
+      title: "Download Complete",
+      description: `Downloaded ${resources.length} ${isBusinessOpportunity ? 'business opportunities' : 'programs/services'}`,
+    });
+  };
+
   const handleBulkCategoryUpdate = async () => {
     if (!bulkCategory || selectedIds.size === 0) {
       toast({
@@ -288,15 +323,21 @@ export default function ResourcesList({ onEdit, isBusinessOpportunity = false, r
         </Card>
       )}
 
-      {/* Search Bar */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-        <Input
-          placeholder="Search resources by name, description, category, email, or phone..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10"
-        />
+      {/* Search Bar and Download Button */}
+      <div className="flex gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Input
+            placeholder="Search resources by name, description, category, email, or phone..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <Button onClick={handleDownloadCSV} variant="outline">
+          <Download className="h-4 w-4 mr-2" />
+          Download CSV
+        </Button>
       </div>
 
       {/* Results Summary */}

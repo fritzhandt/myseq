@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
 
 interface ResourceRow {
+  id?: string; // Optional ID for updates
   organization_name: string;
   description: string;
   categories: string; // comma-separated
@@ -35,6 +36,7 @@ const ResourceCSVUpload = ({ onUploadComplete, defaultType = 'resource' }: Resou
     const data = XLSX.utils.sheet_to_json<any>(worksheet);
 
     return data.map(row => ({
+      id: row.id || row.ID || row.Id || undefined, // Include ID for updates
       organization_name: row.organization_name || row['Organization Name'] || '',
       description: row.description || row.Description || '',
       categories: row.categories || row.Categories || '',
@@ -76,6 +78,7 @@ const ResourceCSVUpload = ({ onUploadComplete, defaultType = 'resource' }: Resou
       });
 
       return {
+        id: row.id || undefined, // Include ID for updates
         organization_name: row.organization_name || row['organization name'] || '',
         description: row.description || '',
         categories: row.categories || '',
@@ -139,31 +142,80 @@ const ResourceCSVUpload = ({ onUploadComplete, defaultType = 'resource' }: Resou
     setUploading(true);
 
     try {
-      const processedResources = previewResources.map(resource => ({
-        organization_name: resource.organization_name,
-        description: resource.description,
-        categories: resource.categories.split(',').map(c => c.trim()).filter(Boolean),
-        website: resource.website ? ensureProtocol(resource.website) : null,
-        email: resource.email || null,
-        phone: resource.phone || null,
-        address: resource.address || null,
-        type: resource.type || defaultType,
-        logo_url: null,
-        cover_photo_url: null,
-      }));
+      // Separate resources with and without IDs
+      const resourcesWithIds = previewResources.filter(r => r.id);
+      const resourcesWithoutIds = previewResources.filter(r => !r.id);
 
-      const { error } = await supabase
-        .from('resources')
-        .insert(processedResources);
+      let updateCount = 0;
+      let insertCount = 0;
 
-      if (error) throw error;
+      // Update existing resources (those with IDs)
+      if (resourcesWithIds.length > 0) {
+        const updatePromises = resourcesWithIds.map(resource => {
+          const updateData = {
+            organization_name: resource.organization_name,
+            description: resource.description,
+            categories: resource.categories.split(',').map(c => c.trim()).filter(Boolean),
+            website: resource.website ? ensureProtocol(resource.website) : null,
+            email: resource.email || null,
+            phone: resource.phone || null,
+            address: resource.address || null,
+            type: resource.type || defaultType,
+            updated_at: new Date().toISOString(),
+          };
 
-      toast.success(`Successfully imported ${processedResources.length} ${defaultType === 'business_opportunity' ? 'opportunities' : 'programs/services'}`);
+          return supabase
+            .from('resources')
+            .update(updateData)
+            .eq('id', resource.id);
+        });
+
+        const updateResults = await Promise.all(updatePromises);
+        const updateErrors = updateResults.filter(r => r.error);
+
+        if (updateErrors.length > 0) {
+          console.error('Update errors:', updateErrors);
+          throw new Error(`Failed to update ${updateErrors.length} resource(s)`);
+        }
+
+        updateCount = resourcesWithIds.length;
+      }
+
+      // Insert new resources (those without IDs)
+      if (resourcesWithoutIds.length > 0) {
+        const processedResources = resourcesWithoutIds.map(resource => ({
+          organization_name: resource.organization_name,
+          description: resource.description,
+          categories: resource.categories.split(',').map(c => c.trim()).filter(Boolean),
+          website: resource.website ? ensureProtocol(resource.website) : null,
+          email: resource.email || null,
+          phone: resource.phone || null,
+          address: resource.address || null,
+          type: resource.type || defaultType,
+          logo_url: null,
+          cover_photo_url: null,
+        }));
+
+        const { error: insertError } = await supabase
+          .from('resources')
+          .insert(processedResources);
+
+        if (insertError) throw insertError;
+
+        insertCount = resourcesWithoutIds.length;
+      }
+
+      // Show success message with counts
+      const messages = [];
+      if (updateCount > 0) messages.push(`${updateCount} updated`);
+      if (insertCount > 0) messages.push(`${insertCount} added`);
+      
+      toast.success(`Successfully processed ${defaultType === 'business_opportunity' ? 'opportunities' : 'programs/services'}: ${messages.join(', ')}`);
       clearPreview();
       onUploadComplete?.();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error importing resources:', error);
-      toast.error('Failed to import resources. Please try again.');
+      toast.error(error.message || 'Failed to import resources. Please try again.');
     } finally {
       setUploading(false);
     }
@@ -194,7 +246,9 @@ const ResourceCSVUpload = ({ onUploadComplete, defaultType = 'resource' }: Resou
             <AlertDescription>
               <strong>Required columns:</strong> organization_name, description, categories (comma-separated)
               <br />
-              <strong>Optional columns:</strong> website, email, phone, address, type
+              <strong>Optional columns:</strong> id (for updates), website, email, phone, address, type
+              <br />
+              <strong>Note:</strong> If you include an 'id' column, existing resources will be updated. Otherwise, new resources will be added.
             </AlertDescription>
           </Alert>
 
