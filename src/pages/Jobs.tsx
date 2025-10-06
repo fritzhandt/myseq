@@ -40,6 +40,7 @@ export default function Jobs() {
   const [currentPage, setCurrentPage] = useState(1);
   const [activeTab, setActiveTab] = useState('government');
   const [governmentFilter, setGovernmentFilter] = useState<'all' | 'city' | 'state'>('all');
+  const [privateSectorFilter, setPrivateSectorFilter] = useState<'all' | 'open_positions' | 'internships'>('all');
   const itemsPerPage = 10;
   const location = useLocation();
   const navigate = useNavigate();
@@ -91,7 +92,7 @@ export default function Jobs() {
     if (jobs.length > 0) {
       applyFilters();
     }
-  }, [jobs, searchQuery, locationFilter, employerFilter, activeTab, governmentFilter]);
+  }, [jobs, searchQuery, locationFilter, employerFilter, activeTab, governmentFilter, privateSectorFilter]);
 
   const fetchJobs = async () => {
     try {
@@ -124,6 +125,14 @@ export default function Jobs() {
       });
     }
 
+    // If in private sector tab, apply private sector filter (open_positions/internships)
+    if (activeTab === 'private_sector' && privateSectorFilter !== 'all') {
+      filtered = filtered.filter(job => {
+        const subcategory = (job as any).subcategory || 'open_positions';
+        return subcategory === privateSectorFilter;
+      });
+    }
+
     // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
@@ -151,7 +160,7 @@ export default function Jobs() {
 
     setFilteredJobs(filtered);
     setCurrentPage(1);
-  }, [jobs, searchQuery, locationFilter, employerFilter, activeTab, governmentFilter]);
+  }, [jobs, searchQuery, locationFilter, employerFilter, activeTab, governmentFilter, privateSectorFilter]);
 
   const handleManualSearch = useCallback(() => {
     applyFilters();
@@ -168,6 +177,7 @@ export default function Jobs() {
     setLocationFilter('all');
     setEmployerFilter('all');
     setGovernmentFilter('all');
+    setPrivateSectorFilter('all');
     // Auto-apply filters after clearing
     setTimeout(() => {
       applyFilters();
@@ -375,6 +385,36 @@ export default function Jobs() {
               <CardContent className="p-6">
                  {/* Always visible: Job Title Search */}
                  <div className="space-y-4">
+                    {/* Private Sector Type Filter */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        Job Type
+                      </label>
+                      <div className="flex gap-2">
+                        <Button
+                          variant={privateSectorFilter === 'all' ? 'default' : 'outline'}
+                          onClick={() => setPrivateSectorFilter('all')}
+                          className="flex-1"
+                        >
+                          All
+                        </Button>
+                        <Button
+                          variant={privateSectorFilter === 'open_positions' ? 'default' : 'outline'}
+                          onClick={() => setPrivateSectorFilter('open_positions')}
+                          className="flex-1"
+                        >
+                          Open Positions
+                        </Button>
+                        <Button
+                          variant={privateSectorFilter === 'internships' ? 'default' : 'outline'}
+                          onClick={() => setPrivateSectorFilter('internships')}
+                          className="flex-1"
+                        >
+                          Internships
+                        </Button>
+                      </div>
+                    </div>
+
                     <div className="space-y-2">
                       <label className="text-sm font-medium flex items-center gap-2">
                         <Briefcase className="h-4 w-4" />
