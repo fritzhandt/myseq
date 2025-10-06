@@ -10,6 +10,7 @@ import UserPagination from "@/components/UserPagination";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useAnalytics } from "@/hooks/useAnalytics";
+import { translateSearchQuery } from "@/utils/translateSearch";
 
 interface Resource {
   id: string;
@@ -111,7 +112,7 @@ export default function Resources() {
     }
   };
 
-  const filterResources = () => {
+  const filterResources = async () => {
     let filtered = resources;
 
     // Filter by category
@@ -121,14 +122,36 @@ export default function Resources() {
       );
     }
 
-    // Filter by search query
+    // Filter by search query with translation
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(resource =>
-        resource.organization_name.toLowerCase().includes(query) ||
-        resource.description.toLowerCase().includes(query) ||
-        resource.categories.some(category => category.toLowerCase().includes(query))
-      );
+      setLoading(true);
+      try {
+        // Translate the query to English if needed
+        const searchTerms = await translateSearchQuery(searchQuery);
+        
+        filtered = filtered.filter(resource => {
+          // Check against all search terms (original + translated)
+          return searchTerms.some(term => {
+            const query = term.toLowerCase();
+            return (
+              resource.organization_name.toLowerCase().includes(query) ||
+              resource.description.toLowerCase().includes(query) ||
+              resource.categories.some(category => category.toLowerCase().includes(query))
+            );
+          });
+        });
+      } catch (error) {
+        console.error('Translation error:', error);
+        // Fallback to original search if translation fails
+        const query = searchQuery.toLowerCase();
+        filtered = filtered.filter(resource =>
+          resource.organization_name.toLowerCase().includes(query) ||
+          resource.description.toLowerCase().includes(query) ||
+          resource.categories.some(category => category.toLowerCase().includes(query))
+        );
+      } finally {
+        setLoading(false);
+      }
     }
 
     setFilteredResources(filtered);

@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Briefcase, MapPin, Building, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { translateSearchQuery } from '@/utils/translateSearch';
 
 interface Job {
   id: string;
@@ -109,7 +110,7 @@ export default function Jobs() {
     }
   };
 
-  const applyFilters = useCallback(() => {
+  const applyFilters = useCallback(async () => {
     let filtered = [...jobs];
 
     // Filter by category (government/private_sector)
@@ -124,15 +125,38 @@ export default function Jobs() {
       });
     }
 
-    // Filter by search query
+    // Filter by search query with translation
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(job =>
-        job.title.toLowerCase().includes(query) ||
-        job.description.toLowerCase().includes(query) ||
-        job.employer.toLowerCase().includes(query) ||
-        job.location.toLowerCase().includes(query)
-      );
+      setIsSearching(true);
+      try {
+        // Translate the query to English if needed
+        const searchTerms = await translateSearchQuery(searchQuery);
+        
+        filtered = filtered.filter(job => {
+          // Check against all search terms (original + translated)
+          return searchTerms.some(term => {
+            const query = term.toLowerCase();
+            return (
+              job.title.toLowerCase().includes(query) ||
+              job.description.toLowerCase().includes(query) ||
+              job.employer.toLowerCase().includes(query) ||
+              job.location.toLowerCase().includes(query)
+            );
+          });
+        });
+      } catch (error) {
+        console.error('Translation error:', error);
+        // Fallback to original search if translation fails
+        const query = searchQuery.toLowerCase();
+        filtered = filtered.filter(job =>
+          job.title.toLowerCase().includes(query) ||
+          job.description.toLowerCase().includes(query) ||
+          job.employer.toLowerCase().includes(query) ||
+          job.location.toLowerCase().includes(query)
+        );
+      } finally {
+        setIsSearching(false);
+      }
     }
 
     // Filter by location
