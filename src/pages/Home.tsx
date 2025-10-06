@@ -7,7 +7,7 @@ import SearchBar from '@/components/SearchBar';
 import Navbar from '@/components/Navbar';
 import CommunityAlertBanner from '@/components/CommunityAlertBanner';
 import UserPagination from '@/components/UserPagination';
-import { TranslatedText } from '@/components/TranslatedText';
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -17,7 +17,6 @@ import EventCard3D from '@/components/3d/EventCard3D';
 import HeroBackground3D from '@/components/3d/HeroBackground3D';
 import LoadingSpinner3D from '@/components/3d/LoadingSpinner3D';
 import { useAnalytics } from '@/hooks/useAnalytics';
-import { useTranslation } from '@/contexts/TranslationContext';
 
 interface Event {
   id: string;
@@ -67,12 +66,11 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { trackPageView } = useAnalytics();
-  const { currentLanguage } = useTranslation();
 
   // Track page view
   useEffect(() => {
-    trackPageView('/home', undefined, currentLanguage);
-  }, []);
+    trackPageView('/home');
+  }, [trackPageView]);
 
   // Handle AI navigation state
   useEffect(() => {

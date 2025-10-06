@@ -15,9 +15,7 @@ import PDFViewer from "@/components/PDFViewer";
 import AnnouncementDialog from "@/components/AnnouncementDialog";
 import { EventCard } from "@/components/EventCard";
 import PhotoViewer from "@/components/PhotoViewer";
-import { TranslatedText } from "@/components/TranslatedText";
 import { useAnalytics } from "@/hooks/useAnalytics";
-import { useTranslation } from "@/contexts/TranslationContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface CivicOrganization {
@@ -76,7 +74,6 @@ const CivicDetail = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { trackPageView, trackTabView, trackContentClick } = useAnalytics();
-  const { currentLanguage } = useTranslation();
   const isMobile = useIsMobile();
   
   const [organization, setOrganization] = useState<CivicOrganization | null>(null);
@@ -103,10 +100,10 @@ const CivicDetail = () => {
   // Track page view on mount
   useEffect(() => {
     if (orgId) {
-      trackPageView(`/civics/${orgId}`, orgId, currentLanguage);
+      trackPageView(`/civics/${orgId}`, orgId);
       fetchOrganizationData();
     }
-  }, [orgId]);
+  }, [orgId, trackPageView]);
 
   // Track tab changes
   useEffect(() => {
