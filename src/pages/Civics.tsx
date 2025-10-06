@@ -10,7 +10,6 @@ import Navbar from "@/components/Navbar";
 import AdminPagination from "@/components/AdminPagination";
 import { Users, MapPin, Search, Vote, ExternalLink, Phone, ArrowLeft, Building2, Shield, Globe } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { TranslatedText } from "@/components/TranslatedText";
 
 interface CivicOrganization {
   id: string;
@@ -130,7 +129,7 @@ const Civics = () => {
             className="flex items-center text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            <TranslatedText contentKey="civics.back_to_menu" originalText="Back to Main Menu" />
+            Back to Main Menu
           </Button>
         </div>
       </div>
@@ -139,18 +138,12 @@ const Civics = () => {
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
-            <TranslatedText 
-              contentKey="civics.title" 
-              originalText="Civic Organizations"
-              as="h1"
-              className="text-4xl font-bold mb-4 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent"
-            />
-            <TranslatedText 
-              contentKey="civics.description" 
-              originalText="Connect with local civic organizations in Southeast Queens. Find meeting information, announcements, and ways to get involved in your community."
-              as="p"
-              className="text-lg text-muted-foreground max-w-2xl mx-auto"
-            />
+            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+              Civic Organizations
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Connect with local civic organizations in Southeast Queens. Find meeting information, announcements, and ways to get involved in your community.
+            </p>
           </div>
 
           {/* Tabs for Organization Type */}
@@ -207,18 +200,12 @@ const Civics = () => {
             ) : filteredOrgs.length === 0 ? (
               <div className="col-span-full text-center py-12">
                 <Vote className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                <TranslatedText 
-                  contentKey={searchQuery ? "civics.no_results" : "civics.no_orgs"}
-                  originalText={searchQuery ? "No organizations found" : "No organizations yet"}
-                  as="h3"
-                  className="text-xl font-semibold mb-2"
-                />
-                <TranslatedText 
-                  contentKey={searchQuery ? "civics.adjust_search" : "civics.check_back"}
-                  originalText={searchQuery ? "Try adjusting your search terms" : "Check back later for civic organizations in your area"}
-                  as="p"
-                  className="text-muted-foreground"
-                />
+                <h3 className="text-xl font-semibold mb-2">
+                  {searchQuery ? "No organizations found" : "No organizations yet"}
+                </h3>
+                <p className="text-muted-foreground">
+                  {searchQuery ? "Try adjusting your search terms" : "Check back later for civic organizations in your area"}
+                </p>
               </div>
             ) : (
               paginatedOrgs.map((org) => (
@@ -240,18 +227,12 @@ const Civics = () => {
                     <div className="flex items-start gap-2">
                       <MapPin className="h-4 w-4 mt-0.5 text-green-600 flex-shrink-0" />
                       <div>
-                        <TranslatedText 
-                          contentKey="civics.coverage_area_label" 
-                          originalText="Coverage Area"
-                          as="p"
-                          className="text-sm font-medium"
-                        />
-                        <TranslatedText 
-                          contentKey={`civics.org_${org.id}_coverage`}
-                          originalText={org.coverage_area}
-                          as="p"
-                          className="text-sm text-muted-foreground"
-                        />
+                        <p className="text-sm font-medium">
+                          Coverage Area
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {org.coverage_area}
+                        </p>
                       </div>
                     </div>
                     
@@ -260,18 +241,12 @@ const Civics = () => {
                       <div className="flex items-start gap-2">
                         <Users className="h-4 w-4 mt-0.5 text-blue-600 flex-shrink-0" />
                         <div>
-                          <TranslatedText 
-                            contentKey="civics.meetings_label" 
-                            originalText="Meetings"
-                            as="p"
-                            className="text-sm font-medium"
-                          />
-                          <TranslatedText 
-                            contentKey={`civics.org_${org.id}_meeting`}
-                            originalText={org.meeting_info}
-                            as="p"
-                            className="text-sm text-muted-foreground"
-                          />
+                          <p className="text-sm font-medium">
+                            Meetings
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {org.meeting_info}
+                          </p>
                         </div>
                       </div>
                     )}
@@ -281,12 +256,9 @@ const Civics = () => {
                       <div className="flex items-start gap-2">
                         <Phone className="h-4 w-4 mt-0.5 text-purple-600 flex-shrink-0" />
                         <div>
-                          <TranslatedText 
-                            contentKey="civics.phone_label" 
-                            originalText="Phone"
-                            as="p"
-                            className="text-sm font-medium"
-                          />
+                          <p className="text-sm font-medium">
+                            Phone
+                          </p>
                           <p className="text-sm text-muted-foreground">{org.contact_info.phone}</p>
                         </div>
                       </div>
@@ -297,12 +269,9 @@ const Civics = () => {
                       <div className="flex items-start gap-2">
                         <Globe className="h-4 w-4 mt-0.5 text-orange-600 flex-shrink-0" />
                         <div>
-                          <TranslatedText 
-                            contentKey="civics.website_label" 
-                            originalText="Website"
-                            as="p"
-                            className="text-sm font-medium"
-                          />
+                          <p className="text-sm font-medium">
+                            Website
+                          </p>
                           <a 
                             href={org.contact_info.website}
                             target="_blank"
@@ -323,7 +292,7 @@ const Civics = () => {
                       variant="outline"
                       onClick={() => handleOrgClick(org.id)}
                     >
-                      <TranslatedText contentKey="civics.view_page" originalText="View Page" />
+                      View Page
                     </Button>
                   </CardContent>
                 </Card>
@@ -346,19 +315,16 @@ const Civics = () => {
 
           {/* Admin Access */}
           <div className="text-center mt-12 pt-8 border-t">
-            <TranslatedText 
-              contentKey="civics.org_join_prompt" 
-              originalText="Are you a civic organization looking to join our platform?"
-              as="p"
-              className="text-muted-foreground mb-4"
-            />
+            <p className="text-muted-foreground mb-4">
+              Are you a civic organization looking to join our platform?
+            </p>
             <Button 
               variant="outline" 
               onClick={() => navigate('/civic-auth')}
               className="hover:bg-green-50 hover:border-green-500 hover:text-green-600"
             >
               <Vote className="mr-2 h-4 w-4" />
-              <TranslatedText contentKey="civics.org_access" originalText="Organization Access" />
+              Organization Access
             </Button>
           </div>
         </div>

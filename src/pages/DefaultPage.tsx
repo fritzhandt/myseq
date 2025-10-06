@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Navbar from "@/components/Navbar";
 import CommunityAlertBanner from "@/components/CommunityAlertBanner";
 import AISearchBar from "@/components/AISearchBar";
-import { TranslatedText } from "@/components/TranslatedText";
 import { useNavbar } from "@/contexts/NavbarContext";
 import { Calendar, Users, Briefcase, ArrowRight, MapPin, Heart, HelpCircle, Building2, Landmark, Zap, Info } from "lucide-react";
 
@@ -29,21 +28,21 @@ export default function DefaultPage() {
             <div className="max-w-4xl mx-auto">
               <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full text-primary font-medium mb-6">
                 <MapPin className="h-4 w-4" />
-                <TranslatedText contentKey="location-tag" originalText="Southeast Queens, NYC" />
+                Southeast Queens, NYC
               </div>
               
               <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent font-oswald uppercase tracking-tight">
-                <TranslatedText contentKey="hero-title-main" originalText="SOUTHEAST QUEENS INFORMATION CENTER" />
+                SOUTHEAST QUEENS INFORMATION CENTER
               </h1>
               
               <p className="text-base md:text-2xl text-muted-foreground mb-4 max-w-2xl mx-auto leading-tight md:leading-relaxed">
-                <TranslatedText contentKey="hero-description" originalText="Discover organizations, programs, resources, jobs, business opportunities, youth services, senior services, and more" />
+                Discover organizations, programs, resources, jobs, business opportunities, youth services, senior services, and more
               </p>
               
               <div className="inline-flex items-center gap-2 bg-yellow-500/10 px-4 py-1.5 rounded-full border border-yellow-500/30">
                 <Zap className="h-3 w-3 text-yellow-600" />
                 <span className="text-xs font-semibold text-yellow-600 uppercase tracking-wider">
-                  <TranslatedText contentKey="hero-powered-by" originalText="Powered by AI" />
+                  Powered by AI
                 </span>
               </div>
             </div>
@@ -70,10 +69,10 @@ export default function DefaultPage() {
                     <Landmark className="h-8 w-8 text-white" />
                   </div>
                   <CardTitle className="text-2xl mb-2 group-hover:text-green-600 transition-colors duration-300">
-                    <TranslatedText contentKey="civics-card-title" originalText="Civic Organizations" />
+                    Civic Organizations
                   </CardTitle>
                   <CardDescription className="text-base leading-relaxed">
-                    <TranslatedText contentKey="civics-card-description" originalText="Connect with local civic organizations in your community. Find meeting information, announcements, and ways to get involved in local governance." />
+                    Connect with local civic organizations in your community. Find meeting information, announcements, and ways to get involved in local governance.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="relative z-10 mt-auto">
@@ -82,7 +81,7 @@ export default function DefaultPage() {
                     variant="outline"
                     onClick={() => window.location.href = '/civics'}
                   >
-                    <TranslatedText contentKey="browse-civics-btn" originalText="Browse Civics" />
+                    Browse Civics
                     <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                   </Button>
                 </CardContent>
@@ -104,10 +103,10 @@ export default function DefaultPage() {
                     <Users className="h-8 w-8 text-white" />
                   </div>
                   <CardTitle className="text-2xl mb-2 group-hover:text-primary transition-colors duration-300">
-                    <TranslatedText contentKey="resources-card-title" originalText="Programs & Services" />
+                    Programs & Services
                   </CardTitle>
                   <CardDescription className="text-base leading-relaxed">
-                    <TranslatedText contentKey="resources-card-description" originalText="Local organizations, services, and support networks for our community" />
+                    Local organizations, services, and support networks for our community
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="relative z-10 mt-auto">
@@ -116,7 +115,7 @@ export default function DefaultPage() {
                     variant="outline"
                     onClick={() => window.location.href = '/resources'}
                   >
-                    <TranslatedText contentKey="browse-resources-btn" originalText="Browse Resources" />
+                    Browse Resources
                     <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                   </Button>
                 </CardContent>
@@ -130,10 +129,10 @@ export default function DefaultPage() {
                     <Building2 className="h-8 w-8 text-white" />
                   </div>
                   <CardTitle className="text-2xl mb-2 group-hover:text-accent transition-colors duration-300">
-                    <TranslatedText contentKey="business-card-title" originalText="Business Opportunities" />
+                    Business Opportunities
                   </CardTitle>
                   <CardDescription className="text-base leading-relaxed">
-                    <TranslatedText contentKey="business-card-description" originalText="Entrepreneurship resources and business development opportunities" />
+                    Entrepreneurship resources and business development opportunities
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="relative z-10 mt-auto">
@@ -142,7 +141,7 @@ export default function DefaultPage() {
                     variant="outline"
                     onClick={() => window.location.href = '/business-opportunities'}
                   >
-                    <TranslatedText contentKey="explore-business-btn" originalText="Explore Opportunities" />
+                    Explore Opportunities
                     <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                   </Button>
                 </CardContent>
@@ -156,10 +155,10 @@ export default function DefaultPage() {
                     <Briefcase className="h-8 w-8 text-white" />
                   </div>
                   <CardTitle className="text-2xl mb-2 group-hover:text-accent transition-colors duration-300">
-                    <TranslatedText contentKey="jobs-card-title" originalText="Career Opportunities" />
+                    Career Opportunities
                   </CardTitle>
                   <CardDescription className="text-base leading-relaxed">
-                    <TranslatedText contentKey="jobs-card-description" originalText="Employment opportunities and career development resources locally" />
+                    Employment opportunities and career development resources locally
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="relative z-10 mt-auto">
@@ -168,7 +167,7 @@ export default function DefaultPage() {
                     variant="outline"
                     onClick={() => window.location.href = '/jobs'}
                   >
-                    <TranslatedText contentKey="find-opportunities-btn" originalText="Find Opportunities" />
+                    Find Opportunities
                     <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                   </Button>
                 </CardContent>
@@ -182,10 +181,10 @@ export default function DefaultPage() {
                     <Info className="h-8 w-8 text-white" />
                   </div>
                   <CardTitle className="text-2xl mb-2 group-hover:text-blue-600 transition-colors duration-300">
-                    <TranslatedText contentKey="more-info-card-title" originalText="More Information" />
+                    More Information
                   </CardTitle>
                   <CardDescription className="text-base leading-relaxed">
-                    <TranslatedText contentKey="more-info-card-description" originalText="Get information on your elected officials, police precincts, and more!" />
+                    Get information on your elected officials, police precincts, and more!
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="relative z-10 mt-auto">
@@ -193,7 +192,7 @@ export default function DefaultPage() {
                     className="w-full group-hover:bg-blue-600 group-hover:text-white transition-all duration-300" 
                     variant="outline"
                   >
-                    <TranslatedText contentKey="explore-more-btn" originalText="Explore More" />
+                    Explore More
                     <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                   </Button>
                 </CardContent>
@@ -206,10 +205,10 @@ export default function DefaultPage() {
         <section className="py-20 px-4 text-center">
           <div className="container mx-auto max-w-4xl">
             <h2 className="text-3xl md:text-4xl font-bold mb-6 font-oswald uppercase tracking-wide">
-              <TranslatedText contentKey="cta-title" originalText="Questions? Contact Your Elected Officials" />
+              Questions? Contact Your Elected Officials
             </h2>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              <TranslatedText contentKey="cta-description" originalText="Have concerns about community issues or need assistance with local services? Reach out to your elected representatives who can help address your needs and advocate for our community." />
+              Have concerns about community issues or need assistance with local services? Reach out to your elected representatives who can help address your needs and advocate for our community.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
@@ -217,7 +216,7 @@ export default function DefaultPage() {
                 className="bg-gradient-to-r from-primary to-blue-300 hover:from-primary/90 hover:to-blue-400 text-white px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
                 onClick={() => window.location.href = '/contact-elected'}
               >
-                <TranslatedText contentKey="contact-elected-btn" originalText="Contact Your Elected" />
+                Contact Your Elected
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </div>

@@ -7,7 +7,6 @@ import { ArrowLeft, Phone, Mail, MapPin, User, ChevronDown, ChevronUp, ExternalL
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import Navbar from '@/components/Navbar';
-import { TranslatedText } from '@/components/TranslatedText';
 
 interface ElectedOfficial {
   id: string;
@@ -167,10 +166,7 @@ const ContactElected = () => {
             <div className="max-w-6xl mx-auto">
               <div className="flex items-center justify-center py-12">
                 <div className="text-muted-foreground">
-                  <TranslatedText 
-                    contentKey="contact_elected.loading"
-                    originalText="Loading elected officials..."
-                  />
+                  Loading elected officials...
                 </div>
               </div>
             </div>
@@ -192,34 +188,22 @@ const ContactElected = () => {
               className="mb-6"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              <TranslatedText 
-                contentKey="contact_elected.back_to_home"
-                originalText="Back to Home"
-              />
+              Back to Home
             </Button>
             
             <div className="text-center mb-12">
-              <TranslatedText 
-                contentKey="contact_elected.title"
-                originalText="Contact Your Elected Officials"
-                as="h1"
-                className="text-4xl font-bold mb-6"
-              />
-              <TranslatedText 
-                contentKey="contact_elected.subtitle"
-                originalText="Facing a federal, state, or city issue? Want to voice your concerns? Contact your elected representative and get help immediately."
-                as="p"
-                className="text-lg text-muted-foreground max-w-3xl mx-auto mb-6"
-              />
+              <h1 className="text-4xl font-bold mb-6">
+                Contact Your Elected Officials
+              </h1>
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-6">
+                Facing a federal, state, or city issue? Want to voice your concerns? Contact your elected representative and get help immediately.
+              </p>
               <Button
                 onClick={() => navigate('/my-elected-lookup')}
                 className="bg-primary hover:bg-primary/90 text-white px-6 py-3"
               >
                 <User className="mr-2 h-4 w-4" />
-                <TranslatedText 
-                  contentKey="contact_elected.find_representatives"
-                  originalText="Find My Specific Representatives"
-                />
+                Find My Specific Representatives
               </Button>
             </div>
 
@@ -231,10 +215,7 @@ const ContactElected = () => {
                     <CardHeader className="cursor-pointer hover:bg-muted/30 transition-colors">
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-xl">
-                          <TranslatedText 
-                            contentKey="contact_elected.who_should_i_contact"
-                            originalText="Who should I contact?"
-                          />
+                          Who should I contact?
                         </CardTitle>
                         {guidanceOpen ? (
                           <ChevronUp className="w-5 h-5 text-primary" />
@@ -247,26 +228,14 @@ const ContactElected = () => {
                   <CollapsibleContent>
                     <CardContent className="space-y-4">
                       <p className="text-muted-foreground">
-                        <TranslatedText 
-                          contentKey="contact_elected.guidance_text_1"
-                          originalText="Most day-to-day problems are handled locally, so we recommend reaching out to your local elected officials first. If it turns out you need federal help, your local offices will point you in the right direction."
-                        />
+                        Most day-to-day problems are handled locally, so we recommend reaching out to your local elected officials first. If it turns out you need federal help, your local offices will point you in the right direction.
                       </p>
                       <p className="text-muted-foreground">
-                        <TranslatedText 
-                          contentKey="contact_elected.guidance_text_2"
-                          originalText="For emergencies, dial 911. For non-emergency and other police related matters, please use the"
-                        />{' '}
+                        For emergencies, dial 911. For non-emergency and other police related matters, please use the{' '}
                         <Link to="/police-precincts" className="text-primary hover:underline font-medium">
-                          <TranslatedText 
-                            contentKey="contact_elected.police_precincts_link"
-                            originalText="Police Precincts"
-                          />
+                          Police Precincts
                         </Link>{' '}
-                        <TranslatedText 
-                          contentKey="contact_elected.guidance_text_3"
-                          originalText="page for more information."
-                        />
+                        page for more information.
                       </p>
                     </CardContent>
                   </CollapsibleContent>
@@ -292,12 +261,9 @@ const ContactElected = () => {
 
                       {/* Mobile Layout - Collapsible Cards */}
                       <div className="md:hidden">
-                        <TranslatedText 
-                          contentKey="contact_elected.mobile_instruction"
-                          originalText="Click a name to view their contact information"
-                          as="p"
-                          className="text-sm text-muted-foreground text-center mb-4"
-                        />
+                        <p className="text-sm text-muted-foreground text-center mb-4">
+                          Click a name to view their contact information
+                        </p>
                         <div className="space-y-4">
                           {categoryOfficials.map((official) => (
                             <Collapsible
@@ -340,7 +306,7 @@ const ContactElected = () => {
                                          <Phone className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
                                          <div>
                                            <p className="text-sm font-medium">
-                                             <TranslatedText contentKey="contact_elected.phone" originalText="Phone" />
+                                             Phone
                                            </p>
                                            <a 
                                              href={`tel:${official.phone}`}
@@ -357,7 +323,7 @@ const ContactElected = () => {
                                          <Mail className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
                                          <div>
                                            <p className="text-sm font-medium">
-                                             <TranslatedText contentKey="contact_elected.email" originalText="Email" />
+                                             Email
                                            </p>
                                            <a 
                                              href={`mailto:${official.email}`}
@@ -374,7 +340,7 @@ const ContactElected = () => {
                                          <MapPin className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
                                          <div>
                                            <p className="text-sm font-medium">
-                                             <TranslatedText contentKey="contact_elected.office_address" originalText="Office Address" />
+                                             Office Address
                                            </p>
                                            <p className="text-sm text-muted-foreground">
                                              {official.office_address}
@@ -388,7 +354,7 @@ const ContactElected = () => {
                                           <ExternalLink className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
                                           <div>
                                             <p className="text-sm font-medium">
-                                              <TranslatedText contentKey="contact_elected.website" originalText="Website" />
+                                              Website
                                             </p>
                                             <a 
                                               href={`https://${official.website}`}
@@ -437,7 +403,7 @@ const ContactElected = () => {
                                    <Phone className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
                                    <div>
                                      <p className="text-sm font-medium">
-                                       <TranslatedText contentKey="contact_elected.phone" originalText="Phone" />
+                                       Phone
                                      </p>
                                      <a 
                                        href={`tel:${official.phone}`}
@@ -454,7 +420,7 @@ const ContactElected = () => {
                                    <Mail className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
                                    <div>
                                      <p className="text-sm font-medium">
-                                       <TranslatedText contentKey="contact_elected.email" originalText="Email" />
+                                       Email
                                      </p>
                                      <a 
                                        href={`mailto:${official.email}`}
@@ -471,7 +437,7 @@ const ContactElected = () => {
                                    <MapPin className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
                                    <div>
                                      <p className="text-sm font-medium">
-                                       <TranslatedText contentKey="contact_elected.office_address" originalText="Office Address" />
+                                       Office Address
                                      </p>
                                      <p className="text-sm text-muted-foreground">
                                        {official.office_address}
@@ -485,7 +451,7 @@ const ContactElected = () => {
                                    <ExternalLink className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
                                    <div>
                                      <p className="text-sm font-medium">
-                                       <TranslatedText contentKey="contact_elected.website" originalText="Website" />
+                                       Website
                                      </p>
                                     <a 
                                       href={`https://${official.website}`}
@@ -509,64 +475,41 @@ const ContactElected = () => {
             })}
 
             <div className="mt-12 bg-muted p-8 rounded-lg">
-              <TranslatedText 
-                contentKey="contact_elected.tips_title"
-                originalText="Tips for Contacting Your Representatives"
-                as="h2"
-                className="text-2xl font-semibold mb-4"
-              />
+              <h2 className="text-2xl font-semibold mb-4">
+                Tips for Contacting Your Representatives
+              </h2>
               <div className="grid md:grid-cols-2 gap-6 text-sm text-muted-foreground">
                 <div>
-                  <TranslatedText 
-                    contentKey="contact_elected.tip1_title"
-                    originalText="Be Clear and Concise"
-                    as="h3"
-                    className="font-medium text-foreground mb-2"
-                  />
-                  <TranslatedText 
-                    contentKey="contact_elected.tip1_desc"
-                    originalText="State your position clearly and include specific details about how the issue affects you and your community."
-                    as="p"
-                  />
+                  <h3 className="font-medium text-foreground mb-2">
+                    Be Clear and Concise
+                  </h3>
+                  <p>
+                    State your position clearly and include specific details about how the issue affects you and your community.
+                  </p>
                 </div>
                 <div>
-                  <TranslatedText 
-                    contentKey="contact_elected.tip2_title"
-                    originalText="Include Your Address"
-                    as="h3"
-                    className="font-medium text-foreground mb-2"
-                  />
-                  <TranslatedText 
-                    contentKey="contact_elected.tip2_desc"
-                    originalText="Always include your full address to verify you're a constituent in their district."
-                    as="p"
-                  />
+                  <h3 className="font-medium text-foreground mb-2">
+                    Include Your Address
+                  </h3>
+                  <p>
+                    Always include your full address to verify you're a constituent in their district.
+                  </p>
                 </div>
                 <div>
-                  <TranslatedText 
-                    contentKey="contact_elected.tip3_title"
-                    originalText="Follow Up"
-                    as="h3"
-                    className="font-medium text-foreground mb-2"
-                  />
-                  <TranslatedText 
-                    contentKey="contact_elected.tip3_desc"
-                    originalText="If you don't receive a response within 2-3 weeks, it's appropriate to follow up politely."
-                    as="p"
-                  />
+                  <h3 className="font-medium text-foreground mb-2">
+                    Follow Up
+                  </h3>
+                  <p>
+                    If you don't receive a response within 2-3 weeks, it's appropriate to follow up politely.
+                  </p>
                 </div>
                 <div>
-                  <TranslatedText 
-                    contentKey="contact_elected.tip4_title"
-                    originalText="Be Respectful"
-                    as="h3"
-                    className="font-medium text-foreground mb-2"
-                  />
-                  <TranslatedText 
-                    contentKey="contact_elected.tip4_desc"
-                    originalText="Maintain a professional and respectful tone, even when discussing contentious issues."
-                    as="p"
-                  />
+                  <h3 className="font-medium text-foreground mb-2">
+                    Be Respectful
+                  </h3>
+                  <p>
+                    Maintain a professional and respectful tone, even when discussing contentious issues.
+                  </p>
                 </div>
               </div>
             </div>

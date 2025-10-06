@@ -8,9 +8,7 @@ import ResourceCard from "@/components/ResourceCard";
 import UserPagination from "@/components/UserPagination";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { TranslatedText } from "@/components/TranslatedText";
 import { useAnalytics } from "@/hooks/useAnalytics";
-import { useTranslation } from "@/contexts/TranslationContext";
 
 interface BusinessOpportunity {
   id: string;
@@ -36,12 +34,11 @@ export default function BusinessOpportunities() {
   const location = useLocation();
   const navigate = useNavigate();
   const { trackPageView } = useAnalytics();
-  const { currentLanguage } = useTranslation();
 
   // Track page view
   useEffect(() => {
-    trackPageView('/business-opportunities', undefined, currentLanguage);
-  }, []);
+    trackPageView('/business-opportunities');
+  }, [trackPageView]);
 
   // Handle AI navigation state 
   useEffect(() => {
@@ -134,7 +131,7 @@ export default function BusinessOpportunities() {
             className="flex items-center text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            <TranslatedText contentKey="business-back-btn" originalText="Back to Main Menu" />
+            Back to Main Menu
           </Button>
         </div>
       </div>
@@ -143,13 +140,10 @@ export default function BusinessOpportunities() {
         <div className="text-center mb-8">
           <div className="flex-1">
             <h1 className="text-4xl font-bold mb-4">
-              <TranslatedText contentKey="business-title" originalText="Business Opportunities" />
+              Business Opportunities
             </h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              <TranslatedText 
-                contentKey="business-subtitle" 
-                originalText="Explore business opportunities and entrepreneurship resources in your community" 
-              />
+              Explore business opportunities and entrepreneurship resources in your community
             </p>
           </div>
         </div>
@@ -172,17 +166,11 @@ export default function BusinessOpportunities() {
               disabled={loading}
               className="shrink-0 px-6"
             >
-              <TranslatedText 
-                contentKey="business-search-btn" 
-                originalText={loading ? 'Searching...' : 'Search'} 
-              />
+              {loading ? 'Searching...' : 'Search'}
             </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-2 text-center">
-            <TranslatedText 
-              contentKey="business-search-hint" 
-              originalText="Search finds relevant opportunities. Press Enter or click Search." 
-            />
+            Search finds relevant opportunities. Press Enter or click Search.
           </p>
         </div>
 
@@ -190,13 +178,13 @@ export default function BusinessOpportunities() {
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-muted-foreground">
-              <TranslatedText contentKey="business-loading" originalText="Loading business opportunities..." />
+              Loading business opportunities...
             </div>
           </div>
         ) : filteredOpportunities.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground text-lg">
-              <TranslatedText contentKey="business-no-results" originalText="No business opportunities found." />
+              No business opportunities found.
             </p>
             {searchQuery && (
               <Button
@@ -204,7 +192,7 @@ export default function BusinessOpportunities() {
                 onClick={() => setSearchQuery("")}
                 className="mt-4"
               >
-                <TranslatedText contentKey="business-clear-filters" originalText="Clear Search" />
+                Clear Search
               </Button>
             )}
           </div>
