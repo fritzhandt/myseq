@@ -35,7 +35,7 @@ const MyElectedLookup = () => {
       title: "Councilmember",
       description: "Find your New York City Council representative", 
       url: "https://council.nyc.gov/districts/",
-      icon: null
+      icon: <img src="/nyc-council-seal.jpg" alt="NYC Council Seal" className="w-12 h-12 object-contain" />
     },
     {
       title: "Congressperson",
