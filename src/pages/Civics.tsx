@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from "@/components/Navbar";
 import AdminPagination from "@/components/AdminPagination";
-import { Users, MapPin, Search, Vote, ExternalLink, Phone, ArrowLeft, Building2, Shield, Globe } from "lucide-react";
+import { Users, MapPin, Search, Vote, ExternalLink, Phone, Mail, ArrowLeft, Building2, Shield, Globe } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface CivicOrganization {
@@ -259,7 +259,32 @@ const Civics = () => {
                           <p className="text-sm font-medium">
                             Phone
                           </p>
-                          <p className="text-sm text-muted-foreground">{org.contact_info.phone}</p>
+                          <a 
+                            href={`tel:${org.contact_info.phone}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-sm text-muted-foreground hover:text-green-600"
+                          >
+                            {org.contact_info.phone}
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Email */}
+                    {org.contact_info?.email && (
+                      <div className="flex items-start gap-2">
+                        <Mail className="h-4 w-4 mt-0.5 text-pink-600 flex-shrink-0" />
+                        <div>
+                          <p className="text-sm font-medium">
+                            Email
+                          </p>
+                          <a 
+                            href={`mailto:${org.contact_info.email}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-sm text-muted-foreground hover:text-green-600 break-all"
+                          >
+                            {org.contact_info.email}
+                          </a>
                         </div>
                       </div>
                     )}
