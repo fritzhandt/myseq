@@ -272,7 +272,7 @@ export default function Resources() {
                 <Users className="h-5 w-5" />
                 <TranslatedText 
                   contentKey="category-community-resources" 
-                  originalText="Community Resources" 
+                  originalText="More Resource Categories" 
                 />
                 <ChevronDown className={`h-4 w-4 transition-transform ${showCommunitySubcategories ? 'rotate-180' : ''}`} />
               </Button>
