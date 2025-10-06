@@ -29,7 +29,7 @@ const MyElectedLookup = () => {
       title: "Senator", 
       description: "Find your New York State Senate representative",
       url: "https://www.nysenate.gov/find-my-senator",
-      icon: null
+      icon: <img src="/us-senate-seal.jpg" alt="US Senate Seal" className="w-12 h-12 object-contain" />
     },
     {
       title: "Councilmember",
