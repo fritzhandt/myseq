@@ -276,9 +276,17 @@ const ContactElected = () => {
                                   <CardHeader className="pb-4 cursor-pointer hover:bg-muted/30 transition-colors">
                                     <div className="flex items-center justify-between">
                                       <div className="flex items-center">
-                                        <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-3">
-                                          <User className="w-6 h-6 text-primary" />
-                                        </div>
+                                        {official.photo_url ? (
+                                          <img 
+                                            src={official.photo_url} 
+                                            alt={official.name}
+                                            className="w-12 h-12 rounded-full object-cover mr-3"
+                                          />
+                                        ) : (
+                                          <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                                            <User className="w-6 h-6 text-primary" />
+                                          </div>
+                                        )}
                                         <div className="text-left">
                                           <CardTitle className="text-lg">{official.name}</CardTitle>
                                           <p className="text-sm text-muted-foreground">{official.office}</p>
@@ -381,9 +389,17 @@ const ContactElected = () => {
                           <Card key={official.id} className="h-full">
                             <CardHeader className="pb-4">
                               <div className="flex items-center mb-2">
-                                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-3">
-                                  <User className="w-6 h-6 text-primary" />
-                                </div>
+                                {official.photo_url ? (
+                                  <img 
+                                    src={official.photo_url} 
+                                    alt={official.name}
+                                    className="w-12 h-12 rounded-full object-cover mr-3"
+                                  />
+                                ) : (
+                                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                                    <User className="w-6 h-6 text-primary" />
+                                  </div>
+                                )}
                                 <div>
                                   <CardTitle className="text-lg">{official.name}</CardTitle>
                                   <p className="text-sm text-muted-foreground">{official.office}</p>
