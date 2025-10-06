@@ -164,11 +164,20 @@ TOPICS THAT SHOULD NOT BE ROUTED (answer these in general query):
 JOB CATEGORIES (for /jobs page):
 - "government" → Government jobs (city and state)
 - "private_sector" → Private sector jobs
+- "internships" → Internship opportunities
 
 GOVERNMENT JOB TYPES (for /jobs page when category is "government"):
-- "city" → City government jobs
-- "state" → State government jobs
-- "all" → Both city and state government jobs
+- "city" → City government jobs only
+- "state" → State government jobs only
+- "all" → Both city and state government jobs (default if not specified)
+
+JOB SEARCH PARAMETERS:
+When routing to /jobs, extract and include these parameters when mentioned:
+- category: "government", "private_sector", or "internships"
+- governmentType: "all", "city", or "state" (only for government jobs)
+- searchTerm: specific job title or keywords (e.g., "teacher", "sanitation", "engineering")
+- location: specific location mentioned (e.g., "Queens", "Jamaica", "Rosedale")
+- employer: specific employer name (e.g., "Target", "Amazon", "NYC DOE")
 
 CIVIC ORGANIZATION TYPES (for /civics page):
 - "community_board" → Community Boards (CB), Community Board meetings, district boards
@@ -213,12 +222,22 @@ CIVIC & GOVERNMENT:
 ✓ "civic organization in rosedale" → /civics + organizationType:"civic_organization" + searchTerm:"rosedale"
 ✓ "police precinct council" → /civics + organizationType:"police_precinct_council"
 ✓ "precinct community council" → /civics + organizationType:"police_precinct_council"
+
+JOB ROUTING EXAMPLES:
 ✓ "government jobs" → /jobs + category:"government" + governmentType:"all"
 ✓ "city jobs" → /jobs + category:"government" + governmentType:"city"
 ✓ "state jobs" → /jobs + category:"government" + governmentType:"state"
-✓ "jobs at target" → /jobs + category:"private_sector" + employer:"target"
+✓ "city sanitation jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"sanitation"
+✓ "state teaching jobs" → /jobs + category:"government" + governmentType:"state" + searchTerm:"teaching"
+✓ "jobs at target" → /jobs + category:"private_sector" + employer:"Target"
 ✓ "private sector jobs" → /jobs + category:"private_sector"
-✓ "sanitation jobs" → /jobs + category:"government" + searchTerm:"sanitation"
+✓ "private jobs in jamaica" → /jobs + category:"private_sector" + location:"Jamaica"
+✓ "sanitation jobs" → /jobs + category:"government" + searchTerm:"sanitation" + governmentType:"all"
+✓ "teaching jobs in queens" → /jobs + searchTerm:"teaching" + location:"Queens"
+✓ "internships" → /jobs + category:"internships"
+✓ "summer internships" → /jobs + category:"internships" + searchTerm:"summer"
+✓ "engineering internship" → /jobs + category:"internships" + searchTerm:"engineering"
+✓ "city engineering jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"engineering"
 ✓ "who is my councilperson" → /my-elected-lookup
 ✓ "where can i learn tennis" → /resources + searchTerm:"tennis" + category:"sports"
 ✓ "tennis lessons" → /resources + searchTerm:"tennis" + category:"sports"
@@ -264,9 +283,22 @@ CRITICAL: Return ONLY valid JSON, no other text or explanations.
 
 RESPONSE FORMAT (ONLY JSON, NO TEXT):
 
+For job searches, include all relevant parameters:
+{
+  "destination": "/jobs",
+  "category": "government|private_sector|internships",
+  "governmentType": "all|city|state",
+  "searchTerm": "job title or keywords",
+  "location": "location if specified",
+  "employer": "employer name if specified",
+  "success": true
+}
+
+For other pages:
 {
   "destination": "/page",
   "searchTerm": "optional",
+  "category": "optional",
   "success": true
 }
 

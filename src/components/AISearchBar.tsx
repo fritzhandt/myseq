@@ -13,6 +13,7 @@ interface AINavigationResponse {
   destination?: string;
   searchTerm?: string;
   category?: string;
+  governmentType?: string;
   dateStart?: string;
   dateEnd?: string;
   employer?: string;
@@ -92,6 +93,7 @@ export default function AISearchBar() {
       console.log('Navigating to:', response.destination, 'with state:', {
         searchTerm: response.searchTerm,
         category: response.category,
+        governmentType: response.governmentType,
         dateStart: response.dateStart,
         dateEnd: response.dateEnd,
         employer: response.employer,
@@ -102,6 +104,7 @@ export default function AISearchBar() {
       const navigationState = {
         searchTerm: response.searchTerm,
         category: response.category,
+        governmentType: response.governmentType,
         dateStart: response.dateStart,
         dateEnd: response.dateEnd,
         employer: response.employer,
