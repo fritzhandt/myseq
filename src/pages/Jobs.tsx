@@ -40,7 +40,6 @@ export default function Jobs() {
   const [currentPage, setCurrentPage] = useState(1);
   const [activeTab, setActiveTab] = useState('government');
   const [governmentFilter, setGovernmentFilter] = useState<'all' | 'city' | 'state'>('all');
-  const [privateSectorFilter, setPrivateSectorFilter] = useState<'all' | 'open_positions' | 'internships'>('all');
   const itemsPerPage = 10;
   const location = useLocation();
   const navigate = useNavigate();
@@ -92,7 +91,7 @@ export default function Jobs() {
     if (jobs.length > 0) {
       applyFilters();
     }
-  }, [jobs, searchQuery, locationFilter, employerFilter, activeTab, governmentFilter, privateSectorFilter]);
+  }, [jobs, searchQuery, locationFilter, employerFilter, activeTab, governmentFilter]);
 
   const fetchJobs = async () => {
     try {
@@ -113,25 +112,16 @@ export default function Jobs() {
   const applyFilters = useCallback(() => {
     let filtered = [...jobs];
 
-    // Filter by category (government/private_sector)
-    filtered = filtered.filter(job => job.category === activeTab);
-
-    // If in government tab, apply government type filter (city/state/both)
-    if (activeTab === 'government' && governmentFilter !== 'all') {
-      filtered = filtered.filter(job => {
-        // If job has subcategory field, use it; otherwise default to 'city' for backward compatibility
-        const subcategory = (job as any).subcategory || 'city';
-        return subcategory === governmentFilter || subcategory === 'both';
-      });
+    // Filter by category (government/private/internships)
+    if (activeTab === 'government') {
+      filtered = filtered.filter(job => job.category === 'government');
+    } else if (activeTab === 'private_sector') {
+      filtered = filtered.filter(job => job.category === 'private');
+    } else if (activeTab === 'internships') {
+      filtered = filtered.filter(job => job.category === 'internships');
     }
 
-    // If in private sector tab, apply private sector filter (open_positions/internships)
-    if (activeTab === 'private_sector' && privateSectorFilter !== 'all') {
-      filtered = filtered.filter(job => {
-        const subcategory = (job as any).subcategory || 'open_positions';
-        return subcategory === privateSectorFilter;
-      });
-    }
+    // If in private sector tab, no additional filter needed
 
     // Filter by search query
     if (searchQuery.trim()) {
@@ -160,7 +150,7 @@ export default function Jobs() {
 
     setFilteredJobs(filtered);
     setCurrentPage(1);
-  }, [jobs, searchQuery, locationFilter, employerFilter, activeTab, governmentFilter, privateSectorFilter]);
+  }, [jobs, searchQuery, locationFilter, employerFilter, activeTab, governmentFilter]);
 
   const handleManualSearch = useCallback(() => {
     applyFilters();
@@ -177,7 +167,6 @@ export default function Jobs() {
     setLocationFilter('all');
     setEmployerFilter('all');
     setGovernmentFilter('all');
-    setPrivateSectorFilter('all');
     // Auto-apply filters after clearing
     setTimeout(() => {
       applyFilters();
@@ -185,12 +174,19 @@ export default function Jobs() {
   };
 
   const filteredByCategory = jobs.filter(job => {
-    if (job.category !== activeTab) return false;
-    if (activeTab === 'government' && governmentFilter !== 'all') {
-      const subcategory = (job as any).subcategory || 'city';
-      return subcategory === governmentFilter || subcategory === 'both';
+    if (activeTab === 'government') {
+      if (job.category !== 'government') return false;
+      if (governmentFilter !== 'all') {
+        const subcategory = (job as any).subcategory || 'city';
+        return subcategory === governmentFilter || subcategory === 'both';
+      }
+      return true;
+    } else if (activeTab === 'private_sector') {
+      return job.category === 'private';
+    } else if (activeTab === 'internships') {
+      return job.category === 'internships';
     }
-    return true;
+    return false;
   });
   
   const uniqueLocations = [...new Set(filteredByCategory.map(job => job.location))];
@@ -235,11 +231,12 @@ export default function Jobs() {
         </div>
 
         {/* Search and Filters */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="flex justify-center mb-6">
-            <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsList className="grid w-full max-w-2xl grid-cols-3">
               <TabsTrigger value="government">Government</TabsTrigger>
               <TabsTrigger value="private_sector">Private Sector</TabsTrigger>
+              <TabsTrigger value="internships">Internships</TabsTrigger>
             </TabsList>
           </div>
 
@@ -379,41 +376,11 @@ export default function Jobs() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="private_sector" className="mt-0">
+          <TabsContent value="internships" className="mt-0">
             <Card className="mb-8">
               <CardContent className="p-6">
-                 {/* Always visible: Job Title Search */}
-                 <div className="space-y-4">
-                    {/* Private Sector Type Filter */}
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">
-                        Job Type
-                      </label>
-                      <div className="flex gap-2">
-                        <Button
-                          variant={privateSectorFilter === 'all' ? 'default' : 'outline'}
-                          onClick={() => setPrivateSectorFilter('all')}
-                          className="flex-1"
-                        >
-                          All
-                        </Button>
-                        <Button
-                          variant={privateSectorFilter === 'open_positions' ? 'default' : 'outline'}
-                          onClick={() => setPrivateSectorFilter('open_positions')}
-                          className="flex-1"
-                        >
-                          Open Positions
-                        </Button>
-                        <Button
-                          variant={privateSectorFilter === 'internships' ? 'default' : 'outline'}
-                          onClick={() => setPrivateSectorFilter('internships')}
-                          className="flex-1"
-                        >
-                          Internships
-                        </Button>
-                      </div>
-                    </div>
-
+                  {/* Always visible: Job Title Search */}
+                  <div className="space-y-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium flex items-center gap-2">
                         <Briefcase className="h-4 w-4" />
@@ -421,7 +388,7 @@ export default function Jobs() {
                       </label>
                       <div className="flex gap-2">
                         <Input
-                          placeholder="Search job title using AI"
+                          placeholder="Search job title..."
                           value={searchQuery}
                           onChange={(e) => {
                             const value = e.target.value;

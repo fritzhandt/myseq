@@ -58,7 +58,7 @@ export default function JobEditDialog({ job, open, onOpenChange, onSuccess }: Jo
         apply_info: job.apply_info,
         is_apply_link: job.is_apply_link,
         category: job.category,
-        subcategory: job.subcategory || (job.category === 'government' ? 'city' : 'open_positions')
+        subcategory: job.subcategory || (job.category === 'government' ? 'city' : '')
       });
     }
   }, [job]);
@@ -161,11 +161,11 @@ export default function JobEditDialog({ job, open, onOpenChange, onSuccess }: Jo
               <Label htmlFor="category">Category *</Label>
               <Select
                 value={formData.category}
-                onValueChange={(value: 'government' | 'private_sector') => {
+                onValueChange={(value: 'government' | 'state' | 'private' | 'internships') => {
                   setFormData(prev => ({
                     ...prev,
                     category: value,
-                    subcategory: value === 'government' ? 'city' : 'open_positions'
+                    subcategory: value === 'government' ? 'city' : value === 'state' ? 'state' : ''
                   }));
                 }}
               >
@@ -173,36 +173,31 @@ export default function JobEditDialog({ job, open, onOpenChange, onSuccess }: Jo
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="government">Government</SelectItem>
-                  <SelectItem value="private_sector">Private Sector</SelectItem>
+                  <SelectItem value="government">City Government</SelectItem>
+                  <SelectItem value="state">State Government</SelectItem>
+                  <SelectItem value="private">Private Sector</SelectItem>
+                  <SelectItem value="internships">Internships</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="subcategory">Subcategory *</Label>
-              <Select
-                value={formData.subcategory}
-                onValueChange={(value) => setFormData({ ...formData, subcategory: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {formData.category === 'government' ? (
-                    <>
-                      <SelectItem value="city">City</SelectItem>
-                      <SelectItem value="state">State</SelectItem>
-                    </>
-                  ) : (
-                    <>
-                      <SelectItem value="open_positions">Open Positions</SelectItem>
-                      <SelectItem value="internships">Internships</SelectItem>
-                    </>
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
+            {formData.category === 'government' && (
+              <div className="space-y-2">
+                <Label htmlFor="subcategory">Subcategory *</Label>
+                <Select
+                  value={formData.subcategory}
+                  onValueChange={(value) => setFormData({ ...formData, subcategory: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="city">City</SelectItem>
+                    <SelectItem value="state">State</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">

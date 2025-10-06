@@ -43,8 +43,8 @@ export default function JobManualEntryForm({ open, onOpenChange, onSuccess }: Jo
     description: '',
     apply_info: '',
     is_apply_link: false,
-    category: 'government' as 'government' | 'private_sector',
-    subcategory: 'city' as 'city' | 'state' | 'open_positions' | 'internships'
+    category: 'government' as 'government' | 'private' | 'internships',
+    subcategory: 'city' as 'city' | 'state'
   });
 
   const resetForm = () => {
@@ -67,10 +67,10 @@ export default function JobManualEntryForm({ open, onOpenChange, onSuccess }: Jo
     setErrors({});
 
     try {
-      // Validate form data - include subcategory for private_sector jobs too
+      // Validate form data
       const validatedData = jobSchema.parse({
         ...formData,
-        subcategory: formData.subcategory
+        subcategory: formData.category === 'government' ? formData.subcategory : null
       });
 
       setLoading(true);
@@ -197,11 +197,11 @@ export default function JobManualEntryForm({ open, onOpenChange, onSuccess }: Jo
               <Label htmlFor="category">Category *</Label>
               <Select
                 value={formData.category}
-                onValueChange={(value: 'government' | 'private_sector') => {
+                onValueChange={(value: 'government' | 'private' | 'internships') => {
                   setFormData({ 
                     ...formData, 
                     category: value,
-                    subcategory: value === 'government' ? 'city' : 'open_positions'
+                    subcategory: value === 'government' ? 'city' : 'city'
                   });
                 }}
               >
@@ -209,39 +209,34 @@ export default function JobManualEntryForm({ open, onOpenChange, onSuccess }: Jo
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="government">Government</SelectItem>
-                  <SelectItem value="private_sector">Private Sector</SelectItem>
+                  <SelectItem value="government">City Government</SelectItem>
+                  <SelectItem value="state">State Government</SelectItem>
+                  <SelectItem value="private">Private Sector</SelectItem>
+                  <SelectItem value="internships">Internships</SelectItem>
                 </SelectContent>
               </Select>
               {errors.category && <p className="text-sm text-destructive">{errors.category}</p>}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="subcategory">Subcategory *</Label>
-              <Select
-                value={formData.subcategory}
-                onValueChange={(value: 'city' | 'state' | 'open_positions' | 'internships') => 
-                  setFormData({ ...formData, subcategory: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {formData.category === 'government' ? (
-                    <>
-                      <SelectItem value="city">City</SelectItem>
-                      <SelectItem value="state">State</SelectItem>
-                    </>
-                  ) : (
-                    <>
-                      <SelectItem value="open_positions">Open Positions</SelectItem>
-                      <SelectItem value="internships">Internships</SelectItem>
-                    </>
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
+            {formData.category === 'government' && (
+              <div className="space-y-2">
+                <Label htmlFor="subcategory">Subcategory *</Label>
+                <Select
+                  value={formData.subcategory}
+                  onValueChange={(value: 'city' | 'state') => 
+                    setFormData({ ...formData, subcategory: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="city">City</SelectItem>
+                    <SelectItem value="state">State</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">
