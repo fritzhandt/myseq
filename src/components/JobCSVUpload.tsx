@@ -26,20 +26,18 @@ export default function JobCSVUpload() {
   const { isSubAdmin } = useUserRole();
   const [uploading, setUploading] = useState(false);
   const [previewJobs, setPreviewJobs] = useState<Job[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>('government');
-  const [selectedSubcategory, setSelectedSubcategory] = useState<string>('city');
+  const [selectedCategory, setSelectedCategory] = useState<string>('city');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const getCategoryValue = () => {
-    if (selectedCategory === 'government') return 'government';
-    if (selectedCategory === 'state') return 'government';
+    if (selectedCategory === 'city' || selectedCategory === 'state') return 'government';
     if (selectedCategory === 'private') return 'private';
     if (selectedCategory === 'internships') return 'internships';
     return selectedCategory;
   };
 
   const getSubcategoryValue = () => {
-    if (selectedCategory === 'government') return 'city';
+    if (selectedCategory === 'city') return 'city';
     if (selectedCategory === 'state') return 'state';
     return null;
   };
@@ -207,8 +205,7 @@ export default function JobCSVUpload() {
 
   const clearPreview = () => {
     setPreviewJobs([]);
-    setSelectedCategory('government');
-    setSelectedSubcategory('city');
+    setSelectedCategory('city');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -236,7 +233,7 @@ export default function JobCSVUpload() {
                   <SelectValue placeholder="Select job category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="government">City Government</SelectItem>
+                  <SelectItem value="city">City Government</SelectItem>
                   <SelectItem value="state">State Government</SelectItem>
                   <SelectItem value="private">Private Sector</SelectItem>
                   <SelectItem value="internships">Internships</SelectItem>
