@@ -23,7 +23,7 @@ const MyElectedLookup = () => {
       title: "Assemblymember",
       description: "Find your New York State Assembly representative",
       url: "https://nyassembly.gov/mem/search/",
-      icon: <Search className="w-6 h-6" />
+      icon: <img src="/ny-assembly-seal.jpg" alt="NY Assembly Seal" className="w-12 h-12 object-contain" />
     },
     {
       title: "Senator", 
