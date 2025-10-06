@@ -41,7 +41,7 @@ const MyElectedLookup = () => {
       title: "Congressperson",
       description: "Find your U.S. House of Representatives member",
       url: "https://www.house.gov/representatives/find-your-representative",
-      icon: null
+      icon: <img src="/us-house-seal.png" alt="US House Seal" className="w-12 h-12 object-contain" />
     }
   ];
 
