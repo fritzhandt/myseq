@@ -44,6 +44,7 @@ const ContactElected = () => {
 
   const handleFilterChange = (filter: string | null) => {
     setActiveFilter(filter);
+    setGuidanceOpen(false); // Close guidance when a filter is selected
   };
 
   const fetchOfficials = async () => {
