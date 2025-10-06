@@ -4,7 +4,6 @@ import Navbar from "@/components/Navbar";
 import CommunityAlertBanner from "@/components/CommunityAlertBanner";
 import { useNavigate } from "react-router-dom";
 import { Phone, MapPin } from "lucide-react";
-import { TranslatedText } from "@/components/TranslatedText";
 
 const precincts = [
   {
@@ -56,22 +55,16 @@ export default function PolicePrecincts() {
             onClick={() => navigate('/')}
             className="mb-6"
           >
-            <TranslatedText contentKey="police_precincts.back_to_home" originalText="← Back to Home" />
+            ← Back to Home
           </Button>
           
           <div className="text-center mb-8">
-            <TranslatedText 
-              contentKey="police_precincts.title"
-              originalText="Police Precincts"
-              as="h1"
-              className="text-4xl font-bold text-foreground mb-4 font-oswald uppercase tracking-wide"
-            />
-            <TranslatedText 
-              contentKey="police_precincts.subtitle"
-              originalText="Contact information for NYPD precincts serving Southeast Queens"
-              as="p"
-              className="text-lg text-muted-foreground max-w-2xl mx-auto"
-            />
+            <h1 className="text-4xl font-bold text-foreground mb-4 font-oswald uppercase tracking-wide">
+              Police Precincts
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Contact information for NYPD precincts serving Southeast Queens
+            </p>
           </div>
         </div>
 
@@ -80,16 +73,10 @@ export default function PolicePrecincts() {
             <Card key={precinct.number} className="hover:shadow-lg transition-shadow duration-300 flex flex-col">
               <CardHeader>
                 <CardTitle className="text-2xl font-bold text-primary">
-                  <TranslatedText 
-                    contentKey={`police_precincts.precinct_${precinct.number}_title`}
-                    originalText={`${precinct.number}th Precinct`}
-                  />
+                  {precinct.number}th Precinct
                 </CardTitle>
                 <CardDescription className="text-base">
-                  <TranslatedText 
-                    contentKey="police_precincts.nypd_southeast_queens"
-                    originalText="NYPD - Southeast Queens"
-                  />
+                  NYPD - Southeast Queens
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4 flex-1 flex flex-col">
@@ -97,13 +84,9 @@ export default function PolicePrecincts() {
                   <div className="flex items-start gap-3">
                     <MapPin className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
                     <div className="flex-1">
-                      <p className="font-medium text-foreground mb-2">
-                        <TranslatedText contentKey="police_precincts.coverage_area" originalText="Coverage Area" />
-                      </p>
+                      <p className="font-medium text-foreground mb-2">Coverage Area</p>
                       <p className="text-muted-foreground mb-3">{precinct.coverageArea}</p>
-                      <p className="font-medium text-foreground mt-3">
-                        <TranslatedText contentKey="police_precincts.address" originalText="Address" />
-                      </p>
+                      <p className="font-medium text-foreground mt-3">Address</p>
                       <p className="text-muted-foreground">{precinct.address}</p>
                     </div>
                   </div>
@@ -111,9 +94,7 @@ export default function PolicePrecincts() {
                   <div className="flex items-center gap-3">
                     <Phone className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                     <div>
-                      <p className="font-medium text-foreground">
-                        <TranslatedText contentKey="police_precincts.phone_community_affairs" originalText="Phone (Community Affairs - Non-Emergency)" />
-                      </p>
+                      <p className="font-medium text-foreground">Phone (Community Affairs - Non-Emergency)</p>
                       <a 
                         href={`tel:${precinct.phone}`}
                         className="text-primary hover:underline"
@@ -126,22 +107,14 @@ export default function PolicePrecincts() {
                 
                 <div className="pt-4 border-t mt-auto">
                   <p className="text-sm text-muted-foreground mb-3">
-                    <strong>
-                      <TranslatedText 
-                        contentKey="police_precincts.commanding_officer"
-                        originalText="Commanding Officer:"
-                      />
-                    </strong> {precinct.commandingOfficer}
+                    <strong>Commanding Officer:</strong> {precinct.commandingOfficer}
                   </p>
                   <Button
                     variant="default"
                     className="w-full"
                     onClick={() => window.open(precinct.website, '_blank')}
                   >
-                    <TranslatedText 
-                      contentKey="police_precincts.more_information"
-                      originalText="More Information"
-                    />
+                    More Information
                   </Button>
                 </div>
               </CardContent>
@@ -150,22 +123,13 @@ export default function PolicePrecincts() {
         </div>
 
         <div className="mt-12 bg-muted/50 rounded-lg p-6">
-          <TranslatedText 
-            contentKey="police_precincts.emergency_info_title"
-            originalText="Emergency Information"
-            as="h2"
-            className="text-xl font-semibold mb-4 text-foreground"
-          />
+          <h2 className="text-xl font-semibold mb-4 text-foreground">Emergency Information</h2>
           <div className="space-y-2 text-muted-foreground">
             <p>
-              <strong>
-                <TranslatedText contentKey="police_precincts.emergency" originalText="Emergency:" />
-              </strong> <TranslatedText contentKey="police_precincts.call_911" originalText="Call 911" />
+              <strong>Emergency:</strong> Call 911
             </p>
             <p>
-              <strong>
-                <TranslatedText contentKey="police_precincts.crime_stoppers" originalText="Crime Stoppers:" />
-              </strong> 1-800-577-TIPS (8477)
+              <strong>Crime Stoppers:</strong> 1-800-577-TIPS (8477)
             </p>
           </div>
         </div>

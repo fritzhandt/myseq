@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
-import { TranslationProvider } from "@/contexts/TranslationContext";
 import { NavbarProvider } from "@/contexts/NavbarContext";
 import DefaultPage from "./pages/DefaultPage";
 import EventDetail from "./pages/EventDetail";
@@ -24,7 +23,6 @@ import Civics from "./pages/Civics";
 import CivicDetail from "./pages/CivicDetail";
 import CivicAuth from "./pages/CivicAuth";
 import CivicAdmin from "./pages/CivicAdmin";
-import TestTranslation from "./pages/TestTranslation";
 import NotFound from "./pages/NotFound";
 import "./index.css";
 
@@ -40,37 +38,34 @@ const queryClient = new QueryClient({
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <TranslationProvider>
-        <NavbarProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<DefaultPage />} />
-              <Route path="/event/:id" element={<EventDetail />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/contact-elected" element={<ContactElected />} />
-              <Route path="/my-elected-lookup" element={<MyElectedLookup />} />
-              <Route path="/special-event" element={<SpecialEvent />} />
-              <Route path="/community-alert/:id" element={<CommunityAlert />} />
-              <Route path="/resources" element={<Resources />} />
-              <Route path="/business-opportunities" element={<BusinessOpportunities />} />
-              <Route path="/jobs" element={<Jobs />} />
-              {/* <Route path="/solve-issue" element={<SolveIssue />} /> */}
-              <Route path="/police-precincts" element={<PolicePrecincts />} />
-              <Route path="/civics" element={<Civics />} />
-              <Route path="/civics/:orgId" element={<CivicDetail />} />
-              <Route path="/civic-auth" element={<CivicAuth />} />
-              <Route path="/civic-admin" element={<CivicAdmin />} />
-              <Route path="/test-translation" element={<TestTranslation />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <Toaster />
-          </BrowserRouter>
-        </NavbarProvider>
-      </TranslationProvider>
+      <NavbarProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<DefaultPage />} />
+            <Route path="/event/:id" element={<EventDetail />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/contact-elected" element={<ContactElected />} />
+            <Route path="/my-elected-lookup" element={<MyElectedLookup />} />
+            <Route path="/special-event" element={<SpecialEvent />} />
+            <Route path="/community-alert/:id" element={<CommunityAlert />} />
+            <Route path="/resources" element={<Resources />} />
+            <Route path="/business-opportunities" element={<BusinessOpportunities />} />
+            <Route path="/jobs" element={<Jobs />} />
+            {/* <Route path="/solve-issue" element={<SolveIssue />} /> */}
+            <Route path="/police-precincts" element={<PolicePrecincts />} />
+            <Route path="/civics" element={<Civics />} />
+            <Route path="/civics/:orgId" element={<CivicDetail />} />
+            <Route path="/civic-auth" element={<CivicAuth />} />
+            <Route path="/civic-admin" element={<CivicAdmin />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <Toaster />
+        </BrowserRouter>
+      </NavbarProvider>
     </ThemeProvider>
   </QueryClientProvider>
 );

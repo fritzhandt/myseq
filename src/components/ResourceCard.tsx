@@ -3,9 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Phone, Mail, MapPin, ChevronDown, ChevronUp } from "lucide-react";
-import { TranslatedText } from "@/components/TranslatedText";
-import { useTranslatedText } from "@/hooks/useTranslatedText";
-import { useLocation } from "react-router-dom";
 
 interface Resource {
   id: string;
@@ -26,12 +23,6 @@ interface ResourceCardProps {
 
 export default function ResourceCard({ resource }: ResourceCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const location = useLocation();
-  const { translatedText: translatedDescription } = useTranslatedText(
-    `resource-desc-${resource.id}`,
-    resource.description,
-    location.pathname
-  );
 
   return (
     <Card className="h-full hover:shadow-lg transition-shadow overflow-hidden flex flex-col">
@@ -56,10 +47,7 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
           <div className="flex flex-wrap gap-2">
             {resource.categories.map((category) => (
               <Badge key={category} variant="secondary" className="capitalize text-xs">
-                <TranslatedText 
-                  contentKey={`category-${category.replace(/\s+/g, '-')}`} 
-                  originalText={category} 
-                />
+                {category}
               </Badge>
             ))}
           </div>
@@ -69,7 +57,7 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
       <CardContent className="flex-1 flex flex-col">
         <div className="mb-4">
           <p className={`text-muted-foreground ${isExpanded ? '' : 'line-clamp-3'}`}>
-            {translatedDescription}
+            {resource.description}
           </p>
           {resource.description.length > 120 && (
             <Button
@@ -80,12 +68,12 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
             >
               {isExpanded ? (
                 <>
-                  <TranslatedText contentKey="show-less" originalText="Show less" />
+                  Show less
                   <ChevronUp className="h-4 w-4 ml-1" />
                 </>
               ) : (
                 <>
-                  <TranslatedText contentKey="show-more" originalText="Show more" />
+                  Show more
                   <ChevronDown className="h-4 w-4 ml-1" />
                 </>
               )}
@@ -131,7 +119,7 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
                 className="inline-flex items-center justify-center"
               >
                 <ExternalLink className="h-4 w-4 mr-2" />
-                <TranslatedText contentKey="visit-website" originalText="Visit Website" />
+                Visit Website
               </a>
             </Button>
           )}
