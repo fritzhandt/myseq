@@ -258,15 +258,12 @@ const CivicDetail = () => {
         <Navbar />
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto text-center">
-            <TranslatedText 
-              contentKey="civic_detail.not_found" 
-              originalText="Organization Not Found"
-              as="h1"
-              className="text-2xl font-bold mb-4"
-            />
+            <h1 className="text-2xl font-bold mb-4">
+              Organization Not Found
+            </h1>
             <Button onClick={() => navigate('/civics')}>
               <ArrowLeft className="mr-2 h-4 w-4" />
-              <TranslatedText contentKey="civic_detail.back_to_orgs" originalText="Back to Organizations" />
+              Back to Organizations
             </Button>
           </div>
         </main>
@@ -288,7 +285,7 @@ const CivicDetail = () => {
               className="mb-4 hover:bg-green-50 hover:text-green-600"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              <TranslatedText contentKey="civic_detail.back_button" originalText="Back to Organizations" />
+              Back to Organizations
             </Button>
             
             <div className="text-center">
@@ -311,37 +308,37 @@ const CivicDetail = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="general">
-                    <TranslatedText contentKey="civic_detail.tab_general" originalText="General Info" />
+                    General Info
                   </SelectItem>
                   <SelectItem value="newsletters">
-                    <TranslatedText contentKey="civic_detail.tab_newsletter" originalText="Newsletter" />
+                    Newsletter
                   </SelectItem>
                   <SelectItem value="announcements">
-                    <TranslatedText contentKey="civic_detail.tab_announcements" originalText="Announcements" />
+                    Announcements
                   </SelectItem>
                   <SelectItem value="leadership">
-                    <TranslatedText contentKey="civic_detail.tab_leadership" originalText="Leadership" />
+                    Leadership
                   </SelectItem>
                   <SelectItem value="links">
-                    <TranslatedText contentKey="civic_detail.tab_links" originalText="Important Links" />
+                    Important Links
                   </SelectItem>
                   <SelectItem value="gallery">
-                    <TranslatedText contentKey="civic_detail.tab_gallery" originalText="Gallery" />
+                    Gallery
                   </SelectItem>
                   <SelectItem value="events">
-                    <TranslatedText contentKey="civic_detail.tab_events" originalText="Events" />
+                    Events
                   </SelectItem>
                 </SelectContent>
               </Select>
             ) : (
               <TabsList className="grid w-full grid-cols-7">
-                <TabsTrigger value="general"><TranslatedText contentKey="civic_detail.tab_general" originalText="General Info" /></TabsTrigger>
-                <TabsTrigger value="newsletters"><TranslatedText contentKey="civic_detail.tab_newsletter" originalText="Newsletter" /></TabsTrigger>
-                <TabsTrigger value="announcements"><TranslatedText contentKey="civic_detail.tab_announcements" originalText="Announcements" /></TabsTrigger>
-                <TabsTrigger value="leadership"><TranslatedText contentKey="civic_detail.tab_leadership" originalText="Leadership" /></TabsTrigger>
-                <TabsTrigger value="links"><TranslatedText contentKey="civic_detail.tab_links" originalText="Important Links" /></TabsTrigger>
-                <TabsTrigger value="gallery"><TranslatedText contentKey="civic_detail.tab_gallery" originalText="Gallery" /></TabsTrigger>
-                <TabsTrigger value="events"><TranslatedText contentKey="civic_detail.tab_events" originalText="Events" /></TabsTrigger>
+                <TabsTrigger value="general">General Info</TabsTrigger>
+                <TabsTrigger value="newsletters">Newsletter</TabsTrigger>
+                <TabsTrigger value="announcements">Announcements</TabsTrigger>
+                <TabsTrigger value="leadership">Leadership</TabsTrigger>
+                <TabsTrigger value="links">Important Links</TabsTrigger>
+                <TabsTrigger value="gallery">Gallery</TabsTrigger>
+                <TabsTrigger value="events">Events</TabsTrigger>
               </TabsList>
             )}
 
@@ -351,22 +348,19 @@ const CivicDetail = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Users className="h-5 w-5" />
-                    <TranslatedText contentKey="civic_detail.about_title" originalText="About Our Organization" />
+                    About Our Organization
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <TranslatedText 
-                    contentKey={`civic_detail.org_${organization.id}_description`}
-                    originalText={organization.description}
-                    as="p"
-                    className="text-muted-foreground leading-relaxed mb-6"
-                  />
+                  <p className="text-muted-foreground leading-relaxed mb-6">
+                    {organization.description}
+                  </p>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Contact Information */}
                     <div>
                       <h3 className="font-semibold mb-3">
-                        <TranslatedText contentKey="civic_detail.contact_title" originalText="Contact Information" />
+                        Contact Information
                       </h3>
                       <div className="space-y-2 text-sm">
                         {organization.contact_info?.phone && (
@@ -394,7 +388,7 @@ const CivicDetail = () => {
                               rel="noopener noreferrer"
                               className="hover:text-green-600"
                             >
-                              <TranslatedText contentKey="civic_detail.website_link" originalText="Website" />
+                              Website
                             </a>
                           </div>
                         )}
@@ -405,27 +399,19 @@ const CivicDetail = () => {
                     {(organization.meeting_info || organization.meeting_address) && (
                       <div>
                         <h3 className="font-semibold mb-3">
-                          <TranslatedText contentKey="civic_detail.meeting_title" originalText="Meeting Information" />
+                          Meeting Information
                         </h3>
                         <div className="space-y-2 text-sm">
                           {organization.meeting_info && (
                             <div className="flex items-start gap-2">
                               <Clock className="h-3 w-3 text-muted-foreground mt-0.5" />
-                              <TranslatedText 
-                                contentKey={`civic_detail.org_${organization.id}_meeting_info`}
-                                originalText={organization.meeting_info}
-                                as="span"
-                              />
+                              <span>{organization.meeting_info}</span>
                             </div>
                           )}
                           {organization.meeting_address && (
                             <div className="flex items-start gap-2">
                               <MapPin className="h-3 w-3 text-muted-foreground mt-0.5" />
-                              <TranslatedText 
-                                contentKey={`civic_detail.org_${organization.id}_meeting_address`}
-                                originalText={organization.meeting_address}
-                                as="span"
-                              />
+                              <span>{organization.meeting_address}</span>
                             </div>
                           )}
                         </div>
@@ -435,18 +421,12 @@ const CivicDetail = () => {
 
                   {/* How to Join */}
                   <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
-                    <TranslatedText 
-                      contentKey="civic_detail.how_to_join_title" 
-                      originalText="How to Get Involved"
-                      as="h3"
-                      className="font-semibold mb-2 text-green-800"
-                    />
-                    <TranslatedText 
-                      contentKey="civic_detail.how_to_join_text" 
-                      originalText="Interested in joining or learning more? Contact us using the information above or attend one of our meetings to see how you can contribute to your community."
-                      as="p"
-                      className="text-sm text-green-700"
-                    />
+                    <h3 className="font-semibold mb-2 text-green-800">
+                      How to Get Involved
+                    </h3>
+                    <p className="text-sm text-green-700">
+                      Interested in joining or learning more? Contact us using the information above or attend one of our meetings to see how you can contribute to your community.
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -458,25 +438,19 @@ const CivicDetail = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <FileText className="h-5 w-5" />
-                    <TranslatedText contentKey="civic_detail.newsletter_archive" originalText="Newsletter Archive" />
+                    Newsletter Archive
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   {newsletters.length === 0 ? (
                     <div className="text-center py-8">
                       <FileText className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                      <TranslatedText 
-                        contentKey="civic_detail.no_newsletters_title" 
-                        originalText="No newsletters yet"
-                        as="h3"
-                        className="text-lg font-semibold mb-2"
-                      />
-                      <TranslatedText 
-                        contentKey="civic_detail.no_newsletters_text" 
-                        originalText="Check back later for newsletter updates from this organization."
-                        as="p"
-                        className="text-muted-foreground"
-                      />
+                      <h3 className="text-lg font-semibold mb-2">
+                        No newsletters yet
+                      </h3>
+                      <p className="text-muted-foreground">
+                        Check back later for newsletter updates from this organization.
+                      </p>
                     </div>
                   ) : (
                     <>
@@ -487,12 +461,7 @@ const CivicDetail = () => {
                           className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50"
                         >
                           <div>
-                            <TranslatedText 
-                              contentKey={`civic_detail.newsletter_${newsletter.id}_title`}
-                              originalText={newsletter.title}
-                              as="h3"
-                              className="font-medium"
-                            />
+                            <h3 className="font-medium">{newsletter.title}</h3>
                             <p className="text-sm text-muted-foreground">
                               {format(parseISO(newsletter.upload_date), 'MMM d, yyyy')}
                             </p>
@@ -503,7 +472,7 @@ const CivicDetail = () => {
                             onClick={() => handleViewPDF(newsletter)}
                           >
                             <FileText className="mr-2 h-4 w-4" />
-                            <TranslatedText contentKey="civic_detail.view_pdf" originalText="View PDF" />
+                            View PDF
                           </Button>
                         </div>
                         ))}
@@ -532,25 +501,19 @@ const CivicDetail = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Calendar className="h-5 w-5" />
-                    <TranslatedText contentKey="civic_detail.announcements_title" originalText="Recent Announcements" />
+                    Recent Announcements
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   {announcements.length === 0 ? (
                     <div className="text-center py-8">
                       <Calendar className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                      <TranslatedText 
-                        contentKey="civic_detail.no_announcements_title" 
-                        originalText="No announcements yet"
-                        as="h3"
-                        className="text-lg font-semibold mb-2"
-                      />
-                      <TranslatedText 
-                        contentKey="civic_detail.no_announcements_text" 
-                        originalText="Check back later for announcements from this organization."
-                        as="p"
-                        className="text-muted-foreground"
-                      />
+                      <h3 className="text-lg font-semibold mb-2">
+                        No announcements yet
+                      </h3>
+                      <p className="text-muted-foreground">
+                        Check back later for announcements from this organization.
+                      </p>
                     </div>
                   ) : (
                     <>
@@ -566,24 +529,18 @@ const CivicDetail = () => {
                         >
                           <CardHeader className="pb-3">
                             <div className="flex items-start justify-between gap-4">
-                              <TranslatedText 
-                                contentKey={`civic_detail.announcement_${announcement.id}_title`}
-                                originalText={announcement.title}
-                                as="h3"
-                                className="font-semibold text-lg line-clamp-2 flex-1"
-                              />
+                              <h3 className="font-semibold text-lg line-clamp-2 flex-1">
+                                {announcement.title}
+                              </h3>
                               <Badge variant="outline" className="text-xs flex-shrink-0">
                                 {format(parseISO(announcement.created_at), 'MMM d')}
                               </Badge>
                             </div>
                           </CardHeader>
                           <CardContent>
-                            <TranslatedText 
-                              contentKey={`civic_detail.announcement_${announcement.id}_content`}
-                              originalText={announcement.content}
-                              as="p"
-                              className="text-muted-foreground line-clamp-3 text-sm leading-relaxed mb-3"
-                            />
+                            <p className="text-muted-foreground line-clamp-3 text-sm leading-relaxed mb-3">
+                              {announcement.content}
+                            </p>
                             
                             {/* Preview indicators */}
                             <div className="flex items-center justify-between">
@@ -596,7 +553,7 @@ const CivicDetail = () => {
                                 )}
                               </div>
                               <span className="text-xs text-primary font-medium">
-                                <TranslatedText contentKey="civic_detail.click_read_more" originalText="Click to read more →" />
+                                Click to read more →
                               </span>
                             </div>
                           </CardContent>
@@ -627,25 +584,19 @@ const CivicDetail = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Users className="h-5 w-5" />
-                    <TranslatedText contentKey="civic_detail.leadership_title" originalText="Leadership Team" />
+                    Leadership Team
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   {leadership.length === 0 ? (
                     <div className="text-center py-8">
                       <Users className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                      <TranslatedText 
-                        contentKey="civic_detail.no_leadership_title" 
-                        originalText="No leadership information yet"
-                        as="h3"
-                        className="text-lg font-semibold mb-2"
-                      />
-                      <TranslatedText 
-                        contentKey="civic_detail.no_leadership_text" 
-                        originalText="Check back later for leadership team information."
-                        as="p"
-                        className="text-muted-foreground"
-                      />
+                      <h3 className="text-lg font-semibold mb-2">
+                        No leadership information yet
+                      </h3>
+                      <p className="text-muted-foreground">
+                        Check back later for leadership team information.
+                      </p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -662,18 +613,12 @@ const CivicDetail = () => {
                               <Users className="h-12 w-12 text-muted-foreground" />
                             </div>
                           )}
-                          <TranslatedText 
-                            contentKey={`civic_detail.leader_${leader.id}_name`}
-                            originalText={leader.name}
-                            as="h3"
-                            className="font-semibold text-lg"
-                          />
-                          <TranslatedText 
-                            contentKey={`civic_detail.leader_${leader.id}_title`}
-                            originalText={leader.title}
-                            as="p"
-                            className="text-muted-foreground mb-3"
-                          />
+                          <h3 className="font-semibold text-lg">
+                            {leader.name}
+                          </h3>
+                          <p className="text-muted-foreground mb-3">
+                            {leader.title}
+                          </p>
                           
                           {leader.contact_info && (
                             <div className="space-y-1 text-sm">
@@ -715,25 +660,19 @@ const CivicDetail = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Link className="h-5 w-5" />
-                    <TranslatedText contentKey="civic_detail.links_title" originalText="Important Links" />
+                    Important Links
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   {importantLinks.length === 0 ? (
                     <div className="text-center py-8">
                       <Link className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                      <TranslatedText 
-                        contentKey="civic_detail.no_links_title" 
-                        originalText="No important links yet"
-                        as="h3"
-                        className="text-lg font-semibold mb-2"
-                      />
-                      <TranslatedText 
-                        contentKey="civic_detail.no_links_text" 
-                        originalText="Check back later for important links and resources."
-                        as="p"
-                        className="text-muted-foreground"
-                      />
+                      <h3 className="text-lg font-semibold mb-2">
+                        No important links yet
+                      </h3>
+                      <p className="text-muted-foreground">
+                        Check back later for important links and resources.
+                      </p>
                     </div>
                   ) : (
                     <div className="grid gap-4">
@@ -744,19 +683,13 @@ const CivicDetail = () => {
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
-                              <TranslatedText 
-                                contentKey={`civic_detail.link_${link.id}_title`}
-                                originalText={link.title}
-                                as="h3"
-                                className="font-semibold text-lg mb-1"
-                              />
+                              <h3 className="font-semibold text-lg mb-1">
+                                {link.title}
+                              </h3>
                               {link.description && (
-                                <TranslatedText 
-                                  contentKey={`civic_detail.link_${link.id}_description`}
-                                  originalText={link.description}
-                                  as="p"
-                                  className="text-muted-foreground text-sm mb-3"
-                                />
+                                <p className="text-muted-foreground text-sm mb-3">
+                                  {link.description}
+                                </p>
                               )}
                             </div>
                             <Button
@@ -768,7 +701,7 @@ const CivicDetail = () => {
                               }}
                               className="ml-4"
                             >
-                              <TranslatedText contentKey="civic_detail.visit_link" originalText="Visit Link" />
+                              Visit Link
                             </Button>
                           </div>
                         </div>
@@ -785,25 +718,19 @@ const CivicDetail = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Images className="h-5 w-5" />
-                    <TranslatedText contentKey="civic_detail.gallery_title" originalText="Photo Gallery" />
+                    Photo Gallery
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   {galleryPhotos.length === 0 ? (
                     <div className="text-center py-8">
                       <Images className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                      <TranslatedText 
-                        contentKey="civic_detail.no_photos_title" 
-                        originalText="No photos yet"
-                        as="h3"
-                        className="text-lg font-semibold mb-2"
-                      />
-                      <TranslatedText 
-                        contentKey="civic_detail.no_photos_text" 
-                        originalText="Check back later for photo updates from this organization."
-                        as="p"
-                        className="text-muted-foreground"
-                      />
+                      <h3 className="text-lg font-semibold mb-2">
+                        No photos yet
+                      </h3>
+                      <p className="text-muted-foreground">
+                        Check back later for photo updates from this organization.
+                      </p>
                     </div>
                    ) : (
                      <>
@@ -826,22 +753,16 @@ const CivicDetail = () => {
                               {(photo.title || photo.description) && (
                                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
                                   <div className="p-4 text-white">
-                                    {photo.title && (
-                                      <TranslatedText 
-                                        contentKey={`civic_detail.photo_${photo.id}_title`}
-                                        originalText={photo.title}
-                                        as="h4"
-                                        className="font-semibold text-sm mb-1"
-                                      />
-                                    )}
-                                    {photo.description && (
-                                      <TranslatedText 
-                                        contentKey={`civic_detail.photo_${photo.id}_description`}
-                                        originalText={photo.description}
-                                        as="p"
-                                        className="text-xs opacity-90"
-                                      />
-                                    )}
+                                     {photo.title && (
+                                       <h4 className="font-semibold text-sm mb-1">
+                                         {photo.title}
+                                       </h4>
+                                     )}
+                                     {photo.description && (
+                                       <p className="text-xs opacity-90">
+                                         {photo.description}
+                                       </p>
+                                     )}
                                   </div>
                                 </div>
                               )}
@@ -880,25 +801,19 @@ const CivicDetail = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Calendar className="h-5 w-5" />
-                    <TranslatedText contentKey="civic_detail.events_title" originalText="Upcoming Events" />
+                    Upcoming Events
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   {civicEvents.length === 0 ? (
                     <div className="text-center py-8">
                       <Calendar className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                      <TranslatedText 
-                        contentKey="civic_detail.no_events_title" 
-                        originalText="No events scheduled"
-                        as="h3"
-                        className="text-lg font-semibold mb-2"
-                      />
-                      <TranslatedText 
-                        contentKey="civic_detail.no_events_text" 
-                        originalText="Check back later for event updates from this organization."
-                        as="p"
-                        className="text-muted-foreground"
-                      />
+                      <h3 className="text-lg font-semibold mb-2">
+                        No events scheduled
+                      </h3>
+                      <p className="text-muted-foreground">
+                        Check back later for event updates from this organization.
+                      </p>
                     </div>
                   ) : (
                     <>

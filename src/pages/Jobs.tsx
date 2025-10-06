@@ -206,7 +206,7 @@ export default function Jobs() {
             className="flex items-center text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            <TranslatedText contentKey="jobs.back_to_menu" originalText="Back to Main Menu" />
+            Back to Main Menu
           </Button>
         </div>
       </div>
@@ -216,23 +216,20 @@ export default function Jobs() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            <TranslatedText contentKey="jobs.title_part1" originalText="Find Your Next" />{' '}
-            <span className="text-primary"><TranslatedText contentKey="jobs.title_part2" originalText="Opportunity" /></span>
+            Find Your Next{' '}
+            <span className="text-primary">Opportunity</span>
           </h1>
-          <TranslatedText 
-            contentKey="jobs.subtitle" 
-            originalText="Discover job opportunities in your community and take the next step in your career"
-            as="p"
-            className="text-muted-foreground text-lg max-w-2xl mx-auto"
-          />
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            Discover job opportunities in your community and take the next step in your career
+          </p>
         </div>
 
         {/* Search and Filters */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="flex justify-center mb-6">
             <TabsList className="grid w-full max-w-md grid-cols-2">
-              <TabsTrigger value="government"><TranslatedText contentKey="jobs.government_jobs" originalText="Government" /></TabsTrigger>
-              <TabsTrigger value="private_sector"><TranslatedText contentKey="jobs.private_sector_jobs" originalText="Private Sector" /></TabsTrigger>
+              <TabsTrigger value="government">Government</TabsTrigger>
+              <TabsTrigger value="private_sector">Private Sector</TabsTrigger>
             </TabsList>
           </div>
 
@@ -244,7 +241,7 @@ export default function Jobs() {
                     {/* Government Type Filter */}
                     <div className="space-y-2">
                       <label className="text-sm font-medium">
-                        <TranslatedText contentKey="jobs.government_type" originalText="Government Type" />
+                        Government Type
                       </label>
                       <div className="flex gap-2">
                         <Button
@@ -252,21 +249,21 @@ export default function Jobs() {
                           onClick={() => setGovernmentFilter('all')}
                           className="flex-1"
                         >
-                          <TranslatedText contentKey="jobs.all_types" originalText="All" />
+                          All
                         </Button>
                         <Button
                           variant={governmentFilter === 'city' ? 'default' : 'outline'}
                           onClick={() => setGovernmentFilter('city')}
                           className="flex-1"
                         >
-                          <TranslatedText contentKey="jobs.city_jobs" originalText="City" />
+                          City
                         </Button>
                         <Button
                           variant={governmentFilter === 'state' ? 'default' : 'outline'}
                           onClick={() => setGovernmentFilter('state')}
                           className="flex-1"
                         >
-                          <TranslatedText contentKey="jobs.state_jobs" originalText="State" />
+                          State
                         </Button>
                       </div>
                     </div>
@@ -274,7 +271,7 @@ export default function Jobs() {
                     <div className="space-y-2">
                       <label className="text-sm font-medium flex items-center gap-2">
                         <Briefcase className="h-4 w-4" />
-                        <TranslatedText contentKey="jobs.job_title_label" originalText="Job Title" />
+                        Job Title
                       </label>
                       <div className="flex gap-2">
                         <Input
@@ -300,10 +297,7 @@ export default function Jobs() {
                           disabled={isSearching}
                           className="shrink-0"
                         >
-                          <TranslatedText 
-                            contentKey="jobs.search_button" 
-                            originalText={isSearching ? 'Searching...' : 'Search'}
-                          />
+                          {isSearching ? 'Searching...' : 'Search'}
                         </Button>
                       </div>
                     </div>
@@ -315,7 +309,7 @@ export default function Jobs() {
                       onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
                       className="w-full flex items-center justify-center gap-2"
                     >
-                      <TranslatedText contentKey="jobs.advanced_search" originalText="Advanced Search" />
+                      Advanced Search
                       {showAdvancedSearch ? (
                         <ChevronUp className="h-4 w-4" />
                       ) : (
@@ -331,7 +325,7 @@ export default function Jobs() {
                         <div className="space-y-2">
                           <label className="text-sm font-medium flex items-center gap-2">
                             <MapPin className="h-4 w-4" />
-                            <TranslatedText contentKey="jobs.location_label" originalText="Location" />
+                            Location
                           </label>
                           <Select value={locationFilter} onValueChange={setLocationFilter}>
                             <SelectTrigger className="w-full bg-background">
@@ -340,7 +334,7 @@ export default function Jobs() {
                               </SelectValue>
                             </SelectTrigger>
                             <SelectContent className="bg-background z-50">
-                              <SelectItem value="all"><TranslatedText contentKey="jobs.all_locations" originalText="All locations" /></SelectItem>
+                              <SelectItem value="all">All locations</SelectItem>
                               {uniqueLocations.map(location => (
                                 <SelectItem key={location} value={location}>{location}</SelectItem>
                               ))}
@@ -352,7 +346,7 @@ export default function Jobs() {
                         <div className="space-y-2">
                           <label className="text-sm font-medium flex items-center gap-2">
                             <Building className="h-4 w-4" />
-                            <TranslatedText contentKey="jobs.employer_label" originalText="Employer" />
+                            Employer
                           </label>
                           <SearchableEmployerDropdown
                             employers={uniqueEmployers}
@@ -365,7 +359,7 @@ export default function Jobs() {
                         {/* Clear Filters */}
                         <div className="space-y-2 flex items-end">
                           <Button variant="outline" onClick={clearFilters} className="w-full">
-                            <TranslatedText contentKey="jobs.clear_filters" originalText="Clear Filters" />
+                            Clear Filters
                           </Button>
                         </div>
                      </div>
@@ -383,7 +377,7 @@ export default function Jobs() {
                     <div className="space-y-2">
                       <label className="text-sm font-medium flex items-center gap-2">
                         <Briefcase className="h-4 w-4" />
-                        <TranslatedText contentKey="jobs.job_title_label" originalText="Job Title" />
+                        Job Title
                       </label>
                       <div className="flex gap-2">
                         <Input
@@ -409,10 +403,7 @@ export default function Jobs() {
                           disabled={isSearching}
                           className="shrink-0"
                         >
-                          <TranslatedText 
-                            contentKey="jobs.search_button" 
-                            originalText={isSearching ? 'Searching...' : 'Search'}
-                          />
+                          {isSearching ? 'Searching...' : 'Search'}
                         </Button>
                       </div>
                     </div>
@@ -424,7 +415,7 @@ export default function Jobs() {
                       onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
                       className="w-full flex items-center justify-center gap-2"
                     >
-                      <TranslatedText contentKey="jobs.advanced_search" originalText="Advanced Search" />
+                      Advanced Search
                       {showAdvancedSearch ? (
                         <ChevronUp className="h-4 w-4" />
                       ) : (
@@ -440,7 +431,7 @@ export default function Jobs() {
                         <div className="space-y-2">
                           <label className="text-sm font-medium flex items-center gap-2">
                             <MapPin className="h-4 w-4" />
-                            <TranslatedText contentKey="jobs.location_label" originalText="Location" />
+                            Location
                           </label>
                           <Select value={locationFilter} onValueChange={setLocationFilter}>
                             <SelectTrigger className="w-full bg-background">
@@ -449,7 +440,7 @@ export default function Jobs() {
                               </SelectValue>
                             </SelectTrigger>
                             <SelectContent className="bg-background z-50">
-                              <SelectItem value="all"><TranslatedText contentKey="jobs.all_locations" originalText="All locations" /></SelectItem>
+                              <SelectItem value="all">All locations</SelectItem>
                               {uniqueLocations.map(location => (
                                 <SelectItem key={location} value={location}>{location}</SelectItem>
                               ))}
@@ -461,7 +452,7 @@ export default function Jobs() {
                         <div className="space-y-2">
                           <label className="text-sm font-medium flex items-center gap-2">
                             <Building className="h-4 w-4" />
-                            <TranslatedText contentKey="jobs.employer_label" originalText="Employer" />
+                            Employer
                           </label>
                           <SearchableEmployerDropdown
                             employers={uniqueEmployers}
@@ -474,7 +465,7 @@ export default function Jobs() {
                         {/* Clear Filters */}
                         <div className="space-y-2 flex items-end">
                           <Button variant="outline" onClick={clearFilters} className="w-full">
-                            <TranslatedText contentKey="jobs.clear_filters" originalText="Clear Filters" />
+                            Clear Filters
                           </Button>
                         </div>
                      </div>

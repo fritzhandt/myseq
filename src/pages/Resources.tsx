@@ -183,7 +183,7 @@ export default function Resources() {
             className="flex items-center text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            <TranslatedText contentKey="resources-back-btn" originalText="Back to Main Menu" />
+            Back to Main Menu
           </Button>
         </div>
       </div>
@@ -192,13 +192,10 @@ export default function Resources() {
         <div className="text-center mb-8">
           <div className="flex-1">
             <h1 className="text-4xl font-bold mb-4">
-              <TranslatedText contentKey="resources-title" originalText="Programs & Services" />
+              Programs & Services
             </h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              <TranslatedText 
-                contentKey="resources-subtitle" 
-                originalText="Discover local organizations and services available in your community" 
-              />
+              Discover local organizations and services available in your community
             </p>
           </div>
         </div>
@@ -217,7 +214,7 @@ export default function Resources() {
                 }}
                 className="min-w-[180px]"
               >
-                <TranslatedText contentKey="resources-all-categories" originalText="All Categories" />
+                All Categories
               </Button>
             </div>
 
@@ -242,10 +239,7 @@ export default function Resources() {
                     >
                       <Icon className="h-5 w-5" />
                       <span className="text-xs text-center leading-tight">
-                        <TranslatedText 
-                          contentKey={`category-${category.name.replace(/\s+/g, '-')}`} 
-                          originalText={category.name} 
-                        />
+                        {category.name}
                       </span>
                     </Button>
                   );
@@ -267,10 +261,7 @@ export default function Resources() {
                 className="w-full md:w-auto min-w-[240px] mx-auto flex items-center justify-center gap-2"
               >
                 <Users className="h-5 w-5" />
-                <TranslatedText 
-                  contentKey="category-community-resources" 
-                  originalText="More Resource Categories" 
-                />
+                More Resource Categories
                 <ChevronDown className={`h-4 w-4 transition-transform ${showCommunitySubcategories ? 'rotate-180' : ''}`} />
               </Button>
               
@@ -289,10 +280,7 @@ export default function Resources() {
                       >
                         <Icon className="h-5 w-5" />
                         <span className="text-xs text-center leading-tight">
-                          <TranslatedText 
-                            contentKey={`category-${subcategory.name.replace(/\s+/g, '-')}`} 
-                            originalText={subcategory.name} 
-                          />
+                          {subcategory.name}
                         </span>
                       </Button>
                     );
@@ -321,10 +309,7 @@ export default function Resources() {
               disabled={loading}
               className="shrink-0 px-6"
             >
-              <TranslatedText 
-                contentKey="resources-search-btn" 
-                originalText={loading ? 'Searching...' : 'Search'} 
-              />
+              {loading ? 'Searching...' : 'Search'}
             </Button>
           </div>
         </div>
@@ -333,13 +318,13 @@ export default function Resources() {
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-muted-foreground">
-              <TranslatedText contentKey="resources-loading" originalText="Loading resources..." />
+              Loading resources...
             </div>
           </div>
         ) : filteredResources.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground text-lg">
-              <TranslatedText contentKey="resources-no-results" originalText="No resources found." />
+              No resources found.
             </p>
             {(searchQuery || selectedCategory) && (
               <Button
@@ -350,7 +335,7 @@ export default function Resources() {
                 }}
                 className="mt-4"
               >
-                <TranslatedText contentKey="resources-clear-filters" originalText="Clear Filters" />
+                Clear Filters
               </Button>
             )}
           </div>
