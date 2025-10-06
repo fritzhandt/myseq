@@ -45,7 +45,6 @@ export default function Jobs() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { trackPageView } = useAnalytics();
-  const { trackPageView } = useAnalytics();
 
   const MAX_JOB_SEARCH_LENGTH = 100;
 
