@@ -29,19 +29,19 @@ const MyElectedLookup = () => {
       title: "Senator", 
       description: "Find your New York State Senate representative",
       url: "https://www.nysenate.gov/find-my-senator",
-      icon: <Search className="w-6 h-6" />
+      icon: null
     },
     {
       title: "Councilmember",
       description: "Find your New York City Council representative", 
       url: "https://council.nyc.gov/districts/",
-      icon: <Search className="w-6 h-6" />
+      icon: null
     },
     {
       title: "Congressperson",
       description: "Find your U.S. House of Representatives member",
       url: "https://www.house.gov/representatives/find-your-representative",
-      icon: <Search className="w-6 h-6" />
+      icon: null
     }
   ];
 
@@ -80,9 +80,11 @@ const MyElectedLookup = () => {
             {lookupOptions.map((option, index) => (
               <div key={index} className="bg-card p-6 rounded-lg border shadow-sm flex flex-col">
                 <div className="text-center mb-6 flex-1">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 text-primary">
-                    {option.icon}
-                  </div>
+                  {option.icon && (
+                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 text-primary">
+                      {option.icon}
+                    </div>
+                  )}
                   <h2 className="text-xl font-semibold mb-2">{option.title}</h2>
                   <p className="text-sm text-muted-foreground mb-6">{option.description}</p>
                 </div>
