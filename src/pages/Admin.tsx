@@ -16,6 +16,7 @@ import CivicOrganizationsManager from '@/components/CivicOrganizationsManager';
 import JobCSVUpload from '@/components/JobCSVUpload';
 import JobReportsList from '@/components/JobReportsList';
 import AdminJobsList from '@/components/AdminJobsList';
+import JobManualEntryForm from '@/components/JobManualEntryForm';
 import ResourceCSVUpload from '@/components/ResourceCSVUpload';
 import { PendingApprovalsManager } from '@/components/PendingApprovalsManager';
 import MyPendingSubmissions from '@/components/MyPendingSubmissions';
@@ -41,6 +42,7 @@ const Admin = () => {
   const [showCommunityAlertForm, setShowCommunityAlertForm] = useState(false);
   const [showResourceForm, setShowResourceForm] = useState(false);
   const [showBusinessOpportunityForm, setShowBusinessOpportunityForm] = useState(false);
+  const [showJobManualEntryForm, setShowJobManualEntryForm] = useState(false);
   
   // Editing states
   const [editingEvent, setEditingEvent] = useState<any>(null);
@@ -494,6 +496,10 @@ const Admin = () => {
             <div className="space-y-6">
               <div className="flex justify-between items-center">
                 <h2 className="text-3xl font-bold">Manage Jobs</h2>
+                <Button onClick={() => setShowJobManualEntryForm(true)} size="lg">
+                  <Plus className="h-5 w-5 mr-2" />
+                  Add Job Manually
+                </Button>
               </div>
               
               <Tabs defaultValue="upload" className="w-full">
@@ -516,6 +522,15 @@ const Admin = () => {
                 </TabsContent>
               </Tabs>
             </div>
+            
+            <JobManualEntryForm
+              open={showJobManualEntryForm}
+              onOpenChange={setShowJobManualEntryForm}
+              onSuccess={() => {
+                // Jobs list will auto-refresh when tab is re-opened
+                setShowJobManualEntryForm(false);
+              }}
+            />
           </TabsContent>
 
           {isMainAdmin && (
