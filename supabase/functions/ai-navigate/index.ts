@@ -111,6 +111,117 @@ serve(async (req) => {
     }
 
     // ==========================================
+    // STEP 0: CRISIS DETECTION (HIGHEST PRIORITY)
+    // ==========================================
+    const crisisPrompt = `You are a CRISIS DETECTION SYSTEM. Your ONLY job is to detect if someone is expressing suicidal ideation or planning self-harm.
+
+CRITICAL: You must detect BOTH explicit AND implicit indicators of self-harm/suicide.
+
+EXPLICIT INDICATORS (obvious):
+- Direct statements: "I want to kill myself", "I want to die", "life isn't worth living", "I'm going to hurt myself", "suicide", "end it all"
+- Planning statements: "how to commit suicide", "ways to end my life", "painless ways to die"
+
+IMPLICIT INDICATORS (require context analysis):
+- Combinations that indicate suicide planning:
+  * "noose" + any item to stand on (stool, chair, ladder, step stool, etc.)
+  * "rope" + hanging context + location (beam, ceiling, etc.)
+  * "how to hang" + self/myself
+  * Methods + materials for self-harm
+  * "gun" + "myself" / "my head"
+  * "pills" + "overdose" / "how many"
+  * Bridge/height + jumping context
+
+EXAMPLES THAT SHOULD TRIGGER CRISIS RESPONSE:
+✓ "how do i tie a noose and where can i purchase a stool"
+✓ "instructions for making a noose and need a chair"
+✓ "where to buy rope and a ladder"
+✓ "how to hang myself"
+✓ "best way to end it all"
+✓ "i want to die tonight"
+✓ "planning to kill myself"
+✓ "how many pills to overdose"
+
+LEGITIMATE QUERIES THAT SHOULD NOT TRIGGER (seeking help, not crisis):
+✗ "I need mental health counseling" → seeking help, NOT crisis
+✗ "where can I get therapy for depression" → seeking help, NOT crisis
+✗ "I'm feeling depressed and need support" → seeking help, NOT crisis
+✗ "mental health resources near me" → seeking help, NOT crisis
+✗ "support groups for anxiety" → seeking help, NOT crisis
+✗ "I'm struggling and need someone to talk to" → seeking help, NOT crisis
+✗ "counseling services in my area" → seeking help, NOT crisis
+
+THE KEY DISTINCTION:
+- CRISIS = Active planning, methods, suicidal ideation, immediate danger
+- SEEKING HELP = Looking for therapy, counseling, support groups, mental health services
+
+RESPONSE FORMAT (JSON ONLY):
+If CRISIS detected:
+{
+  "isCrisis": true,
+  "success": true
+}
+
+If NOT crisis:
+{
+  "isCrisis": false,
+  "success": true
+}
+
+CRITICAL: Return ONLY valid JSON, no explanations.`;
+
+    // Check for crisis first
+    const crisisResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: crisisPrompt },
+          { role: 'user', content: query }
+        ],
+        max_tokens: 100,
+        temperature: 0.0
+      }),
+    });
+
+    if (!crisisResponse.ok) {
+      console.error('Crisis detection API error:', crisisResponse.status);
+      // Continue to navigation if crisis detection fails - don't block legitimate queries
+    } else {
+      const crisisData = await crisisResponse.json();
+      const crisisAiResponse = crisisData.choices?.[0]?.message?.content;
+      console.log('Crisis Detection Response:', crisisAiResponse);
+      
+      try {
+        let crisisJsonStr = crisisAiResponse.trim();
+        const firstBrace = crisisJsonStr.indexOf('{');
+        const lastBrace = crisisJsonStr.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace !== -1) {
+          crisisJsonStr = crisisJsonStr.substring(firstBrace, lastBrace + 1);
+        }
+        
+        const crisisResult = JSON.parse(crisisJsonStr);
+        
+        if (crisisResult.isCrisis === true) {
+          console.log('CRISIS DETECTED - Returning help resources');
+          return new Response(JSON.stringify({
+            success: true,
+            isGeneralQuery: true,
+            answer: "Help is available. You're not alone. Call 988 or visit https://www.nyc.gov/site/doh/health/health-topics/988.page to get the help you need. There are also other private organizations that can provide mental health assistance, just go to 'Community Resources' and click the 'Mental Health/Wellness' tab."
+          }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+      } catch (e) {
+        console.error('Error parsing crisis detection:', e);
+        // Continue to navigation if parsing fails
+      }
+    }
+
+    // ==========================================
     // STEP 1: NAVIGATION ROUTER (NO ANSWERING)
     // ==========================================
     const navigationPrompt = `You are an AGGRESSIVE ROUTER. Your PRIMARY goal is to find a route. You ONLY say NO_MATCH as a LAST RESORT.
