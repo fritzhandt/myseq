@@ -22,9 +22,10 @@ import { PendingApprovalsManager } from '@/components/PendingApprovalsManager';
 import MyPendingSubmissions from '@/components/MyPendingSubmissions';
 import { AdminStats } from '@/components/AdminStats';
 import ProfileSettings from '@/components/ProfileSettings';
+import AIRateLimitManager from '@/components/AIRateLimitManager';
 import { useToast } from '@/hooks/use-toast';
 import { useUserRole } from '@/hooks/useUserRole';
-import { Plus, Calendar, LogOut, Star, AlertTriangle, Users, MapPin, FileText, Building2, Clock, BarChart3, Briefcase, User } from 'lucide-react';
+import { Plus, Calendar, LogOut, Star, AlertTriangle, Users, MapPin, FileText, Building2, Clock, BarChart3, Briefcase, User, Zap } from 'lucide-react';
 
 // Admin Panel - Role-based access control system
 const Admin = () => {
@@ -266,7 +267,7 @@ const Admin = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue={isMainAdmin ? "pending-approvals" : (isSubAdmin ? "my-submissions" : "events")} className="w-full">
-          <TabsList className={`grid w-full ${isMainAdmin ? 'grid-cols-9' : (isSubAdmin ? 'grid-cols-7' : 'grid-cols-7')} mb-8`}>
+          <TabsList className={`grid w-full ${isMainAdmin ? 'grid-cols-10' : (isSubAdmin ? 'grid-cols-7' : 'grid-cols-7')} mb-8`}>
             {isMainAdmin && (
               <TabsTrigger value="pending-approvals" className="flex items-center gap-2 relative">
                 <Clock className="h-4 w-4" />
@@ -322,6 +323,12 @@ const Admin = () => {
               <MapPin className="h-4 w-4" />
               Jobs
             </TabsTrigger>
+            {isMainAdmin && (
+              <TabsTrigger value="ai-limits" className="flex items-center gap-2">
+                <Zap className="h-4 w-4" />
+                AI Limits
+              </TabsTrigger>
+            )}
             {isMainAdmin && (
               <TabsTrigger value="stats" className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />
@@ -532,6 +539,18 @@ const Admin = () => {
               }}
             />
           </TabsContent>
+
+          {isMainAdmin && (
+            <TabsContent value="ai-limits">
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-3xl font-bold">AI Search Rate Limits</h2>
+                  <p className="text-sm text-muted-foreground">Monitor and manage AI search usage</p>
+                </div>
+                <AIRateLimitManager />
+              </div>
+            </TabsContent>
+          )}
 
           {isMainAdmin && (
             <TabsContent value="stats">
