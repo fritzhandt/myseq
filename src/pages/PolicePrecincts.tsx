@@ -164,11 +164,6 @@ export default function PolicePrecincts() {
             </p>
             <p>
               <strong>
-                <TranslatedText contentKey="police_precincts.non_emergency" originalText="Non-Emergency:" />
-              </strong> <TranslatedText contentKey="police_precincts.call_311" originalText="Call 311 or (212) 639-9675" />
-            </p>
-            <p>
-              <strong>
                 <TranslatedText contentKey="police_precincts.crime_stoppers" originalText="Crime Stoppers:" />
               </strong> 1-800-577-TIPS (8477)
             </p>
