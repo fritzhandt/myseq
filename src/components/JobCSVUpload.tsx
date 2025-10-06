@@ -30,6 +30,20 @@ export default function JobCSVUpload() {
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('city');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const getCategoryValue = () => {
+    if (selectedCategory === 'government') return 'government';
+    if (selectedCategory === 'state') return 'government';
+    if (selectedCategory === 'private') return 'private';
+    if (selectedCategory === 'internships') return 'internships';
+    return selectedCategory;
+  };
+
+  const getSubcategoryValue = () => {
+    if (selectedCategory === 'government') return 'city';
+    if (selectedCategory === 'state') return 'state';
+    return null;
+  };
+
   const parseXLSX = (arrayBuffer: ArrayBuffer): Job[] => {
     try {
       const workbook = XLSX.read(arrayBuffer, { type: 'array' });
@@ -159,8 +173,8 @@ export default function JobCSVUpload() {
         apply_info: job.applyLink,
         description: job.description || `${job.type} position at ${job.company}`,
         is_apply_link: isValidURL(job.applyLink),
-        category: selectedCategory,
-        subcategory: selectedCategory === 'government' ? selectedSubcategory : null,
+        category: getCategoryValue(),
+        subcategory: getSubcategoryValue(),
       }));
 
       // Sub-admins jobs are not currently supported in pending tables
@@ -217,36 +231,18 @@ export default function JobCSVUpload() {
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="category">Job Category</Label>
-              <Select value={selectedCategory} onValueChange={(value) => {
-                setSelectedCategory(value);
-                if (value !== 'government') {
-                  setSelectedSubcategory('');
-                }
-              }}>
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select job category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="government">Government</SelectItem>
-                  <SelectItem value="private_sector">Private Sector</SelectItem>
+                  <SelectItem value="government">City Government</SelectItem>
+                  <SelectItem value="state">State Government</SelectItem>
+                  <SelectItem value="private">Private Sector</SelectItem>
+                  <SelectItem value="internships">Internships</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-
-            {selectedCategory === 'government' && (
-              <div className="space-y-2">
-                <Label htmlFor="subcategory">Government Type</Label>
-                <Select value={selectedSubcategory} onValueChange={setSelectedSubcategory}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select government type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="city">City</SelectItem>
-                    <SelectItem value="state">State</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
             
             <Alert>
               <AlertCircle className="h-4 w-4" />
