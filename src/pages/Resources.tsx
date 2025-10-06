@@ -53,6 +53,7 @@ export default function Resources() {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [showCommunitySubcategories, setShowCommunitySubcategories] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [fromAINavigation, setFromAINavigation] = useState(false);
   const itemsPerPage = 12;
   const location = useLocation();
   const navigate = useNavigate();
@@ -67,9 +68,18 @@ export default function Resources() {
   useEffect(() => {
     const state = location.state as any;
     if (state?.searchTerm || state?.category) {
+      // Mark that this came from AI navigation
+      setFromAINavigation(true);
+      
       // Set search parameters immediately
       if (state.searchTerm) setSearchQuery(state.searchTerm);
-      if (state.category) setSelectedCategory(state.category);
+      if (state.category) {
+        setSelectedCategory(state.category);
+        // Show community subcategories if the category is in that section
+        if (COMMUNITY_SUBCATEGORIES.some(s => s.name === state.category)) {
+          setShowCommunitySubcategories(true);
+        }
+      }
       
       // Clear navigation state immediately
       navigate(location.pathname, { replace: true });
@@ -129,6 +139,22 @@ export default function Resources() {
         resource.description.toLowerCase().includes(query) ||
         resource.categories.some(category => category.toLowerCase().includes(query))
       );
+    }
+
+    // If this was from AI navigation with both search and category, but no results found
+    // Clear the search and just show the category
+    if (fromAINavigation && filtered.length === 0 && searchQuery.trim() && selectedCategory) {
+      console.log('AI navigation: No results with search term, falling back to category only');
+      setSearchQuery("");
+      setFromAINavigation(false);
+      
+      // Re-filter with just category
+      filtered = resources.filter(resource =>
+        resource.categories.includes(selectedCategory)
+      );
+    } else if (fromAINavigation && filtered.length > 0) {
+      // Results found, clear the flag
+      setFromAINavigation(false);
     }
 
     setFilteredResources(filtered);
