@@ -215,7 +215,7 @@ const Civics = () => {
                 >
                   <CardHeader>
                     <CardTitle className="flex items-start justify-between gap-2">
-                      <span className="group-hover:text-green-600 transition-colors">
+                      <span className="group-hover:text-green-600 transition-colors break-words">
                         {org.name}
                       </span>
                       <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-green-600 transition-colors flex-shrink-0" />
