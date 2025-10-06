@@ -3,16 +3,11 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { ArrowLeft, Phone, Mail, MapPin, User, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import Navbar from '@/components/Navbar';
+import { cn } from '@/lib/utils';
 
 interface ElectedOfficial {
   id: string;
@@ -215,50 +210,85 @@ const ContactElected = () => {
               Back to Home
             </Button>
             
-            <div className="text-center mb-12">
+            <div className="text-center mb-8">
               <h1 className="text-4xl font-bold mb-6">
                 Contact Your Elected Officials
               </h1>
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-6">
                 Facing a federal, state, or city issue? Want to voice your concerns? Contact your elected representative and get help immediately.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button
+                onClick={() => navigate('/my-elected-lookup')}
+                className="bg-primary hover:bg-primary/90 text-white px-6 py-3"
+              >
+                <User className="mr-2 h-4 w-4" />
+                Find My Specific Representatives
+              </Button>
+            </div>
+
+            {/* Filter Tabs */}
+            <div className="mb-12">
+              <div className="flex flex-wrap justify-center gap-2 max-w-4xl mx-auto">
                 <Button
-                  onClick={() => navigate('/my-elected-lookup')}
-                  className="bg-primary hover:bg-primary/90 text-white px-6 py-3"
+                  variant={activeFilter === null ? "default" : "outline"}
+                  onClick={() => handleFilterChange(null)}
+                  className={cn(
+                    "transition-all",
+                    activeFilter === null && "bg-primary text-white"
+                  )}
                 >
-                  <User className="mr-2 h-4 w-4" />
-                  Find My Specific Representatives
+                  All Representatives
                 </Button>
-                
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="px-6 py-3">
-                      {activeFilter ? 'Filtered View' : 'Filter by Section'}
-                      <ChevronDown className="ml-2 h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="center" className="w-56 bg-background z-50">
-                    <DropdownMenuItem onClick={() => handleFilterChange(null)}>
-                      Show All
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleFilterChange('federal')}>
-                      Federal Representatives
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleFilterChange('state-executive')}>
-                      State Executive
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleFilterChange('state-legislative')}>
-                      State Legislative
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleFilterChange('city-executive')}>
-                      City Executive
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleFilterChange('city-council')}>
-                      City Council
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <Button
+                  variant={activeFilter === 'federal' ? "default" : "outline"}
+                  onClick={() => handleFilterChange('federal')}
+                  className={cn(
+                    "transition-all",
+                    activeFilter === 'federal' && "bg-primary text-white"
+                  )}
+                >
+                  Federal
+                </Button>
+                <Button
+                  variant={activeFilter === 'state-executive' ? "default" : "outline"}
+                  onClick={() => handleFilterChange('state-executive')}
+                  className={cn(
+                    "transition-all",
+                    activeFilter === 'state-executive' && "bg-primary text-white"
+                  )}
+                >
+                  State Executive
+                </Button>
+                <Button
+                  variant={activeFilter === 'state-legislative' ? "default" : "outline"}
+                  onClick={() => handleFilterChange('state-legislative')}
+                  className={cn(
+                    "transition-all",
+                    activeFilter === 'state-legislative' && "bg-primary text-white"
+                  )}
+                >
+                  State Legislative
+                </Button>
+                <Button
+                  variant={activeFilter === 'city-executive' ? "default" : "outline"}
+                  onClick={() => handleFilterChange('city-executive')}
+                  className={cn(
+                    "transition-all",
+                    activeFilter === 'city-executive' && "bg-primary text-white"
+                  )}
+                >
+                  City Executive
+                </Button>
+                <Button
+                  variant={activeFilter === 'city-council' ? "default" : "outline"}
+                  onClick={() => handleFilterChange('city-council')}
+                  className={cn(
+                    "transition-all",
+                    activeFilter === 'city-council' && "bg-primary text-white"
+                  )}
+                >
+                  City Council
+                </Button>
               </div>
             </div>
 
