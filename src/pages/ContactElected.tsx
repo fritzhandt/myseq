@@ -3,6 +3,12 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { ArrowLeft, Phone, Mail, MapPin, User, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
@@ -38,6 +44,13 @@ const ContactElected = () => {
       ...prev,
       [id]: !prev[id]
     }));
+  };
+
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   const fetchOfficials = async () => {
@@ -198,13 +211,41 @@ const ContactElected = () => {
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-6">
                 Facing a federal, state, or city issue? Want to voice your concerns? Contact your elected representative and get help immediately.
               </p>
-              <Button
-                onClick={() => navigate('/my-elected-lookup')}
-                className="bg-primary hover:bg-primary/90 text-white px-6 py-3"
-              >
-                <User className="mr-2 h-4 w-4" />
-                Find My Specific Representatives
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <Button
+                  onClick={() => navigate('/my-elected-lookup')}
+                  className="bg-primary hover:bg-primary/90 text-white px-6 py-3"
+                >
+                  <User className="mr-2 h-4 w-4" />
+                  Find My Specific Representatives
+                </Button>
+                
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="px-6 py-3">
+                      Jump to Section
+                      <ChevronDown className="ml-2 h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="center" className="w-56 bg-background z-50">
+                    <DropdownMenuItem onClick={() => scrollToSection('federal-section')}>
+                      Federal Representatives
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => scrollToSection('state-executive-section')}>
+                      State Executive
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => scrollToSection('state-legislative-section')}>
+                      State Legislative
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => scrollToSection('city-executive-section')}>
+                      City Executive
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => scrollToSection('city-council-section')}>
+                      City Council
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
 
             {/* Who Should I Contact Guidance */}
@@ -247,17 +288,31 @@ const ContactElected = () => {
               const levelData = groupedOfficials[level];
               if (!levelData) return null;
 
+              // Generate section IDs based on level
+              const sectionId = level === 'federal' ? 'federal-section' : 
+                               level === 'state' ? null : 
+                               'city-section';
+
               return (
-                <div key={level} className="mb-12">
+                <div key={level} className="mb-12" id={sectionId || undefined}>
                   <h2 className="text-2xl font-bold mb-6 text-center">
                     {levelTitles[level as keyof typeof levelTitles]}
                   </h2>
                   
-                  {Object.entries(levelData).map(([category, categoryOfficials]) => (
-                    <div key={category} className="mb-8">
-                      <h3 className="text-xl font-semibold mb-4 text-primary">
-                        {getCategoryTitle(category, level)}
-                      </h3>
+                  {Object.entries(levelData).map(([category, categoryOfficials]) => {
+                    // Generate category-specific section IDs
+                    const categorySectionId = 
+                      level === 'state' && category === 'executive' ? 'state-executive-section' :
+                      level === 'state' && category === 'legislative' ? 'state-legislative-section' :
+                      level === 'city' && category === 'executive' ? 'city-executive-section' :
+                      level === 'city' && category === 'legislative' ? 'city-council-section' :
+                      undefined;
+
+                    return (
+                      <div key={category} className="mb-8" id={categorySectionId}>
+                        <h3 className="text-xl font-semibold mb-4 text-primary">
+                          {getCategoryTitle(category, level)}
+                        </h3>
 
                       {/* Mobile Layout - Collapsible Cards */}
                       <div className="md:hidden">
@@ -485,7 +540,8 @@ const ContactElected = () => {
                         ))}
                       </div>
                     </div>
-                  ))}
+                  );
+                })}
                 </div>
               );
             })}
