@@ -1,39 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Menu, Info, Users, Mail, Search, Vote, Shield, Calendar, Briefcase, Home, Building2, HelpCircle, Instagram, ExternalLink, Landmark, Languages } from 'lucide-react';
+import { Menu, Info, Users, Mail, Search, Vote, Shield, Calendar, Briefcase, Home, Building2, HelpCircle, Instagram, ExternalLink, Landmark } from 'lucide-react';
 import AddToHomeButton from '@/components/AddToHomeButton';
+import { GoogleTranslate } from '@/components/GoogleTranslate';
 import { useNavbar } from '@/contexts/NavbarContext';
 
 const Navbar = () => {
   const { isOpen, closeMenu, toggleMenu } = useNavbar();
   const [showVoteDialog, setShowVoteDialog] = useState(false);
-  
-  useEffect(() => {
-    // Hide Google Translate branding
-    const style = document.createElement('style');
-    style.innerHTML = `
-      .goog-te-banner-frame.skiptranslate { display: none !important; }
-      body { top: 0px !important; }
-      .goog-te-gadget { font-family: inherit !important; }
-      .goog-te-gadget .goog-te-combo { 
-        padding: 4px 8px;
-        border-radius: 6px;
-        border: 1px solid hsl(var(--border));
-        background: hsl(var(--background));
-        color: hsl(var(--foreground));
-        font-size: 14px;
-      }
-      .goog-te-gadget img { display: none !important; }
-      .goog-te-gadget-simple { 
-        background-color: transparent !important;
-        border: none !important;
-      }
-    `;
-    document.head.appendChild(style);
-  }, []);
   
   return <nav className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
@@ -57,7 +34,9 @@ const Navbar = () => {
             </a>
             
             {/* Google Translate Widget */}
-            <div id="google_translate_element" className="hidden sm:block"></div>
+            <div className="hidden sm:block">
+              <GoogleTranslate />
+            </div>
             
             <AddToHomeButton />
             
