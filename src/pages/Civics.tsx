@@ -10,7 +10,6 @@ import Navbar from "@/components/Navbar";
 import AdminPagination from "@/components/AdminPagination";
 import { Users, MapPin, Search, Vote, ExternalLink, Phone, ArrowLeft, Building2, Shield, Globe } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { translateSearchQuery } from "@/utils/translateSearch";
 
 interface CivicOrganization {
   id: string;
@@ -56,48 +55,22 @@ const Civics = () => {
   }, []);
 
   useEffect(() => {
-    const filterOrgs = async () => {
-      let filtered = organizations;
-      
-      if (searchQuery) {
-        setLoading(true);
-        try {
-          // Translate the query to English if needed
-          const searchTerms = await translateSearchQuery(searchQuery);
-          
-          // When searching, show all results regardless of tab
-          filtered = filtered.filter(org => {
-            // Check against all search terms (original + translated)
-            return searchTerms.some(term => {
-              const query = term.toLowerCase();
-              return (
-                org.name.toLowerCase().includes(query) ||
-                org.description.toLowerCase().includes(query) ||
-                org.coverage_area.toLowerCase().includes(query)
-              );
-            });
-          });
-        } catch (error) {
-          console.error('Translation error:', error);
-          // Fallback to original search if translation fails
-          filtered = filtered.filter(org =>
-            org.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            org.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            org.coverage_area.toLowerCase().includes(searchQuery.toLowerCase())
-          );
-        } finally {
-          setLoading(false);
-        }
-      } else {
-        // When not searching, filter by organization type
-        filtered = filtered.filter(org => org.organization_type === activeTab);
-      }
-      
-      setFilteredOrgs(filtered);
-      setCurrentPage(1); // Reset to first page when filters change
-    };
-
-    filterOrgs();
+    let filtered = organizations;
+    
+    if (searchQuery) {
+      // When searching, show all results regardless of tab
+      filtered = filtered.filter(org =>
+        org.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        org.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        org.coverage_area.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    } else {
+      // When not searching, filter by organization type
+      filtered = filtered.filter(org => org.organization_type === activeTab);
+    }
+    
+    setFilteredOrgs(filtered);
+    setCurrentPage(1); // Reset to first page when filters change
   }, [searchQuery, organizations, activeTab]);
 
   const fetchOrganizations = async () => {
