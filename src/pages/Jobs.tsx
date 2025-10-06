@@ -115,13 +115,19 @@ export default function Jobs() {
     // Filter by category (government/private/internships)
     if (activeTab === 'government') {
       filtered = filtered.filter(job => job.category === 'government');
+      
+      // Filter by government type (city/state)
+      if (governmentFilter !== 'all') {
+        filtered = filtered.filter(job => {
+          const subcategory = (job as any).subcategory || 'city';
+          return subcategory === governmentFilter;
+        });
+      }
     } else if (activeTab === 'private_sector') {
       filtered = filtered.filter(job => job.category === 'private');
     } else if (activeTab === 'internships') {
       filtered = filtered.filter(job => job.category === 'internships');
     }
-
-    // If in private sector tab, no additional filter needed
 
     // Filter by search query
     if (searchQuery.trim()) {
@@ -178,7 +184,7 @@ export default function Jobs() {
       if (job.category !== 'government') return false;
       if (governmentFilter !== 'all') {
         const subcategory = (job as any).subcategory || 'city';
-        return subcategory === governmentFilter || subcategory === 'both';
+        return subcategory === governmentFilter;
       }
       return true;
     } else if (activeTab === 'private_sector') {
