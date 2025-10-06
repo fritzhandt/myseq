@@ -44,7 +44,7 @@ export default function JobManualEntryForm({ open, onOpenChange, onSuccess }: Jo
     apply_info: '',
     is_apply_link: false,
     category: 'government' as 'government' | 'private_sector',
-    subcategory: 'city'
+    subcategory: 'city' as 'city' | 'state' | 'open_positions' | 'internships'
   });
 
   const resetForm = () => {
@@ -197,9 +197,13 @@ export default function JobManualEntryForm({ open, onOpenChange, onSuccess }: Jo
               <Label htmlFor="category">Category *</Label>
               <Select
                 value={formData.category}
-                onValueChange={(value: 'government' | 'private_sector') => 
-                  setFormData({ ...formData, category: value })
-                }
+                onValueChange={(value: 'government' | 'private_sector') => {
+                  setFormData({ 
+                    ...formData, 
+                    category: value,
+                    subcategory: value === 'government' ? 'city' : 'open_positions'
+                  });
+                }}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -212,23 +216,32 @@ export default function JobManualEntryForm({ open, onOpenChange, onSuccess }: Jo
               {errors.category && <p className="text-sm text-destructive">{errors.category}</p>}
             </div>
 
-            {formData.category === 'government' && (
-              <div className="space-y-2">
-                <Label htmlFor="subcategory">Subcategory *</Label>
-                <Select
-                  value={formData.subcategory}
-                  onValueChange={(value) => setFormData({ ...formData, subcategory: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="city">City</SelectItem>
-                    <SelectItem value="state">State</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
+            <div className="space-y-2">
+              <Label htmlFor="subcategory">Subcategory *</Label>
+              <Select
+                value={formData.subcategory}
+                onValueChange={(value: 'city' | 'state' | 'open_positions' | 'internships') => 
+                  setFormData({ ...formData, subcategory: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {formData.category === 'government' ? (
+                    <>
+                      <SelectItem value="city">City</SelectItem>
+                      <SelectItem value="state">State</SelectItem>
+                    </>
+                  ) : (
+                    <>
+                      <SelectItem value="open_positions">Open Positions</SelectItem>
+                      <SelectItem value="internships">Internships</SelectItem>
+                    </>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="space-y-2">
