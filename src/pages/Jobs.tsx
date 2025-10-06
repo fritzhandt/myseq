@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Briefcase, MapPin, Building, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
@@ -237,35 +237,47 @@ export default function Jobs() {
         </div>
 
         {/* Search and Filters */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <div className="w-full">
           <div className="flex flex-col items-center mb-8">
             <p className="text-sm font-medium text-muted-foreground mb-3">Select a category first!</p>
             <div className="relative">
               <div className="absolute -inset-1 bg-gradient-to-r from-primary/40 via-primary/60 to-primary/40 blur-xl rounded-2xl opacity-70"></div>
-              <TabsList className="relative grid w-full max-w-2xl grid-cols-3 bg-card border-2 border-primary/30 rounded-xl p-1.5 shadow-lg">
-                <TabsTrigger 
-                  value="government" 
-                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg font-semibold transition-all duration-200"
+              <div className="relative grid w-full max-w-2xl grid-cols-3 bg-card border-2 border-primary/30 rounded-xl p-1.5 shadow-lg">
+                <button
+                  onClick={() => setActiveTab('government')}
+                  className={`px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 ${
+                    activeTab === 'government'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-foreground hover:bg-muted'
+                  }`}
                 >
                   Government
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="private_sector" 
-                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg font-semibold transition-all duration-200"
+                </button>
+                <button
+                  onClick={() => setActiveTab('private_sector')}
+                  className={`px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 ${
+                    activeTab === 'private_sector'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-foreground hover:bg-muted'
+                  }`}
                 >
                   Private Sector
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="internships" 
-                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg font-semibold transition-all duration-200"
+                </button>
+                <button
+                  onClick={() => setActiveTab('internships')}
+                  className={`px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 ${
+                    activeTab === 'internships'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-foreground hover:bg-muted'
+                  }`}
                 >
                   Internships
-                </TabsTrigger>
-              </TabsList>
+                </button>
+              </div>
             </div>
           </div>
 
-          <TabsContent value="government" className="mt-0">
+          {activeTab === 'government' && (
             <Card className="mb-8">
               <CardContent className="p-6">
                  {/* Always visible: Job Title Search */}
@@ -399,9 +411,9 @@ export default function Jobs() {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          )}
 
-          <TabsContent value="private_sector" className="mt-0">
+          {activeTab === 'private_sector' && (
             <Card className="mb-8">
               <CardContent className="p-6">
                   {/* Always visible: Job Title Search */}
@@ -505,9 +517,9 @@ export default function Jobs() {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          )}
 
-          <TabsContent value="internships" className="mt-0">
+          {activeTab === 'internships' && (
             <Card className="mb-8">
               <CardContent className="p-6">
                   {/* Always visible: Job Title Search */}
@@ -611,8 +623,8 @@ export default function Jobs() {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+          )}
+        </div>
 
         {/* Results Count */}
         <div className="mb-6">
