@@ -124,7 +124,7 @@ export default function Jobs() {
         });
       }
     } else if (activeTab === 'private_sector') {
-      filtered = filtered.filter(job => job.category === 'private');
+      filtered = filtered.filter(job => job.category === 'private_sector');
     } else if (activeTab === 'internships') {
       filtered = filtered.filter(job => job.category === 'internships');
     }
@@ -188,7 +188,7 @@ export default function Jobs() {
       }
       return true;
     } else if (activeTab === 'private_sector') {
-      return job.category === 'private';
+      return job.category === 'private_sector';
     } else if (activeTab === 'internships') {
       return job.category === 'internships';
     }

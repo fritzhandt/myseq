@@ -31,7 +31,7 @@ export default function JobCSVUpload() {
 
   const getCategoryValue = () => {
     if (selectedCategory === 'city' || selectedCategory === 'state') return 'government';
-    if (selectedCategory === 'private') return 'private';
+    if (selectedCategory === 'private') return 'private_sector';
     if (selectedCategory === 'internships') return 'internships';
     return selectedCategory;
   };
