@@ -47,7 +47,7 @@ const About = () => {
               <p className="text-muted-foreground">
                 Have resources, jobs, suggestions to better My SEQ, or other opportunities? Let us know by contacting us{' '}
                 <a 
-                  href="mailto:district33@nyassembly.gov?subject=MY%20SEQ%20SUPPORT/INQUIRY" 
+                  href="mailto:mysoutheastqueens@gmail.com?subject=MY%20SEQ%20SUPPORT/INQUIRY" 
                   className="text-primary hover:text-primary/80 underline underline-offset-4"
                 >
                   here

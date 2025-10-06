@@ -92,7 +92,7 @@ const FAQ = () => {
             <div className="mt-8 text-center">
               <p className="text-muted-foreground mb-4">Don't see your question answered here?</p>
               <Button asChild>
-                <a href="mailto:district33@nyassembly.gov?subject=MY%20SEQ%20SUPPORT/INQUIRY">
+                <a href="mailto:mysoutheastqueens@gmail.com?subject=MY%20SEQ%20SUPPORT/INQUIRY">
                   Contact Us
                 </a>
               </Button>
