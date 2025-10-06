@@ -4,6 +4,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Trash2, Building2, MapPin, Edit, Ban, Search } from 'lucide-react';
 import AdminPagination from './AdminPagination';
 import { useToast } from '@/hooks/use-toast';
@@ -48,6 +50,11 @@ export default function AdminJobsList() {
   const [currentPrivatePage, setCurrentPrivatePage] = useState(1);
   const [currentCityPage, setCurrentCityPage] = useState(1);
   const [currentStatePage, setCurrentStatePage] = useState(1);
+  const [currentOpenPage, setCurrentOpenPage] = useState(1);
+  const [currentInternPage, setCurrentInternPage] = useState(1);
+  const [selectedPrivateIds, setSelectedPrivateIds] = useState<Set<string>>(new Set());
+  const [bulkSubcategory, setBulkSubcategory] = useState('');
+  const [bulkUpdating, setBulkUpdating] = useState(false);
   const itemsPerPage = 10;
   const { toast } = useToast();
   const { isSubAdmin, isMainAdmin } = useUserRole();
@@ -229,33 +236,141 @@ export default function AdminJobsList() {
     }
   };
 
-  const JobCard = ({ job }: { job: Job }) => (
+  const toggleSelectPrivate = (id: string) => {
+    const newSelected = new Set(selectedPrivateIds);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedPrivateIds(newSelected);
+  };
+
+  const toggleSelectAllPrivate = (jobs: Job[]) => {
+    if (selectedPrivateIds.size === jobs.length && jobs.length > 0) {
+      setSelectedPrivateIds(new Set());
+    } else {
+      setSelectedPrivateIds(new Set(jobs.map(j => j.id)));
+    }
+  };
+
+  const handleBulkSubcategoryUpdate = async () => {
+    if (!bulkSubcategory || selectedPrivateIds.size === 0) {
+      toast({
+        title: "Error",
+        description: "Please select a subcategory and at least one job",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setBulkUpdating(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      if (isSubAdmin) {
+        // Sub-admins create pending modification requests for each job
+        const jobs = privateSectorJobs.filter(j => selectedPrivateIds.has(j.id));
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('full_name, phone_number')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        const insertPromises = jobs.map(job =>
+          supabase.from("pending_job_modifications").insert({
+            job_id: job.id,
+            action: 'update',
+            modified_data: { ...job, subcategory: bulkSubcategory },
+            submitted_by: user.id,
+            submitter_name: profile?.full_name || null,
+            submitter_phone: profile?.phone_number || null
+          })
+        );
+
+        await Promise.all(insertPromises);
+
+        toast({
+          title: "Requests Submitted",
+          description: `${selectedPrivateIds.size} job update requests submitted for approval`,
+        });
+      } else {
+        // Main admins update directly
+        const updatePromises = Array.from(selectedPrivateIds).map(id =>
+          supabase
+            .from("jobs")
+            .update({ subcategory: bulkSubcategory, updated_at: new Date().toISOString() })
+            .eq("id", id)
+        );
+
+        const results = await Promise.all(updatePromises);
+        const errors = results.filter(r => r.error);
+
+        if (errors.length > 0) {
+          throw new Error(`Failed to update ${errors.length} jobs`);
+        }
+
+        toast({
+          title: "Success",
+          description: `Updated ${selectedPrivateIds.size} job(s) to ${bulkSubcategory === 'open_positions' ? 'Open Positions' : 'Internships'}`,
+        });
+      }
+
+      setSelectedPrivateIds(new Set());
+      setBulkSubcategory("");
+      fetchJobs();
+    } catch (error) {
+      console.error("Error bulk updating:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update jobs",
+        variant: "destructive",
+      });
+    } finally {
+      setBulkUpdating(false);
+    }
+  };
+
+  const JobCard = ({ job, showCheckbox = false }: { job: Job, showCheckbox?: boolean }) => (
     <Card className={`mb-4 ${!job.is_active ? 'opacity-60' : ''}`}>
       <CardContent className="pt-6">
         <div className="flex justify-between items-start">
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-lg">{job.title}</h3>
-              {!job.is_active && (
-                <span className="px-2 py-0.5 bg-destructive/10 text-destructive text-xs rounded">
-                  Inactive
+          <div className="flex items-start gap-3 flex-1">
+            {showCheckbox && (
+              <Checkbox
+                checked={selectedPrivateIds.has(job.id)}
+                onCheckedChange={() => toggleSelectPrivate(job.id)}
+                className="mt-1"
+              />
+            )}
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold text-lg">{job.title}</h3>
+                {!job.is_active && (
+                  <span className="px-2 py-0.5 bg-destructive/10 text-destructive text-xs rounded">
+                    Inactive
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                <Building2 className="h-4 w-4" />
+                <span>{job.employer}</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                <MapPin className="h-4 w-4" />
+                <span>{job.location}</span>
+              </div>
+              <p className="text-sm font-medium mt-2">{job.salary}</p>
+              {job.subcategory && (
+                <span className="inline-block mt-2 px-2 py-1 bg-primary/10 text-primary text-xs rounded">
+                  {job.subcategory === 'city' ? 'City' : 
+                   job.subcategory === 'state' ? 'State' : 
+                   job.subcategory === 'open_positions' ? 'Open Positions' : 'Internships'}
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-              <Building2 className="h-4 w-4" />
-              <span>{job.employer}</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-              <MapPin className="h-4 w-4" />
-              <span>{job.location}</span>
-            </div>
-            <p className="text-sm font-medium mt-2">{job.salary}</p>
-            {job.subcategory && (
-              <span className="inline-block mt-2 px-2 py-1 bg-primary/10 text-primary text-xs rounded">
-                {job.subcategory === 'city' ? 'City' : 'State'}
-              </span>
-            )}
           </div>
           <div className="flex gap-1">
             <Button
@@ -304,15 +419,19 @@ export default function AdminJobsList() {
 
   const cityJobs = filteredGovJobs.filter(job => job.subcategory === 'city');
   const stateJobs = filteredGovJobs.filter(job => job.subcategory === 'state');
+  const openPositionsJobs = filteredPrivateJobs.filter(job => job.subcategory === 'open_positions');
+  const internshipsJobs = filteredPrivateJobs.filter(job => job.subcategory === 'internships');
 
   // Pagination calculations
   const cityTotalPages = Math.ceil(cityJobs.length / itemsPerPage);
   const stateTotalPages = Math.ceil(stateJobs.length / itemsPerPage);
-  const privateTotalPages = Math.ceil(filteredPrivateJobs.length / itemsPerPage);
+  const openTotalPages = Math.ceil(openPositionsJobs.length / itemsPerPage);
+  const internTotalPages = Math.ceil(internshipsJobs.length / itemsPerPage);
 
   const paginatedCityJobs = cityJobs.slice((currentCityPage - 1) * itemsPerPage, currentCityPage * itemsPerPage);
   const paginatedStateJobs = stateJobs.slice((currentStatePage - 1) * itemsPerPage, currentStatePage * itemsPerPage);
-  const paginatedPrivateJobs = filteredPrivateJobs.slice((currentPrivatePage - 1) * itemsPerPage, currentPrivatePage * itemsPerPage);
+  const paginatedOpenJobs = openPositionsJobs.slice((currentOpenPage - 1) * itemsPerPage, currentOpenPage * itemsPerPage);
+  const paginatedInternJobs = internshipsJobs.slice((currentInternPage - 1) * itemsPerPage, currentInternPage * itemsPerPage);
 
   return (
     <>
@@ -356,7 +475,7 @@ export default function AdminJobsList() {
                 </Card>
               ) : (
                 <>
-                  {paginatedCityJobs.map(job => <JobCard key={job.id} job={job} />)}
+                  {paginatedCityJobs.map(job => <JobCard key={job.id} job={job} showCheckbox={false} />)}
                   {cityJobs.length > itemsPerPage && (
                     <AdminPagination
                       currentPage={currentCityPage}
@@ -379,7 +498,7 @@ export default function AdminJobsList() {
                 </Card>
               ) : (
                 <>
-                  {paginatedStateJobs.map(job => <JobCard key={job.id} job={job} />)}
+                  {paginatedStateJobs.map(job => <JobCard key={job.id} job={job} showCheckbox={false} />)}
                   {stateJobs.length > itemsPerPage && (
                     <AdminPagination
                       currentPage={currentStatePage}
@@ -396,26 +515,120 @@ export default function AdminJobsList() {
         </TabsContent>
 
         <TabsContent value="private" className="space-y-4">
-          {filteredPrivateJobs.length === 0 ? (
-            <Card>
-              <CardContent className="pt-6 text-center text-muted-foreground">
-                {searchTerm ? 'No private sector jobs match your search' : 'No private sector jobs found'}
+          {/* Bulk Actions Bar */}
+          {selectedPrivateIds.size > 0 && (
+            <Card className="bg-primary/5 border-primary/20">
+              <CardContent className="py-4">
+                <div className="flex items-center gap-4">
+                  <span className="text-sm font-medium">
+                    {selectedPrivateIds.size} selected
+                  </span>
+                  <Select value={bulkSubcategory} onValueChange={setBulkSubcategory}>
+                    <SelectTrigger className="w-[200px]">
+                      <SelectValue placeholder="Change category to..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="open_positions">Open Positions</SelectItem>
+                      <SelectItem value="internships">Internships</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button 
+                    onClick={handleBulkSubcategoryUpdate}
+                    disabled={!bulkSubcategory || bulkUpdating}
+                    size="sm"
+                  >
+                    {bulkUpdating ? "Updating..." : "Update Categories"}
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => setSelectedPrivateIds(new Set())}
+                    size="sm"
+                  >
+                    Clear Selection
+                  </Button>
+                </div>
               </CardContent>
             </Card>
-          ) : (
-            <>
-              {paginatedPrivateJobs.map(job => <JobCard key={job.id} job={job} />)}
-              {filteredPrivateJobs.length > itemsPerPage && (
-                <AdminPagination
-                  currentPage={currentPrivatePage}
-                  totalPages={privateTotalPages}
-                  totalItems={filteredPrivateJobs.length}
-                  itemsPerPage={itemsPerPage}
-                  onPageChange={setCurrentPrivatePage}
-                />
-              )}
-            </>
           )}
+
+          <Tabs defaultValue="open_positions" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="open_positions">Open Positions ({openPositionsJobs.length})</TabsTrigger>
+              <TabsTrigger value="internships">Internships ({internshipsJobs.length})</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="open_positions" className="space-y-4 mt-4">
+              {/* Select All Checkbox */}
+              {openPositionsJobs.length > 0 && (
+                <div className="flex items-center gap-2 px-2 py-2 border-b">
+                  <Checkbox
+                    checked={selectedPrivateIds.size > 0 && openPositionsJobs.every(j => selectedPrivateIds.has(j.id))}
+                    onCheckedChange={() => toggleSelectAllPrivate(openPositionsJobs)}
+                  />
+                  <span className="text-sm text-muted-foreground">
+                    Select all on this page
+                  </span>
+                </div>
+              )}
+
+              {openPositionsJobs.length === 0 ? (
+                <Card>
+                  <CardContent className="pt-6 text-center text-muted-foreground">
+                    {searchTerm ? 'No open positions match your search' : 'No open positions found'}
+                  </CardContent>
+                </Card>
+              ) : (
+                <>
+                  {paginatedOpenJobs.map(job => <JobCard key={job.id} job={job} showCheckbox={true} />)}
+                  {openPositionsJobs.length > itemsPerPage && (
+                    <AdminPagination
+                      currentPage={currentOpenPage}
+                      totalPages={openTotalPages}
+                      totalItems={openPositionsJobs.length}
+                      itemsPerPage={itemsPerPage}
+                      onPageChange={setCurrentOpenPage}
+                    />
+                  )}
+                </>
+              )}
+            </TabsContent>
+
+            <TabsContent value="internships" className="space-y-4 mt-4">
+              {/* Select All Checkbox */}
+              {internshipsJobs.length > 0 && (
+                <div className="flex items-center gap-2 px-2 py-2 border-b">
+                  <Checkbox
+                    checked={selectedPrivateIds.size > 0 && internshipsJobs.every(j => selectedPrivateIds.has(j.id))}
+                    onCheckedChange={() => toggleSelectAllPrivate(internshipsJobs)}
+                  />
+                  <span className="text-sm text-muted-foreground">
+                    Select all on this page
+                  </span>
+                </div>
+              )}
+
+              {internshipsJobs.length === 0 ? (
+                <Card>
+                  <CardContent className="pt-6 text-center text-muted-foreground">
+                    {searchTerm ? 'No internships match your search' : 'No internships found'}
+                  </CardContent>
+                </Card>
+              ) : (
+                <>
+                  {paginatedInternJobs.map(job => <JobCard key={job.id} job={job} showCheckbox={true} />)}
+                  {internshipsJobs.length > itemsPerPage && (
+                    <AdminPagination
+                      currentPage={currentInternPage}
+                      totalPages={internTotalPages}
+                      totalItems={internshipsJobs.length}
+                      itemsPerPage={itemsPerPage}
+                      onPageChange={setCurrentInternPage}
+                    />
+                  )}
+                </>
+              )}
+            </TabsContent>
+          </Tabs>
         </TabsContent>
       </Tabs>
 

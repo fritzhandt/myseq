@@ -58,7 +58,7 @@ export default function JobEditDialog({ job, open, onOpenChange, onSuccess }: Jo
         apply_info: job.apply_info,
         is_apply_link: job.is_apply_link,
         category: job.category,
-        subcategory: job.subcategory || 'city'
+        subcategory: job.subcategory || (job.category === 'government' ? 'city' : 'open_positions')
       });
     }
   }, [job]);
@@ -161,7 +161,13 @@ export default function JobEditDialog({ job, open, onOpenChange, onSuccess }: Jo
               <Label htmlFor="category">Category *</Label>
               <Select
                 value={formData.category}
-                onValueChange={(value) => setFormData({ ...formData, category: value })}
+                onValueChange={(value: 'government' | 'private_sector') => {
+                  setFormData(prev => ({
+                    ...prev,
+                    category: value,
+                    subcategory: value === 'government' ? 'city' : 'open_positions'
+                  }));
+                }}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -173,23 +179,30 @@ export default function JobEditDialog({ job, open, onOpenChange, onSuccess }: Jo
               </Select>
             </div>
 
-            {formData.category === 'government' && (
-              <div className="space-y-2">
-                <Label htmlFor="subcategory">Subcategory *</Label>
-                <Select
-                  value={formData.subcategory}
-                  onValueChange={(value) => setFormData({ ...formData, subcategory: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="city">City</SelectItem>
-                    <SelectItem value="state">State</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
+            <div className="space-y-2">
+              <Label htmlFor="subcategory">Subcategory *</Label>
+              <Select
+                value={formData.subcategory}
+                onValueChange={(value) => setFormData({ ...formData, subcategory: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {formData.category === 'government' ? (
+                    <>
+                      <SelectItem value="city">City</SelectItem>
+                      <SelectItem value="state">State</SelectItem>
+                    </>
+                  ) : (
+                    <>
+                      <SelectItem value="open_positions">Open Positions</SelectItem>
+                      <SelectItem value="internships">Internships</SelectItem>
+                    </>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="space-y-2">

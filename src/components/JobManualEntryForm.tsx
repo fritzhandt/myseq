@@ -67,10 +67,10 @@ export default function JobManualEntryForm({ open, onOpenChange, onSuccess }: Jo
     setErrors({});
 
     try {
-      // Validate form data
+      // Validate form data - include subcategory for private_sector jobs too
       const validatedData = jobSchema.parse({
         ...formData,
-        subcategory: formData.category === 'government' ? formData.subcategory : null
+        subcategory: formData.subcategory
       });
 
       setLoading(true);
