@@ -242,22 +242,22 @@ export default function Jobs() {
             <p className="text-sm font-medium text-muted-foreground mb-3">Select a category first!</p>
             <div className="relative">
               <div className="absolute -inset-1 bg-gradient-to-r from-primary/40 via-primary/60 to-primary/40 blur-xl rounded-2xl opacity-70"></div>
-              <TabsList className="relative grid w-full max-w-2xl grid-cols-3 bg-card border-2 border-primary/30 rounded-xl p-1.5 shadow-lg items-center">
+              <TabsList className="relative grid w-full max-w-2xl grid-cols-3 bg-card border-2 border-primary/30 rounded-xl p-1.5 shadow-lg">
                 <TabsTrigger 
                   value="government" 
-                  className="!py-2.5 !h-10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg font-semibold transition-all duration-200 !shadow-none"
+                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg font-semibold transition-all duration-200"
                 >
                   Government
                 </TabsTrigger>
                 <TabsTrigger 
                   value="private_sector" 
-                  className="!py-2.5 !h-10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg font-semibold transition-all duration-200 !shadow-none"
+                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg font-semibold transition-all duration-200"
                 >
                   Private Sector
                 </TabsTrigger>
                 <TabsTrigger 
                   value="internships" 
-                  className="!py-2.5 !h-10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg font-semibold transition-all duration-200 !shadow-none"
+                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg font-semibold transition-all duration-200"
                 >
                   Internships
                 </TabsTrigger>
