@@ -38,6 +38,7 @@ const ContactElected = () => {
   const [officials, setOfficials] = useState<ElectedOfficial[]>([]);
   const [loading, setLoading] = useState(true);
   const [guidanceOpen, setGuidanceOpen] = useState(true);
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
 
   const toggleOfficial = (id: string) => {
     setExpandedOfficials(prev => ({
@@ -46,11 +47,8 @@ const ContactElected = () => {
     }));
   };
 
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+  const handleFilterChange = (filter: string | null) => {
+    setActiveFilter(filter);
   };
 
   const fetchOfficials = async () => {
@@ -170,6 +168,19 @@ const ContactElected = () => {
     return categoryTitles[category as keyof typeof categoryTitles] || category;
   };
 
+  // Check if a section should be displayed based on active filter
+  const shouldDisplaySection = (level: string, category: string) => {
+    if (!activeFilter) return true;
+    
+    if (activeFilter === 'federal') return level === 'federal';
+    if (activeFilter === 'state-executive') return level === 'state' && category === 'executive';
+    if (activeFilter === 'state-legislative') return level === 'state' && category === 'legislative';
+    if (activeFilter === 'city-executive') return level === 'city' && category === 'executive';
+    if (activeFilter === 'city-council') return level === 'city' && category === 'legislative';
+    
+    return true;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -223,24 +234,27 @@ const ContactElected = () => {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="px-6 py-3">
-                      Jump to Section
+                      {activeFilter ? 'Filtered View' : 'Filter by Section'}
                       <ChevronDown className="ml-2 h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="center" className="w-56 bg-background z-50">
-                    <DropdownMenuItem onClick={() => scrollToSection('federal-section')}>
+                    <DropdownMenuItem onClick={() => handleFilterChange(null)}>
+                      Show All
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleFilterChange('federal')}>
                       Federal Representatives
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => scrollToSection('state-executive-section')}>
+                    <DropdownMenuItem onClick={() => handleFilterChange('state-executive')}>
                       State Executive
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => scrollToSection('state-legislative-section')}>
+                    <DropdownMenuItem onClick={() => handleFilterChange('state-legislative')}>
                       State Legislative
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => scrollToSection('city-executive-section')}>
+                    <DropdownMenuItem onClick={() => handleFilterChange('city-executive')}>
                       City Executive
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => scrollToSection('city-council-section')}>
+                    <DropdownMenuItem onClick={() => handleFilterChange('city-council')}>
                       City Council
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -288,28 +302,25 @@ const ContactElected = () => {
               const levelData = groupedOfficials[level];
               if (!levelData) return null;
 
-              // Generate section IDs based on level
-              const sectionId = level === 'federal' ? 'federal-section' : 
-                               level === 'state' ? null : 
-                               'city-section';
+              // Check if any category in this level should be displayed
+              const hasVisibleCategories = Object.entries(levelData).some(([category]) => 
+                shouldDisplaySection(level, category)
+              );
+
+              if (!hasVisibleCategories) return null;
 
               return (
-                <div key={level} className="mb-12" id={sectionId || undefined}>
+                <div key={level} className="mb-12">
                   <h2 className="text-2xl font-bold mb-6 text-center">
                     {levelTitles[level as keyof typeof levelTitles]}
                   </h2>
                   
                   {Object.entries(levelData).map(([category, categoryOfficials]) => {
-                    // Generate category-specific section IDs
-                    const categorySectionId = 
-                      level === 'state' && category === 'executive' ? 'state-executive-section' :
-                      level === 'state' && category === 'legislative' ? 'state-legislative-section' :
-                      level === 'city' && category === 'executive' ? 'city-executive-section' :
-                      level === 'city' && category === 'legislative' ? 'city-council-section' :
-                      undefined;
+                    // Skip this category if it doesn't match the filter
+                    if (!shouldDisplaySection(level, category)) return null;
 
                     return (
-                      <div key={category} className="mb-8" id={categorySectionId}>
+                      <div key={category} className="mb-8">
                         <h3 className="text-xl font-semibold mb-4 text-primary">
                           {getCategoryTitle(category, level)}
                         </h3>
