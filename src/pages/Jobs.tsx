@@ -238,14 +238,29 @@ export default function Jobs() {
 
         {/* Search and Filters */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="flex flex-col items-center mb-6">
-            <p className="text-xs text-muted-foreground/60 mb-2">Select a category first!</p>
+          <div className="flex flex-col items-center mb-8">
+            <p className="text-sm font-medium text-muted-foreground mb-3">Select a category first!</p>
             <div className="relative">
-              <div className="absolute -inset-1 bg-gradient-to-r from-primary via-primary/80 to-primary opacity-30 blur-sm rounded-2xl"></div>
-              <TabsList className="relative grid w-full max-w-2xl grid-cols-3 bg-background/80 backdrop-blur-sm border-2 border-primary/20 rounded-2xl">
-                <TabsTrigger value="government" className="data-[state=active]:bg-primary/10">Government</TabsTrigger>
-                <TabsTrigger value="private_sector" className="data-[state=active]:bg-primary/10">Private Sector</TabsTrigger>
-                <TabsTrigger value="internships" className="data-[state=active]:bg-primary/10">Internships</TabsTrigger>
+              <div className="absolute -inset-1 bg-gradient-to-r from-primary/40 via-primary/60 to-primary/40 blur-xl rounded-2xl opacity-70"></div>
+              <TabsList className="relative grid w-full max-w-2xl grid-cols-3 bg-card border-2 border-primary/30 rounded-xl p-1.5 shadow-lg">
+                <TabsTrigger 
+                  value="government" 
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary/90 data-[state=active]:text-primary-foreground data-[state=active]:shadow-md rounded-lg font-semibold transition-all duration-200"
+                >
+                  Government
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="private_sector" 
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary/90 data-[state=active]:text-primary-foreground data-[state=active]:shadow-md rounded-lg font-semibold transition-all duration-200"
+                >
+                  Private Sector
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="internships" 
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary/90 data-[state=active]:text-primary-foreground data-[state=active]:shadow-md rounded-lg font-semibold transition-all duration-200"
+                >
+                  Internships
+                </TabsTrigger>
               </TabsList>
             </div>
           </div>
