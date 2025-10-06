@@ -227,9 +227,10 @@ export default function Jobs() {
         {/* Search and Filters */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="flex justify-center mb-6">
-            <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsList className="grid w-full max-w-2xl grid-cols-3">
               <TabsTrigger value="government">Government</TabsTrigger>
               <TabsTrigger value="private_sector">Private Sector</TabsTrigger>
+              <TabsTrigger value="trainings">Trainings</TabsTrigger>
             </TabsList>
           </div>
 
@@ -470,6 +471,27 @@ export default function Jobs() {
                         </div>
                      </div>
                    </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="trainings" className="mt-0">
+            <Card className="mb-8">
+              <CardContent className="p-8">
+                <div className="text-center space-y-6">
+                  <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                    <Briefcase className="h-8 w-8 text-primary" />
+                  </div>
+                  <h2 className="text-2xl font-bold">Training Programs</h2>
+                  <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+                    Explore professional development and training opportunities to advance your skills and career in Southeast Queens.
+                  </p>
+                  <div className="pt-4">
+                    <p className="text-sm text-muted-foreground">
+                      Training programs section coming soon. Check back for updates on workforce development, certification programs, and skill-building opportunities.
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
