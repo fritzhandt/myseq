@@ -565,6 +565,7 @@ export type Database = {
           description: string
           employer: string
           id: string
+          is_active: boolean
           is_apply_link: boolean
           location: string
           salary: string
@@ -579,6 +580,7 @@ export type Database = {
           description: string
           employer: string
           id?: string
+          is_active?: boolean
           is_apply_link?: boolean
           location: string
           salary: string
@@ -593,6 +595,7 @@ export type Database = {
           description?: string
           employer?: string
           id?: string
+          is_active?: boolean
           is_apply_link?: boolean
           location?: string
           salary?: string

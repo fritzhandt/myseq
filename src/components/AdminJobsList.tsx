@@ -3,8 +3,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Trash2, Building2, MapPin } from 'lucide-react';
+import { Trash2, Building2, MapPin, Edit, Ban } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import JobEditDialog from './JobEditDialog';
 import { useUserRole } from '@/hooks/useUserRole';
 import {
   AlertDialog,
@@ -23,8 +24,12 @@ interface Job {
   title: string;
   location: string;
   salary: string;
+  description: string;
+  apply_info: string;
+  is_apply_link: boolean;
   category: string;
   subcategory: string | null;
+  is_active: boolean;
   created_at: string;
 }
 
@@ -33,6 +38,7 @@ export default function AdminJobsList() {
   const [privateSectorJobs, setPrivateSectorJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteJobId, setDeleteJobId] = useState<string | null>(null);
+  const [editJob, setEditJob] = useState<Job | null>(null);
   const { toast } = useToast();
   const { isSubAdmin, isMainAdmin } = useUserRole();
 
@@ -137,12 +143,78 @@ export default function AdminJobsList() {
     }
   };
 
+  const handleDeactivate = async (jobId: string, currentStatus: boolean) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const job = [...governmentJobs, ...privateSectorJobs].find(j => j.id === jobId);
+      if (!job) throw new Error('Job not found');
+
+      // Sub-admins create pending modification request
+      if (isSubAdmin) {
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('full_name, phone_number')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        const { error } = await supabase
+          .from("pending_job_modifications")
+          .insert({
+            job_id: jobId,
+            action: 'update',
+            modified_data: { ...job, is_active: !currentStatus },
+            submitted_by: user.id,
+            submitter_name: profile?.full_name || null,
+            submitter_phone: profile?.phone_number || null
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: "Request Submitted",
+          description: `Your ${currentStatus ? 'deactivation' : 'activation'} request has been submitted for approval`,
+        });
+      } else {
+        // Main admins update directly
+        const { error } = await supabase
+          .from('jobs')
+          .update({ is_active: !currentStatus })
+          .eq('id', jobId);
+
+        if (error) throw error;
+
+        toast({
+          title: "Success",
+          description: `Job ${currentStatus ? 'deactivated' : 'activated'} successfully`,
+        });
+      }
+
+      fetchJobs();
+    } catch (error) {
+      console.error('Error toggling job status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update job status",
+        variant: "destructive",
+      });
+    }
+  };
+
   const JobCard = ({ job }: { job: Job }) => (
-    <Card className="mb-4">
+    <Card className={`mb-4 ${!job.is_active ? 'opacity-60' : ''}`}>
       <CardContent className="pt-6">
         <div className="flex justify-between items-start">
           <div className="flex-1">
-            <h3 className="font-semibold text-lg">{job.title}</h3>
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold text-lg">{job.title}</h3>
+              {!job.is_active && (
+                <span className="px-2 py-0.5 bg-destructive/10 text-destructive text-xs rounded">
+                  Inactive
+                </span>
+              )}
+            </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
               <Building2 className="h-4 w-4" />
               <span>{job.employer}</span>
@@ -158,13 +230,32 @@ export default function AdminJobsList() {
               </span>
             )}
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setDeleteJobId(job.id)}
-          >
-            <Trash2 className="h-4 w-4 text-destructive" />
-          </Button>
+          <div className="flex gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setEditJob(job)}
+              title="Edit job"
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleDeactivate(job.id, job.is_active)}
+              title={job.is_active ? "Deactivate job" : "Activate job"}
+            >
+              <Ban className={`h-4 w-4 ${job.is_active ? 'text-orange-500' : 'text-green-500'}`} />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setDeleteJobId(job.id)}
+              title="Delete job"
+            >
+              <Trash2 className="h-4 w-4 text-destructive" />
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -240,6 +331,13 @@ export default function AdminJobsList() {
           )}
         </TabsContent>
       </Tabs>
+
+      <JobEditDialog
+        job={editJob}
+        open={!!editJob}
+        onOpenChange={(open) => !open && setEditJob(null)}
+        onSuccess={fetchJobs}
+      />
 
       <AlertDialog open={!!deleteJobId} onOpenChange={(open) => !open && setDeleteJobId(null)}>
         <AlertDialogContent>
