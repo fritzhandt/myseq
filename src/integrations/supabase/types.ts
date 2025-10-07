@@ -271,6 +271,41 @@ export type Database = {
           },
         ]
       }
+      civic_org_sessions: {
+        Row: {
+          civic_org_id: string
+          created_at: string
+          expires_at: string
+          id: string
+          last_accessed_at: string
+          session_token: string
+        }
+        Insert: {
+          civic_org_id: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          last_accessed_at?: string
+          session_token: string
+        }
+        Update: {
+          civic_org_id?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          last_accessed_at?: string
+          session_token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "civic_org_sessions_civic_org_id_fkey"
+            columns: ["civic_org_id"]
+            isOneToOne: false
+            referencedRelation: "civic_organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       civic_organizations: {
         Row: {
           access_code: string
@@ -1423,6 +1458,14 @@ export type Database = {
       archive_expired_events: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      cleanup_expired_civic_sessions: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      get_current_civic_org: {
+        Args: { session_token: string }
+        Returns: string
       }
       get_pending_translations: {
         Args: { batch_size?: number }

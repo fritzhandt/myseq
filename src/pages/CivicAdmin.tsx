@@ -19,7 +19,6 @@ import { CivicStats } from "@/components/CivicStats";
 interface CivicSession {
   orgId: string;
   orgName: string;
-  expires: number;
 }
 
 const CivicAdmin = () => {
@@ -35,18 +34,32 @@ const CivicAdmin = () => {
 
   const checkAuthentication = async () => {
     try {
-      const civicSession = localStorage.getItem('civic_session');
+      const sessionToken = localStorage.getItem('civic_session_token');
       
-      if (!civicSession) {
+      if (!sessionToken) {
         navigate('/civic-auth');
         return;
       }
 
-      const parsedSession = JSON.parse(civicSession);
-      
-      // Check if session is expired
-      if (parsedSession.expires <= Date.now()) {
-        localStorage.removeItem('civic_session');
+      // Validate session with secure edge function
+      const response = await fetch(
+        'https://qdqmhgwjupsoradhktzu.supabase.co/functions/v1/civic-auth?action=validate',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkcW1oZ3dqdXBzb3JhZGhrdHp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgzODY5NzQsImV4cCI6MjA3Mzk2Mjk3NH0.90wVzi9LjnGUlBtCEBw6XHKJkf2DY1e_nVq7sP0L_8o',
+          },
+          body: JSON.stringify({ session_token: sessionToken }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || data.error || !data.valid) {
+        localStorage.removeItem('civic_session_token');
+        localStorage.removeItem('civic_org_name');
+        localStorage.removeItem('civic_org_id');
         toast({
           title: "Session Expired",
           description: "Please log in again",
@@ -56,37 +69,47 @@ const CivicAdmin = () => {
         return;
       }
 
-      // Verify organization still exists and is active
-      const { data: org, error } = await supabase
-        .from('civic_organizations')
-        .select('id, name, is_active')
-        .eq('id', parsedSession.orgId)
-        .eq('is_active', true)
-        .single();
-
-      if (error || !org) {
-        localStorage.removeItem('civic_session');
-        toast({
-          title: "Access Denied",
-          description: "Organization not found or inactive",
-          variant: "destructive",
-        });
-        navigate('/civic-auth');
-        return;
-      }
-
-      setSession(parsedSession);
+      setSession({
+        orgId: data.org_id,
+        orgName: data.org_name,
+      });
     } catch (error) {
       console.error('Auth check error:', error);
-      localStorage.removeItem('civic_session');
+      localStorage.removeItem('civic_session_token');
+      localStorage.removeItem('civic_org_name');
+      localStorage.removeItem('civic_org_id');
       navigate('/civic-auth');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('civic_session');
+  const handleLogout = async () => {
+    const sessionToken = localStorage.getItem('civic_session_token');
+    
+    if (sessionToken) {
+      // Call logout endpoint to invalidate session
+      try {
+        await fetch(
+          'https://qdqmhgwjupsoradhktzu.supabase.co/functions/v1/civic-auth?action=logout',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkcW1oZ3dqdXBzb3JhZGhrdHp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgzODY5NzQsImV4cCI6MjA3Mzk2Mjk3NH0.90wVzi9LjnGUlBtCEBw6XHKJkf2DY1e_nVq7sP0L_8o',
+            },
+            body: JSON.stringify({ session_token: sessionToken }),
+          }
+        );
+      } catch (error) {
+        console.error('Logout error:', error);
+      }
+    }
+    
+    localStorage.removeItem('civic_session_token');
+    localStorage.removeItem('civic_org_name');
+    localStorage.removeItem('civic_org_id');
+    
     toast({
       title: "Logged Out",
       description: "You have been successfully logged out",

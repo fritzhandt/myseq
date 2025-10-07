@@ -1,18 +1,27 @@
 import { supabase } from "@/integrations/supabase/client";
 
-// API Gateway client for secure communication
+// API Gateway client for secure communication using Supabase authentication
 class ApiClient {
-  private readonly apiKey = "sk-proj-custom-frontend-key-2025"; // This will be set as FRONTEND_API_KEY secret
   private readonly baseUrl = "https://qdqmhgwjupsoradhktzu.supabase.co/functions/v1";
 
   private async makeRequest(functionName: string, data?: any, method: string = 'POST') {
     try {
+      // Get Supabase session for authentication
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkcW1oZ3dqdXBzb3JhZGhrdHp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgzODY5NzQsImV4cCI6MjA3Mzk2Mjk3NH0.90wVzi9LjnGUlBtCEBw6XHKJkf2DY1e_nVq7sP0L_8o',
+      };
+
+      // Add authorization header if user is authenticated
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+
       const response = await fetch(`${this.baseUrl}/api-gateway/${functionName}`, {
         method,
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': this.apiKey,
-        },
+        headers,
         body: data ? JSON.stringify(data) : undefined,
       });
 

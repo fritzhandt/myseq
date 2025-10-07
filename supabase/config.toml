@@ -80,3 +80,6 @@ verify_jwt = false
 
 [functions.process-translation-queue]
 verify_jwt = false
+
+[functions.civic-auth]
+verify_jwt = false

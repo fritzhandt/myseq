@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import Navbar from "@/components/Navbar";
 import { Building2, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import bcrypt from 'bcryptjs';
 
 const CivicAuth = () => {
   const [accessCode, setAccessCode] = useState("");
@@ -20,19 +18,9 @@ const CivicAuth = () => {
 
   // Check if already authenticated
   useEffect(() => {
-    const civicSession = localStorage.getItem('civic_session');
-    if (civicSession) {
-      try {
-        const session = JSON.parse(civicSession);
-        if (session.expires > Date.now()) {
-          navigate('/civic-admin');
-          return;
-        } else {
-          localStorage.removeItem('civic_session');
-        }
-      } catch (error) {
-        localStorage.removeItem('civic_session');
-      }
+    const sessionToken = localStorage.getItem('civic_session_token');
+    if (sessionToken) {
+      navigate('/civic-admin');
     }
   }, [navigate]);
 
@@ -51,47 +39,41 @@ const CivicAuth = () => {
     setLoading(true);
 
     try {
-      // Find organization with matching access code
-      const { data: org, error } = await supabase
-        .from('civic_organizations')
-        .select('*')
-        .eq('access_code', accessCode.trim())
-        .eq('is_active', true)
-        .single();
+      // Call secure civic auth edge function
+      const response = await fetch(
+        'https://qdqmhgwjupsoradhktzu.supabase.co/functions/v1/civic-auth?action=login',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkcW1oZ3dqdXBzb3JhZGhrdHp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgzODY5NzQsImV4cCI6MjA3Mzk2Mjk3NH0.90wVzi9LjnGUlBtCEBw6XHKJkf2DY1e_nVq7sP0L_8o',
+          },
+          body: JSON.stringify({
+            access_code: accessCode.trim(),
+            password: password,
+          }),
+        }
+      );
 
-      if (error || !org) {
+      const data = await response.json();
+
+      if (!response.ok || data.error) {
         toast({
           title: "Authentication Failed",
-          description: "Invalid access code or password",
+          description: data.error || "Invalid access code or password",
           variant: "destructive",
         });
         return;
       }
 
-      // Verify password using bcrypt
-      const isPasswordValid = await bcrypt.compare(password, org.password_hash);
-      
-      if (!isPasswordValid) {
-        toast({
-          title: "Authentication Failed", 
-          description: "Invalid access code or password",
-          variant: "destructive",
-        });
-        return;
-      }
+      // Store only the session token (not the full session data)
+      localStorage.setItem('civic_session_token', data.session_token);
+      localStorage.setItem('civic_org_name', data.org_name);
+      localStorage.setItem('civic_org_id', data.org_id);
 
-      // Create session
-      const session = {
-        orgId: org.id,
-        orgName: org.name,
-        expires: Date.now() + (24 * 60 * 60 * 1000), // 24 hours
-      };
-
-      localStorage.setItem('civic_session', JSON.stringify(session));
-      
       toast({
         title: "Success",
-        description: `Welcome back, ${org.name}!`,
+        description: `Welcome back, ${data.org_name}!`,
       });
 
       navigate('/civic-admin');
