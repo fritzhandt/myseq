@@ -83,3 +83,6 @@ verify_jwt = false
 
 [functions.civic-auth]
 verify_jwt = false
+
+[functions.civic-content]
+verify_jwt = false

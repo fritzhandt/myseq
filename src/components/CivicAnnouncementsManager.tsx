@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { civicApi } from "@/lib/civicApi";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,20 +45,13 @@ const CivicAnnouncementsManager = ({ orgId }: CivicAnnouncementsManagerProps) =>
 
   const fetchAnnouncements = async () => {
     try {
-      const { data, error } = await supabase
-        .from('civic_announcements')
-        .select('*')
-        .eq('civic_org_id', orgId)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
+      const data = await civicApi.listAnnouncements();
       setAnnouncements(data || []);
     } catch (error) {
       console.error('Error fetching announcements:', error);
       toast({
         title: "Error",
-        description: "Failed to load announcements",
+        description: error instanceof Error ? error.message : "Failed to load announcements",
         variant: "destructive",
       });
     } finally {
@@ -78,37 +72,20 @@ const CivicAnnouncementsManager = ({ orgId }: CivicAnnouncementsManagerProps) =>
     setSaving(true);
 
     try {
+      const announcementData = {
+        title: formData.title,
+        content: formData.content,
+        photos: uploadedPhotos,
+      };
+
       if (editingAnnouncement) {
-        // Update existing announcement
-        const { error } = await supabase
-          .from('civic_announcements')
-          .update({
-            title: formData.title,
-            content: formData.content,
-            photos: uploadedPhotos,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', editingAnnouncement.id);
-
-        if (error) throw error;
-
+        await civicApi.updateAnnouncement(editingAnnouncement.id, announcementData);
         toast({
           title: "Success",
           description: "Announcement updated successfully",
         });
       } else {
-        // Create new announcement
-        const { error } = await supabase
-          .from('civic_announcements')
-          .insert({
-            civic_org_id: orgId,
-            title: formData.title,
-            content: formData.content,
-            photos: uploadedPhotos,
-          });
-
-        if (error) throw error;
-
+        await civicApi.createAnnouncement(announcementData);
         toast({
           title: "Success",
           description: "Announcement created successfully",
@@ -124,7 +101,7 @@ const CivicAnnouncementsManager = ({ orgId }: CivicAnnouncementsManagerProps) =>
       console.error('Error saving announcement:', error);
       toast({
         title: "Error",
-        description: "Failed to save announcement",
+        description: error instanceof Error ? error.message : "Failed to save announcement",
         variant: "destructive",
       });
     } finally {
@@ -144,24 +121,17 @@ const CivicAnnouncementsManager = ({ orgId }: CivicAnnouncementsManagerProps) =>
 
   const handleDelete = async (id: string) => {
     try {
-      const { error } = await supabase
-        .from('civic_announcements')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-
+      await civicApi.deleteAnnouncement(id);
       toast({
         title: "Success",
         description: "Announcement deleted successfully",
       });
-
       fetchAnnouncements();
     } catch (error) {
       console.error('Error deleting announcement:', error);
       toast({
         title: "Error",
-        description: "Failed to delete announcement",
+        description: error instanceof Error ? error.message : "Failed to delete announcement",
         variant: "destructive",
       });
     }
