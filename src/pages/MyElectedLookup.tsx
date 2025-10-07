@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { ExternalLink, Search, ArrowLeft } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import { SealImage } from '@/components/SealImage';
 
 const MyElectedLookup = () => {
   const navigate = useNavigate();
@@ -23,25 +24,25 @@ const MyElectedLookup = () => {
       title: "Assemblymember",
       description: "Find your New York State Assembly representative",
       url: "https://nyassembly.gov/mem/search/",
-      icon: <img src="/ny-assembly-seal.jpg" alt="NY Assembly Seal" className="w-12 h-12 object-contain" />
+      icon: <SealImage src="/ny-assembly-seal.jpg" alt="NY Assembly Seal" className="w-12 h-12 object-contain" />
     },
     {
       title: "Senator", 
       description: "Find your New York State Senate representative",
       url: "https://www.nysenate.gov/find-my-senator",
-      icon: <img src="/us-senate-seal.jpg" alt="US Senate Seal" className="w-12 h-12 object-contain" />
+      icon: <SealImage src="/us-senate-seal.jpg" alt="US Senate Seal" className="w-12 h-12 object-contain" />
     },
     {
       title: "Councilmember",
       description: "Find your New York City Council representative", 
       url: "https://council.nyc.gov/districts/",
-      icon: <img src="/nyc-council-seal.jpg" alt="NYC Council Seal" className="w-12 h-12 object-contain" />
+      icon: <SealImage src="/nyc-council-seal.jpg" alt="NYC Council Seal" className="w-12 h-12 object-contain" />
     },
     {
       title: "Congressperson",
       description: "Find your U.S. House of Representatives member",
       url: "https://www.house.gov/representatives/find-your-representative",
-      icon: <img src="/us-house-seal.png" alt="US House Seal" className="w-12 h-12 object-contain" />
+      icon: <SealImage src="/us-house-seal.png" alt="US House Seal" className="w-12 h-12 object-contain" />
     }
   ];
 
