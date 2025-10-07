@@ -24,7 +24,7 @@ const Navbar = () => {
           {/* Right side buttons */}
           <div className="flex items-center gap-2">
             <a
-              href="mailto:mysoutheastqueens@gmail.com"
+              href="mailto:mysoutheastqueens@gmail.com?subject=MY%20SEQ%20SUPPORT/INQUIRY"
               className="hidden sm:flex items-center justify-center h-9 w-9 rounded-md hover:bg-accent transition-colors"
               aria-label="Contact us via email"
             >
