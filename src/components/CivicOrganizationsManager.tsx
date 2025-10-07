@@ -247,25 +247,46 @@ export default function CivicOrganizationsManager() {
           title: "Success",
           description: "Civic organization created successfully!",
         });
+        
+        // Reset form after creating new org (not editing)
+        setFormData({
+          name: '',
+          description: '',
+          access_code: '',
+          password: '',
+          coverage_area: '',
+          meeting_info: '',
+          meeting_address: '',
+          email: '',
+          phone: '',
+          website: '',
+          is_active: true,
+          organization_type: creatingOrgType
+        });
       }
 
-      // Reset form
-      setFormData({
-        name: '',
-        description: '',
-        access_code: '',
-        password: '',
-        coverage_area: '',
-        meeting_info: '',
-        meeting_address: '',
-        email: '',
-        phone: '',
-        website: '',
-        is_active: true,
-        organization_type: 'civic_organization'
-      });
-      setIsCreating(false);
-      setEditingOrg(null);
+      // Only close dialog after editing, keep open after creating
+      if (editingOrg) {
+        setFormData({
+          name: '',
+          description: '',
+          access_code: '',
+          password: '',
+          coverage_area: '',
+          meeting_info: '',
+          meeting_address: '',
+          email: '',
+          phone: '',
+          website: '',
+          is_active: true,
+          organization_type: 'civic_organization'
+        });
+        setIsCreating(false);
+        setEditingOrg(null);
+      } else {
+        setEditingOrg(null);
+      }
+      
       fetchOrganizations();
     } catch (error: any) {
       toast({
