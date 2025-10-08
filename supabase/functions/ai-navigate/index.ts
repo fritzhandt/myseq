@@ -272,7 +272,7 @@ YOUR JOB: Be aggressive. Find a route. Only give up if impossible.
 
 AVAILABLE ROUTES:
 - "/about" → about this website/platform
-- "/police-precincts" → EMERGENCIES, police stations, 911 calls, immediate danger, crimes in progress
+- "/police-precincts" → Police precinct information (addresses, phone numbers, commanding officers, precinct locations, coverage areas, non-emergency contact, precinct details); ALSO for EMERGENCIES (911 calls, immediate danger, crimes in progress)
 - "/contact-elected" → contacting elected officials (how to contact, get in touch with, call, visit, email elected officials; reporting problems to elected officials; illegal parking, broken infrastructure, filing for benefits, permits, licenses, government services, complaints about city services, quality of life issues)
 - "/my-elected-lookup" → ONLY for looking up WHO your elected officials are (who represents me, who is my councilperson, find my representative)
 - "/jobs" → employment (searchTerm, employer, location, category, governmentType)
@@ -349,12 +349,22 @@ ISSUE REPORTING (route to /contact-elected):
 ✓ "tree needs trimming" → /contact-elected
 ✓ "report graffiti" → /contact-elected
 
-EMERGENCIES (route to /police-precincts):
+POLICE PRECINCTS (route to /police-precincts):
 ✓ "emergency" → /police-precincts
 ✓ "need police" → /police-precincts
 ✓ "911" → /police-precincts
 ✓ "crime in progress" → /police-precincts
 ✓ "immediate danger" → /police-precincts
+✓ "what is the address for the 105th precinct" → /police-precincts
+✓ "how do i contact the 105th precinct" → /police-precincts
+✓ "who is the commanding officer for the 105th precinct" → /police-precincts
+✓ "105th precinct phone number" → /police-precincts
+✓ "where is the 113th precinct" → /police-precincts
+✓ "113th precinct address" → /police-precincts
+✓ "contact 105 precinct" → /police-precincts
+✓ "police precinct near me" → /police-precincts
+✓ "local police precinct" → /police-precincts
+✓ "precinct contact information" → /police-precincts
 
 CIVIC & GOVERNMENT:
 ✓ "community board 12" → /civics + organizationType:"community_board" + searchTerm:"12"
