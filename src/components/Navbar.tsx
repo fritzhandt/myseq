@@ -219,9 +219,29 @@ const Navbar = () => {
                         </div>
                         <span>Contact Us</span>
                       </a>
+                      
+                      <a 
+                        href="https://www.instagram.com/yourpage"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group sm:hidden" 
+                        onClick={closeMenu}
+                      >
+                        <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
+                          <Instagram className="w-4 h-4" />
+                        </div>
+                        <span>Follow on Instagram</span>
+                      </a>
                     </div>
                   </div>
                 </nav>
+              </div>
+              
+              {/* Bottom Section - Language Selection */}
+              <div className="px-6 py-4 border-t flex-shrink-0 sm:hidden">
+                <div className="flex items-center justify-center">
+                  <GoogleTranslate />
+                </div>
               </div>
             </SheetContent>
             </Sheet>
