@@ -7,6 +7,7 @@ import { Menu, Info, Users, Mail, Search, Vote, Shield, Calendar, Briefcase, Hom
 import AddToHomeButton from '@/components/AddToHomeButton';
 import { GoogleTranslate } from '@/components/GoogleTranslate';
 import { useNavbar } from '@/contexts/NavbarContext';
+import AccessibilityMenu from '@/components/AccessibilityMenu';
 
 const Navbar = () => {
   const { isOpen, closeMenu, toggleMenu } = useNavbar();
@@ -45,6 +46,9 @@ const Navbar = () => {
             <div className="hidden sm:block">
               <GoogleTranslate />
             </div>
+            
+            {/* Accessibility Menu */}
+            <AccessibilityMenu />
             
             <AddToHomeButton />
             

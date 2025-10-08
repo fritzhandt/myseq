@@ -138,3 +138,31 @@ All colors MUST be HSL.
     box-shadow: var(--shadow-urban);
   }
 }
+
+/* Accessibility styles */
+@layer base {
+  /* Text size options */
+  html.text-normal {
+    font-size: 16px;
+  }
+  
+  html.text-large {
+    font-size: 18px;
+  }
+  
+  html.text-extra-large {
+    font-size: 20px;
+  }
+  
+  /* Color inversion */
+  html.invert-colors {
+    filter: invert(1) hue-rotate(180deg);
+  }
+  
+  /* Prevent double inversion on images and videos when colors are inverted */
+  html.invert-colors img,
+  html.invert-colors video,
+  html.invert-colors [style*="background-image"] {
+    filter: invert(1) hue-rotate(180deg);
+  }
+}
