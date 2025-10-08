@@ -258,13 +258,13 @@ export default function Jobs() {
         {/* Search and Filters */}
         <div className="w-full">
           <div className="flex flex-col items-center mb-8">
-            <p className="text-sm font-medium text-muted-foreground mb-3">Select a category first!</p>
-            <div className="relative">
+            <p className="text-sm font-medium text-muted-foreground mb-3 text-center">Select a category first!</p>
+            <div className="relative w-full max-w-2xl px-4">
               <div className="absolute -inset-1 bg-gradient-to-r from-primary/40 via-primary/60 to-primary/40 blur-xl rounded-2xl opacity-70"></div>
-              <div className="relative grid w-full max-w-2xl grid-cols-3 bg-card border-2 border-primary/30 rounded-xl p-1.5 shadow-lg">
+              <div className="relative grid w-full grid-cols-3 bg-card border-2 border-primary/30 rounded-xl p-1.5 shadow-lg">
                 <button
                   onClick={() => setActiveTab('government')}
-                  className={`px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 ${
+                  className={`px-2 sm:px-4 md:px-6 py-2.5 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200 ${
                     activeTab === 'government'
                       ? 'bg-primary text-primary-foreground'
                       : 'text-foreground hover:bg-muted'
@@ -274,17 +274,18 @@ export default function Jobs() {
                 </button>
                 <button
                   onClick={() => setActiveTab('private_sector')}
-                  className={`px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 ${
+                  className={`px-2 sm:px-4 md:px-6 py-2.5 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200 ${
                     activeTab === 'private_sector'
                       ? 'bg-primary text-primary-foreground'
                       : 'text-foreground hover:bg-muted'
                   }`}
                 >
-                  Private Sector
+                  <span className="hidden sm:inline">Private Sector</span>
+                  <span className="sm:hidden">Private</span>
                 </button>
                 <button
                   onClick={() => setActiveTab('internships')}
-                  className={`px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 ${
+                  className={`px-2 sm:px-4 md:px-6 py-2.5 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200 ${
                     activeTab === 'internships'
                       ? 'bg-primary text-primary-foreground'
                       : 'text-foreground hover:bg-muted'
