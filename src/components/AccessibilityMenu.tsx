@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Type, Palette } from 'lucide-react';
+import { Accessibility, Type, Palette } from 'lucide-react';
 
 type TextSize = 'normal' | 'large' | 'extra-large';
 
@@ -73,22 +73,7 @@ export default function AccessibilityMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" aria-label="Accessibility options">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="h-5 w-5"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <circle cx="12" cy="7" r="1.5" fill="currentColor" />
-            <path d="M7 11h10" />
-            <path d="M9 15l1.5 4.5" />
-            <path d="M15 15l-1.5 4.5" />
-          </svg>
+          <Accessibility className="h-5 w-5" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
