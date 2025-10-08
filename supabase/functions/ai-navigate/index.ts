@@ -99,6 +99,17 @@ serve(async (req) => {
         .insert({ search_date: today, search_count: 1 });
     }
 
+    // Fetch active employers from database for dynamic employer recognition
+    const { data: employersData } = await supabase
+      .from('jobs')
+      .select('employer')
+      .eq('is_active', true)
+      .order('employer');
+
+    const employers = [...new Set(employersData?.map(j => j.employer) || [])];
+    const employerList = employers.join(', ');
+    console.log('Fetched employers:', employerList);
+
     if (!openAIApiKey) {
       console.error('OpenAI API key not found');
       return new Response(JSON.stringify({
@@ -286,9 +297,27 @@ JOB SEARCH PARAMETERS:
 When routing to /jobs, extract and include these parameters when mentioned:
 - category: "government", "private_sector", or "internships"
 - governmentType: "all", "city", or "state" (only for government jobs)
-- searchTerm: specific job title or keywords (e.g., "teacher", "sanitation", "engineering")
+- searchTerm: specific job title or keywords (e.g., "teacher", "sanitation", "engineering") - THIS IS OPTIONAL
 - location: specific location mentioned (e.g., "Queens", "Jamaica", "Rosedale")
-- employer: specific employer name (e.g., "Target", "Amazon", "NYC DOE")
+- employer: specific employer name if recognized from the list below
+
+IMPORTANT: The searchTerm parameter is OPTIONAL. Users can search by employer only, location only, or any combination of filters.
+
+KNOWN EMPLOYERS IN DATABASE:
+${employerList}
+
+EMPLOYER RECOGNITION RULES:
+1. If the user's query mentions any name from the employer list (even partially), use the "employer" parameter with the EXACT name from the list
+2. Common patterns indicating employer search:
+   - "is [employer] hiring?"
+   - "jobs at [employer]"
+   - "[employer] positions"
+   - "work at [employer]"
+   - "employment at [employer]"
+   - "[employer] careers"
+3. Use fuzzy matching - "DOT" or "transportation" should match "Department Of Transportation"
+4. If unsure whether it's an employer or job title, prefer employer if it matches the list
+5. Always use the exact employer name from the database list to ensure proper filtering
 
 CIVIC ORGANIZATION TYPES (for /civics page):
 - "community_board" → Community Boards (CB), Community Board meetings, district boards
@@ -338,11 +367,17 @@ JOB ROUTING EXAMPLES:
 ✓ "government jobs" → /jobs + category:"government" + governmentType:"all"
 ✓ "city jobs" → /jobs + category:"government" + governmentType:"city"
 ✓ "state jobs" → /jobs + category:"government" + governmentType:"state"
-✓ "city sanitation jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"sanitation"
-✓ "state teaching jobs" → /jobs + category:"government" + governmentType:"state" + searchTerm:"teaching"
-✓ "jobs at target" → /jobs + category:"private_sector" + employer:"Target"
+✓ "is the department of transportation hiring?" → /jobs + employer:"Department Of Transportation" + category:"government"
+✓ "jobs at target" → /jobs + employer:"Target" + category:"private_sector"
+✓ "amazon jobs" → /jobs + employer:"Amazon" + category:"private_sector"
+✓ "work at mta" → /jobs + employer:"MTA" + category:"government"
+✓ "chase bank careers" → /jobs + employer:"Chase Bank" + category:"private_sector"
 ✓ "private sector jobs" → /jobs + category:"private_sector"
 ✓ "private jobs in jamaica" → /jobs + category:"private_sector" + location:"Jamaica"
+✓ "jobs in queens" → /jobs + location:"Queens"
+✓ "work in rosedale" → /jobs + location:"Rosedale"
+✓ "city sanitation jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"sanitation"
+✓ "state teaching jobs" → /jobs + category:"government" + governmentType:"state" + searchTerm:"teaching"
 ✓ "sanitation jobs" → /jobs + category:"government" + searchTerm:"sanitation" + governmentType:"all"
 ✓ "teaching jobs in queens" → /jobs + searchTerm:"teaching" + location:"Queens"
 ✓ "internships" → /jobs + category:"internships"
@@ -394,16 +429,22 @@ CRITICAL: Return ONLY valid JSON, no other text or explanations.
 
 RESPONSE FORMAT (ONLY JSON, NO TEXT):
 
-For job searches, include all relevant parameters:
+For job searches (searchTerm is OPTIONAL - can search by employer/location only):
 {
   "destination": "/jobs",
-  "category": "government|private_sector|internships",
-  "governmentType": "all|city|state",
-  "searchTerm": "job title or keywords",
-  "location": "location if specified",
-  "employer": "employer name if specified",
+  "category": "government|private_sector|internships",  // optional
+  "governmentType": "all|city|state",  // optional, only for government
+  "searchTerm": "job title or keywords",  // OPTIONAL
+  "location": "location if specified",  // optional
+  "employer": "exact employer name from database list",  // optional
   "success": true
 }
+
+Examples:
+- "is DOT hiring?" → { "destination": "/jobs", "employer": "Department Of Transportation", "category": "government", "success": true }
+- "jobs in jamaica" → { "destination": "/jobs", "location": "Jamaica", "success": true }
+- "amazon positions" → { "destination": "/jobs", "employer": "Amazon", "category": "private_sector", "success": true }
+- "city sanitation jobs" → { "destination": "/jobs", "category": "government", "governmentType": "city", "searchTerm": "sanitation", "success": true }
 
 For other pages:
 {
