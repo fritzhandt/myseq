@@ -124,6 +124,8 @@ serve(async (req) => {
     if (action === 'login') {
       const { access_code, password }: LoginRequest = await req.json();
 
+      console.log('Login attempt for access code:', access_code);
+
       if (!access_code || !password) {
         return new Response(
           JSON.stringify({ error: 'Access code and password are required' }),
@@ -146,6 +148,8 @@ serve(async (req) => {
         );
       }
 
+      console.log('Organization found:', org.name, 'Active:', org.is_active);
+
       if (!org.is_active) {
         return new Response(
           JSON.stringify({ error: 'Organization is not active' }),
@@ -155,6 +159,8 @@ serve(async (req) => {
 
       // Verify password using native crypto
       const verificationResult = await verifyPassword(password, org.password_hash);
+
+      console.log('Password verification result:', verificationResult);
 
       if (verificationResult.needsReset) {
         return new Response(
@@ -178,6 +184,8 @@ serve(async (req) => {
       const expiresAt = new Date();
       expiresAt.setHours(expiresAt.getHours() + 24); // 24 hour session
 
+      console.log('Creating session for org:', org.id, 'Expires:', expiresAt);
+
       // Store session in database
       const { error: sessionError } = await supabase
         .from('civic_org_sessions')
@@ -195,6 +203,8 @@ serve(async (req) => {
         );
       }
 
+      console.log('Session created successfully');
+
       return new Response(
         JSON.stringify({
           session_token: sessionToken,
@@ -209,7 +219,10 @@ serve(async (req) => {
     if (action === 'validate') {
       const { session_token }: ValidateRequest = await req.json();
 
+      console.log('Validating session token');
+
       if (!session_token) {
+        console.error('No session token provided');
         return new Response(
           JSON.stringify({ error: 'Session token is required' }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -220,7 +233,10 @@ serve(async (req) => {
       const { data: orgId, error: validateError } = await supabase
         .rpc('get_current_civic_org', { session_token });
 
+      console.log('RPC validation result - orgId:', orgId, 'error:', validateError);
+
       if (validateError || !orgId) {
+        console.error('Session validation failed:', validateError);
         return new Response(
           JSON.stringify({ error: 'Invalid or expired session' }),
           { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -234,12 +250,17 @@ serve(async (req) => {
         .eq('id', orgId)
         .single();
 
+      console.log('Organization fetch result:', org, 'error:', orgError);
+
       if (orgError || !org || !org.is_active) {
+        console.error('Organization not found or inactive');
         return new Response(
           JSON.stringify({ error: 'Organization not found or inactive' }),
           { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
+
+      console.log('Session validated successfully for:', org.name);
 
       return new Response(
         JSON.stringify({
