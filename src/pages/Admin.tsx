@@ -13,6 +13,7 @@ import CommunityAlertsList from '@/components/CommunityAlertsList';
 import ResourceForm from '@/components/ResourceForm';
 import ResourcesList from '@/components/ResourcesList';
 import CivicOrganizationsManager from '@/components/CivicOrganizationsManager';
+import { CivicPasswordResetManager } from '@/components/CivicPasswordResetManager';
 import JobCSVUpload from '@/components/JobCSVUpload';
 import JobReportsList from '@/components/JobReportsList';
 import AdminJobsList from '@/components/AdminJobsList';
@@ -496,7 +497,10 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="civics">
-            <CivicOrganizationsManager />
+            <div className="space-y-6">
+              <CivicPasswordResetManager />
+              <CivicOrganizationsManager />
+            </div>
           </TabsContent>
 
           <TabsContent value="jobs">
