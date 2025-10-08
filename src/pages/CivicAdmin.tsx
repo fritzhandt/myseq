@@ -36,10 +36,14 @@ const CivicAdmin = () => {
     try {
       const sessionToken = localStorage.getItem('civic_session_token');
       
+      console.log('Checking authentication, session token:', sessionToken ? 'exists' : 'missing');
+      
       if (!sessionToken) {
         navigate('/civic-auth');
         return;
       }
+
+      console.log('Sending validation request with token:', sessionToken.substring(0, 10) + '...');
 
       // Validate session with secure edge function
       const response = await fetch(
@@ -56,18 +60,23 @@ const CivicAdmin = () => {
 
       const data = await response.json();
 
+      console.log('Validation response status:', response.ok, 'data:', data);
+
       if (!response.ok || data.error || !data.valid) {
+        console.error('Session validation failed:', data.error);
         localStorage.removeItem('civic_session_token');
         localStorage.removeItem('civic_org_name');
         localStorage.removeItem('civic_org_id');
         toast({
           title: "Session Expired",
-          description: "Please log in again",
+          description: data.error || "Please log in again",
           variant: "destructive",
         });
         navigate('/civic-auth');
         return;
       }
+
+      console.log('Session validated successfully for:', data.org_name);
 
       setSession({
         orgId: data.org_id,
