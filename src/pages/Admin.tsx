@@ -248,7 +248,7 @@ const Admin = () => {
           <MonitorSmartphone className="h-5 w-5" />
           <AlertTitle className="font-bold">Desktop Only</AlertTitle>
           <AlertDescription>
-            The admin panel is optimized for desktop use only. Please use a desktop or laptop computer for the best experience.
+            The admin panel has many complex features that are optimized for desktop use only. Please use a computer for the best experience.
           </AlertDescription>
         </Alert>
       )}
