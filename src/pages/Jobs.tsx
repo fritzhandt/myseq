@@ -80,14 +80,8 @@ export default function Jobs() {
         setShowAdvancedSearch(true);
       }
       
-      // Mark as AI populated and show toast on mobile
+      // Mark as AI populated for animation
       setIsAIPopulated(true);
-      if (isMobile) {
-        toast({
-          title: "AI applied your search filters",
-          description: "Results have been filtered based on your request.",
-        });
-      }
       
       // Clear the navigation state
       navigate(location.pathname, { replace: true });
