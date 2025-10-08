@@ -59,6 +59,8 @@ export default function ProfileSettings() {
           user_id: user.id,
           full_name: fullName,
           phone_number: phoneNumber,
+        }, {
+          onConflict: 'user_id'
         });
 
       if (error) throw error;
