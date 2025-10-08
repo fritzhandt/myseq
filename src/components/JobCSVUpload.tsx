@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { useUserRole } from '@/hooks/useUserRole';
 import { supabase } from '@/integrations/supabase/client';
-import { Upload, FileText, Trash2, AlertCircle } from 'lucide-react';
+import { Upload, FileText, Trash2, AlertCircle, Download } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import * as XLSX from 'xlsx';
 
@@ -211,6 +211,36 @@ export default function JobCSVUpload() {
     }
   };
 
+  const downloadTemplate = () => {
+    const headers = ['Company/Organization', 'Location', 'Position', 'Type', 'Link to Apply'];
+    const sampleData = [
+      ['NYC Department of Transportation', 'New York, NY', 'Civil Engineer', 'Full-Time', 'https://example.com/apply'],
+      ['Acme Corporation', 'Brooklyn, NY', 'Software Developer', 'Full-Time', 'Send resume to hr@example.com'],
+      ['Tech Startup Inc', 'Manhattan, NY', 'Marketing Intern', 'Part-Time', 'https://example.com/careers']
+    ];
+    
+    const csvContent = [
+      headers.join(','),
+      ...sampleData.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'job_upload_template.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Template downloaded",
+      description: "Use this CSV template to prepare your job listings.",
+    });
+  };
+
   return (
     <div className="space-y-6">
       {/* Upload Section */}
@@ -241,13 +271,24 @@ export default function JobCSVUpload() {
               </Select>
             </div>
             
-            <Alert>
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                <strong>File Format:</strong> CSV or Excel (.xlsx) files are supported. Column A: Company/Organization, Column B: Location, Column C: Position, Column D: Type, Column E: Link to Apply.
-                The Link to Apply can be a URL (will show "Apply Now" button) or application instructions.
-              </AlertDescription>
-            </Alert>
+            <div className="flex items-center justify-between gap-4">
+              <Alert className="flex-1">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  <strong>File Format:</strong> CSV or Excel (.xlsx) files are supported. Column A: Company/Organization, Column B: Location, Column C: Position, Column D: Type, Column E: Link to Apply.
+                  The Link to Apply can be a URL (will show "Apply Now" button) or application instructions.
+                </AlertDescription>
+              </Alert>
+              
+              <Button
+                variant="outline"
+                onClick={downloadTemplate}
+                className="whitespace-nowrap"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download Template
+              </Button>
+            </div>
             
             <div className="flex gap-4">
               <Input
