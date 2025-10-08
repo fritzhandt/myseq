@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Briefcase, MapPin, Building, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Job {
   id: string;
@@ -40,11 +41,13 @@ export default function Jobs() {
   const [currentPage, setCurrentPage] = useState(1);
   const [activeTab, setActiveTab] = useState('government');
   const [governmentFilter, setGovernmentFilter] = useState<'all' | 'city' | 'state'>('all');
+  const [isAIPopulated, setIsAIPopulated] = useState(false);
   const itemsPerPage = 10;
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { trackPageView } = useAnalytics();
+  const isMobile = useIsMobile();
 
   const MAX_JOB_SEARCH_LENGTH = 100;
 
@@ -72,15 +75,31 @@ export default function Jobs() {
         setGovernmentFilter(state.governmentType);
       }
       
+      // Auto-expand advanced search on mobile if location or employer filters are set
+      if (isMobile && (state.employer || state.location)) {
+        setShowAdvancedSearch(true);
+      }
+      
+      // Mark as AI populated and show toast on mobile
+      setIsAIPopulated(true);
+      if (isMobile) {
+        toast({
+          title: "AI applied your search filters",
+          description: "Results have been filtered based on your request.",
+        });
+      }
+      
       // Clear the navigation state
       navigate(location.pathname, { replace: true });
       
       // Trigger immediate filter after state is set
       setTimeout(() => {
         applyFilters();
+        // Reset AI populated flag after animation
+        setTimeout(() => setIsAIPopulated(false), 600);
       }, 0);
     }
-  }, [location.state, navigate, location.pathname, jobs, loading]);
+  }, [location.state, navigate, location.pathname, jobs, loading, isMobile, toast]);
 
   useEffect(() => {
     fetchJobs();
@@ -634,7 +653,9 @@ export default function Jobs() {
         </div>
 
         {/* Job List */}
-        <JobList jobs={paginatedJobs} loading={loading} isSearching={isSearching} />
+        <div className={isAIPopulated ? 'animate-fade-in' : ''}>
+          <JobList jobs={paginatedJobs} loading={loading} isSearching={isSearching} />
+        </div>
         
         {/* Pagination */}
         {filteredJobs.length > 0 && (
