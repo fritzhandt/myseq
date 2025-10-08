@@ -5,8 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from "@/components/Navbar";
-import { Building2, LogOut, Settings, Users, FileText, Megaphone, Link, Images, Calendar, BarChart3 } from "lucide-react";
+import { Building2, LogOut, Settings, Users, FileText, Megaphone, Link, Images, Calendar, BarChart3, MonitorSmartphone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import CivicGeneralSettings from "@/components/CivicGeneralSettings";
 import CivicAnnouncementsManager from "@/components/CivicAnnouncementsManager";
 import CivicNewsletterManager from "@/components/CivicNewsletterManager";
@@ -27,6 +29,7 @@ const CivicAdmin = () => {
   const [activeTab, setActiveTab] = useState("general");
   const navigate = useNavigate();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     checkAuthentication();
@@ -149,6 +152,17 @@ const CivicAdmin = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       <Navbar />
+
+      {/* Mobile Warning Banner */}
+      {isMobile && (
+        <Alert variant="destructive" className="rounded-none border-x-0 m-0">
+          <MonitorSmartphone className="h-5 w-5" />
+          <AlertTitle className="font-bold">Desktop Only</AlertTitle>
+          <AlertDescription>
+            The admin panel is optimized for desktop use only. Please use a desktop or laptop computer for the best experience.
+          </AlertDescription>
+        </Alert>
+      )}
       
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">

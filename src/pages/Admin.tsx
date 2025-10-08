@@ -26,7 +26,9 @@ import ProfileSettings from '@/components/ProfileSettings';
 import AIRateLimitManager from '@/components/AIRateLimitManager';
 import { useToast } from '@/hooks/use-toast';
 import { useUserRole } from '@/hooks/useUserRole';
-import { Plus, Calendar, LogOut, Star, AlertTriangle, Users, MapPin, FileText, Building2, Clock, BarChart3, Briefcase, User, Zap } from 'lucide-react';
+import { Plus, Calendar, LogOut, Star, AlertTriangle, Users, MapPin, FileText, Building2, Clock, BarChart3, Briefcase, User, Zap, MonitorSmartphone } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 // Admin Panel - Role-based access control system
 const Admin = () => {
@@ -35,6 +37,7 @@ const Admin = () => {
   const { userRole, loading: roleLoading, isMainAdmin, isSubAdmin, hasAdminAccess } = useUserRole();
   const [loading, setLoading] = useState(true);
   const [pendingCount, setPendingCount] = useState(0);
+  const isMobile = useIsMobile();
   const [resourcesRefresh, setResourcesRefresh] = useState(0);
   const [businessRefresh, setBusinessRefresh] = useState(0);
   
@@ -239,6 +242,17 @@ const Admin = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Mobile Warning Banner */}
+      {isMobile && (
+        <Alert variant="destructive" className="rounded-none border-x-0 border-t-0">
+          <MonitorSmartphone className="h-5 w-5" />
+          <AlertTitle className="font-bold">Desktop Only</AlertTitle>
+          <AlertDescription>
+            The admin panel is optimized for desktop use only. Please use a desktop or laptop computer for the best experience.
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Header */}
       <header className="bg-card border-b shadow-sm">
         <div className="container mx-auto px-4 py-4">
