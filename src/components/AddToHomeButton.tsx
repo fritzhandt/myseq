@@ -92,7 +92,7 @@ export default function AddToHomeButton() {
           </ol>
           <div className="bg-muted/50 rounded-lg p-3 mt-4">
             <p className="text-xs text-muted-foreground">
-              <strong>Benefits:</strong> Faster loading, offline access, and native app-like experience on your device.
+              <strong>Benefits:</strong> Faster loading and native app-like experience on your device.
             </p>
           </div>
         </div>
