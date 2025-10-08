@@ -5,7 +5,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Menu, Info, Users, Mail, Search, Vote, Shield, Calendar, Briefcase, Home, Building2, HelpCircle, Instagram, ExternalLink, Landmark } from 'lucide-react';
 import AddToHomeButton from '@/components/AddToHomeButton';
-import { GoogleTranslate } from '@/components/GoogleTranslate';
+import { LanguageSelector } from '@/components/LanguageSelector';
 import { useNavbar } from '@/contexts/NavbarContext';
 import AccessibilityMenu from '@/components/AccessibilityMenu';
 
@@ -42,9 +42,9 @@ const Navbar = () => {
               <Instagram className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
             </a>
             
-            {/* Google Translate Widget */}
+            {/* Language Selector */}
             <div className="hidden sm:block">
-              <GoogleTranslate />
+              <LanguageSelector />
             </div>
             
             {/* Accessibility Menu */}
@@ -240,7 +240,7 @@ const Navbar = () => {
               {/* Bottom Section - Language Selection */}
               <div className="px-6 py-4 border-t flex-shrink-0 sm:hidden">
                 <div className="flex items-center justify-center">
-                  <GoogleTranslate />
+                  <LanguageSelector />
                 </div>
               </div>
             </SheetContent>
