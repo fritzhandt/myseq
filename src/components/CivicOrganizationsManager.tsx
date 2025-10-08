@@ -662,181 +662,6 @@ export default function CivicOrganizationsManager() {
             </Button>
           </div>
 
-          <Dialog open={isCreating} onOpenChange={(open) => {
-              setIsCreating(open);
-              if (!open) {
-                setEditingOrg(null);
-                setFormData({
-                  name: '',
-                  description: '',
-                  access_code: '',
-                  password: '',
-                  coverage_area: '',
-                  meeting_info: '',
-                  meeting_address: '',
-                  email: '',
-                  phone: '',
-                  website: '',
-                  is_active: true,
-                  organization_type: 'civic_organization'
-                });
-              }
-            }}>
-            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>
-                  {editingOrg ? 'Edit' : 'Create New'} {
-                    creatingOrgType === 'community_board' ? 'Community Board' :
-                    creatingOrgType === 'police_council' ? 'Police Council' :
-                    'Civic Organization'
-                  }
-                </DialogTitle>
-              </DialogHeader>
-            
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Organization Name *</Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="e.g., Rosedale Civic Association"
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="coverage_area">Coverage Area *</Label>
-                  <Input
-                    id="coverage_area"
-                    value={formData.coverage_area}
-                    onChange={(e) => setFormData(prev => ({ ...prev, coverage_area: e.target.value }))}
-                    placeholder="e.g., Rosedale, Queens"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Brief description of the organization"
-                  rows={3}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="access_code">Access Code *</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="access_code"
-                      value={formData.access_code}
-                      onChange={(e) => setFormData(prev => ({ ...prev, access_code: e.target.value.toUpperCase() }))}
-                      placeholder="ACCESS CODE"
-                      required
-                    />
-                    <Button type="button" onClick={generateAccessCode} variant="outline">
-                      Generate
-                    </Button>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password {editingOrg ? '(leave blank to keep current)' : '*'}</Label>
-                  <Input
-                    id="password"
-                    type="text"
-                    value={formData.password}
-                    onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                    placeholder={editingOrg ? "Leave blank to keep current password" : "Password"}
-                    required={!editingOrg}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="meeting_info">Meeting Schedule</Label>
-                  <Input
-                    id="meeting_info"
-                    value={formData.meeting_info}
-                    onChange={(e) => setFormData(prev => ({ ...prev, meeting_info: e.target.value }))}
-                    placeholder="e.g., 3rd Tuesday of each month, 7:00 PM"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="meeting_address">Meeting Address</Label>
-                  <Input
-                    id="meeting_address"
-                    value={formData.meeting_address}
-                    onChange={(e) => setFormData(prev => ({ ...prev, meeting_address: e.target.value }))}
-                    placeholder="Meeting location address"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Contact Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                    placeholder="contact@organization.org"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input
-                    id="phone"
-                    value={formData.phone}
-                    onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                    placeholder="(718) 555-0123"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="website">Website</Label>
-                  <Input
-                    id="website"
-                    value={formData.website}
-                    onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
-                    placeholder="https://organization.org"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="is_active"
-                  checked={formData.is_active}
-                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))}
-                />
-                <Label htmlFor="is_active">Active</Label>
-              </div>
-
-              <div className="flex justify-end gap-2 pt-4">
-                <Button type="button" variant="outline" onClick={() => {
-                  setIsCreating(false);
-                  setEditingOrg(null);
-                }}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={loading}>
-                  {loading ? (editingOrg ? "Updating..." : "Creating...") : (editingOrg ? "Update Organization" : "Create Organization")}
-                </Button>
-              </div>
-            </form>
-            </DialogContent>
-          </Dialog>
 
           <CivicOrgCSVUpload onUploadComplete={fetchOrganizations} />
 
@@ -1300,6 +1125,183 @@ export default function CivicOrganizationsManager() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Create/Edit Organization Dialog */}
+      <Dialog open={isCreating} onOpenChange={(open) => {
+          setIsCreating(open);
+          if (!open) {
+            setEditingOrg(null);
+            setFormData({
+              name: '',
+              description: '',
+              access_code: '',
+              password: '',
+              coverage_area: '',
+              meeting_info: '',
+              meeting_address: '',
+              email: '',
+              phone: '',
+              website: '',
+              is_active: true,
+              organization_type: 'civic_organization'
+            });
+          }
+        }}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {editingOrg ? 'Edit' : 'Create New'} {
+                creatingOrgType === 'community_board' ? 'Community Board' :
+                creatingOrgType === 'police_council' ? 'Police Council' :
+                'Civic Organization'
+              }
+            </DialogTitle>
+          </DialogHeader>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Organization Name *</Label>
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="e.g., Rosedale Civic Association"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="coverage_area">Coverage Area *</Label>
+              <Input
+                id="coverage_area"
+                value={formData.coverage_area}
+                onChange={(e) => setFormData(prev => ({ ...prev, coverage_area: e.target.value }))}
+                placeholder="e.g., Rosedale, Queens"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              placeholder="Brief description of the organization"
+              rows={3}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="access_code">Access Code *</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="access_code"
+                  value={formData.access_code}
+                  onChange={(e) => setFormData(prev => ({ ...prev, access_code: e.target.value.toUpperCase() }))}
+                  placeholder="ACCESS CODE"
+                  required
+                />
+                <Button type="button" onClick={generateAccessCode} variant="outline">
+                  Generate
+                </Button>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="password">Password {editingOrg ? '(leave blank to keep current)' : '*'}</Label>
+              <Input
+                id="password"
+                type="text"
+                value={formData.password}
+                onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                placeholder={editingOrg ? "Leave blank to keep current password" : "Password"}
+                required={!editingOrg}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="meeting_info">Meeting Schedule</Label>
+              <Input
+                id="meeting_info"
+                value={formData.meeting_info}
+                onChange={(e) => setFormData(prev => ({ ...prev, meeting_info: e.target.value }))}
+                placeholder="e.g., 3rd Tuesday of each month, 7:00 PM"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="meeting_address">Meeting Address</Label>
+              <Input
+                id="meeting_address"
+                value={formData.meeting_address}
+                onChange={(e) => setFormData(prev => ({ ...prev, meeting_address: e.target.value }))}
+                placeholder="Meeting location address"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Contact Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                placeholder="contact@organization.org"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone</Label>
+              <Input
+                id="phone"
+                value={formData.phone}
+                onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                placeholder="(718) 555-0123"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="website">Website</Label>
+              <Input
+                id="website"
+                value={formData.website}
+                onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
+                placeholder="https://organization.org"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="is_active"
+              checked={formData.is_active}
+              onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))}
+            />
+            <Label htmlFor="is_active">Active</Label>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-4">
+            <Button type="button" variant="outline" onClick={() => {
+              setIsCreating(false);
+              setEditingOrg(null);
+            }}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? (editingOrg ? "Updating..." : "Creating...") : (editingOrg ? "Update Organization" : "Create Organization")}
+            </Button>
+          </div>
+        </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Reset Password Dialog */}
       <Dialog open={resetPasswordDialog.isOpen} onOpenChange={(open) => setResetPasswordDialog({isOpen: open})}>
