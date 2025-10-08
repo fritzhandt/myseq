@@ -300,6 +300,7 @@ export default function CivicOrganizationsManager() {
   };
 
   const handleEdit = (org: CivicOrganization) => {
+    console.log('handleEdit called with org:', org);
     setFormData({
       name: org.name,
       description: org.description,
@@ -317,6 +318,7 @@ export default function CivicOrganizationsManager() {
     setEditingOrg(org);
     setCreatingOrgType(org.organization_type);
     setIsCreating(true);
+    console.log('handleEdit completed - isCreating should be true');
   };
 
   const exportAccessCodes = () => {
