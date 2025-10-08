@@ -425,12 +425,22 @@ export default function CivicOrganizationsManager() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Generate new password
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-      let newPassword = '';
-      for (let i = 0; i < 12; i++) {
-        newPassword += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
+      // Generate new password in word-number format
+      const words = [
+        'apple', 'beach', 'chair', 'dance', 'eagle', 'flame', 'grape', 'house',
+        'island', 'jungle', 'kite', 'lemon', 'magic', 'ocean', 'piano', 'quiet',
+        'river', 'storm', 'tower', 'urban', 'voice', 'water', 'young', 'zebra',
+        'bridge', 'castle', 'dragon', 'forest', 'garden', 'happy', 'knight', 'light',
+        'mountain', 'night', 'orange', 'purple', 'queen', 'royal', 'silver', 'tiger',
+        'anchor', 'blaze', 'cloud', 'delta', 'echo', 'frost', 'glow', 'haven',
+        'iris', 'jade', 'karma', 'lotus', 'marble', 'nova', 'orbit', 'pearl',
+        'remix', 'solar', 'tempo', 'unity', 'vibe', 'wave', 'zen', 'atom'
+      ].filter(w => w.length <= 8);
+      
+      const getRandomWord = () => words[Math.floor(Math.random() * words.length)];
+      const getRandomNumber = () => Math.floor(1000 + Math.random() * 9000).toString();
+      
+      const newPassword = `${getRandomWord()}-${getRandomNumber()}-${getRandomWord()}-${getRandomNumber()}`;
 
       // Hash the new password
       const saltRounds = 12;
