@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { ExternalLink, Search, ArrowLeft, Building2, Users, Landmark, Flag } from 'lucide-react';
+import { ExternalLink, ArrowLeft } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 const MyElectedLookup = () => {
   const navigate = useNavigate();
@@ -22,25 +22,25 @@ const MyElectedLookup = () => {
       title: "Assemblymember",
       description: "Find your New York State Assembly representative",
       url: "https://nyassembly.gov/mem/search/",
-      icon: <Building2 className="w-6 h-6" />
+      sealUrl: "/seals/ny-assembly.jpeg"
     },
     {
       title: "Senator", 
       description: "Find your New York State Senate representative",
       url: "https://www.nysenate.gov/find-my-senator",
-      icon: <Landmark className="w-6 h-6" />
+      sealUrl: "/seals/ny-senate.jpg"
     },
     {
       title: "Councilmember",
       description: "Find your New York City Council representative", 
       url: "https://council.nyc.gov/districts/",
-      icon: <Users className="w-6 h-6" />
+      sealUrl: "/seals/nyc-council.svg"
     },
     {
       title: "Congressperson",
       description: "Find your U.S. House of Representatives member",
       url: "https://www.house.gov/representatives/find-your-representative",
-      icon: <Flag className="w-6 h-6" />
+      sealUrl: "/seals/us-house.png"
     }
   ];
 
@@ -79,11 +79,13 @@ const MyElectedLookup = () => {
             {lookupOptions.map((option, index) => (
               <div key={index} className="bg-card p-6 rounded-lg border shadow-sm flex flex-col">
                 <div className="text-center mb-6 flex-1">
-                  {option.icon && (
-                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 text-primary">
-                      {option.icon}
-                    </div>
-                  )}
+                  <div className="w-20 h-20 mx-auto mb-4">
+                    <img 
+                      src={option.sealUrl} 
+                      alt={`${option.title} Seal`}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
                   <h2 className="text-xl font-semibold mb-2">{option.title}</h2>
                   <p className="text-sm text-muted-foreground mb-6">{option.description}</p>
                 </div>
