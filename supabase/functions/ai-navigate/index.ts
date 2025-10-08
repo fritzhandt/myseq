@@ -110,6 +110,16 @@ serve(async (req) => {
     const employerList = employers.join(', ');
     console.log('Fetched employers:', employerList);
 
+    // Fetch resource categories from database for dynamic category recognition
+    const { data: resourcesData } = await supabase
+      .from('resources')
+      .select('categories');
+
+    const allCategories = resourcesData?.flatMap(r => r.categories) || [];
+    const resourceCategories = [...new Set(allCategories)].sort();
+    const resourceCategoryList = resourceCategories.join(', ');
+    console.log('Fetched resource categories:', resourceCategoryList);
+
     if (!openAIApiKey) {
       console.error('OpenAI API key not found');
       return new Response(JSON.stringify({
@@ -325,13 +335,30 @@ CIVIC ORGANIZATION TYPES (for /civics page):
 - "police_precinct_council" → Police Precinct Councils, community councils, precinct community meetings, police community relations
 
 RESOURCE CATEGORIES (for /resources page):
-- "sports" → tennis lessons, basketball, leagues, sports programs, athletic training, fitness
-- "mental health/wellness" → counseling, therapy, support groups, mental health services, wellness programs
-- "arts" → music lessons, art classes, dance, theater, creative programs
-- "recreational" → parks, recreation centers, activities, community centers, restaurants, dining, food establishments
-- "conflict management" → mediation, conflict resolution, dispute resolution services
-- "legal services" → legal aid, attorneys, immigration help, rights assistance
-- "educational" → tutoring, classes, workshops, learning programs, schools
+AVAILABLE CATEGORIES IN DATABASE: ${resourceCategoryList}
+
+CATEGORY MATCHING RULES:
+1. If user asks for a BROAD category that matches one of the available categories, select ONLY the category and DO NOT add searchTerm
+2. If user asks for SPECIFIC things within a category, select the category AND add searchTerm for specifics
+3. Use exact category names from the database list
+4. Common category mappings:
+   - "seniors", "senior citizens", "elderly" → "Seniors" (category only, no searchTerm)
+   - "youth", "young people", "teens", "children" → "Youth" (category only, no searchTerm)
+   - "mental health", "wellness", "therapy", "counseling" → "Mental Health/Wellness"
+   - "sports", "fitness", "athletics" → "Sports"
+   - "arts", "music", "dance", "theater" → "Arts"
+   - "legal", "lawyer", "attorney" → "Legal Services"
+   - "education", "tutoring", "learning" → "Educational"
+   - "recreation", "parks", "activities" → "Recreational"
+
+EXAMPLES:
+- "what resources are available for seniors" → category:"Seniors" (NO searchTerm - broad category query)
+- "senior programs" → category:"Seniors" (NO searchTerm)
+- "senior fitness classes" → category:"Seniors" + searchTerm:"fitness classes" (specific within category)
+- "mental health resources" → category:"Mental Health/Wellness" (NO searchTerm - broad category)
+- "therapy for anxiety" → category:"Mental Health/Wellness" + searchTerm:"anxiety therapy" (specific)
+- "youth programs" → category:"Youth" (NO searchTerm)
+- "basketball for kids" → category:"Youth" + searchTerm:"basketball" (specific)
 
 ROUTING EXAMPLES:
 
@@ -395,15 +422,26 @@ JOB ROUTING EXAMPLES:
 ✓ "engineering internship" → /jobs + category:"internships" + searchTerm:"engineering"
 ✓ "city engineering jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"engineering"
 ✓ "who is my councilperson" → /my-elected-lookup
-✓ "where can i learn tennis" → /resources + searchTerm:"tennis" + category:"sports"
-✓ "tennis lessons" → /resources + searchTerm:"tennis" + category:"sports"
-✓ "basketball programs" → /resources + searchTerm:"basketball" + category:"sports"
-✓ "mental health counseling" → /resources + searchTerm:"counseling" + category:"mental health/wellness"
-✓ "art classes for kids" → /resources + searchTerm:"art classes kids" + category:"arts"
-✓ "tutoring services" → /resources + searchTerm:"tutoring" + category:"educational"
-✓ "fitness center near me" → /resources + searchTerm:"fitness" + category:"sports"
-✓ "free legal help" → /resources + searchTerm:"legal help" + category:"legal services"
-✓ "conflict resolution" → /resources + searchTerm:"conflict" + category:"conflict management"
+RESOURCES ROUTING (CRITICAL - Follow category matching rules):
+✓ "what resources are available for seniors" → /resources + category:"Seniors" (NO searchTerm - broad category)
+✓ "senior programs" → /resources + category:"Seniors" (NO searchTerm)
+✓ "seniors" → /resources + category:"Seniors" (NO searchTerm)
+✓ "senior fitness classes" → /resources + category:"Seniors" + searchTerm:"fitness classes" (specific within category)
+✓ "youth programs" → /resources + category:"Youth" (NO searchTerm)
+✓ "programs for kids" → /resources + category:"Youth" (NO searchTerm)
+✓ "youth basketball" → /resources + category:"Youth" + searchTerm:"basketball" (specific)
+✓ "mental health resources" → /resources + category:"Mental Health/Wellness" (NO searchTerm)
+✓ "wellness programs" → /resources + category:"Mental Health/Wellness" (NO searchTerm)
+✓ "mental health" → /resources + category:"Mental Health/Wellness" (NO searchTerm)
+✓ "therapy for anxiety" → /resources + category:"Mental Health/Wellness" + searchTerm:"anxiety therapy"
+✓ "sports programs" → /resources + category:"Sports" (NO searchTerm)
+✓ "where can i learn tennis" → /resources + category:"Sports" + searchTerm:"tennis lessons"
+✓ "tennis lessons" → /resources + category:"Sports" + searchTerm:"tennis"
+✓ "basketball programs" → /resources + category:"Sports" + searchTerm:"basketball"
+✓ "art classes for kids" → /resources + category:"Arts" + searchTerm:"art classes kids"
+✓ "tutoring services" → /resources + category:"Educational" + searchTerm:"tutoring"
+✓ "fitness center near me" → /resources + category:"Sports" + searchTerm:"fitness"
+✓ "free legal help" → /resources + category:"Legal Services" + searchTerm:"free legal help"
 ✓ "business opportunities" → /business-opportunities
 ✓ "small business support" → /business-opportunities + searchTerm:"small business"
 ✓ "entrepreneurship programs" → /business-opportunities + searchTerm:"entrepreneurship"
