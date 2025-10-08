@@ -93,7 +93,7 @@ export default function Jobs() {
         setTimeout(() => setIsAIPopulated(false), 600);
       }, 0);
     }
-  }, [location.state, navigate, location.pathname, jobs, loading, isMobile, toast]);
+  }, [location.state, navigate, location.pathname, jobs, loading, isMobile]);
 
   useEffect(() => {
     fetchJobs();
