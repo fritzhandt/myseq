@@ -736,19 +736,14 @@ export default function CivicOrganizationsManager() {
                 
                 <div className="space-y-2">
                   <Label htmlFor="password">Password {editingOrg ? '(leave blank to keep current)' : '*'}</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="password"
-                      type="text"
-                      value={formData.password}
-                      onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                      placeholder={editingOrg ? "Leave blank to keep current password" : "Password"}
-                      required={!editingOrg}
-                    />
-                    <Button type="button" onClick={generatePassword} variant="outline">
-                      Generate
-                    </Button>
-                  </div>
+                  <Input
+                    id="password"
+                    type="text"
+                    value={formData.password}
+                    onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                    placeholder={editingOrg ? "Leave blank to keep current password" : "Password"}
+                    required={!editingOrg}
+                  />
                 </div>
               </div>
 

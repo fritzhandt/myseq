@@ -49,6 +49,24 @@ export const CivicPasswordResetManager = () => {
     }
   };
 
+  const generatePassword = () => {
+    const words = [
+      'apple', 'beach', 'chair', 'dance', 'eagle', 'flame', 'grape', 'house',
+      'island', 'jungle', 'kite', 'lemon', 'magic', 'ocean', 'piano', 'quiet',
+      'river', 'storm', 'tower', 'urban', 'voice', 'water', 'young', 'zebra',
+      'bridge', 'castle', 'dragon', 'forest', 'garden', 'happy', 'knight', 'light',
+      'mountain', 'night', 'orange', 'purple', 'queen', 'royal', 'silver', 'tiger',
+      'anchor', 'blaze', 'cloud', 'delta', 'echo', 'frost', 'glow', 'haven',
+      'iris', 'jade', 'karma', 'lotus', 'marble', 'nova', 'orbit', 'pearl',
+      'remix', 'solar', 'tempo', 'unity', 'vibe', 'wave', 'zen', 'atom'
+    ].filter(w => w.length <= 8);
+    
+    const getRandomWord = () => words[Math.floor(Math.random() * words.length)];
+    const getRandomNumber = () => Math.floor(1000 + Math.random() * 9000).toString();
+    
+    return `${getRandomWord()}-${getRandomNumber()}-${getRandomWord()}-${getRandomNumber()}`;
+  };
+
   const handlePasswordReset = async (orgId: string, orgName: string) => {
     const newPassword = newPasswords[orgId];
     
@@ -169,16 +187,32 @@ export const CivicPasswordResetManager = () => {
                     )}
                   </TableCell>
                   <TableCell>
-                    <Input
-                      type="password"
-                      placeholder="Enter new password (min 8 chars)"
-                      value={newPasswords[org.id] || ''}
-                      onChange={(e) => setNewPasswords(prev => ({
-                        ...prev,
-                        [org.id]: e.target.value
-                      }))}
-                      className="max-w-xs"
-                    />
+                    <div className="flex gap-2">
+                      <Input
+                        type="password"
+                        placeholder="Enter new password (min 8 chars)"
+                        value={newPasswords[org.id] || ''}
+                        onChange={(e) => setNewPasswords(prev => ({
+                          ...prev,
+                          [org.id]: e.target.value
+                        }))}
+                        className="max-w-xs"
+                      />
+                      <Button
+                        onClick={() => {
+                          const password = generatePassword();
+                          setNewPasswords(prev => ({
+                            ...prev,
+                            [org.id]: password
+                          }));
+                        }}
+                        variant="outline"
+                        size="sm"
+                        type="button"
+                      >
+                        Generate
+                      </Button>
+                    </div>
                   </TableCell>
                   <TableCell>
                     <Button
