@@ -257,14 +257,11 @@ const Admin = () => {
       <header className="bg-card border-b shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <Calendar className="h-8 w-8 text-primary" />
-              <div>
-                <h1 className="text-2xl font-bold">Admin Panel</h1>
-                <p className="text-sm text-muted-foreground">
-                  Role: {userRole === 'main_admin' ? 'Main Admin' : 'Sub Admin'}
-                </p>
-              </div>
+            <div>
+              <h1 className="text-2xl font-bold">Admin Panel</h1>
+              <p className="text-sm text-muted-foreground">
+                Role: {userRole === 'main_admin' ? 'Main Admin' : 'Sub Admin'}
+              </p>
             </div>
             <div className="flex gap-2">
               <Button onClick={() => navigate('/')} variant="outline">
