@@ -86,3 +86,6 @@ verify_jwt = false
 
 [functions.civic-content]
 verify_jwt = false
+
+[functions.civic-password-reset]
+verify_jwt = false

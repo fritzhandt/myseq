@@ -320,6 +320,7 @@ export type Database = {
           name: string
           organization_type: string
           password_hash: string
+          password_needs_reset: boolean | null
           updated_at: string
         }
         Insert: {
@@ -335,6 +336,7 @@ export type Database = {
           name: string
           organization_type?: string
           password_hash: string
+          password_needs_reset?: boolean | null
           updated_at?: string
         }
         Update: {
@@ -350,6 +352,7 @@ export type Database = {
           name?: string
           organization_type?: string
           password_hash?: string
+          password_needs_reset?: boolean | null
           updated_at?: string
         }
         Relationships: []

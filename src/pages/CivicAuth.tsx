@@ -58,11 +58,21 @@ const CivicAuth = () => {
       const data = await response.json();
 
       if (!response.ok || data.error) {
-        toast({
-          title: "Authentication Failed",
-          description: data.error || "Invalid access code or password",
-          variant: "destructive",
-        });
+        // Handle password reset needed error
+        if (data.error === 'PASSWORD_NEEDS_RESET') {
+          toast({
+            title: "Password Reset Required",
+            description: data.message || "Your password format needs to be updated. Please contact the platform administrator.",
+            variant: "destructive",
+            duration: 10000,
+          });
+        } else {
+          toast({
+            title: "Authentication Failed",
+            description: data.error || "Invalid access code or password",
+            variant: "destructive",
+          });
+        }
         return;
       }
 

@@ -38,47 +38,63 @@ async function hashPassword(password: string): Promise<string> {
   return `${saltBase64}:${hashBase64}`;
 }
 
-async function verifyPassword(password: string, storedHash: string): Promise<boolean> {
-  const encoder = new TextEncoder();
-  const [saltBase64, hashBase64] = storedHash.split(':');
-  
-  const salt = Uint8Array.from(atob(saltBase64), c => c.charCodeAt(0));
-  const storedHashArray = Uint8Array.from(atob(hashBase64), c => c.charCodeAt(0));
-  
-  const passwordBuffer = encoder.encode(password);
-  
-  const key = await crypto.subtle.importKey(
-    'raw',
-    passwordBuffer,
-    { name: 'PBKDF2' },
-    false,
-    ['deriveBits']
-  );
-  
-  const hashBuffer = await crypto.subtle.deriveBits(
-    {
-      name: 'PBKDF2',
-      salt: salt,
-      iterations: 100000,
-      hash: 'SHA-256'
-    },
-    key,
-    256
-  );
-  
-  const computedHashArray = new Uint8Array(hashBuffer);
-  
-  // Constant-time comparison
-  if (computedHashArray.length !== storedHashArray.length) {
-    return false;
+async function verifyPassword(password: string, storedHash: string): Promise<{ success: boolean; needsReset?: boolean }> {
+  // Check if this is a bcrypt hash (legacy format)
+  if (storedHash.startsWith('$2a$') || storedHash.startsWith('$2b$')) {
+    return { success: false, needsReset: true };
   }
   
-  let result = 0;
-  for (let i = 0; i < computedHashArray.length; i++) {
-    result |= computedHashArray[i] ^ storedHashArray[i];
+  // Handle PBKDF2 format (new format)
+  try {
+    const encoder = new TextEncoder();
+    const [saltBase64, hashBase64] = storedHash.split(':');
+    
+    if (!saltBase64 || !hashBase64) {
+      console.error('Invalid password hash format');
+      return { success: false };
+    }
+    
+    const salt = Uint8Array.from(atob(saltBase64), c => c.charCodeAt(0));
+    const storedHashArray = Uint8Array.from(atob(hashBase64), c => c.charCodeAt(0));
+    
+    const passwordBuffer = encoder.encode(password);
+    
+    const key = await crypto.subtle.importKey(
+      'raw',
+      passwordBuffer,
+      { name: 'PBKDF2' },
+      false,
+      ['deriveBits']
+    );
+    
+    const hashBuffer = await crypto.subtle.deriveBits(
+      {
+        name: 'PBKDF2',
+        salt: salt,
+        iterations: 100000,
+        hash: 'SHA-256'
+      },
+      key,
+      256
+    );
+    
+    const computedHashArray = new Uint8Array(hashBuffer);
+    
+    // Constant-time comparison
+    if (computedHashArray.length !== storedHashArray.length) {
+      return { success: false };
+    }
+    
+    let result = 0;
+    for (let i = 0; i < computedHashArray.length; i++) {
+      result |= computedHashArray[i] ^ storedHashArray[i];
+    }
+    
+    return { success: result === 0 };
+  } catch (error) {
+    console.error('Password verification error:', error);
+    return { success: false };
   }
-  
-  return result === 0;
 }
 
 interface LoginRequest {
@@ -138,9 +154,19 @@ serve(async (req) => {
       }
 
       // Verify password using native crypto
-      const passwordMatch = await verifyPassword(password, org.password_hash);
+      const verificationResult = await verifyPassword(password, org.password_hash);
 
-      if (!passwordMatch) {
+      if (verificationResult.needsReset) {
+        return new Response(
+          JSON.stringify({ 
+            error: 'PASSWORD_NEEDS_RESET',
+            message: 'Your password format needs to be updated. Please contact the platform administrator to reset your password.' 
+          }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      if (!verificationResult.success) {
         return new Response(
           JSON.stringify({ error: 'Invalid credentials' }),
           { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
