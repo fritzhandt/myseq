@@ -1,11 +1,85 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
-import * as bcrypt from "https://deno.land/x/bcrypt@v0.2.4/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Password hashing utilities using Deno's native crypto API
+async function hashPassword(password: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const passwordBuffer = encoder.encode(password);
+  
+  const key = await crypto.subtle.importKey(
+    'raw',
+    passwordBuffer,
+    { name: 'PBKDF2' },
+    false,
+    ['deriveBits']
+  );
+  
+  const hashBuffer = await crypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      salt: salt,
+      iterations: 100000,
+      hash: 'SHA-256'
+    },
+    key,
+    256
+  );
+  
+  const hashArray = new Uint8Array(hashBuffer);
+  const saltBase64 = btoa(String.fromCharCode(...salt));
+  const hashBase64 = btoa(String.fromCharCode(...hashArray));
+  
+  return `${saltBase64}:${hashBase64}`;
+}
+
+async function verifyPassword(password: string, storedHash: string): Promise<boolean> {
+  const encoder = new TextEncoder();
+  const [saltBase64, hashBase64] = storedHash.split(':');
+  
+  const salt = Uint8Array.from(atob(saltBase64), c => c.charCodeAt(0));
+  const storedHashArray = Uint8Array.from(atob(hashBase64), c => c.charCodeAt(0));
+  
+  const passwordBuffer = encoder.encode(password);
+  
+  const key = await crypto.subtle.importKey(
+    'raw',
+    passwordBuffer,
+    { name: 'PBKDF2' },
+    false,
+    ['deriveBits']
+  );
+  
+  const hashBuffer = await crypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      salt: salt,
+      iterations: 100000,
+      hash: 'SHA-256'
+    },
+    key,
+    256
+  );
+  
+  const computedHashArray = new Uint8Array(hashBuffer);
+  
+  // Constant-time comparison
+  if (computedHashArray.length !== storedHashArray.length) {
+    return false;
+  }
+  
+  let result = 0;
+  for (let i = 0; i < computedHashArray.length; i++) {
+    result |= computedHashArray[i] ^ storedHashArray[i];
+  }
+  
+  return result === 0;
+}
 
 interface LoginRequest {
   access_code: string;
@@ -63,8 +137,8 @@ serve(async (req) => {
         );
       }
 
-      // Verify password using bcrypt
-      const passwordMatch = await bcrypt.compare(password, org.password_hash);
+      // Verify password using native crypto
+      const passwordMatch = await verifyPassword(password, org.password_hash);
 
       if (!passwordMatch) {
         return new Response(
