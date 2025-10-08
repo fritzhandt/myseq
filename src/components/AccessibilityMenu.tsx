@@ -8,7 +8,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Accessibility, Type, Palette } from 'lucide-react';
+import { Type, Palette } from 'lucide-react';
+import accessibilityIcon from '@/assets/accessibility-icon.svg';
 
 type TextSize = 'normal' | 'large' | 'extra-large';
 
@@ -73,7 +74,7 @@ export default function AccessibilityMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" aria-label="Accessibility options">
-          <Accessibility className="h-5 w-5" />
+          <img src={accessibilityIcon} alt="" className="h-5 w-5" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
