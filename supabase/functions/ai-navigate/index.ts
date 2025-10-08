@@ -338,27 +338,52 @@ RESOURCE CATEGORIES (for /resources page):
 AVAILABLE CATEGORIES IN DATABASE: ${resourceCategoryList}
 
 CATEGORY MATCHING RULES:
-1. If user asks for a BROAD category that matches one of the available categories, select ONLY the category and DO NOT add searchTerm
-2. If user asks for SPECIFIC things within a category, select the category AND add searchTerm for specifics
-3. Use exact category names from the database list
-4. Common category mappings:
-   - "seniors", "senior citizens", "elderly" → "Seniors" (category only, no searchTerm)
-   - "youth", "young people", "teens", "children" → "Youth" (category only, no searchTerm)
-   - "mental health", "wellness", "therapy", "counseling" → "Mental Health/Wellness"
-   - "sports", "fitness", "athletics" → "Sports"
-   - "arts", "music", "dance", "theater" → "Arts"
-   - "legal", "lawyer", "attorney" → "Legal Services"
-   - "education", "tutoring", "learning" → "Educational"
+1. Match user queries to the ACTUAL categories from the database list above
+2. Use FUZZY MATCHING - be intelligent about synonyms and variations:
+   - "seniors", "senior citizens", "senior services", "elderly", "older adults" → "Senior Services"
+   - "youth", "young people", "teens", "children", "kids" → "Youth"
+   - "mental health", "wellness", "therapy", "counseling", "psychological" → "Mental Health/Wellness"
+   - "sports", "fitness", "athletics", "exercise", "recreation center" → "Sports"
+   - "arts", "music", "dance", "theater", "culture", "creative" → "Arts"
+   - "legal", "lawyer", "attorney", "law" → "Legal Services"
+   - "education", "tutoring", "learning", "school" → "Educational"
+   - "food", "food pantry", "meals", "hunger", "nutrition" → "Food"
+   - "environment", "environmental", "green", "sustainability" → "Environment"
+   - "cultural", "culture", "heritage" → "Cultural"
+   - "community", "community center", "neighborhood" → "Community Resources"
+   - "social", "social services", "social support" → "Social"
+   - "conflict", "mediation", "conflict resolution" → "Conflict Management"
    - "recreation", "parks", "activities" → "Recreational"
 
+3. CRITICAL DECISION LOGIC - When to use category only vs category + searchTerm:
+   - BROAD QUERY (just asking about the category) → Select category ONLY, NO searchTerm
+     Examples: "senior services", "what's available for seniors", "youth programs", "mental health resources"
+   
+   - SPECIFIC QUERY (asking for something specific within category) → Select category AND searchTerm
+     Examples: "senior fitness classes", "youth basketball", "therapy for anxiety"
+   
+   - NO CATEGORY MATCH → Use searchTerm with ALL categories (let frontend filter)
+     Examples: "help with rent", "financial assistance", "job training"
+
+4. Always use the EXACT category name from the database list for the category parameter
+
 EXAMPLES:
-- "what resources are available for seniors" → category:"Seniors" (NO searchTerm - broad category query)
-- "senior programs" → category:"Seniors" (NO searchTerm)
-- "senior fitness classes" → category:"Seniors" + searchTerm:"fitness classes" (specific within category)
+- "what resources are available for seniors" → category:"Senior Services" (NO searchTerm - broad category query)
+- "what senior services are available" → category:"Senior Services" (NO searchTerm)
+- "senior programs" → category:"Senior Services" (NO searchTerm)
+- "programs for elderly" → category:"Senior Services" (NO searchTerm)
+- "senior fitness classes" → category:"Senior Services" + searchTerm:"fitness classes" (specific within category)
 - "mental health resources" → category:"Mental Health/Wellness" (NO searchTerm - broad category)
-- "therapy for anxiety" → category:"Mental Health/Wellness" + searchTerm:"anxiety therapy" (specific)
+- "wellness programs" → category:"Mental Health/Wellness" (NO searchTerm)
+- "therapy for anxiety" → category:"Mental Health/Wellness" + searchTerm:"anxiety" (specific)
 - "youth programs" → category:"Youth" (NO searchTerm)
+- "programs for kids" → category:"Youth" (NO searchTerm)
 - "basketball for kids" → category:"Youth" + searchTerm:"basketball" (specific)
+- "sports programs" → category:"Sports" (NO searchTerm)
+- "tennis lessons" → category:"Sports" + searchTerm:"tennis" (specific)
+- "food pantry" → category:"Food" (NO searchTerm)
+- "legal help" → category:"Legal Services" (NO searchTerm)
+- "cultural events" → category:"Cultural" (NO searchTerm)
 
 ROUTING EXAMPLES:
 
@@ -422,26 +447,34 @@ JOB ROUTING EXAMPLES:
 ✓ "engineering internship" → /jobs + category:"internships" + searchTerm:"engineering"
 ✓ "city engineering jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"engineering"
 ✓ "who is my councilperson" → /my-elected-lookup
-RESOURCES ROUTING (CRITICAL - Follow category matching rules):
-✓ "what resources are available for seniors" → /resources + category:"Seniors" (NO searchTerm - broad category)
-✓ "senior programs" → /resources + category:"Seniors" (NO searchTerm)
-✓ "seniors" → /resources + category:"Seniors" (NO searchTerm)
-✓ "senior fitness classes" → /resources + category:"Seniors" + searchTerm:"fitness classes" (specific within category)
+RESOURCES ROUTING (CRITICAL - Follow fuzzy matching rules):
+✓ "what resources are available for seniors" → /resources + category:"Senior Services" (NO searchTerm)
+✓ "what senior services are available" → /resources + category:"Senior Services" (NO searchTerm)
+✓ "senior programs" → /resources + category:"Senior Services" (NO searchTerm)
+✓ "seniors" → /resources + category:"Senior Services" (NO searchTerm)
+✓ "programs for elderly" → /resources + category:"Senior Services" (NO searchTerm)
+✓ "senior fitness classes" → /resources + category:"Senior Services" + searchTerm:"fitness classes" (specific)
 ✓ "youth programs" → /resources + category:"Youth" (NO searchTerm)
 ✓ "programs for kids" → /resources + category:"Youth" (NO searchTerm)
 ✓ "youth basketball" → /resources + category:"Youth" + searchTerm:"basketball" (specific)
 ✓ "mental health resources" → /resources + category:"Mental Health/Wellness" (NO searchTerm)
 ✓ "wellness programs" → /resources + category:"Mental Health/Wellness" (NO searchTerm)
 ✓ "mental health" → /resources + category:"Mental Health/Wellness" (NO searchTerm)
-✓ "therapy for anxiety" → /resources + category:"Mental Health/Wellness" + searchTerm:"anxiety therapy"
+✓ "therapy for anxiety" → /resources + category:"Mental Health/Wellness" + searchTerm:"anxiety" (specific)
 ✓ "sports programs" → /resources + category:"Sports" (NO searchTerm)
-✓ "where can i learn tennis" → /resources + category:"Sports" + searchTerm:"tennis lessons"
-✓ "tennis lessons" → /resources + category:"Sports" + searchTerm:"tennis"
-✓ "basketball programs" → /resources + category:"Sports" + searchTerm:"basketball"
-✓ "art classes for kids" → /resources + category:"Arts" + searchTerm:"art classes kids"
-✓ "tutoring services" → /resources + category:"Educational" + searchTerm:"tutoring"
-✓ "fitness center near me" → /resources + category:"Sports" + searchTerm:"fitness"
-✓ "free legal help" → /resources + category:"Legal Services" + searchTerm:"free legal help"
+✓ "where can i learn tennis" → /resources + category:"Sports" + searchTerm:"tennis lessons" (specific)
+✓ "tennis lessons" → /resources + category:"Sports" + searchTerm:"tennis" (specific)
+✓ "basketball programs" → /resources + category:"Sports" + searchTerm:"basketball" (specific)
+✓ "art classes for kids" → /resources + category:"Arts" + searchTerm:"art classes kids" (specific)
+✓ "tutoring services" → /resources + category:"Educational" + searchTerm:"tutoring" (specific)
+✓ "fitness center near me" → /resources + category:"Sports" + searchTerm:"fitness" (specific)
+✓ "legal help" → /resources + category:"Legal Services" (NO searchTerm)
+✓ "free legal help" → /resources + category:"Legal Services" + searchTerm:"free" (specific)
+✓ "help with eviction" → /resources + category:"Legal Services" + searchTerm:"eviction" (specific)
+✓ "food pantry" → /resources + category:"Food" (NO searchTerm)
+✓ "free meals" → /resources + category:"Food" + searchTerm:"free meals" (specific)
+✓ "cultural events" → /resources + category:"Cultural" (NO searchTerm)
+✓ "community center" → /resources + category:"Community Resources" + searchTerm:"community center" (specific)
 ✓ "business opportunities" → /business-opportunities
 ✓ "small business support" → /business-opportunities + searchTerm:"small business"
 ✓ "entrepreneurship programs" → /business-opportunities + searchTerm:"entrepreneurship"
