@@ -317,8 +317,8 @@ export default function CivicOrganizationsManager() {
     });
     setEditingOrg(org);
     setCreatingOrgType(org.organization_type);
-    setIsCreating(true);
-    console.log('handleEdit completed - isCreating should be true');
+    setIsCreating(false);
+    console.log('handleEdit completed - isCreating should be false');
   };
 
   const exportAccessCodes = () => {
