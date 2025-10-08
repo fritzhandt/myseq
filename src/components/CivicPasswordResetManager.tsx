@@ -7,8 +7,9 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, Key, RefreshCw } from "lucide-react";
+import { AlertCircle, Key, RefreshCw, Copy } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface CivicOrg {
   id: string;
@@ -22,6 +23,7 @@ export const CivicPasswordResetManager = () => {
   const [loading, setLoading] = useState(true);
   const [resetting, setResetting] = useState<string | null>(null);
   const [newPasswords, setNewPasswords] = useState<Record<string, string>>({});
+  const [passwordDialog, setPasswordDialog] = useState<{isOpen: boolean, password?: string, orgName?: string}>({isOpen: false});
   const { toast } = useToast();
 
   useEffect(() => {
@@ -108,7 +110,14 @@ export const CivicPasswordResetManager = () => {
         description: `Password reset for ${orgName}`,
       });
 
-      // Clear the password field and refresh the list
+      // Show password dialog
+      setPasswordDialog({
+        isOpen: true,
+        password: newPassword,
+        orgName: orgName
+      });
+
+      // Clear the password field
       setNewPasswords(prev => {
         const updated = { ...prev };
         delete updated[orgId];
@@ -243,6 +252,59 @@ export const CivicPasswordResetManager = () => {
           </AlertDescription>
         </Alert>
       </CardContent>
+
+      {/* Password Success Dialog */}
+      <Dialog open={passwordDialog.isOpen} onOpenChange={(open) => setPasswordDialog({isOpen: open})}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>New Password Generated</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              A new password has been generated for <strong>{passwordDialog.orgName}</strong>:
+            </p>
+            
+            <div className="space-y-2">
+              <Label>New Password</Label>
+              <div className="flex items-center gap-2">
+                <code className="bg-muted px-3 py-2 rounded font-mono text-lg flex-1">
+                  {passwordDialog.password}
+                </code>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    if (passwordDialog.password) {
+                      navigator.clipboard.writeText(passwordDialog.password);
+                      toast({
+                        title: "Copied",
+                        description: "Password copied to clipboard",
+                      });
+                    }
+                  }}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription className="text-sm">
+                Make sure to save this password securely. You won't be able to see it again.
+              </AlertDescription>
+            </Alert>
+            
+            <Button
+              onClick={() => setPasswordDialog({isOpen: false})}
+              className="w-full"
+            >
+              Done
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
