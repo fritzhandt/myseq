@@ -5,7 +5,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Menu, Info, Users, Mail, Search, Vote, Shield, Calendar, Briefcase, Home, Building2, HelpCircle, Instagram, ExternalLink, Landmark } from 'lucide-react';
 import AddToHomeButton from '@/components/AddToHomeButton';
-import { LanguageSelector } from '@/components/LanguageSelector';
+import { GoogleTranslate } from '@/components/GoogleTranslate';
 import { useNavbar } from '@/contexts/NavbarContext';
 import AccessibilityMenu from '@/components/AccessibilityMenu';
 
@@ -42,9 +42,9 @@ const Navbar = () => {
               <Instagram className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
             </a>
             
-            {/* Language Selector */}
+            {/* Google Translate Widget */}
             <div className="hidden sm:block">
-              <LanguageSelector />
+              <GoogleTranslate />
             </div>
             
             {/* Accessibility Menu */}
@@ -219,29 +219,9 @@ const Navbar = () => {
                         </div>
                         <span>Contact Us</span>
                       </a>
-                      
-                      <a 
-                        href="https://www.instagram.com/yourpage"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-4 px-4 py-3 rounded-lg text-base font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 group sm:hidden" 
-                        onClick={closeMenu}
-                      >
-                        <div className="p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
-                          <Instagram className="w-4 h-4" />
-                        </div>
-                        <span>Follow on Instagram</span>
-                      </a>
                     </div>
                   </div>
                 </nav>
-              </div>
-              
-              {/* Bottom Section - Language Selection */}
-              <div className="px-6 py-4 border-t flex-shrink-0 sm:hidden">
-                <div className="flex items-center justify-center">
-                  <LanguageSelector />
-                </div>
               </div>
             </SheetContent>
             </Sheet>
