@@ -145,19 +145,11 @@ export default function Resources() {
       );
     }
 
-    // If this was from AI navigation with both search and category, but no results found
-    // Clear the search and just show the category
-    if (fromAINavigation && filtered.length === 0 && searchQuery.trim() && selectedCategory) {
-      console.log('AI navigation: No results with search term, falling back to category only');
-      setSearchQuery("");
+    // If this was from AI navigation and we have results, clear the flag
+    if (fromAINavigation && filtered.length > 0) {
       setFromAINavigation(false);
-      
-      // Re-filter with just category
-      filtered = resources.filter(resource =>
-        resource.categories.includes(selectedCategory)
-      );
-    } else if (fromAINavigation && filtered.length > 0) {
-      // Results found, clear the flag
+    } else if (fromAINavigation && filtered.length === 0) {
+      // No results found, but keep the search term visible so users know what was searched
       setFromAINavigation(false);
     }
 
