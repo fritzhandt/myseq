@@ -27,6 +27,34 @@ interface NavigationResponse {
   error?: string;
 }
 
+// ---- tiny JSON repair helper (last resort) ----
+async function repairJson(raw: string, apiKey: string): Promise<Record<string, unknown> | null> {
+  try {
+    return JSON.parse(raw);
+  } catch {
+    try {
+      const fix = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          temperature: 0,
+          response_format: { type: "json_object" },
+          messages: [
+            { role: "system", content: "Return ONLY a valid JSON object. Remove code fences and fix escaping." },
+            { role: "user", content: raw },
+          ],
+        }),
+      });
+      const data = await fix.json();
+      const content = data?.choices?.[0]?.message?.content ?? "";
+      return JSON.parse(content);
+    } catch {
+      return null;
+    }
+  }
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
