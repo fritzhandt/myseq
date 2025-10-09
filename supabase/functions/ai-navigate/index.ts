@@ -1,14 +1,14 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const openAIApiKey = Deno.env.get("OPENAI_API_KEY");
+const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 interface NavigationResponse {
@@ -29,106 +29,115 @@ interface NavigationResponse {
 
 serve(async (req) => {
   // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { query } = await req.json();
-    
-    console.log('Received query:', query);
+
+    console.log("Received query:", query);
 
     if (!query) {
-      console.log('No query provided');
-      return new Response(JSON.stringify({ 
-        success: false, 
-        error: "Please provide a search query" 
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400
-      });
+      console.log("No query provided");
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Please provide a search query",
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 400,
+        },
+      );
     }
 
     // Check daily search limit
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const today = new Date().toISOString().split('T')[0]; // Get YYYY-MM-DD format
-    
+    const today = new Date().toISOString().split("T")[0]; // Get YYYY-MM-DD format
+
     // Get or create today's usage record
     const { data: usageData, error: usageError } = await supabase
-      .from('ai_search_usage')
-      .select('search_count')
-      .eq('search_date', today)
+      .from("ai_search_usage")
+      .select("search_count")
+      .eq("search_date", today)
       .single();
 
-    if (usageError && usageError.code !== 'PGRST116') { // PGRST116 = no rows found
-      console.error('Error checking usage:', usageError);
-      return new Response(JSON.stringify({
-        success: false,
-        error: "Service temporarily unavailable"
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500
-      });
+    if (usageError && usageError.code !== "PGRST116") {
+      // PGRST116 = no rows found
+      console.error("Error checking usage:", usageError);
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Service temporarily unavailable",
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 500,
+        },
+      );
     }
 
     const currentCount = usageData?.search_count || 0;
-    console.log('Current daily search count:', currentCount);
+    console.log("Current daily search count:", currentCount);
 
     if (currentCount >= 300) {
-      console.log('Daily search limit exceeded');
-      return new Response(JSON.stringify({
-        success: false,
-        error: "Daily search limit exceeded"
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 429
-      });
+      console.log("Daily search limit exceeded");
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Daily search limit exceeded",
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 429,
+        },
+      );
     }
 
     // Increment the search count
     if (usageData) {
       // Update existing record
       await supabase
-        .from('ai_search_usage')
+        .from("ai_search_usage")
         .update({ search_count: currentCount + 1 })
-        .eq('search_date', today);
+        .eq("search_date", today);
     } else {
       // Create new record for today
-      await supabase
-        .from('ai_search_usage')
-        .insert({ search_date: today, search_count: 1 });
+      await supabase.from("ai_search_usage").insert({ search_date: today, search_count: 1 });
     }
 
     // Fetch active employers from database for dynamic employer recognition
     const { data: employersData } = await supabase
-      .from('jobs')
-      .select('employer')
-      .eq('is_active', true)
-      .order('employer');
+      .from("jobs")
+      .select("employer")
+      .eq("is_active", true)
+      .order("employer");
 
-    const employers = [...new Set(employersData?.map(j => j.employer) || [])];
-    const employerList = employers.join(', ');
-    console.log('Fetched employers:', employerList);
+    const employers = [...new Set(employersData?.map((j) => j.employer) || [])];
+    const employerList = employers.join(", ");
+    console.log("Fetched employers:", employerList);
 
     // Fetch resource categories from database for dynamic category recognition
-    const { data: resourcesData } = await supabase
-      .from('resources')
-      .select('categories');
+    const { data: resourcesData } = await supabase.from("resources").select("categories");
 
-    const allCategories = resourcesData?.flatMap(r => r.categories) || [];
+    const allCategories = resourcesData?.flatMap((r) => r.categories) || [];
     const resourceCategories = [...new Set(allCategories)].sort();
-    const resourceCategoryList = resourceCategories.join(', ');
-    console.log('Fetched resource categories:', resourceCategoryList);
+    const resourceCategoryList = resourceCategories.join(", ");
+    console.log("Fetched resource categories:", resourceCategoryList);
 
     if (!openAIApiKey) {
-      console.error('OpenAI API key not found');
-      return new Response(JSON.stringify({
-        success: false,
-        error: "AI service is not configured properly"
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500
-      });
+      console.error("OpenAI API key not found");
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "AI service is not configured properly",
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 500,
+        },
+      );
     }
 
     // ==========================================
@@ -191,53 +200,57 @@ If NOT crisis:
 CRITICAL: Return ONLY valid JSON, no explanations.`;
 
     // Check for crisis first
-    const crisisResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
+    const crisisResponse = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${openAIApiKey}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: "gpt-4o-mini",
         messages: [
-          { role: 'system', content: crisisPrompt },
-          { role: 'user', content: query }
+          { role: "system", content: crisisPrompt },
+          { role: "user", content: query },
         ],
         max_tokens: 100,
-        temperature: 0.0
+        temperature: 0.0,
       }),
     });
 
     if (!crisisResponse.ok) {
-      console.error('Crisis detection API error:', crisisResponse.status);
+      console.error("Crisis detection API error:", crisisResponse.status);
       // Continue to navigation if crisis detection fails - don't block legitimate queries
     } else {
       const crisisData = await crisisResponse.json();
       const crisisAiResponse = crisisData.choices?.[0]?.message?.content;
-      console.log('Crisis Detection Response:', crisisAiResponse);
-      
+      console.log("Crisis Detection Response:", crisisAiResponse);
+
       try {
         let crisisJsonStr = crisisAiResponse.trim();
-        const firstBrace = crisisJsonStr.indexOf('{');
-        const lastBrace = crisisJsonStr.lastIndexOf('}');
+        const firstBrace = crisisJsonStr.indexOf("{");
+        const lastBrace = crisisJsonStr.lastIndexOf("}");
         if (firstBrace !== -1 && lastBrace !== -1) {
           crisisJsonStr = crisisJsonStr.substring(firstBrace, lastBrace + 1);
         }
-        
+
         const crisisResult = JSON.parse(crisisJsonStr);
-        
+
         if (crisisResult.isCrisis === true) {
-          console.log('CRISIS DETECTED - Returning help resources');
-          return new Response(JSON.stringify({
-            success: true,
-            isGeneralQuery: true,
-            answer: "Help is available. You're not alone. Call 988 or visit https://www.nyc.gov/site/doh/health/health-topics/988.page to get the help you need. There are also other private organizations that can provide mental health assistance, just go to 'Community Resources' and click the 'Mental Health/Wellness' tab."
-          }), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          });
+          console.log("CRISIS DETECTED - Returning help resources");
+          return new Response(
+            JSON.stringify({
+              success: true,
+              isGeneralQuery: true,
+              answer:
+                "Help is available. You're not alone. Call 988 or visit https://www.nyc.gov/site/doh/health/health-topics/988.page to get the help you need. There are also other private organizations that can provide mental health assistance, just go to 'Community Resources' and click the 'Mental Health/Wellness' tab.",
+            }),
+            {
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
+          );
         }
       } catch (e) {
-        console.error('Error parsing crisis detection:', e);
+        console.error("Error parsing crisis detection:", e);
         // Continue to navigation if parsing fails
       }
     }
@@ -468,6 +481,8 @@ JOB ROUTING EXAMPLES:
 ✓ "engineering internship" → /jobs + category:"internships" + searchTerm:"engineering"
 ✓ "city engineering jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"engineering"
 ✓ "who is my councilperson" → /my-elected-lookup
+✓ "healthcare jobs" → /jobs + searchTerm:"(healthcare OR health care OR medical OR hospital OR clinic OR nursing OR nurse OR rn OR lpn OR cna OR hha OR home health aide OR medical assistant OR ma OR cma OR physician OR pa OR physician assistant OR np OR nurse practitioner OR pharmacist OR pharmacy OR phlebotomist OR lab OR laboratory OR radiology OR x ray OR imaging OR ultrasound OR sonography OR respiratory therapist OR physical therapist OR pt OR occupational therapist OR ot OR speech therapist OR slp OR social worker OR lmsw OR lcsw OR behavioral health OR mental health) AND (job OR jobs OR position OR positions OR opening OR openings OR hiring OR career OR careers) NOT (master of OR degree OR mba OR phd OR executive)"
+✓ "healthcare jobs in queens" → /jobs + location:"Queens" + searchTerm:"(healthcare OR health care OR medical OR hospital OR clinic OR nursing OR nurse OR rn OR lpn OR cna OR hha OR home health aide OR medical assistant OR ma OR cma OR physician OR pa OR physician assistant OR np OR nurse practitioner OR pharmacist OR pharmacy OR phlebotomist OR lab OR laboratory OR radiology OR x ray OR imaging OR ultrasound OR sonography OR respiratory therapist OR physical therapist OR pt OR occupational therapist OR ot OR speech therapist OR slp OR social worker OR lmsw OR lcsw OR behavioral health OR mental health) AND (job OR jobs OR position OR positions OR opening OR openings OR hiring OR career OR careers) NOT (master of OR degree OR mba OR phd OR executive)"
 RESOURCES ROUTING (CRITICAL - Follow fuzzy matching rules):
 ✓ "what resources are available for seniors" → /resources + category:"Senior Services" (NO searchTerm)
 ✓ "what senior services are available" → /resources + category:"Senior Services" (NO searchTerm)
@@ -520,7 +535,7 @@ KEYWORD MAPPING:
 - "who is my", "find my representative", "my councilperson", "who represents" → /my-elected-lookup (ONLY for identifying officials, NOT for contacting them)
 - "learn", "lessons", "classes", "training" → /resources category:"sports", "arts", or "educational"
 - "help", "support", "assistance" → check context for category
-- "health", "medical", "fitness", "wellness" → /resources category:"mental health/wellness" or "sports"
+- "health", "healthcare", "medical", "fitness", "wellness" → /resources category:"mental health/wellness" or "sports"
 - "legal", "lawyer", "immigration" → /resources category:"legal services"
 - "business", "entrepreneur", "career", "startup", "small business" → /business-opportunities
 - "recreation", "park", "activities" → /resources category:"recreational"
@@ -676,20 +691,20 @@ OR (only if CLEARLY about different region like Manhattan/Brooklyn)
 }`;
 
     // STEP 1: Try navigation first
-    const navigationResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
+    const navigationResponse = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${openAIApiKey}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: 'gpt-4o',  // Use more capable model for complex boolean query construction
+        model: "gpt-4o", // Use more capable model for complex boolean query construction
         messages: [
-          { role: 'system', content: navigationPrompt },
-          { role: 'user', content: query }
+          { role: "system", content: navigationPrompt },
+          { role: "user", content: query },
         ],
-        max_tokens: 500,  // Increased for longer boolean queries
-        temperature: 0.0
+        max_tokens: 500, // Increased for longer boolean queries
+        temperature: 0.0,
       }),
     });
 
@@ -701,20 +716,20 @@ OR (only if CLEARLY about different region like Manhattan/Brooklyn)
     }
 
     const navData = await navigationResponse.json();
-    console.log('Navigation Response:', JSON.stringify(navData, null, 2));
-    
+    console.log("Navigation Response:", JSON.stringify(navData, null, 2));
+
     if (!navData.choices || !navData.choices[0] || !navData.choices[0].message) {
-      console.error('Invalid OpenAI response structure:', navData);
-      throw new Error('Invalid response from OpenAI API');
+      console.error("Invalid OpenAI response structure:", navData);
+      throw new Error("Invalid response from OpenAI API");
     }
-    
+
     const navAiResponse = navData.choices[0].message.content;
-    console.log('Navigation AI Response:', navAiResponse);
+    console.log("Navigation AI Response:", navAiResponse);
 
     // Extract JSON from response (strip any text before/after JSON)
     let jsonStr = navAiResponse.trim();
-    const firstBrace = jsonStr.indexOf('{');
-    const lastBrace = jsonStr.lastIndexOf('}');
+    const firstBrace = jsonStr.indexOf("{");
+    const lastBrace = jsonStr.lastIndexOf("}");
     if (firstBrace !== -1 && lastBrace !== -1) {
       jsonStr = jsonStr.substring(firstBrace, lastBrace + 1);
     }
@@ -723,26 +738,26 @@ OR (only if CLEARLY about different region like Manhattan/Brooklyn)
     try {
       parsedNavResponse = JSON.parse(jsonStr);
     } catch (parseError) {
-      console.error('Failed to parse navigation response:', parseError);
-      console.error('Raw response:', navAiResponse);
+      console.error("Failed to parse navigation response:", parseError);
+      console.error("Raw response:", navAiResponse);
       parsedNavResponse = {
         success: false,
-        error: "I couldn't understand your request. Please try rephrasing it."
+        error: "I couldn't understand your request. Please try rephrasing it.",
       };
     }
 
     // If navigation found a match, return it
     if (parsedNavResponse.success && parsedNavResponse.destination) {
-      console.log('Navigation match found:', parsedNavResponse.destination);
+      console.log("Navigation match found:", parsedNavResponse.destination);
       return new Response(JSON.stringify(parsedNavResponse), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     // If navigation explicitly says no match, try general information query
-    if (parsedNavResponse.success === false && 'noMatch' in parsedNavResponse) {
-      console.log('No navigation match, trying general information query');
-      
+    if (parsedNavResponse.success === false && "noMatch" in parsedNavResponse) {
+      console.log("No navigation match, trying general information query");
+
       // ==========================================
       // STEP 2: GENERAL INFO (NO ROUTING)
       // ==========================================
@@ -820,39 +835,39 @@ OR
   "error": "I can only answer questions about Southeast Queens, NY"
 }`;
 
-      const generalResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
+      const generalResponse = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${openAIApiKey}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${openAIApiKey}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: "gpt-4o-mini",
           messages: [
-            { role: 'system', content: generalPrompt },
-            { role: 'user', content: query }
+            { role: "system", content: generalPrompt },
+            { role: "user", content: query },
           ],
           max_tokens: 500,
-          temperature: 0.3
+          temperature: 0.3,
         }),
       });
 
       if (!generalResponse.ok) {
         const errorText = await generalResponse.text();
         console.error(`General query API error: ${generalResponse.status} - ${errorText}`);
-        throw new Error('General information service error');
+        throw new Error("General information service error");
       }
 
       const genData = await generalResponse.json();
-      console.log('General Response:', JSON.stringify(genData, null, 2));
-      
+      console.log("General Response:", JSON.stringify(genData, null, 2));
+
       const genAiResponse = genData.choices[0].message.content;
-      console.log('General AI Response:', genAiResponse);
+      console.log("General AI Response:", genAiResponse);
 
       // Extract JSON from response (strip any text before/after JSON)
       let genJsonStr = genAiResponse.trim();
-      const genFirstBrace = genJsonStr.indexOf('{');
-      const genLastBrace = genJsonStr.lastIndexOf('}');
+      const genFirstBrace = genJsonStr.indexOf("{");
+      const genLastBrace = genJsonStr.lastIndexOf("}");
       if (genFirstBrace !== -1 && genLastBrace !== -1) {
         genJsonStr = genJsonStr.substring(genFirstBrace, genLastBrace + 1);
       }
@@ -861,33 +876,35 @@ OR
       try {
         parsedGenResponse = JSON.parse(genJsonStr);
       } catch (parseError) {
-        console.error('Failed to parse general response:', parseError);
-        console.error('Raw response:', genAiResponse);
+        console.error("Failed to parse general response:", parseError);
+        console.error("Raw response:", genAiResponse);
         parsedGenResponse = {
           success: false,
-          error: "I couldn't process your question. Please try again."
+          error: "I couldn't process your question. Please try again.",
         };
       }
 
       return new Response(JSON.stringify(parsedGenResponse), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     // If navigation had an error, return it
     return new Response(JSON.stringify(parsedNavResponse), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-
   } catch (error) {
-    console.error('Error in ai-navigate function:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    return new Response(JSON.stringify({ 
-      success: false, 
-      error: 'Something went wrong processing your request. Please try again.' 
-    }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    console.error("Error in ai-navigate function:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: "Something went wrong processing your request. Please try again.",
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
   }
 });
