@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, ArrowLeft, X, Sparkles } from "lucide-react";
+import { Search, ArrowLeft } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import ResourceCard from "@/components/ResourceCard";
 import UserPagination from "@/components/UserPagination";
@@ -31,8 +31,6 @@ export default function BusinessOpportunities() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [showAIBadge, setShowAIBadge] = useState(false);
-  const [actualSearchQuery, setActualSearchQuery] = useState("");
   const itemsPerPage = 12;
   const location = useLocation();
   const navigate = useNavigate();
@@ -47,9 +45,7 @@ export default function BusinessOpportunities() {
   useEffect(() => {
     const state = location.state as any;
     if (state?.searchTerm) {
-      setActualSearchQuery(state.searchTerm);
       setSearchQuery(state.searchTerm);
-      setShowAIBadge(true);
       navigate(location.pathname, { replace: true });
     }
   }, [location.state, navigate, location.pathname]);
@@ -108,10 +104,6 @@ export default function BusinessOpportunities() {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
-    if (showAIBadge) {
-      setShowAIBadge(false);
-      setActualSearchQuery("");
-    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -165,32 +157,13 @@ export default function BusinessOpportunities() {
           <div className="flex gap-2">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              {showAIBadge ? (
-                <div className="flex items-center h-[50px] px-10 border border-primary/20 rounded-md bg-background">
-                  <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 border border-primary/30 rounded-full animate-pulse shadow-[0_0_15px_rgba(var(--primary),0.3)]">
-                    <Sparkles className="h-4 w-4 text-primary" />
-                    <span className="text-sm font-medium text-primary">AI Results</span>
-                    <button
-                      onClick={() => {
-                        setShowAIBadge(false);
-                        setSearchQuery("");
-                        setActualSearchQuery("");
-                      }}
-                      className="ml-1 hover:bg-primary/20 rounded-full p-0.5 transition-colors"
-                    >
-                      <X className="h-3.5 w-3.5 text-primary" />
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <Input
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Search business opportunities..."
-                  className="pl-10 pr-4 py-3 text-base"
-                />
-              )}
+              <Input
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onKeyPress={handleKeyPress}
+                placeholder="Search business opportunities..."
+                className="pl-10 pr-4 py-3 text-base"
+              />
             </div>
             <Button 
               onClick={handleSearch}
@@ -215,16 +188,12 @@ export default function BusinessOpportunities() {
         ) : filteredOpportunities.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground text-lg">
-              No business opportunities found, try changing your search parameters.
+              No business opportunities found.
             </p>
             {searchQuery && (
               <Button
                 variant="outline"
-                onClick={() => {
-                  setSearchQuery("");
-                  setShowAIBadge(false);
-                  setActualSearchQuery("");
-                }}
+                onClick={() => setSearchQuery("")}
                 className="mt-4"
               >
                 Clear Search
