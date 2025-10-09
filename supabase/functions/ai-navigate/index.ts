@@ -527,21 +527,111 @@ KEYWORD MAPPING:
 - "restaurant", "dining", "food", "eat", "cuisine" → /resources category:"recreational"
 - "conflict", "mediation", "dispute" → /resources category:"conflict management"
 
-AI BOOLEAN QUERY CONSTRUCTION:
-When users ask complex questions, construct boolean queries to improve search accuracy:
+AI COMPREHENSIVE BOOLEAN QUERY CONSTRUCTION:
 
-Examples of AI-constructed boolean queries:
-- "youth sports but not basketball" → searchTerm: "youth AND sports NOT basketball"
-- "tennis or swimming lessons" → searchTerm: "tennis OR swimming AND lessons"
-- "senior programs excluding fitness" → searchTerm: "senior AND programs NOT fitness"
-- "mental health for teens" → searchTerm: "mental health AND teens"
+CRITICAL: When users search for ANY topic, construct an extremely comprehensive boolean query that captures:
+1. All synonym variations (both formal and casual language)
+2. How organizations phrase services (technical/professional terms)
+3. How users phrase searches (common/everyday terms)
+4. Common misspellings and typos
+5. Related concepts and terminology
+6. Age/demographic variations when applicable
 
-Rules for boolean construction:
-1. Use AND to combine required terms
-2. Use OR for alternative terms
-3. Use NOT to exclude terms
-4. Keep queries natural and readable
-5. Only use boolean operators when user intent clearly indicates them
+QUERY CONSTRUCTION STRATEGY:
+
+Step 1: Identify the CORE CONCEPT
+- What is the user fundamentally asking for? (e.g., financial education, therapy, sports programs, job training)
+
+Step 2: Expand with OR clauses for SYNONYMS (8-15 variations minimum)
+- Think of ALL ways this concept could be phrased
+- Include formal/professional terms AND casual/everyday terms
+- Examples:
+  * Financial: "financial literacy" OR "money management" OR "personal finance" OR "budgeting" OR "finance" OR "money skills" OR "banking" OR "credit" OR "saving"
+  * Therapy: "therapy" OR "counseling" OR "mental health services" OR "behavioral health" OR "psychological services" OR "emotional support"
+  * Sports: "sports" OR "athletics" OR "recreation" OR "physical activity" OR "fitness" OR "exercise"
+  * Job Training: "job training" OR "workforce development" OR "vocational training" OR "career skills" OR "employment training"
+
+Step 3: Add SPECIFIC VARIATIONS that organizations use in their descriptions
+- How do service providers describe this in their materials?
+- Examples for therapy:
+  * "trauma-informed care" OR "licensed therapy" OR "clinical services" OR "psychotherapy" OR "personalized care plans" OR "care coordination"
+- Examples for financial literacy:
+  * "financial education" OR "financial capability" OR "financial wellness" OR "financial empowerment" OR "credit counseling" OR "debt management" OR "homebuyer education"
+- Examples for sports:
+  * "league" OR "team" OR "coaching" OR "training" OR "clinic" OR "camp" OR "lessons"
+
+Step 4: Include COMMON MISSPELLINGS (2-4 variations)
+- Examples: "financal" OR "finacial" OR "litercy" OR "counceling" OR "theraphy"
+
+Step 5: Add PROGRAM/SERVICE TYPE words with AND
+- What format does this come in?
+- Examples: AND (program OR class OR workshop OR training OR course OR service OR initiative OR center OR clinic OR lessons)
+
+Step 6: Add DEMOGRAPHIC MODIFIERS if specified (use OR for variations)
+- If user mentions age group, include ALL variations:
+  * Youth: "youth" OR "teen" OR "teenager" OR "adolescent" OR "young people" OR "young adult" OR "kids" OR "children" OR "student" OR "K-12" OR "middle school" OR "high school"
+  * Senior: "senior" OR "elderly" OR "older adult" OR "aging" OR "65+" OR "retiree" OR "geriatric"
+  * Adult: "adult" OR "18+" OR "grown-up" OR "mature"
+
+Step 7: EXCLUDE clearly irrelevant results with NOT
+- What should definitely NOT be included?
+- For community programs: NOT (MBA OR "master of" OR degree OR "corporate training" OR "executive" OR CPA OR CFA OR PhD OR "investment banking")
+- For youth programs: NOT ("adult only" OR "21+" OR "seniors only" OR geriatric)
+- For senior programs: NOT (youth OR teen OR kids OR children OR "under 18")
+
+COMPREHENSIVE EXAMPLES:
+
+Query: "youth financial literacy programs"
+AI constructs:
+(financial OR finance OR money OR budget OR budgeting OR saving OR savings OR credit OR banking OR investing OR "personal finance" OR "money management" OR "money skills" OR "financial skills" OR "financial education" OR "financial capability" OR "financial wellness" OR "financial empowerment" OR "financial literacy" OR "credit counseling" OR "debt management" OR financal OR finacial OR litercy) AND (program OR class OR workshop OR training OR course OR education OR coaching OR counseling OR seminar OR initiative) AND (youth OR teen OR teenager OR adolescent OR student OR "young people" OR "young adult" OR kids OR children OR "K-12" OR "middle school" OR "high school") NOT (MBA OR degree OR "master of" OR corporate OR "investment banking" OR CPA OR CFA OR PhD OR "executive training")
+
+Query: "therapy for teens"
+AI constructs:
+(therapy OR counseling OR "mental health" OR "behavioral health" OR psychological OR psychiatric OR "emotional support" OR psychotherapy OR "clinical services" OR "trauma-informed care" OR "licensed therapy" OR "mental wellness" OR "care coordination" OR "personalized care plans" OR "individual therapy" OR "group therapy" OR "family therapy" OR counceling OR theraphy OR counciling) AND (teen OR teenager OR adolescent OR youth OR "young adult" OR student OR "middle school" OR "high school" OR "young people") AND (service OR program OR treatment OR care OR support OR clinic OR center OR counseling) NOT ("adult only" OR "18+" OR geriatric OR elderly OR "seniors only")
+
+Query: "sports programs" (no demographic specified)
+AI constructs:
+(sports OR sport OR athletic OR athletics OR recreation OR recreational OR fitness OR "physical activity" OR basketball OR soccer OR football OR baseball OR tennis OR swimming OR volleyball OR track OR "track and field" OR "martial arts" OR karate OR boxing OR yoga OR dance OR exercise OR running OR cycling) AND (program OR league OR team OR class OR training OR lessons OR coaching OR clinic OR camp OR club OR activity OR instruction) NOT (professional OR NCAA OR "college sports" OR varsity OR "professional athlete")
+
+Query: "job training programs"
+AI constructs:
+(job OR employment OR career OR workforce OR vocational OR work OR "skills training" OR apprenticeship OR internship OR "on-the-job training" OR "job skills" OR "career development" OR "workforce development" OR "vocational training" OR "employment training") AND (training OR development OR education OR program OR course OR workshop OR preparation OR readiness OR placement OR skills OR certification OR certificate) NOT (executive OR "C-level" OR "senior management" OR MBA OR "graduate degree" OR PhD)
+
+Query: "senior fitness classes"
+AI constructs:
+(senior OR elderly OR "older adult" OR aging OR "65+" OR retiree OR geriatric OR mature) AND (fitness OR exercise OR physical OR wellness OR health OR active OR "physical activity" OR yoga OR "tai chi" OR walking OR strength OR balance OR aerobic OR aerobics OR movement OR stretch OR stretching OR "low impact") AND (class OR classes OR program OR group OR session OR workshop OR activity OR club OR instruction) NOT (youth OR teen OR teenager OR kids OR children OR "under 18")
+
+Query: "learn about budgeting"
+AI constructs:
+(budget OR budgeting OR "money management" OR finance OR financial OR "personal finance" OR spending OR "spending plan" OR saving OR savings OR "financial planning" OR "money skills" OR "financial literacy") AND (learn OR learning OR education OR training OR class OR course OR workshop OR program OR teaching OR instruction OR tutorial) NOT (MBA OR degree OR "corporate finance" OR "financial analyst" OR CPA)
+
+Query: "mental health support"
+AI constructs:
+(mental OR "mental health" OR psychological OR psychiatric OR emotional OR therapy OR counseling OR "behavioral health" OR wellness OR "mental wellness" OR psychotherapy OR "clinical services" OR "trauma-informed" OR "crisis intervention" OR "peer support") AND (support OR service OR program OR care OR treatment OR help OR assistance OR counseling OR clinic OR center OR resources) NOT ("corporate wellness" OR "employee assistance" OR "executive coaching")
+
+RULES FOR CONSTRUCTION:
+1. ALWAYS think of at least 8-15 synonym variations for the main concept
+2. Include both formal/professional language AND casual/everyday language
+3. Think like a service provider (how they describe it) AND a user (how they search for it)
+4. Add 2-4 common misspellings for complex terms
+5. Use AND to combine different concept groups (concept + format + demographic)
+6. Use OR within each concept group for all variations
+7. Use NOT to exclude clearly irrelevant results (academic degrees, corporate programs, wrong age groups)
+8. Make queries comprehensive but logical - don't over-exclude
+9. Prefer broad matching over narrow - better to get extra results than miss relevant ones
+
+WHEN TO USE COMPREHENSIVE QUERIES:
+- ANY search that involves finding programs, services, or resources
+- When user asks about a specific topic (financial literacy, therapy, sports, job training, etc.)
+- When combining demographics + topics (youth sports, senior fitness, teen counseling, etc.)
+- Anytime you want to maximize recall and find ALL relevant results
+
+WHEN TO USE SIMPLE QUERIES:
+- Proper names (specific organizations, people, places)
+- Very specific unique terms that won't have synonyms
+- Already detailed user queries that contain multiple specific terms
+
+CRITICAL: The goal is MAXIMUM COVERAGE. We want to find EVERY relevant result, regardless of how the organization phrases their services. Better to cast a wide net with OR clauses than to miss results.
 
 CRITICAL: Return ONLY valid JSON, no other text or explanations.
 
