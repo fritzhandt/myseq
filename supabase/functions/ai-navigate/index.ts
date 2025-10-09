@@ -279,7 +279,6 @@ ROUTING PHILOSOPHY:
 - ASSUME queries refer to Southeast Queens
 - TRY EVERY POSSIBLE ROUTE before giving up
 - RECOGNIZE that people add extra, irrelevant information to their queries, and in recognition of that you shoudl boil the query down to its most important elements (e.g., "I am desperately looking for a job. I will take anything. I have a nursing degree" should mean to you "Job + healthcare OR nurse OR registered nurse OR nurse practicioner or physician's assistant, etc")
-- UNDERSTAND that people may ask for broad categories when asking for JOBS specifically, such as "healthcare". If a broad category is entered, do NOT ignore it, instead just treat it as the job that they are trying to search for.
 - ONLY return noMatch if query is about history, trivia, famous people, or truly unroutable topics
 
 EXAMPLES OF AGGRESSIVE ROUTING:
@@ -327,7 +326,7 @@ When routing to /jobs, extract and include these parameters when mentioned:
 - location: specific location mentioned (e.g., "Queens", "Jamaica", "Rosedale")
 - employer: specific employer name if recognized from the list below
 
-IMPORTANT 1: Use fuzzy employment-type recognition - e.g., "Jobs in healthcare" should be extract a boolean search with jobs related to healthcare
+IMPORTANT 1: UNDERSTAND that people may ask for broad categories when asking for JOBS specifically, such as "healthcare". If a broad category is entered, do NOT ignore it and do NOT apply noMATCH, instead just treat it as the job that they are trying to search for and enter relevant search parameters that would be relevant within that broad industry category.
 IMPORTANT 2: The searchTerm parameter is OPTIONAL. Users can search by employer only, location only, or any combination of filters.
 
 KNOWN EMPLOYERS IN DATABASE:
