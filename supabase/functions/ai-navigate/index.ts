@@ -675,45 +675,6 @@ OR (only if CLEARLY about different region like Manhattan/Brooklyn)
   "error": "This website serves Southeast Queens only"
 }`;
 
-For job searches (searchTerm is OPTIONAL - can search by employer/location only):
-{
-  "destination": "/jobs",
-  "category": "government|private_sector|internships",  // optional
-  "governmentType": "all|city|state",  // optional, only for government
-  "searchTerm": "job title or keywords",  // OPTIONAL
-  "location": "location if specified",  // optional
-  "employer": "exact employer name from database list",  // optional
-  "success": true
-}
-
-Examples:
-- "is DOT hiring?" → { "destination": "/jobs", "employer": "Department Of Transportation", "category": "government", "success": true }
-- "jobs in jamaica" → { "destination": "/jobs", "location": "Jamaica", "success": true }
-- "amazon positions" → { "destination": "/jobs", "employer": "Amazon", "category": "private_sector", "success": true }
-- "city sanitation jobs" → { "destination": "/jobs", "category": "government", "governmentType": "city", "searchTerm": "sanitation", "success": true }
-
-For other pages:
-{
-  "destination": "/page",
-  "searchTerm": "optional",
-  "category": "optional",
-  "success": true
-}
-
-OR
-
-{
-  "success": false,
-  "noMatch": true
-}
-
-OR (only if CLEARLY about different region like Manhattan/Brooklyn)
-
-{
-  "success": false,
-  "error": "This website serves Southeast Queens only"
-}`;
-
     // STEP 1: Try navigation first
     const navigationResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
