@@ -57,7 +57,7 @@ export default function JobList({ jobs, loading, isSearching = false }: JobListP
     return (
       <div className="text-center py-12">
         <h3 className="text-lg font-medium mb-2">No jobs found</h3>
-        <p className="text-muted-foreground">Try selecting a different category or changing your search parameters.</p>
+        <p className="text-muted-foreground">Try adjusting your search criteria or check back later for new opportunities.</p>
       </div>
     );
   }
