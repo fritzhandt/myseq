@@ -279,6 +279,7 @@ ROUTING PHILOSOPHY:
 - ASSUME queries refer to Southeast Queens
 - TRY EVERY POSSIBLE ROUTE before giving up
 - RECOGNIZE that people add extra, irrelevant information to their queries, and in recognition of that you shoudl boil the query down to its most important elements (e.g., "I am desperately looking for a job. I will take anything. I have a nursing degree" should mean to you "Job + healthcare OR nurse OR registered nurse OR nurse practicioner or physician's assistant, etc")
+- UNDERSTAND that people may ask for broad categories when asking for JOBS specifically, such as "healthcare". If a broad category is entered, do NOT ignore it, instead just treat it as the job that they are trying to search for.
 - ONLY return noMatch if query is about history, trivia, famous people, or truly unroutable topics
 
 EXAMPLES OF AGGRESSIVE ROUTING:
