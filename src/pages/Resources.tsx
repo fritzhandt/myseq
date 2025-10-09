@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Search, ArrowLeft, ChevronDown, Palette, GraduationCap, Heart, Users, Trophy, Leaf, Scale, Globe, UtensilsCrossed, Gavel, Baby, X, Sparkles } from "lucide-react";
+import { Search, ArrowLeft, ChevronDown, Palette, GraduationCap, Heart, Users, Trophy, Leaf, Scale, Globe, UtensilsCrossed, Gavel, Baby } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import ResourceCard from "@/components/ResourceCard";
 import UserPagination from "@/components/UserPagination";
@@ -55,8 +55,6 @@ export default function Resources() {
   const [showCommunitySubcategories, setShowCommunitySubcategories] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [fromAINavigation, setFromAINavigation] = useState(false);
-  const [showAIBadge, setShowAIBadge] = useState(false);
-  const [actualSearchQuery, setActualSearchQuery] = useState("");
   const itemsPerPage = 12;
   const location = useLocation();
   const navigate = useNavigate();
@@ -75,11 +73,7 @@ export default function Resources() {
       setFromAINavigation(true);
       
       // Set search parameters immediately
-      if (state.searchTerm) {
-        setActualSearchQuery(state.searchTerm);
-        setSearchQuery(state.searchTerm);
-        setShowAIBadge(true);
-      }
+      if (state.searchTerm) setSearchQuery(state.searchTerm);
       if (state.category) {
         setSelectedCategory(state.category);
         // Show community subcategories if the category is in that section
@@ -130,11 +124,9 @@ export default function Resources() {
 
   const filterResources = () => {
     let filtered = resources;
-    let hadCategoryFilter = false;
 
     // Filter by category first
     if (selectedCategory) {
-      hadCategoryFilter = true;
       filtered = filtered.filter(resource =>
         resource.categories.includes(selectedCategory)
       );
@@ -153,18 +145,11 @@ export default function Resources() {
       );
     }
 
-    // Auto-switch to "All Categories" if AI selected a category and got no results
-    if (fromAINavigation && hadCategoryFilter && filtered.length === 0 && selectedCategory) {
-      setSelectedCategory("");
-      setFromAINavigation(false);
-      // Will trigger re-filter via useEffect
-      return;
-    }
-
     // If this was from AI navigation and we have results, clear the flag
     if (fromAINavigation && filtered.length > 0) {
       setFromAINavigation(false);
     } else if (fromAINavigation && filtered.length === 0) {
+      // No results found, but keep the search term visible so users know what was searched
       setFromAINavigation(false);
     }
 
@@ -182,11 +167,6 @@ export default function Resources() {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
-    // Hide AI badge when user starts typing
-    if (showAIBadge) {
-      setShowAIBadge(false);
-      setActualSearchQuery("");
-    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -338,32 +318,13 @@ export default function Resources() {
           <div className="flex gap-2">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              {showAIBadge ? (
-                <div className="flex items-center h-[50px] px-10 border border-primary/20 rounded-md bg-background">
-                  <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 border border-primary/30 rounded-full animate-pulse shadow-[0_0_15px_rgba(var(--primary),0.3)]">
-                    <Sparkles className="h-4 w-4 text-primary" />
-                    <span className="text-sm font-medium text-primary">AI Results</span>
-                    <button
-                      onClick={() => {
-                        setShowAIBadge(false);
-                        setSearchQuery("");
-                        setActualSearchQuery("");
-                      }}
-                      className="ml-1 hover:bg-primary/20 rounded-full p-0.5 transition-colors"
-                    >
-                      <X className="h-3.5 w-3.5 text-primary" />
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <Input
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Search resources..."
-                  className="pl-10 pr-4 py-3 text-base"
-                />
-              )}
+              <Input
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onKeyPress={handleKeyPress}
+                placeholder="Search resources..."
+                className="pl-10 pr-4 py-3 text-base"
+              />
             </div>
             <Button 
               onClick={handleSearch}
@@ -385,7 +346,7 @@ export default function Resources() {
         ) : filteredResources.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground text-lg">
-              No resources found, try selecting All Categories or changing your search parameters.
+              No resources found.
             </p>
             {(searchQuery || selectedCategory) && (
               <Button
@@ -393,8 +354,6 @@ export default function Resources() {
                 onClick={() => {
                   setSearchQuery("");
                   setSelectedCategory("");
-                  setShowAIBadge(false);
-                  setActualSearchQuery("");
                 }}
                 className="mt-4"
               >
