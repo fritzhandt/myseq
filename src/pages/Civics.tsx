@@ -8,8 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from "@/components/Navbar";
 import AdminPagination from "@/components/AdminPagination";
-import { Users, MapPin, Search, Vote, ExternalLink, Phone, Mail, ArrowLeft, Building2, Shield, Globe } from "lucide-react";
+import { Users, MapPin, Search, Vote, ExternalLink, Phone, Mail, ArrowLeft, Building2, Shield, Globe, X, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { filterWithBooleanSearch } from "@/utils/booleanSearch";
 
 interface CivicOrganization {
   id: string;
@@ -30,6 +31,9 @@ const Civics = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("community_board");
   const [currentPage, setCurrentPage] = useState(1);
+  const [showAIBadge, setShowAIBadge] = useState(false);
+  const [actualSearchQuery, setActualSearchQuery] = useState("");
+  const [fromAINavigation, setFromAINavigation] = useState(false);
   const itemsPerPage = 9;
   const navigate = useNavigate();
   const location = useLocation();
@@ -38,14 +42,17 @@ const Civics = () => {
   // Handle AI navigation state for civic search  
   useEffect(() => {
     const state = location.state as any;
-    if (state?.searchTerm) {
-      setSearchQuery(state.searchTerm);
-    }
-    if (state?.organizationType) {
-      setActiveTab(state.organizationType);
-    }
-    // Clear the navigation state
     if (state?.searchTerm || state?.organizationType) {
+      setFromAINavigation(true);
+      if (state.searchTerm) {
+        setActualSearchQuery(state.searchTerm);
+        setSearchQuery(state.searchTerm);
+        setShowAIBadge(true);
+      }
+      if (state.organizationType) {
+        setActiveTab(state.organizationType);
+      }
+      // Clear the navigation state
       navigate(location.pathname, { replace: true });
     }
   }, [location.state, navigate, location.pathname]);
@@ -56,22 +63,39 @@ const Civics = () => {
 
   useEffect(() => {
     let filtered = organizations;
+    let hadTabFilter = false;
     
     if (searchQuery) {
-      // When searching, show all results regardless of tab
-      filtered = filtered.filter(org =>
-        org.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        org.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        org.coverage_area.toLowerCase().includes(searchQuery.toLowerCase())
+      // When searching, show all results regardless of tab with boolean support
+      filtered = filterWithBooleanSearch(
+        filtered,
+        searchQuery,
+        (org) => [
+          org.name,
+          org.description,
+          org.coverage_area
+        ]
       );
     } else {
       // When not searching, filter by organization type
+      hadTabFilter = true;
       filtered = filtered.filter(org => org.organization_type === activeTab);
+    }
+
+    // Auto-switch to first tab if AI selected a tab and got no results
+    if (fromAINavigation && hadTabFilter && filtered.length === 0 && activeTab) {
+      setActiveTab("community_board");
+      setFromAINavigation(false);
+      return;
+    }
+
+    if (fromAINavigation && filtered.length > 0) {
+      setFromAINavigation(false);
     }
     
     setFilteredOrgs(filtered);
     setCurrentPage(1); // Reset to first page when filters change
-  }, [searchQuery, organizations, activeTab]);
+  }, [searchQuery, organizations, activeTab, fromAINavigation]);
 
   const fetchOrganizations = async () => {
     try {
@@ -170,13 +194,38 @@ const Civics = () => {
           {/* Search */}
           <div className="mb-8">
             <div className="relative max-w-md mx-auto">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search organizations or coverage areas..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+              {showAIBadge ? (
+                <div className="flex items-center h-10 px-10 border border-primary/20 rounded-md bg-background">
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 border border-primary/30 rounded-full animate-pulse shadow-[0_0_15px_rgba(var(--primary),0.3)]">
+                    <Sparkles className="h-4 w-4 text-primary" />
+                    <span className="text-sm font-medium text-primary">AI Results</span>
+                    <button
+                      onClick={() => {
+                        setShowAIBadge(false);
+                        setSearchQuery("");
+                        setActualSearchQuery("");
+                      }}
+                      className="ml-1 hover:bg-primary/20 rounded-full p-0.5 transition-colors"
+                    >
+                      <X className="h-3.5 w-3.5 text-primary" />
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <Input
+                  placeholder="Search organizations or coverage areas..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    if (showAIBadge) {
+                      setShowAIBadge(false);
+                      setActualSearchQuery("");
+                    }
+                  }}
+                  className="pl-10"
+                />
+              )}
             </div>
           </div>
 
@@ -204,7 +253,7 @@ const Civics = () => {
                   {searchQuery ? "No organizations found" : "No organizations yet"}
                 </h3>
                 <p className="text-muted-foreground">
-                  {searchQuery ? "Try adjusting your search terms" : "Check back later for civic organizations in your area"}
+                  {searchQuery ? "Try changing your search parameters or selecting a different tab" : "Check back later for civic organizations in your area"}
                 </p>
               </div>
             ) : (

@@ -1,14 +1,14 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const openAIApiKey = Deno.env.get("OPENAI_API_KEY");
+const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 interface NavigationResponse {
@@ -29,106 +29,115 @@ interface NavigationResponse {
 
 serve(async (req) => {
   // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { query } = await req.json();
-    
-    console.log('Received query:', query);
+
+    console.log("Received query:", query);
 
     if (!query) {
-      console.log('No query provided');
-      return new Response(JSON.stringify({ 
-        success: false, 
-        error: "Please provide a search query" 
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400
-      });
+      console.log("No query provided");
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Please provide a search query",
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 400,
+        },
+      );
     }
 
     // Check daily search limit
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const today = new Date().toISOString().split('T')[0]; // Get YYYY-MM-DD format
-    
+    const today = new Date().toISOString().split("T")[0]; // Get YYYY-MM-DD format
+
     // Get or create today's usage record
     const { data: usageData, error: usageError } = await supabase
-      .from('ai_search_usage')
-      .select('search_count')
-      .eq('search_date', today)
+      .from("ai_search_usage")
+      .select("search_count")
+      .eq("search_date", today)
       .single();
 
-    if (usageError && usageError.code !== 'PGRST116') { // PGRST116 = no rows found
-      console.error('Error checking usage:', usageError);
-      return new Response(JSON.stringify({
-        success: false,
-        error: "Service temporarily unavailable"
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500
-      });
+    if (usageError && usageError.code !== "PGRST116") {
+      // PGRST116 = no rows found
+      console.error("Error checking usage:", usageError);
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Service temporarily unavailable",
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 500,
+        },
+      );
     }
 
     const currentCount = usageData?.search_count || 0;
-    console.log('Current daily search count:', currentCount);
+    console.log("Current daily search count:", currentCount);
 
     if (currentCount >= 300) {
-      console.log('Daily search limit exceeded');
-      return new Response(JSON.stringify({
-        success: false,
-        error: "Daily search limit exceeded"
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 429
-      });
+      console.log("Daily search limit exceeded");
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Daily search limit exceeded",
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 429,
+        },
+      );
     }
 
     // Increment the search count
     if (usageData) {
       // Update existing record
       await supabase
-        .from('ai_search_usage')
+        .from("ai_search_usage")
         .update({ search_count: currentCount + 1 })
-        .eq('search_date', today);
+        .eq("search_date", today);
     } else {
       // Create new record for today
-      await supabase
-        .from('ai_search_usage')
-        .insert({ search_date: today, search_count: 1 });
+      await supabase.from("ai_search_usage").insert({ search_date: today, search_count: 1 });
     }
 
     // Fetch active employers from database for dynamic employer recognition
     const { data: employersData } = await supabase
-      .from('jobs')
-      .select('employer')
-      .eq('is_active', true)
-      .order('employer');
+      .from("jobs")
+      .select("employer")
+      .eq("is_active", true)
+      .order("employer");
 
-    const employers = [...new Set(employersData?.map(j => j.employer) || [])];
-    const employerList = employers.join(', ');
-    console.log('Fetched employers:', employerList);
+    const employers = [...new Set(employersData?.map((j) => j.employer) || [])];
+    const employerList = employers.join(", ");
+    console.log("Fetched employers:", employerList);
 
     // Fetch resource categories from database for dynamic category recognition
-    const { data: resourcesData } = await supabase
-      .from('resources')
-      .select('categories');
+    const { data: resourcesData } = await supabase.from("resources").select("categories");
 
-    const allCategories = resourcesData?.flatMap(r => r.categories) || [];
+    const allCategories = resourcesData?.flatMap((r) => r.categories) || [];
     const resourceCategories = [...new Set(allCategories)].sort();
-    const resourceCategoryList = resourceCategories.join(', ');
-    console.log('Fetched resource categories:', resourceCategoryList);
+    const resourceCategoryList = resourceCategories.join(", ");
+    console.log("Fetched resource categories:", resourceCategoryList);
 
     if (!openAIApiKey) {
-      console.error('OpenAI API key not found');
-      return new Response(JSON.stringify({
-        success: false,
-        error: "AI service is not configured properly"
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500
-      });
+      console.error("OpenAI API key not found");
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "AI service is not configured properly",
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 500,
+        },
+      );
     }
 
     // ==========================================
@@ -191,53 +200,57 @@ If NOT crisis:
 CRITICAL: Return ONLY valid JSON, no explanations.`;
 
     // Check for crisis first
-    const crisisResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
+    const crisisResponse = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${openAIApiKey}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: "gpt-4o-mini",
         messages: [
-          { role: 'system', content: crisisPrompt },
-          { role: 'user', content: query }
+          { role: "system", content: crisisPrompt },
+          { role: "user", content: query },
         ],
         max_tokens: 100,
-        temperature: 0.0
+        temperature: 0.0,
       }),
     });
 
     if (!crisisResponse.ok) {
-      console.error('Crisis detection API error:', crisisResponse.status);
+      console.error("Crisis detection API error:", crisisResponse.status);
       // Continue to navigation if crisis detection fails - don't block legitimate queries
     } else {
       const crisisData = await crisisResponse.json();
       const crisisAiResponse = crisisData.choices?.[0]?.message?.content;
-      console.log('Crisis Detection Response:', crisisAiResponse);
-      
+      console.log("Crisis Detection Response:", crisisAiResponse);
+
       try {
         let crisisJsonStr = crisisAiResponse.trim();
-        const firstBrace = crisisJsonStr.indexOf('{');
-        const lastBrace = crisisJsonStr.lastIndexOf('}');
+        const firstBrace = crisisJsonStr.indexOf("{");
+        const lastBrace = crisisJsonStr.lastIndexOf("}");
         if (firstBrace !== -1 && lastBrace !== -1) {
           crisisJsonStr = crisisJsonStr.substring(firstBrace, lastBrace + 1);
         }
-        
+
         const crisisResult = JSON.parse(crisisJsonStr);
-        
+
         if (crisisResult.isCrisis === true) {
-          console.log('CRISIS DETECTED - Returning help resources');
-          return new Response(JSON.stringify({
-            success: true,
-            isGeneralQuery: true,
-            answer: "Help is available. You're not alone. Call 988 or visit https://www.nyc.gov/site/doh/health/health-topics/988.page to get the help you need. There are also other private organizations that can provide mental health assistance, just go to 'Community Resources' and click the 'Mental Health/Wellness' tab."
-          }), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          });
+          console.log("CRISIS DETECTED - Returning help resources");
+          return new Response(
+            JSON.stringify({
+              success: true,
+              isGeneralQuery: true,
+              answer:
+                "Help is available. You're not alone. Call 988 or visit https://www.nyc.gov/site/doh/health/health-topics/988.page to get the help you need. There are also other private organizations that can provide mental health assistance, just go to 'Community Resources' and click the 'Mental Health/Wellness' tab.",
+            }),
+            {
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
+          );
         }
       } catch (e) {
-        console.error('Error parsing crisis detection:', e);
+        console.error("Error parsing crisis detection:", e);
         // Continue to navigation if parsing fails
       }
     }
@@ -265,6 +278,7 @@ ROUTING PHILOSOPHY:
 - MAKE EDUCATED GUESSES based on context clues
 - ASSUME queries refer to Southeast Queens
 - TRY EVERY POSSIBLE ROUTE before giving up
+- RECOGNIZE that people add extra, irrelevant information to their queries, and in recognition of that you shoudl boil the query down to its most important elements (e.g., "I am desperately looking for a job. I will take anything. I have a nursing degree" should mean to you "Job + healthcare OR nurse OR registered nurse OR nurse practicioner or physician's assistant, etc")
 - ONLY return noMatch if query is about history, trivia, famous people, or truly unroutable topics
 
 EXAMPLES OF AGGRESSIVE ROUTING:
@@ -294,6 +308,7 @@ TOPICS THAT SHOULD NOT BE ROUTED (answer these in general query):
 - Voter registration → Tell users to click the menu (☰) in top right and select "Register to Vote"
 
 JOB CATEGORIES (for /jobs page):
+
 - "government" → Government jobs (city and state)
 - "private_sector" → Private sector jobs
 - "internships" → Internship opportunities
@@ -311,7 +326,8 @@ When routing to /jobs, extract and include these parameters when mentioned:
 - location: specific location mentioned (e.g., "Queens", "Jamaica", "Rosedale")
 - employer: specific employer name if recognized from the list below
 
-IMPORTANT: The searchTerm parameter is OPTIONAL. Users can search by employer only, location only, or any combination of filters.
+IMPORTANT 1: Use fuzzy employment-type recognition - e.g., "Jobs in healthcare" should be extract a boolean search with jobs related to healthcare
+IMPORTANT 2: The searchTerm parameter is OPTIONAL. Users can search by employer only, location only, or any combination of filters.
 
 KNOWN EMPLOYERS IN DATABASE:
 ${employerList}
@@ -529,7 +545,9 @@ KEYWORD MAPPING:
 
 AI COMPREHENSIVE BOOLEAN QUERY CONSTRUCTION:
 
-CRITICAL: When users search for ANY topic, construct an extremely comprehensive boolean query that captures:
+**CRITICAL INSTRUCTION**: The "searchTerm" field MUST contain a comprehensive boolean search query, NOT just simple keywords!
+
+When users search for ANY topic, construct an extremely comprehensive boolean query for the "searchTerm" field that captures:
 1. All synonym variations (both formal and casual language)
 2. How organizations phrase services (technical/professional terms)
 3. How users phrase searches (common/everyday terms)
@@ -579,37 +597,33 @@ Step 7: EXCLUDE clearly irrelevant results with NOT
 - For youth programs: NOT ("adult only" OR "21+" OR "seniors only" OR geriatric)
 - For senior programs: NOT (youth OR teen OR kids OR children OR "under 18")
 
-COMPREHENSIVE EXAMPLES:
+**COMPREHENSIVE EXAMPLES - THE "searchTerm" FIELD MUST LOOK LIKE THIS:**
 
-Query: "youth financial literacy programs"
-AI constructs:
-(financial OR finance OR money OR budget OR budgeting OR saving OR savings OR credit OR banking OR investing OR "personal finance" OR "money management" OR "money skills" OR "financial skills" OR "financial education" OR "financial capability" OR "financial wellness" OR "financial empowerment" OR "financial literacy" OR "credit counseling" OR "debt management" OR financal OR finacial OR litercy) AND (program OR class OR workshop OR training OR course OR education OR coaching OR counseling OR seminar OR initiative) AND (youth OR teen OR teenager OR adolescent OR student OR "young people" OR "young adult" OR kids OR children OR "K-12" OR "middle school" OR "high school") NOT (MBA OR degree OR "master of" OR corporate OR "investment banking" OR CPA OR CFA OR PhD OR "executive training")
+User query: "youth financial literacy programs"
+❌ WRONG searchTerm: "financial literacy"
+✅ CORRECT searchTerm: "(financial OR finance OR money OR budget OR budgeting OR saving OR savings OR credit OR banking OR investing OR personal finance OR money management OR money skills OR financial skills OR financial education OR financial capability OR financial wellness OR financial empowerment OR financial literacy OR credit counseling OR debt management OR financal OR finacial OR litercy) AND (program OR class OR workshop OR training OR course OR education OR coaching OR counseling OR seminar OR initiative) AND (youth OR teen OR teenager OR adolescent OR student OR young people OR young adult OR kids OR children OR K-12 OR middle school OR high school) NOT (MBA OR degree OR master of OR corporate OR investment banking OR CPA OR CFA OR PhD OR executive training)"
 
-Query: "therapy for teens"
-AI constructs:
-(therapy OR counseling OR "mental health" OR "behavioral health" OR psychological OR psychiatric OR "emotional support" OR psychotherapy OR "clinical services" OR "trauma-informed care" OR "licensed therapy" OR "mental wellness" OR "care coordination" OR "personalized care plans" OR "individual therapy" OR "group therapy" OR "family therapy" OR counceling OR theraphy OR counciling) AND (teen OR teenager OR adolescent OR youth OR "young adult" OR student OR "middle school" OR "high school" OR "young people") AND (service OR program OR treatment OR care OR support OR clinic OR center OR counseling) NOT ("adult only" OR "18+" OR geriatric OR elderly OR "seniors only")
+User query: "are there any financial literacy programs for young kids"
+❌ WRONG searchTerm: "financial literacy"
+✅ CORRECT searchTerm: "(financial OR finance OR money OR budget OR budgeting OR saving OR savings OR credit OR banking OR investing OR personal finance OR money management OR money skills OR financial skills OR financial education OR financial capability OR financial wellness OR financial empowerment OR financial literacy OR credit counseling OR homebuyer education OR debt management OR financal OR finacial OR litercy) AND (program OR class OR workshop OR training OR course OR education OR coaching OR counseling OR seminar OR initiative OR lessons) AND (youth OR teen OR teenager OR adolescent OR student OR young people OR young adult OR kids OR children OR K-12 OR elementary OR middle school OR primary) NOT (MBA OR degree OR master of OR corporate OR investment banking OR CPA OR CFA OR PhD OR executive training OR adult only)"
 
-Query: "sports programs" (no demographic specified)
-AI constructs:
-(sports OR sport OR athletic OR athletics OR recreation OR recreational OR fitness OR "physical activity" OR basketball OR soccer OR football OR baseball OR tennis OR swimming OR volleyball OR track OR "track and field" OR "martial arts" OR karate OR boxing OR yoga OR dance OR exercise OR running OR cycling) AND (program OR league OR team OR class OR training OR lessons OR coaching OR clinic OR camp OR club OR activity OR instruction) NOT (professional OR NCAA OR "college sports" OR varsity OR "professional athlete")
+User query: "therapy for teens"
+❌ WRONG searchTerm: "therapy"
+✅ CORRECT searchTerm: "(therapy OR counseling OR mental health OR behavioral health OR psychological OR psychiatric OR emotional support OR psychotherapy OR clinical services OR trauma-informed care OR licensed therapy OR mental wellness OR care coordination OR personalized care plans OR individual therapy OR group therapy OR family therapy OR counceling OR theraphy OR counciling) AND (teen OR teenager OR adolescent OR youth OR young adult OR student OR middle school OR high school OR young people) AND (service OR program OR treatment OR care OR support OR clinic OR center OR counseling) NOT (adult only OR 18+ OR geriatric OR elderly OR seniors only)"
 
-Query: "job training programs"
-AI constructs:
-(job OR employment OR career OR workforce OR vocational OR work OR "skills training" OR apprenticeship OR internship OR "on-the-job training" OR "job skills" OR "career development" OR "workforce development" OR "vocational training" OR "employment training") AND (training OR development OR education OR program OR course OR workshop OR preparation OR readiness OR placement OR skills OR certification OR certificate) NOT (executive OR "C-level" OR "senior management" OR MBA OR "graduate degree" OR PhD)
+User query: "sports programs"
+❌ WRONG searchTerm: "sports"
+✅ CORRECT searchTerm: "(sports OR sport OR athletic OR athletics OR recreation OR recreational OR fitness OR physical activity OR basketball OR soccer OR football OR baseball OR tennis OR swimming OR volleyball OR track OR track and field OR martial arts OR karate OR boxing OR yoga OR dance OR exercise OR running OR cycling) AND (program OR league OR team OR class OR training OR lessons OR coaching OR clinic OR camp OR club OR activity OR instruction) NOT (professional OR NCAA OR college sports OR varsity OR professional athlete)"
 
-Query: "senior fitness classes"
-AI constructs:
-(senior OR elderly OR "older adult" OR aging OR "65+" OR retiree OR geriatric OR mature) AND (fitness OR exercise OR physical OR wellness OR health OR active OR "physical activity" OR yoga OR "tai chi" OR walking OR strength OR balance OR aerobic OR aerobics OR movement OR stretch OR stretching OR "low impact") AND (class OR classes OR program OR group OR session OR workshop OR activity OR club OR instruction) NOT (youth OR teen OR teenager OR kids OR children OR "under 18")
+User query: "job training programs"
+❌ WRONG searchTerm: "job training"
+✅ CORRECT searchTerm: "(job OR employment OR career OR workforce OR vocational OR work OR skills training OR apprenticeship OR internship OR on-the-job training OR job skills OR career development OR workforce development OR vocational training OR employment training) AND (training OR development OR education OR program OR course OR workshop OR preparation OR readiness OR placement OR skills OR certification OR certificate) NOT (executive OR C-level OR senior management OR MBA OR graduate degree OR PhD)"
 
-Query: "learn about budgeting"
-AI constructs:
-(budget OR budgeting OR "money management" OR finance OR financial OR "personal finance" OR spending OR "spending plan" OR saving OR savings OR "financial planning" OR "money skills" OR "financial literacy") AND (learn OR learning OR education OR training OR class OR course OR workshop OR program OR teaching OR instruction OR tutorial) NOT (MBA OR degree OR "corporate finance" OR "financial analyst" OR CPA)
+User query: "senior fitness classes"
+❌ WRONG searchTerm: "senior fitness"
+✅ CORRECT searchTerm: "(senior OR elderly OR older adult OR aging OR 65+ OR retiree OR geriatric OR mature) AND (fitness OR exercise OR physical OR wellness OR health OR active OR physical activity OR yoga OR tai chi OR walking OR strength OR balance OR aerobic OR aerobics OR movement OR stretch OR stretching OR low impact) AND (class OR classes OR program OR group OR session OR workshop OR activity OR club OR instruction) NOT (youth OR teen OR teenager OR kids OR children OR under 18)"
 
-Query: "mental health support"
-AI constructs:
-(mental OR "mental health" OR psychological OR psychiatric OR emotional OR therapy OR counseling OR "behavioral health" OR wellness OR "mental wellness" OR psychotherapy OR "clinical services" OR "trauma-informed" OR "crisis intervention" OR "peer support") AND (support OR service OR program OR care OR treatment OR help OR assistance OR counseling OR clinic OR center OR resources) NOT ("corporate wellness" OR "employee assistance" OR "executive coaching")
-
-RULES FOR CONSTRUCTION:
+**RULES FOR CONSTRUCTION:**
 1. ALWAYS think of at least 8-15 synonym variations for the main concept
 2. Include both formal/professional language AND casual/everyday language
 3. Think like a service provider (how they describe it) AND a user (how they search for it)
@@ -619,6 +633,7 @@ RULES FOR CONSTRUCTION:
 7. Use NOT to exclude clearly irrelevant results (academic degrees, corporate programs, wrong age groups)
 8. Make queries comprehensive but logical - don't over-exclude
 9. Prefer broad matching over narrow - better to get extra results than miss relevant ones
+10. **THE BOOLEAN QUERY MUST GO IN THE "searchTerm" FIELD - DO NOT JUST PUT KEYWORDS!**
 
 WHEN TO USE COMPREHENSIVE QUERIES:
 - ANY search that involves finding programs, services, or resources
@@ -642,7 +657,7 @@ For job searches (searchTerm is OPTIONAL - can search by employer/location only)
   "destination": "/jobs",
   "category": "government|private_sector|internships",  // optional
   "governmentType": "all|city|state",  // optional, only for government
-  "searchTerm": "job title or keywords",  // OPTIONAL
+  "searchTerm": "COMPREHENSIVE BOOLEAN QUERY HERE (not just keywords!)",  // OPTIONAL
   "location": "location if specified",  // optional
   "employer": "exact employer name from database list",  // optional
   "success": true
@@ -652,12 +667,12 @@ Examples:
 - "is DOT hiring?" → { "destination": "/jobs", "employer": "Department Of Transportation", "category": "government", "success": true }
 - "jobs in jamaica" → { "destination": "/jobs", "location": "Jamaica", "success": true }
 - "amazon positions" → { "destination": "/jobs", "employer": "Amazon", "category": "private_sector", "success": true }
-- "city sanitation jobs" → { "destination": "/jobs", "category": "government", "governmentType": "city", "searchTerm": "sanitation", "success": true }
+- "city sanitation jobs" → { "destination": "/jobs", "category": "government", "governmentType": "city", "searchTerm": "(sanitation OR sanit OR waste OR garbage OR trash OR refuse OR cleaning OR street cleaning)", "success": true }
 
 For other pages:
 {
   "destination": "/page",
-  "searchTerm": "optional",
+  "searchTerm": "COMPREHENSIVE BOOLEAN QUERY HERE (not just keywords!)",
   "category": "optional",
   "success": true
 }
@@ -677,20 +692,20 @@ OR (only if CLEARLY about different region like Manhattan/Brooklyn)
 }`;
 
     // STEP 1: Try navigation first
-    const navigationResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
+    const navigationResponse = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${openAIApiKey}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: "gpt-4o", // Use more capable model for complex boolean query construction
         messages: [
-          { role: 'system', content: navigationPrompt },
-          { role: 'user', content: query }
+          { role: "system", content: navigationPrompt },
+          { role: "user", content: query },
         ],
-        max_tokens: 300,
-        temperature: 0.0
+        max_tokens: 500, // Increased for longer boolean queries
+        temperature: 0.0,
       }),
     });
 
@@ -702,20 +717,20 @@ OR (only if CLEARLY about different region like Manhattan/Brooklyn)
     }
 
     const navData = await navigationResponse.json();
-    console.log('Navigation Response:', JSON.stringify(navData, null, 2));
-    
+    console.log("Navigation Response:", JSON.stringify(navData, null, 2));
+
     if (!navData.choices || !navData.choices[0] || !navData.choices[0].message) {
-      console.error('Invalid OpenAI response structure:', navData);
-      throw new Error('Invalid response from OpenAI API');
+      console.error("Invalid OpenAI response structure:", navData);
+      throw new Error("Invalid response from OpenAI API");
     }
-    
+
     const navAiResponse = navData.choices[0].message.content;
-    console.log('Navigation AI Response:', navAiResponse);
+    console.log("Navigation AI Response:", navAiResponse);
 
     // Extract JSON from response (strip any text before/after JSON)
     let jsonStr = navAiResponse.trim();
-    const firstBrace = jsonStr.indexOf('{');
-    const lastBrace = jsonStr.lastIndexOf('}');
+    const firstBrace = jsonStr.indexOf("{");
+    const lastBrace = jsonStr.lastIndexOf("}");
     if (firstBrace !== -1 && lastBrace !== -1) {
       jsonStr = jsonStr.substring(firstBrace, lastBrace + 1);
     }
@@ -724,26 +739,26 @@ OR (only if CLEARLY about different region like Manhattan/Brooklyn)
     try {
       parsedNavResponse = JSON.parse(jsonStr);
     } catch (parseError) {
-      console.error('Failed to parse navigation response:', parseError);
-      console.error('Raw response:', navAiResponse);
+      console.error("Failed to parse navigation response:", parseError);
+      console.error("Raw response:", navAiResponse);
       parsedNavResponse = {
         success: false,
-        error: "I couldn't understand your request. Please try rephrasing it."
+        error: "I couldn't understand your request. Please try rephrasing it.",
       };
     }
 
     // If navigation found a match, return it
     if (parsedNavResponse.success && parsedNavResponse.destination) {
-      console.log('Navigation match found:', parsedNavResponse.destination);
+      console.log("Navigation match found:", parsedNavResponse.destination);
       return new Response(JSON.stringify(parsedNavResponse), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     // If navigation explicitly says no match, try general information query
-    if (parsedNavResponse.success === false && 'noMatch' in parsedNavResponse) {
-      console.log('No navigation match, trying general information query');
-      
+    if (parsedNavResponse.success === false && "noMatch" in parsedNavResponse) {
+      console.log("No navigation match, trying general information query");
+
       // ==========================================
       // STEP 2: GENERAL INFO (NO ROUTING)
       // ==========================================
@@ -821,39 +836,39 @@ OR
   "error": "I can only answer questions about Southeast Queens, NY"
 }`;
 
-      const generalResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
+      const generalResponse = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${openAIApiKey}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${openAIApiKey}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: "gpt-4o-mini",
           messages: [
-            { role: 'system', content: generalPrompt },
-            { role: 'user', content: query }
+            { role: "system", content: generalPrompt },
+            { role: "user", content: query },
           ],
           max_tokens: 500,
-          temperature: 0.3
+          temperature: 0.3,
         }),
       });
 
       if (!generalResponse.ok) {
         const errorText = await generalResponse.text();
         console.error(`General query API error: ${generalResponse.status} - ${errorText}`);
-        throw new Error('General information service error');
+        throw new Error("General information service error");
       }
 
       const genData = await generalResponse.json();
-      console.log('General Response:', JSON.stringify(genData, null, 2));
-      
+      console.log("General Response:", JSON.stringify(genData, null, 2));
+
       const genAiResponse = genData.choices[0].message.content;
-      console.log('General AI Response:', genAiResponse);
+      console.log("General AI Response:", genAiResponse);
 
       // Extract JSON from response (strip any text before/after JSON)
       let genJsonStr = genAiResponse.trim();
-      const genFirstBrace = genJsonStr.indexOf('{');
-      const genLastBrace = genJsonStr.lastIndexOf('}');
+      const genFirstBrace = genJsonStr.indexOf("{");
+      const genLastBrace = genJsonStr.lastIndexOf("}");
       if (genFirstBrace !== -1 && genLastBrace !== -1) {
         genJsonStr = genJsonStr.substring(genFirstBrace, genLastBrace + 1);
       }
@@ -862,33 +877,35 @@ OR
       try {
         parsedGenResponse = JSON.parse(genJsonStr);
       } catch (parseError) {
-        console.error('Failed to parse general response:', parseError);
-        console.error('Raw response:', genAiResponse);
+        console.error("Failed to parse general response:", parseError);
+        console.error("Raw response:", genAiResponse);
         parsedGenResponse = {
           success: false,
-          error: "I couldn't process your question. Please try again."
+          error: "I couldn't process your question. Please try again.",
         };
       }
 
       return new Response(JSON.stringify(parsedGenResponse), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     // If navigation had an error, return it
     return new Response(JSON.stringify(parsedNavResponse), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-
   } catch (error) {
-    console.error('Error in ai-navigate function:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    return new Response(JSON.stringify({ 
-      success: false, 
-      error: 'Something went wrong processing your request. Please try again.' 
-    }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    console.error("Error in ai-navigate function:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: "Something went wrong processing your request. Please try again.",
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
   }
 });
