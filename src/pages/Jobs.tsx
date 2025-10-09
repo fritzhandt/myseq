@@ -15,6 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Briefcase, MapPin, Building, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { filterWithBooleanSearch } from '@/utils/booleanSearch';
 
 interface Job {
   id: string;
@@ -142,14 +143,17 @@ export default function Jobs() {
       filtered = filtered.filter(job => job.category === 'internships');
     }
 
-    // Filter by search query
+    // Filter by search query with boolean support
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(job =>
-        job.title.toLowerCase().includes(query) ||
-        job.description.toLowerCase().includes(query) ||
-        job.employer.toLowerCase().includes(query) ||
-        job.location.toLowerCase().includes(query)
+      filtered = filterWithBooleanSearch(
+        filtered,
+        searchQuery,
+        (job) => [
+          job.title,
+          job.description,
+          job.employer,
+          job.location
+        ]
       );
     }
 

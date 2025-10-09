@@ -10,6 +10,7 @@ import UserPagination from "@/components/UserPagination";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useAnalytics } from "@/hooks/useAnalytics";
+import { filterWithBooleanSearch } from "@/utils/booleanSearch";
 
 interface Resource {
   id: string;
@@ -124,20 +125,23 @@ export default function Resources() {
   const filterResources = () => {
     let filtered = resources;
 
-    // Filter by category
+    // Filter by category first
     if (selectedCategory) {
       filtered = filtered.filter(resource =>
         resource.categories.includes(selectedCategory)
       );
     }
 
-    // Filter by search query
+    // Filter by search query with boolean support
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(resource =>
-        resource.organization_name.toLowerCase().includes(query) ||
-        resource.description.toLowerCase().includes(query) ||
-        resource.categories.some(category => category.toLowerCase().includes(query))
+      filtered = filterWithBooleanSearch(
+        filtered,
+        searchQuery,
+        (resource) => [
+          resource.organization_name,
+          resource.description,
+          ...resource.categories
+        ]
       );
     }
 

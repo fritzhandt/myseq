@@ -355,7 +355,26 @@ CATEGORY MATCHING RULES:
    - "conflict", "mediation", "conflict resolution" → "Conflict Management"
    - "recreation", "parks", "activities" → "Recreational"
 
-3. CRITICAL DECISION LOGIC - When to use category only vs category + searchTerm:
+3. CRITICAL: AGE-BASED MODIFIERS WITH CATEGORIES
+When users mention age groups (youth, kids, children, teens, young adults, young people) + another category:
+- PRIORITIZE the non-age category
+- PUT the age term in searchTerm
+- EXCEPTION: If ONLY asking about youth/kids without another category, use Youth category
+
+Examples:
+- "youth sports programs" → category:"Sports" + searchTerm:"youth"
+- "kids basketball" → category:"Sports" + searchTerm:"kids basketball"
+- "young adult arts classes" → category:"Arts" + searchTerm:"young adult"
+- "children's educational programs" → category:"Educational" + searchTerm:"children"
+- "teen mental health" → category:"Mental Health/Wellness" + searchTerm:"teen"
+- "youth programs" (alone) → category:"Youth" (NO searchTerm)
+- "kids programs" (alone) → category:"Youth" (NO searchTerm)
+
+Apply the same logic to jobs:
+- "youth employment opportunities" → /jobs + searchTerm:"youth"
+- "jobs for young adults" → /jobs + searchTerm:"young adult"
+
+4. CRITICAL DECISION LOGIC - When to use category only vs category + searchTerm:
    - BROAD QUERY (just asking about the category) → Select category ONLY, NO searchTerm
      Examples: "senior services", "what's available for seniors", "youth programs", "mental health resources"
    
@@ -376,9 +395,11 @@ EXAMPLES:
 - "mental health resources" → category:"Mental Health/Wellness" (NO searchTerm - broad category)
 - "wellness programs" → category:"Mental Health/Wellness" (NO searchTerm)
 - "therapy for anxiety" → category:"Mental Health/Wellness" + searchTerm:"anxiety" (specific)
-- "youth programs" → category:"Youth" (NO searchTerm)
+- "youth programs" → category:"Youth" (NO searchTerm - broad youth category)
 - "programs for kids" → category:"Youth" (NO searchTerm)
-- "basketball for kids" → category:"Youth" + searchTerm:"basketball" (specific)
+- "youth sports programs" → category:"Sports" + searchTerm:"youth" (sports with youth modifier)
+- "youth basketball" → category:"Sports" + searchTerm:"youth basketball" (specific sport with youth)
+- "kids art classes" → category:"Arts" + searchTerm:"kids art" (arts with kids modifier)
 - "sports programs" → category:"Sports" (NO searchTerm)
 - "tennis lessons" → category:"Sports" + searchTerm:"tennis" (specific)
 - "food pantry" → category:"Food" (NO searchTerm)
@@ -505,6 +526,22 @@ KEYWORD MAPPING:
 - "recreation", "park", "activities" → /resources category:"recreational"
 - "restaurant", "dining", "food", "eat", "cuisine" → /resources category:"recreational"
 - "conflict", "mediation", "dispute" → /resources category:"conflict management"
+
+AI BOOLEAN QUERY CONSTRUCTION:
+When users ask complex questions, construct boolean queries to improve search accuracy:
+
+Examples of AI-constructed boolean queries:
+- "youth sports but not basketball" → searchTerm: "youth AND sports NOT basketball"
+- "tennis or swimming lessons" → searchTerm: "tennis OR swimming AND lessons"
+- "senior programs excluding fitness" → searchTerm: "senior AND programs NOT fitness"
+- "mental health for teens" → searchTerm: "mental health AND teens"
+
+Rules for boolean construction:
+1. Use AND to combine required terms
+2. Use OR for alternative terms
+3. Use NOT to exclude terms
+4. Keep queries natural and readable
+5. Only use boolean operators when user intent clearly indicates them
 
 CRITICAL: Return ONLY valid JSON, no other text or explanations.
 
