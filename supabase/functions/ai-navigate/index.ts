@@ -535,7 +535,7 @@ KEYWORD MAPPING:
 - "who is my", "find my representative", "my councilperson", "who represents" → /my-elected-lookup (ONLY for identifying officials, NOT for contacting them)
 - "learn", "lessons", "classes", "training" → /resources category:"sports", "arts", or "educational"
 - "help", "support", "assistance" → check context for category
-- "health", "healthcare", "medical", "fitness", "wellness" → /resources category:"mental health/wellness" or "sports"
+- "health", "medical", "fitness", "wellness", "therapy", "depression", "sad" → /resources category:"mental health/wellness" or "sports"
 - "legal", "lawyer", "immigration" → /resources category:"legal services"
 - "business", "entrepreneur", "career", "startup", "small business" → /business-opportunities
 - "recreation", "park", "activities" → /resources category:"recreational"
