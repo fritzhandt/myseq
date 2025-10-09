@@ -281,6 +281,11 @@ ROUTING PHILOSOPHY:
 - RECOGNIZE that people add extra, irrelevant information to their queries, and in recognition of that you shoudl boil the query down to its most important elements (e.g., "I am desperately looking for a job. I will take anything. I have a nursing degree" should mean to you "Job + healthcare OR nurse OR registered nurse OR nurse practicioner or physician's assistant, etc")
 - ONLY return noMatch if query is about history, trivia, famous people, or truly unroutable topics
 
+**OUTPUT FORMATTING RULE (to prevent JSON breakage):**
+Inside the "searchTerm" string, DO NOT use double quotes around phrases. Use plain words with spaces and parentheses only.
+✅ Example: NOT (master of OR degree)
+❌ Instead of: NOT ("master of" OR "degree")
+
 EXAMPLES OF AGGRESSIVE ROUTING:
 - "restaurants" → /resources + searchTerm:"restaurant" + category:"Recreational"
 - "good restaurants in queens" → /resources + searchTerm:"restaurant" + category:"Recreational"
@@ -699,15 +704,46 @@ OR (only if CLEARLY about different region like Manhattan/Brooklyn)
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-4o", // Use more capable model for complex boolean query construction
+        model: "gpt-4o",
+        temperature: 0,
+        max_tokens: 500,
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "NavigationResponse",
+            strict: true,
+            schema: {
+              type: "object",
+              additionalProperties: false,
+              properties: {
+                destination: { type: "string" },
+                searchTerm: { type: "string" },
+                category: { type: "string", enum: ["government", "private_sector", "internships"] },
+                governmentType: { type: "string", enum: ["all", "city", "state"] },
+                dateStart: { type: "string" },
+                dateEnd: { type: "string" },
+                employer: { type: "string" },
+                location: { type: "string" },
+                organizationType: { type: "string" },
+                isGeneralQuery: { type: "boolean" },
+                answer: { type: "string" },
+                success: { type: "boolean" },
+                error: { type: "string" },
+              },
+              required: ["success"],
+            },
+          },
+        },
         messages: [
           { role: "system", content: navigationPrompt },
           { role: "user", content: query },
         ],
-        max_tokens: 500, // Increased for longer boolean queries
-        temperature: 0.0,
       }),
     });
+
+    const navData = await navigationResponse.json();
+    const navContent = navData.choices?.[0]?.message?.content ?? "{}";
+    const parsedNavResponse: NavigationResponse = JSON.parse(navContent);
 
     if (!navigationResponse.ok) {
       const errorText = await navigationResponse.text();
