@@ -9,6 +9,7 @@ import UserPagination from "@/components/UserPagination";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useAnalytics } from "@/hooks/useAnalytics";
+import { filterWithBooleanSearch } from "@/utils/booleanSearch";
 
 interface BusinessOpportunity {
   id: string;
@@ -80,13 +81,16 @@ export default function BusinessOpportunities() {
   const filterOpportunities = () => {
     let filtered = opportunities;
 
-    // Filter by search query
+    // Filter by search query with boolean support
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(opportunity =>
-        opportunity.organization_name.toLowerCase().includes(query) ||
-        opportunity.description.toLowerCase().includes(query) ||
-        opportunity.categories.some(category => category.toLowerCase().includes(query))
+      filtered = filterWithBooleanSearch(
+        filtered,
+        searchQuery,
+        (opportunity) => [
+          opportunity.organization_name,
+          opportunity.description,
+          ...opportunity.categories
+        ]
       );
     }
 

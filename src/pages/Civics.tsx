@@ -10,6 +10,7 @@ import Navbar from "@/components/Navbar";
 import AdminPagination from "@/components/AdminPagination";
 import { Users, MapPin, Search, Vote, ExternalLink, Phone, Mail, ArrowLeft, Building2, Shield, Globe } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { filterWithBooleanSearch } from "@/utils/booleanSearch";
 
 interface CivicOrganization {
   id: string;
@@ -58,11 +59,15 @@ const Civics = () => {
     let filtered = organizations;
     
     if (searchQuery) {
-      // When searching, show all results regardless of tab
-      filtered = filtered.filter(org =>
-        org.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        org.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        org.coverage_area.toLowerCase().includes(searchQuery.toLowerCase())
+      // When searching, show all results regardless of tab with boolean support
+      filtered = filterWithBooleanSearch(
+        filtered,
+        searchQuery,
+        (org) => [
+          org.name,
+          org.description,
+          org.coverage_area
+        ]
       );
     } else {
       // When not searching, filter by organization type
