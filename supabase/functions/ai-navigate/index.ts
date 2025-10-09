@@ -757,28 +757,28 @@ OR (only if CLEARLY about different region like Manhattan/Brooklyn)
       throw new Error("Invalid response from OpenAI API");
     }
 
-    const navAiResponse = navData.choices[0].message.content;
-    console.log("Navigation AI Response:", navAiResponse);
+    const navContent = navData.choices?.[0]?.message?.content ?? "{}";
 
-    // Extract JSON from response (strip any text before/after JSON)
-    let jsonStr = navAiResponse.trim();
-    const firstBrace = jsonStr.indexOf("{");
-    const lastBrace = jsonStr.lastIndexOf("}");
-    if (firstBrace !== -1 && lastBrace !== -1) {
-      jsonStr = jsonStr.substring(firstBrace, lastBrace + 1);
-    }
+let parsedNavResponse: NavigationResponse;
+try {
+  parsedNavResponse = JSON.parse(navContent);
+} catch (e) {
+  console.error("Router JSON parse failed, attempting repair:", navContent);
+  const repaired = await repairJson(navContent, openAIApiKey);
+  if (!repaired) {
+    return new Response(
+      JSON.stringify({ success: false, error: "I couldn't understand your request. Please try rephrasing it." }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+  parsedNavResponse = repaired as NavigationResponse;
+}
 
-    let parsedNavResponse: NavigationResponse;
-    try {
-      parsedNavResponse = JSON.parse(jsonStr);
-    } catch (parseError) {
-      console.error("Failed to parse navigation response:", parseError);
-      console.error("Raw response:", navAiResponse);
-      parsedNavResponse = {
-        success: false,
-        error: "I couldn't understand your request. Please try rephrasing it.",
-      };
-    }
+// belt-and-suspenders: strip any stray quotes inside searchTerm
+if (parsedNavResponse.searchTerm) {
+  parsedNavResponse.searchTerm = parsedNavResponse.searchTerm.replace(/"/g, "").replace(/\s+/g, " ").trim();
+}
+
 
     // If navigation found a match, return it
     if (parsedNavResponse.success && parsedNavResponse.destination) {
