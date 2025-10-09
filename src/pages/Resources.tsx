@@ -36,7 +36,7 @@ const MAIN_CATEGORIES = [
 
 // Community Resources subcategories with icons
 const COMMUNITY_SUBCATEGORIES = [
-  { name: "Environment", icon: Leaf },
+  { name: "Environmental", icon: Leaf },
   { name: "Conflict Management", icon: Scale },
   { name: "Cultural", icon: Globe },
   { name: "Food", icon: UtensilsCrossed },

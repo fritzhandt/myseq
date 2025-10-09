@@ -18,7 +18,7 @@ const CATEGORIES = [
   "Conflict Management",
   "Cultural",
   "Educational",
-  "Environment",
+  "Environmental",
   "Food",
   "Legal Services",
   "Mental Health/Wellness",

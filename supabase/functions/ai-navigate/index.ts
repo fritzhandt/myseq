@@ -348,7 +348,7 @@ CATEGORY MATCHING RULES:
    - "legal", "lawyer", "attorney", "law" → "Legal Services"
    - "education", "tutoring", "learning", "school" → "Educational"
    - "food", "food pantry", "meals", "hunger", "nutrition" → "Food"
-   - "environment", "environmental", "green", "sustainability" → "Environment"
+   - "environment", "environmental", "green", "sustainability" → "Environmental"
    - "cultural", "culture", "heritage" → "Cultural"
    - "community", "community center", "neighborhood" → "Community Resources"
    - "social", "social services", "social support" → "Social"
