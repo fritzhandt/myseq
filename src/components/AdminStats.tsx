@@ -50,6 +50,14 @@ interface AISearchStats {
   failures: number;
 }
 
+interface AISearchDailyStats {
+  date: string;
+  total_searches: number;
+  general_answers: number;
+  page_redirects: number;
+  failures: number;
+}
+
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FF6B9D', '#C89EFC'];
 
 type DateRange = 'day' | 'week' | 'month' | 'custom';
@@ -88,6 +96,7 @@ export const AdminStats = () => {
     failures: 0
   });
   const [aiSearchTrend, setAISearchTrend] = useState<TrendData[]>([]);
+  const [aiSearchDailyStats, setAISearchDailyStats] = useState<AISearchDailyStats[]>([]);
 
   useEffect(() => {
     loadStats();
@@ -377,6 +386,42 @@ export const AdminStats = () => {
       if (aiSearchData) {
         const aiTrendData = processTimeSeries(aiSearchData, start, end);
         setAISearchTrend(aiTrendData);
+      }
+
+      // AI Search daily breakdown
+      const { data: allAIEvents } = await supabase
+        .from('analytics_events')
+        .select('created_at, event_type')
+        .in('event_type', ['ai_search', 'ai_general_answer', 'ai_page_redirect', 'ai_search_failure'])
+        .gte('created_at', start.toISOString())
+        .lte('created_at', end.toISOString())
+        .order('created_at', { ascending: false });
+
+      if (allAIEvents) {
+        const dailyMap = new Map<string, AISearchDailyStats>();
+        
+        allAIEvents.forEach(event => {
+          const date = format(new Date(event.created_at), 'MMM dd, yyyy');
+          const existing = dailyMap.get(date) || {
+            date,
+            total_searches: 0,
+            general_answers: 0,
+            page_redirects: 0,
+            failures: 0
+          };
+
+          if (event.event_type === 'ai_search') existing.total_searches++;
+          if (event.event_type === 'ai_general_answer') existing.general_answers++;
+          if (event.event_type === 'ai_page_redirect') existing.page_redirects++;
+          if (event.event_type === 'ai_search_failure') existing.failures++;
+
+          dailyMap.set(date, existing);
+        });
+
+        const dailyStats = Array.from(dailyMap.values()).sort((a, b) => 
+          new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+        setAISearchDailyStats(dailyStats);
       }
 
     } catch (error) {
@@ -938,6 +983,69 @@ export const AdminStats = () => {
                 </ResponsiveContainer>
               ) : (
                 <p className="text-muted-foreground text-center py-8">No AI search data yet</p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Daily AI Search Breakdown</CardTitle>
+              <CardDescription>Detailed stats by day ({aiSearchDailyStats.length} days)</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {aiSearchDailyStats.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="border-b bg-muted/50">
+                      <tr>
+                        <th className="text-left py-3 px-4 font-medium">Date</th>
+                        <th className="text-right py-3 px-4 font-medium">Total Searches</th>
+                        <th className="text-right py-3 px-4 font-medium">General Answers</th>
+                        <th className="text-right py-3 px-4 font-medium">Page Redirects</th>
+                        <th className="text-right py-3 px-4 font-medium">Failures</th>
+                        <th className="text-right py-3 px-4 font-medium">Success Rate</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {aiSearchDailyStats.map((day, index) => {
+                        const successRate = day.total_searches > 0 
+                          ? ((day.total_searches - day.failures) / day.total_searches * 100).toFixed(1)
+                          : '0';
+                        const isHighFailure = day.total_searches > 0 && (day.failures / day.total_searches) > 0.2;
+                        
+                        return (
+                          <tr key={index} className="border-b hover:bg-muted/30 transition-colors">
+                            <td className="py-3 px-4 text-sm font-medium">{day.date}</td>
+                            <td className="py-3 px-4 text-sm text-right font-bold">{day.total_searches}</td>
+                            <td className="py-3 px-4 text-sm text-right">
+                              {day.general_answers}
+                              <span className="text-xs text-muted-foreground ml-1">
+                                ({day.total_searches > 0 ? ((day.general_answers / day.total_searches) * 100).toFixed(0) : 0}%)
+                              </span>
+                            </td>
+                            <td className="py-3 px-4 text-sm text-right">
+                              {day.page_redirects}
+                              <span className="text-xs text-muted-foreground ml-1">
+                                ({day.total_searches > 0 ? ((day.page_redirects / day.total_searches) * 100).toFixed(0) : 0}%)
+                              </span>
+                            </td>
+                            <td className={`py-3 px-4 text-sm text-right font-medium ${isHighFailure ? 'text-destructive' : ''}`}>
+                              {day.failures}
+                              {isHighFailure && <AlertCircle className="inline h-3 w-3 ml-1" />}
+                            </td>
+                            <td className="py-3 px-4 text-sm text-right font-bold">
+                              <span className={parseFloat(successRate) >= 80 ? 'text-green-600' : parseFloat(successRate) >= 60 ? 'text-yellow-600' : 'text-red-600'}>
+                                {successRate}%
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-muted-foreground text-center py-8">No daily AI search data available</p>
               )}
             </CardContent>
           </Card>
