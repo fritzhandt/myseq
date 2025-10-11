@@ -183,7 +183,7 @@ export default function AISearchBar() {
             className={`${isMobile ? 'px-4 py-4' : 'px-8 py-6'} bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white rounded-2xl shadow-card`}
           >
             {isLoading ? (
-              <Loader2 className={isMobile ? "h-4 w-4" : "h-5 w-5"} animate-spin />
+              <Loader2 className={`${isMobile ? "h-4 w-4" : "h-5 w-5"} animate-spin`} />
             ) : (
               <Sparkles className={isMobile ? "h-4 w-4" : "h-5 w-5"} />
             )}
