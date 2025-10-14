@@ -703,7 +703,7 @@ OR (only if CLEARLY about different region like Manhattan/Brooklyn)
           { role: "system", content: navigationPrompt },
           { role: "user", content: query },
         ],
-        max_tokens: 500, // Increased for longer boolean queries
+        max_tokens: 200, // Reduced to encourage concise responses
         temperature: 0.0,
       }),
     });
@@ -726,8 +726,13 @@ OR (only if CLEARLY about different region like Manhattan/Brooklyn)
     const navAiResponse = navData.choices[0].message.content;
     console.log("Navigation AI Response:", navAiResponse);
 
-    // Extract JSON from response (strip any text before/after JSON)
+    // Extract JSON from response - strip markdown code fences and whitespace
     let jsonStr = navAiResponse.trim();
+    
+    // Remove markdown code fences if present
+    jsonStr = jsonStr.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/\s*```$/, '');
+    
+    // Now extract JSON object
     const firstBrace = jsonStr.indexOf("{");
     const lastBrace = jsonStr.lastIndexOf("}");
     if (firstBrace !== -1 && lastBrace !== -1) {
