@@ -102,14 +102,14 @@ export default function AISearchBar() {
       });
 
       const navigationState = {
-        searchTerm: response.searchTerm,
-        category: response.category,
-        governmentType: response.governmentType,
-        dateStart: response.dateStart,
-        dateEnd: response.dateEnd,
-        employer: response.employer,
-        location: response.location,
-        organizationType: response.organizationType
+        ...(response.searchTerm && { searchTerm: response.searchTerm }),
+        ...(response.category && { category: response.category }),
+        ...(response.governmentType && { governmentType: response.governmentType }),
+        ...(response.dateStart && { dateStart: response.dateStart }),
+        ...(response.dateEnd && { dateEnd: response.dateEnd }),
+        ...(response.employer && { employer: response.employer }),
+        ...(response.location && { location: response.location }),
+        ...(response.organizationType && { organizationType: response.organizationType })
       };
 
       trackAIPageRedirect();
