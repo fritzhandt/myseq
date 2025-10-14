@@ -389,11 +389,17 @@ Apply the same logic to jobs:
 - "jobs for young adults" → /jobs + searchTerm:"young adult"
 
 4. CRITICAL DECISION LOGIC - When to use category only vs category + searchTerm:
-   - BROAD QUERY (just asking about the category) → Select category ONLY, NO searchTerm
-     Examples: "senior services", "what's available for seniors", "youth programs", "mental health resources"
+   - BROAD QUERY (just asking about the category in general) → Select category ONLY, NO searchTerm
+     Examples: "senior services", "what's available for seniors", "youth programs", "mental health resources", "what senior services are there"
    
-   - SPECIFIC QUERY (asking for something specific within category) → Select category AND searchTerm
-     Examples: "senior fitness classes", "youth basketball", "therapy for anxiety"
+   - SPECIFIC QUERY (asking for something specific within category OR mentioning a facility/program type) → Select category AND searchTerm
+     Examples: 
+       * "senior centers" → category:"Senior Services" + searchTerm:"senior center"
+       * "senior fitness classes" → category:"Senior Services" + searchTerm:"fitness"
+       * "youth basketball" → category:"Sports" + searchTerm:"youth basketball"
+       * "therapy for anxiety" → category:"Mental Health/Wellness" + searchTerm:"anxiety"
+       * "food pantry" → category:"Food" + searchTerm:"pantry"
+       * "recreation center" → category:"Recreational" + searchTerm:"recreation center"
    
    - NO CATEGORY MATCH → Use searchTerm with ALL categories (let frontend filter)
      Examples: "help with rent", "financial assistance", "job training"
@@ -405,7 +411,9 @@ EXAMPLES:
 - "what senior services are available" → category:"Senior Services" (NO searchTerm)
 - "senior programs" → category:"Senior Services" (NO searchTerm)
 - "programs for elderly" → category:"Senior Services" (NO searchTerm)
-- "senior fitness classes" → category:"Senior Services" + searchTerm:"fitness classes" (specific within category)
+- "are there any senior centers available?" → category:"Senior Services" + searchTerm:"senior center" (specific facility type)
+- "what senior centers are there?" → category:"Senior Services" + searchTerm:"senior center" (specific facility type)
+- "senior fitness classes" → category:"Senior Services" + searchTerm:"fitness" (specific within category)
 - "mental health resources" → category:"Mental Health/Wellness" (NO searchTerm - broad category)
 - "wellness programs" → category:"Mental Health/Wellness" (NO searchTerm)
 - "therapy for anxiety" → category:"Mental Health/Wellness" + searchTerm:"anxiety" (specific)
@@ -416,7 +424,7 @@ EXAMPLES:
 - "kids art classes" → category:"Arts" + searchTerm:"kids art" (arts with kids modifier)
 - "sports programs" → category:"Sports" (NO searchTerm)
 - "tennis lessons" → category:"Sports" + searchTerm:"tennis" (specific)
-- "food pantry" → category:"Food" (NO searchTerm)
+- "food pantry" → category:"Food" + searchTerm:"pantry" (specific facility type)
 - "legal help" → category:"Legal Services" (NO searchTerm)
 - "cultural events" → category:"Cultural" (NO searchTerm)
 
