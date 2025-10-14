@@ -17,8 +17,8 @@ const Navbar = () => {
   return <nav className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-14 sm:h-16">
-          {/* Logo/Site Name */}
-          <Link to="/" className="flex items-center">
+          {/* Logo/Site Name - Hidden on mobile */}
+          <Link to="/" className="hidden sm:flex items-center">
             <img src={seqLogo} alt="SEQ Logo" className="h-8 w-8 sm:h-10 sm:w-10" />
           </Link>
 
@@ -61,10 +61,13 @@ const Navbar = () => {
             <SheetContent className="w-[300px] sm:w-[400px] p-0 flex flex-col h-full max-h-screen">
               {/* Header */}
               <div className="px-6 py-6 border-b bg-gradient-to-r from-primary/5 to-primary/10 flex-shrink-0">
-                <h2 className="font-oswald text-xl font-semibold text-foreground uppercase tracking-wide">
+                <div className="flex items-center justify-center mb-3">
+                  <img src={seqLogo} alt="SEQ Logo" className="h-12 w-12" />
+                </div>
+                <h2 className="font-oswald text-xl font-semibold text-foreground uppercase tracking-wide text-center">
                   MYSEQ
                 </h2>
-                <p className="text-sm text-muted-foreground mt-1">Navigate your community</p>
+                <p className="text-sm text-muted-foreground mt-1 text-center">Navigate your community</p>
               </div>
 
               {/* Register to Vote - Prominent Button */}
