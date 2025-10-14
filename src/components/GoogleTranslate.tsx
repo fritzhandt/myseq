@@ -1,5 +1,12 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Languages } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 declare global {
   interface Window {
@@ -8,7 +15,40 @@ declare global {
   }
 }
 
+const languages = [
+  { code: 'en', name: 'English' },
+  { code: 'es', name: 'Español' },
+  { code: 'zh-CN', name: '中文' },
+  { code: 'bn', name: 'বাংলা' },
+  { code: 'ar', name: 'العربية' },
+  { code: 'fr', name: 'Français' },
+  { code: 'ru', name: 'Русский' },
+  { code: 'ht', name: 'Kreyòl' },
+  { code: 'ko', name: '한국어' },
+  { code: 'ur', name: 'اردو' },
+  { code: 'pl', name: 'Polski' },
+  { code: 'pt', name: 'Português' },
+  { code: 'vi', name: 'Tiếng Việt' },
+  { code: 'tl', name: 'Tagalog' },
+  { code: 'it', name: 'Italiano' },
+  { code: 'de', name: 'Deutsch' },
+  { code: 'ja', name: '日本語' },
+];
+
 export const GoogleTranslate = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   useEffect(() => {
     // Add Google Translate script
     const addScript = () => {
@@ -82,6 +122,11 @@ export const GoogleTranslate = () => {
         align-items: center;
         gap: 4px;
       }
+      @media (max-width: 640px) {
+        #google_translate_element {
+          display: none;
+        }
+      }
     `;
     document.head.appendChild(style);
 
@@ -89,6 +134,39 @@ export const GoogleTranslate = () => {
       // Cleanup if needed
     };
   }, []);
+
+  const changeLanguage = (langCode: string) => {
+    const select = document.querySelector('.goog-te-combo') as HTMLSelectElement;
+    if (select) {
+      select.value = langCode;
+      select.dispatchEvent(new Event('change'));
+    }
+  };
+
+  if (isMobile) {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="h-9 w-9">
+            <Languages className="h-5 w-5" />
+            <span className="sr-only">Translate</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48 max-h-[400px] overflow-y-auto z-[100] bg-background">
+          {languages.map((lang) => (
+            <DropdownMenuItem
+              key={lang.code}
+              onClick={() => changeLanguage(lang.code)}
+              className="cursor-pointer"
+            >
+              {lang.name}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+        <div id="google_translate_element" className="hidden"></div>
+      </DropdownMenu>
+    );
+  }
 
   return (
     <div className="flex items-center gap-1">

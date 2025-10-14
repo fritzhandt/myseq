@@ -8,6 +8,7 @@ import AddToHomeButton from '@/components/AddToHomeButton';
 import { GoogleTranslate } from '@/components/GoogleTranslate';
 import { useNavbar } from '@/contexts/NavbarContext';
 import AccessibilityMenu from '@/components/AccessibilityMenu';
+import seqLogo from '@/assets/seq-logo.png';
 
 const Navbar = () => {
   const { isOpen, closeMenu, toggleMenu } = useNavbar();
@@ -17,9 +18,8 @@ const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Logo/Site Name */}
-          <Link to="/" className="text-lg sm:text-xl font-bold text-primary">
-            <span className="hidden sm:inline font-oswald text-black font-semibold uppercase">MY SEQ</span>
-            <span className="sm:hidden font-oswald text-black font-semibold uppercase">MY SEQ</span>
+          <Link to="/" className="flex items-center">
+            <img src={seqLogo} alt="SEQ Logo" className="h-8 w-8 sm:h-10 sm:w-10" />
           </Link>
 
           {/* Right side buttons */}
@@ -43,9 +43,7 @@ const Navbar = () => {
             </a>
             
             {/* Google Translate Widget */}
-            <div className="hidden sm:block">
-              <GoogleTranslate />
-            </div>
+            <GoogleTranslate />
             
             {/* Accessibility Menu */}
             <AccessibilityMenu />
