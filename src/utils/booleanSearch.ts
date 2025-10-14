@@ -148,19 +148,7 @@ export function filterWithBooleanSearch<T>(items: T[], query: string, textExtrac
   const q = normalizeSpaces(query || "");
   if (!q) return items;
 
-  // Detect boolean operators
-  const hasBooleanOperators = /\s+(AND|OR|NOT)\s+/i.test(q);
-
-  // Simple includes fallback for plain queries (keeps your current UX)
-  if (!hasBooleanOperators) {
-    const lowerQuery = q.toLowerCase();
-    return items.filter((item) => {
-      const texts = textExtractor(item);
-      return texts.some((text) => text.toLowerCase().includes(lowerQuery));
-    });
-  }
-
-  // Boolean search with scoring
+  // All searches use intelligent boolean matching with word boundaries and scoring
   const scored = items.map((item) => {
     const texts = textExtractor(item);
     const combinedText = texts.join(" ");
