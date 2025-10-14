@@ -290,6 +290,7 @@ EXAMPLES OF AGGRESSIVE ROUTING:
 - "places to go" → /resources + searchTerm:"recreation" + category:"Recreational"
 - "activities" → /resources + category:"Recreational"
 - "find help" → /resources (broad search)
+- "senior programs" → /resources + category:"Senior Services + (broad search)
 
 YOUR JOB: Be aggressive. Find a route. Only give up if impossible.
 
@@ -352,21 +353,21 @@ AVAILABLE CATEGORIES IN DATABASE: ${resourceCategoryList}
 
 CATEGORY MATCHING RULES:
 1. Match user queries to the ACTUAL categories from the database list above
-2. Use FUZZY MATCHING - be intelligent about synonyms and variations:
-   - "seniors", "senior citizens", "senior services", "elderly", "older adults" → "Senior Services"
+2. Use FUZZY MATCHING - be intelligent about synonyms and variations. You do not have to be too ridgid. You should use reasoning to understand what category the person is trying to ask for, and then select the category if selecting it accords with the rules set:
+   - "seniors", "senior citizens", "senior services", "senior programs" elderly", "older adults" or other inquiries that clearly indicate that a person is looking for services or programs related to seniors → "Senior Services"
    - "youth", "young people", "teens", "children", "kids" → "Youth"
-   - "mental health", "wellness", "therapy", "counseling", "psychological" → "Mental Health/Wellness"
-   - "sports", "fitness", "athletics", "exercise", "recreation center" → "Sports"
-   - "arts", "music", "dance", "theater", "culture", "creative" → "Arts"
-   - "legal", "lawyer", "attorney", "law" → "Legal Services"
-   - "education", "tutoring", "learning", "school" → "Educational"
-   - "food", "food pantry", "meals", "hunger", "nutrition" → "Food"
-   - "environment", "environmental", "green", "sustainability" → "Environmental"
-   - "cultural", "culture", "heritage" → "Cultural"
-   - "community", "community center", "neighborhood" → "Community Resources"
-   - "social", "social services", "social support" → "Social"
-   - "conflict", "mediation", "conflict resolution" → "Conflict Management"
-   - "recreation", "parks", "activities" → "Recreational"
+   - "mental health", "wellness", "therapy", "counseling", "psychological" or other inquiries that clearly indicate that a person is looking for services or programs related to mentla health or wellness → "Mental Health/Wellness"
+   - "sports", "fitness", "athletics", "exercise", "recreation center"  or other inquiries that clearly indicate that a person is looking for services or programs related to sports → "Sports"
+   - "arts", "music", "dance", "theater", "culture", "creative"  or other inquiries that clearly indicate that a person is looking for services or programs related to arts → "Arts"
+   - "legal", "lawyer", "attorney", "law"  or other inquiries that clearly indicate that a person is looking for services or programs related to legal services → "Legal Services"
+   - "education", "tutoring", "learning", "school" or other inquiries that clearly indicate that a person is looking for services or programs related to education → "Educational"
+   - "food", "food pantry", "meals", "hunger", "nutrition"  or other inquiries that clearly indicate that a person is looking for services or programs related to food → "Food"
+   - "environment", "environmental", "green", "sustainability"  or other inquiries that clearly indicate that a person is looking for services or programs related to the environment → "Environmental"
+   - "cultural", "culture", "heritage"  or other inquiries that clearly indicate that a person is looking for services or programs related to culture → "Cultural"
+   - "community", "community center", "neighborhood"  or other inquiries that clearly indicate that a person is looking for services or programs related to community resources → "Community Resources"
+   - "social", "social services", "social support"  or other inquiries that clearly indicate that a person is looking for services or programs related to social services and related items→ "Social"
+   - "conflict", "mediation", "conflict resolution"  or other inquiries that clearly indicate that a person is looking for services or programs related to conflict management → "Conflict Management"
+   - "recreation", "parks", "activities"  or other inquiries that clearly indicate that a person is looking for services or programs related to recreational activities → "Recreational"
 
 3. CRITICAL: AGE-BASED MODIFIERS WITH CATEGORIES
 When users mention age groups (youth, kids, children, teens, young adults, young people) + another category:
@@ -728,10 +729,13 @@ OR (only if CLEARLY about different region like Manhattan/Brooklyn)
 
     // Extract JSON from response - strip markdown code fences and whitespace
     let jsonStr = navAiResponse.trim();
-    
+
     // Remove markdown code fences if present
-    jsonStr = jsonStr.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/\s*```$/, '');
-    
+    jsonStr = jsonStr
+      .replace(/^```json\s*/i, "")
+      .replace(/^```\s*/, "")
+      .replace(/\s*```$/, "");
+
     // Now extract JSON object
     const firstBrace = jsonStr.indexOf("{");
     const lastBrace = jsonStr.lastIndexOf("}");
