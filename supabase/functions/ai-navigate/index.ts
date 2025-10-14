@@ -354,7 +354,7 @@ AVAILABLE CATEGORIES IN DATABASE: ${resourceCategoryList}
 CATEGORY MATCHING RULES:
 1. Match user queries to the ACTUAL categories from the database list above
 2. Use FUZZY MATCHING - be intelligent about synonyms and variations. You do not have to be too ridgid. You should use reasoning to understand what category the person is trying to ask for, and then select the category if selecting it accords with the rules set:
-   - "seniors", "senior citizens", "senior services", "senior programs" elderly", "older adults" or other inquiries that clearly indicate that a person is looking for services or programs related to seniors → "Senior Services"
+   - "seniors", "senior citizens", "senior services", "senior programs", "elderly", "older adults", "senior center", "senior programme", "seniors services", "senor", "seinor", "sevices", "senoir" or other inquiries that clearly indicate that a person is looking for services or programs related to seniors → "Senior Services"
    - "youth", "young people", "teens", "children", "kids" → "Youth"
    - "mental health", "wellness", "therapy", "counseling", "psychological" or other inquiries that clearly indicate that a person is looking for services or programs related to mentla health or wellness → "Mental Health/Wellness"
    - "sports", "fitness", "athletics", "exercise", "recreation center"  or other inquiries that clearly indicate that a person is looking for services or programs related to sports → "Sports"
@@ -727,14 +727,17 @@ OR (only if CLEARLY about different region like Manhattan/Brooklyn)
     const navAiResponse = navData.choices[0].message.content;
     console.log("Navigation AI Response:", navAiResponse);
 
-    // Extract JSON from response - strip markdown code fences and whitespace
+    // Extract JSON from response - strip markdown code fences and whitespace robustly
     let jsonStr = navAiResponse.trim();
 
-    // Remove markdown code fences if present
+    // Remove all variations of markdown code fences
     jsonStr = jsonStr
-      .replace(/^```json\s*/i, "")
-      .replace(/^```\s*/, "")
-      .replace(/\s*```$/, "");
+      .replace(/^```json\s*/gi, "")
+      .replace(/^```\s*/g, "")
+      .replace(/```\s*$/g, "")
+      .trim();
+
+    console.log("Cleaned JSON string for parsing:", jsonStr);
 
     // Now extract JSON object
     const firstBrace = jsonStr.indexOf("{");
@@ -746,8 +749,10 @@ OR (only if CLEARLY about different region like Manhattan/Brooklyn)
     let parsedNavResponse: NavigationResponse;
     try {
       parsedNavResponse = JSON.parse(jsonStr);
+      console.log("Successfully parsed navigation response:", parsedNavResponse);
     } catch (parseError) {
       console.error("Failed to parse navigation response:", parseError);
+      console.error("Attempted to parse:", jsonStr);
       console.error("Raw response:", navAiResponse);
       parsedNavResponse = {
         success: false,

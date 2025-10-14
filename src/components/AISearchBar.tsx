@@ -101,9 +101,25 @@ export default function AISearchBar() {
         organizationType: response.organizationType
       });
 
+      // Validate and normalize category if present
+      let normalizedCategory = response.category;
+      if (normalizedCategory && response.destination === '/resources') {
+        const validCategories = [
+          "Arts", "Educational", "Mental Health/Wellness", "Senior Services", 
+          "Social", "Sports", "Environmental", "Conflict Management", 
+          "Cultural", "Food", "Legal Services", "Youth"
+        ];
+        
+        // Check if the category exactly matches a valid category
+        if (!validCategories.includes(normalizedCategory)) {
+          console.warn(`AI returned invalid category: "${normalizedCategory}". Clearing category.`);
+          normalizedCategory = undefined;
+        }
+      }
+
       const navigationState = {
         ...(response.searchTerm && { searchTerm: response.searchTerm }),
-        ...(response.category && { category: response.category }),
+        ...(normalizedCategory && { category: normalizedCategory }),
         ...(response.governmentType && { governmentType: response.governmentType }),
         ...(response.dateStart && { dateStart: response.dateStart }),
         ...(response.dateEnd && { dateEnd: response.dateEnd }),

@@ -153,8 +153,9 @@ export default function Resources() {
       );
     }
 
-    // Auto-switch to "All Categories" if AI selected a category and got no results
-    if (fromAINavigation && hadCategoryFilter && filtered.length === 0 && selectedCategory) {
+    // Auto-switch to "All Categories" only if AI selected BOTH category AND search term and got no results
+    if (fromAINavigation && hadCategoryFilter && filtered.length === 0 && selectedCategory && searchQuery.trim()) {
+      console.log("AI navigation: clearing category due to no results with both category and search term");
       setSelectedCategory("");
       setFromAINavigation(false);
       // Will trigger re-filter via useEffect
