@@ -81,20 +81,23 @@ export default function Jobs() {
         setShowAdvancedSearch(true);
       }
       
-      // Mark as AI populated for animation
+      // Mark as AI populated for visual indicator
       setIsAIPopulated(true);
       
       // Clear the navigation state
       navigate(location.pathname, { replace: true });
       
-      // Trigger immediate filter after state is set
+      // Filters will apply automatically via useEffect on line 103
+      // Show confirmation toast after a brief delay to let filters apply
       setTimeout(() => {
-        applyFilters();
-        // Reset AI populated flag after animation
-        setTimeout(() => setIsAIPopulated(false), 600);
-      }, 0);
+        toast({
+          title: "AI Search Complete",
+          description: "Your job search results are ready below",
+        });
+        setTimeout(() => setIsAIPopulated(false), 3000);
+      }, 500);
     }
-  }, [location.state, navigate, location.pathname, jobs, loading, isMobile]);
+  }, [location.state, navigate, location.pathname, jobs, loading, isMobile, toast]);
 
   useEffect(() => {
     fetchJobs();
