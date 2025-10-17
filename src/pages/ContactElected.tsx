@@ -3,7 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ArrowLeft, Phone, Mail, MapPin, User, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { ArrowLeft, Phone, Mail, MapPin, User, ChevronDown, ChevronUp, ExternalLink, Search } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import Navbar from '@/components/Navbar';
@@ -34,6 +35,7 @@ const ContactElected = () => {
   const [loading, setLoading] = useState(true);
   const [guidanceOpen, setGuidanceOpen] = useState(true);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const toggleOfficial = (id: string) => {
     setExpandedOfficials(prev => ({
@@ -111,8 +113,21 @@ const ContactElected = () => {
     return 0;
   };
 
+  // Filter officials by search term
+  const filteredOfficials = useMemo(() => {
+    if (!searchTerm.trim()) return officials;
+    
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    return officials.filter(official => 
+      official.name.toLowerCase().includes(lowerSearchTerm) ||
+      official.title.toLowerCase().includes(lowerSearchTerm) ||
+      official.office.toLowerCase().includes(lowerSearchTerm) ||
+      (official.district && official.district.toLowerCase().includes(lowerSearchTerm))
+    );
+  }, [officials, searchTerm]);
+
   const groupedOfficials = useMemo(() => {
-    const grouped = officials.reduce((acc, official) => {
+    const grouped = filteredOfficials.reduce((acc, official) => {
       const key = official.level;
       if (!acc[key]) {
         acc[key] = {};
@@ -142,7 +157,7 @@ const ContactElected = () => {
     });
 
     return grouped;
-  }, [officials]);
+  }, [filteredOfficials]);
 
   const levelOrder = ['federal', 'state', 'city'];
   const levelTitles = {
@@ -225,6 +240,20 @@ const ContactElected = () => {
                 <User className="mr-2 h-4 w-4" />
                 Find My Specific Representatives
               </Button>
+            </div>
+
+            {/* Search Bar */}
+            <div className="mb-8 max-w-2xl mx-auto">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                <Input
+                  type="text"
+                  placeholder="Search by name, title, office, or district..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
             </div>
 
             {/* Filter Tabs */}
