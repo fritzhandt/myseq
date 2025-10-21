@@ -409,6 +409,16 @@ export const PendingApprovalsManager = () => {
               <Label className="font-semibold">Description</Label>
               <p className="text-sm">{isJob ? jobData.description : data.description}</p>
             </div>
+            {!isJob && data.categories && data.categories.length > 0 && (
+              <div>
+                <Label className="font-semibold">Categories</Label>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {data.categories.map((cat: string, idx: number) => (
+                    <Badge key={idx} variant="secondary">{cat}</Badge>
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label className="font-semibold">{isJob ? 'Apply Info' : 'Website'}</Label>
@@ -418,7 +428,39 @@ export const PendingApprovalsManager = () => {
                 <Label className="font-semibold">Phone</Label>
                 <p className="text-sm">{data.phone || 'N/A'}</p>
               </div>
+              {!isJob && (
+                <>
+                  <div>
+                    <Label className="font-semibold">Email</Label>
+                    <p className="text-sm">{data.email || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <Label className="font-semibold">Address</Label>
+                    <p className="text-sm">{data.address || 'N/A'}</p>
+                  </div>
+                </>
+              )}
             </div>
+            {!isJob && data.logo_url && (
+              <div>
+                <Label className="font-semibold">Logo</Label>
+                <img 
+                  src={data.logo_url} 
+                  alt={data.logo_alt || 'Organization logo'} 
+                  className="mt-2 max-h-32 object-contain rounded border"
+                />
+              </div>
+            )}
+            {!isJob && data.cover_photo_url && (
+              <div>
+                <Label className="font-semibold">Cover Photo</Label>
+                <img 
+                  src={data.cover_photo_url} 
+                  alt={data.cover_photo_alt || 'Cover photo'} 
+                  className="mt-2 max-h-48 w-full object-cover rounded border"
+                />
+              </div>
+            )}
           </div>
         );
       case 'community_alert':
