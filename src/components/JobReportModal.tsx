@@ -85,9 +85,20 @@ export default function JobReportModal({ jobId, jobTitle, isOpen, onClose }: Job
         
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="reason">Reason for reporting *</Label>
+            <Label htmlFor="reason">
+              Reason for reporting
+              <span aria-label="required" className="text-destructive ml-1">*</span>
+            </Label>
+            <p id="reason-help" className="sr-only">
+              Select the primary reason you're reporting this job listing
+            </p>
             <Select value={reason} onValueChange={setReason}>
-              <SelectTrigger>
+              <SelectTrigger 
+                id="reason"
+                aria-describedby="reason-help"
+                aria-required="true"
+                aria-invalid={!reason && isSubmitting ? 'true' : 'false'}
+              >
                 <SelectValue placeholder="Select a reason" />
               </SelectTrigger>
               <SelectContent>
@@ -98,17 +109,30 @@ export default function JobReportModal({ jobId, jobTitle, isOpen, onClose }: Job
                 ))}
               </SelectContent>
             </Select>
+            {!reason && isSubmitting && (
+              <p role="alert" aria-live="assertive" className="text-sm text-destructive">
+                Please select a reason for reporting
+              </p>
+            )}
           </div>
           
           <div className="space-y-2">
             <Label htmlFor="description">Additional details (optional)</Label>
+            <p id="description-help" className="text-sm text-muted-foreground">
+              Provide additional context about why you're reporting this job
+            </p>
             <Textarea
               id="description"
-              placeholder="Provide additional context about why you're reporting this job..."
+              placeholder="Provide additional context..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
+              aria-describedby="description-help"
+              maxLength={500}
             />
+            <p className="text-xs text-muted-foreground text-right">
+              {description.length}/500 characters
+            </p>
           </div>
         </div>
 

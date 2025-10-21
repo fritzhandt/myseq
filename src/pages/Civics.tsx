@@ -192,8 +192,22 @@ const Civics = () => {
             </div>
           </div>
 
+          {/* Live region for search results */}
+          <div 
+            role="status" 
+            aria-live="polite" 
+            aria-atomic="true"
+            className="sr-only"
+          >
+            {loading ? 'Loading civic organizations...' : `${filteredOrgs.length} civic organizations found`}
+          </div>
+
           {/* Organizations Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div 
+            role="region" 
+            aria-label="Civic organizations search results"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
             {loading ? (
               Array.from({ length: 6 }).map((_, i) => (
                 <Card key={i} className="animate-pulse">

@@ -759,6 +759,16 @@ export default function Jobs() {
           </p>
         </div>
 
+        {/* Live region for search results */}
+        <div 
+          role="status" 
+          aria-live="polite" 
+          aria-atomic="true"
+          className="sr-only"
+        >
+          {loading ? 'Loading jobs...' : `${filteredJobs.length} jobs found`}
+        </div>
+
         {/* Job List */}
         <div className={isAIPopulated ? 'animate-fade-in' : ''}>
           <JobList jobs={paginatedJobs} loading={loading} isSearching={isSearching} />

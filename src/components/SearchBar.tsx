@@ -48,7 +48,7 @@ const SearchBar = ({ onEventClick, onSearch }: SearchBarProps) => {
   const [sortBy, setSortBy] = useState<'date-asc' | 'date-desc'>('date-asc');
   const [dateFrom, setDateFrom] = useState<Date | undefined>();
   const [dateTo, setDateTo] = useState<Date | undefined>();
-  const searchRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -160,7 +160,7 @@ const SearchBar = ({ onEventClick, onSearch }: SearchBarProps) => {
   };
 
   return (
-    <div ref={searchRef} className="relative w-full max-w-4xl mx-auto">
+    <form role="search" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} ref={searchRef} className="relative w-full max-w-4xl mx-auto">
       {/* Selected Tags */}
       {selectedTags.length > 0 && (
         <div className="mb-3 flex flex-wrap gap-1 sm:gap-2">
@@ -183,11 +183,17 @@ const SearchBar = ({ onEventClick, onSearch }: SearchBarProps) => {
       <div className="bg-card border rounded-lg p-4 shadow-sm">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
+            <label htmlFor="event-search-input" className="sr-only">
+              Search for events by name or tag
+            </label>
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
+              id="event-search-input"
+              type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search events by name or tag..."
+              aria-label="Search events"
               className="pl-10 pr-4 py-2 sm:py-3 text-base"
               onFocus={() => query && setIsOpen(true)}
               onKeyDown={(e) => {
@@ -383,7 +389,7 @@ const SearchBar = ({ onEventClick, onSearch }: SearchBarProps) => {
           )}
         </div>
       )}
-    </div>
+    </form>
   );
 };
 

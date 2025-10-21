@@ -176,13 +176,18 @@ export default function AISearchBar() {
 
   return (
     <>
-      <div className="max-w-4xl mx-auto mb-16">
+      <form role="search" onSubmit={(e) => { e.preventDefault(); handleSearch(); }} className="max-w-4xl mx-auto mb-16">
         {/* Main Search Bar */}
         <div className="relative mb-6">
         <div className="flex gap-2">
           <div className="relative flex-1">
+            <label htmlFor="ai-search-input" className="sr-only">
+              Ask AI anything about Southeast Queens
+            </label>
             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 font-orbitron font-black text-primary text-sm tracking-wider z-10 pointer-events-none">AI</span>
             <Input
+              id="ai-search-input"
+              type="search"
               value={query}
               onChange={(e) => {
                 const value = e.target.value;
@@ -198,6 +203,7 @@ export default function AISearchBar() {
               }}
               onKeyPress={handleKeyPress}
               placeholder={isMobile ? "Ask me anything..." : "Ask me anything about Southeast Queens..."}
+              aria-label="AI search query"
               className={`pl-12 pr-4 ${isMobile ? 'py-4 text-base' : 'py-6 text-lg'} bg-background/80 backdrop-blur-sm border-2 border-primary/20 focus:border-primary/40 rounded-2xl shadow-card`}
               disabled={isLoading}
             />
@@ -236,7 +242,7 @@ export default function AISearchBar() {
           AI results may be inaccurate. Always verify information.
         </p>
       </div>
-      </div>
+      </form>
       
       {/* General Info Dialog */}
       {generalAnswer && (

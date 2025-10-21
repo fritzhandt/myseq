@@ -185,6 +185,16 @@ export default function BusinessOpportunities() {
           </p>
         </div>
 
+        {/* Live region for search results */}
+        <div 
+          role="status" 
+          aria-live="polite" 
+          aria-atomic="true"
+          className="sr-only"
+        >
+          {loading ? 'Loading business opportunities...' : `${filteredOpportunities.length} business opportunities found`}
+        </div>
+
         {/* Opportunities Grid */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
@@ -209,7 +219,11 @@ export default function BusinessOpportunities() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div 
+              role="region" 
+              aria-label="Business opportunities search results"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            >
               {paginatedOpportunities.map((opportunity) => (
                 <ResourceCard key={opportunity.id} resource={opportunity} />
               ))}
