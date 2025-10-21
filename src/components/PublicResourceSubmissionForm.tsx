@@ -37,18 +37,12 @@ export default function PublicResourceSubmissionForm({ open, onOpenChange }: Pub
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
-  const [uploadingCover, setUploadingCover] = useState(false);
   const [removingBackgroundLogo, setRemovingBackgroundLogo] = useState(false);
-  const [removingBackgroundCover, setRemovingBackgroundCover] = useState(false);
   const [selectedLogoFile, setSelectedLogoFile] = useState<File | null>(null);
-  const [selectedCoverFile, setSelectedCoverFile] = useState<File | null>(null);
   const [logoPreviewUrl, setLogoPreviewUrl] = useState<string | null>(null);
-  const [coverPreviewUrl, setCoverPreviewUrl] = useState<string | null>(null);
   const [isDragOverLogo, setIsDragOverLogo] = useState(false);
-  const [isDragOverCover, setIsDragOverCover] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const logoFileInputRef = useRef<HTMLInputElement>(null);
-  const coverFileInputRef = useRef<HTMLInputElement>(null);
   
   const [formData, setFormData] = useState({
     organization_name: '',
@@ -75,9 +69,7 @@ export default function PublicResourceSubmissionForm({ open, onOpenChange }: Pub
       submitter_phone: ''
     });
     setSelectedLogoFile(null);
-    setSelectedCoverFile(null);
     setLogoPreviewUrl(null);
-    setCoverPreviewUrl(null);
     setErrors({});
   };
 
@@ -104,11 +96,6 @@ export default function PublicResourceSubmissionForm({ open, onOpenChange }: Pub
     if (file) processLogoFile(file);
   };
 
-  const handleCoverFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) processCoverFile(file);
-  };
-
   const processLogoFile = (file: File) => {
     if (!file.type.startsWith('image/')) {
       toast({
@@ -131,30 +118,6 @@ export default function PublicResourceSubmissionForm({ open, onOpenChange }: Pub
     setSelectedLogoFile(file);
     const url = URL.createObjectURL(file);
     setLogoPreviewUrl(url);
-  };
-
-  const processCoverFile = (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      toast({
-        title: "Error",
-        description: "Please select an image file",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast({
-        title: "Error",
-        description: "Image must be smaller than 5MB",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setSelectedCoverFile(file);
-    const url = URL.createObjectURL(file);
-    setCoverPreviewUrl(url);
   };
 
   const handleRemoveLogoBackground = async () => {
@@ -189,38 +152,6 @@ export default function PublicResourceSubmissionForm({ open, onOpenChange }: Pub
     }
   };
 
-  const handleRemoveCoverBackground = async () => {
-    if (!selectedCoverFile) return;
-
-    setRemovingBackgroundCover(true);
-    try {
-      const imageElement = await loadImage(selectedCoverFile);
-      const processedBlob = await removeBackground(imageElement);
-      
-      const processedFile = new File([processedBlob], selectedCoverFile.name, {
-        type: 'image/png'
-      });
-      
-      setSelectedCoverFile(processedFile);
-      const url = URL.createObjectURL(processedBlob);
-      setCoverPreviewUrl(url);
-      
-      toast({
-        title: "Success",
-        description: "Background removed successfully",
-      });
-    } catch (error) {
-      console.error('Error removing background:', error);
-      toast({
-        title: "Error",
-        description: "Failed to remove background. You can still use the original image.",
-        variant: "destructive",
-      });
-    } finally {
-      setRemovingBackgroundCover(false);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
@@ -231,16 +162,10 @@ export default function PublicResourceSubmissionForm({ open, onOpenChange }: Pub
       setLoading(true);
 
       let logoUrl = '';
-      let coverPhotoUrl = '';
 
       if (selectedLogoFile) {
         setUploadingLogo(true);
         logoUrl = await uploadImage(selectedLogoFile);
-      }
-
-      if (selectedCoverFile) {
-        setUploadingCover(true);
-        coverPhotoUrl = await uploadImage(selectedCoverFile);
       }
 
       const dataToSave = {
@@ -252,7 +177,7 @@ export default function PublicResourceSubmissionForm({ open, onOpenChange }: Pub
         address: validatedData.address || null,
         website: validatedData.website || null,
         logo_url: logoUrl || null,
-        cover_photo_url: coverPhotoUrl || null,
+        cover_photo_url: null,
         categories: validatedData.categories,
         submitted_by: null,
         submitter_name: formData.submitter_name || null,
@@ -297,7 +222,6 @@ export default function PublicResourceSubmissionForm({ open, onOpenChange }: Pub
     } finally {
       setLoading(false);
       setUploadingLogo(false);
-      setUploadingCover(false);
     }
   };
 
@@ -482,71 +406,6 @@ export default function PublicResourceSubmissionForm({ open, onOpenChange }: Pub
             />
           </div>
 
-          {/* Cover Photo Upload */}
-          <div className="space-y-2">
-            <Label>Cover Photo (Optional)</Label>
-            <div
-              className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
-                isDragOverCover ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
-              }`}
-              onClick={() => coverFileInputRef.current?.click()}
-              onDragOver={(e) => { e.preventDefault(); setIsDragOverCover(true); }}
-              onDragLeave={(e) => { e.preventDefault(); setIsDragOverCover(false); }}
-              onDrop={(e) => {
-                e.preventDefault();
-                setIsDragOverCover(false);
-                const files = e.dataTransfer.files;
-                if (files.length > 0) processCoverFile(files[0]);
-              }}
-            >
-              {coverPreviewUrl ? (
-                <div className="relative">
-                  <img src={coverPreviewUrl} alt="Cover preview" className="max-h-40 mx-auto rounded" />
-                  <div className="flex gap-2 justify-center mt-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRemoveCoverBackground();
-                      }}
-                      disabled={removingBackgroundCover}
-                    >
-                      <Wand2 className="h-4 w-4 mr-2" />
-                      {removingBackgroundCover ? 'Removing...' : 'Remove Background'}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedCoverFile(null);
-                        setCoverPreviewUrl(null);
-                      }}
-                    >
-                      <X className="h-4 w-4 mr-2" />
-                      Remove
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">Click or drag to upload cover photo</p>
-                </>
-              )}
-            </div>
-            <input
-              ref={coverFileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleCoverFileSelect}
-              className="hidden"
-            />
-          </div>
-
           <div className="border-t pt-4">
             <h3 className="font-semibold mb-3">Your Contact Information (Optional)</h3>
             <p className="text-sm text-muted-foreground mb-4">
@@ -580,7 +439,7 @@ export default function PublicResourceSubmissionForm({ open, onOpenChange }: Pub
             <Button type="button" variant="outline" onClick={handleCancel}>
               Cancel
             </Button>
-            <Button type="submit" disabled={loading || uploadingLogo || uploadingCover}>
+            <Button type="submit" disabled={loading || uploadingLogo}>
               {loading ? 'Submitting...' : 'Submit Resource'}
             </Button>
           </div>
