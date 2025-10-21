@@ -21,6 +21,11 @@ const Footer = () => {
             <h2 className="text-lg font-semibold mb-4">Quick Links</h2>
             <ul className="space-y-2">
               <li>
+                <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Home
+                </Link>
+              </li>
+              <li>
                 <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   About Us
                 </Link>
@@ -31,8 +36,38 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/resources" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Resources
+                </Link>
+              </li>
+              <li>
+                <Link to="/jobs" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Jobs
+                </Link>
+              </li>
+              <li>
+                <Link to="/business-opportunities" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Business Opportunities
+                </Link>
+              </li>
+              <li>
+                <Link to="/civics" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Civic Organizations
+                </Link>
+              </li>
+              <li>
                 <Link to="/contact-elected" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Contact Elected Officials
+                </Link>
+              </li>
+              <li>
+                <Link to="/my-elected-lookup" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  My Elected Lookup
+                </Link>
+              </li>
+              <li>
+                <Link to="/police-precincts" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Police Precincts
                 </Link>
               </li>
               <li>
