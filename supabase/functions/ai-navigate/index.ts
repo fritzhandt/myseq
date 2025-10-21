@@ -327,6 +327,122 @@ When routing to /jobs, extract and include these parameters when mentioned:
 
 IMPORTANT: The searchTerm parameter is OPTIONAL. Users can search by employer only, location only, or any combination of filters.
 
+CRITICAL JOB CATEGORY DECISION LOGIC:
+
+When users search for jobs, you MUST follow this decision tree in order:
+
+STEP 1: CHECK FOR SPECIFIC EMPLOYER
+- If the user mentions a specific employer name from the database list below, use that employer's category and subcategory automatically
+- Example: "jobs at Target" → employer:"Target" + category:"private_sector"
+- Example: "MTA hiring" → employer:"MTA" + category:"government"
+
+STEP 2: IDENTIFY IF JOB TYPE IS CATEGORY-AMBIGUOUS
+Category-ambiguous jobs can exist in multiple sectors (government city, government state, or private sector):
+
+COMMON AMBIGUOUS JOB TYPES:
+- Education: teacher, educator, professor, instructor, tutor, counselor, school psychologist, teaching assistant, paraprofessional
+- Healthcare: nurse, RN, LPN, doctor, physician, medical assistant, social worker, therapist, psychologist, psychiatrist, counselor
+- Public Safety: security guard, safety officer, emergency services
+- Administrative: clerk, secretary, administrative assistant, office manager, receptionist
+- Social Services: case manager, caseworker, social worker, community outreach, youth counselor
+- Maintenance: custodian, janitor, maintenance worker, building engineer
+- Transportation: driver, bus driver, dispatcher
+- Technology: IT specialist, systems analyst, network administrator
+- Legal: paralegal, legal assistant, court officer
+
+STEP 3: LOOK FOR EXPLICIT CATEGORY INDICATORS
+
+GOVERNMENT INDICATORS (city or state):
+- Explicit mentions: "government job", "civil service", "public sector", "city job", "state job", "municipal", "public service"
+- Agency names: DOE, DSNY, DCAS, FDNY, NYPD, DMV, DOT, Parks Department, etc.
+- Context clues: "public school", "city hospital", "state facility", "government agency"
+- Examples:
+  * "public school teacher" → Government (likely city)
+  * "state university professor" → Government → State
+  * "NYC DOE teacher" → Government → City
+  * "civil service nurse" → Government (default to city)
+
+CITY GOVERNMENT INDICATORS (subcategory):
+- "city", "NYC", "New York City", "municipal", "DCAS"
+- City agency names: DSNY, NYPD, FDNY, NYC Parks, NYC DOE (K-12)
+- "public school" (K-12 schools are city, not state)
+
+STATE GOVERNMENT INDICATORS (subcategory):
+- "state", "NYS", "New York State", "SUNY", "state university"
+- State agency names: DMV, State DOT, CUNY, state hospitals
+- "state college", "state university"
+
+PRIVATE SECTOR INDICATORS:
+- "private", "charter school", "private hospital", "corporate", "company"
+- Private company names: Target, Amazon, CVS, Walgreens, etc.
+- Context: "retail", "restaurant", "franchise", "private practice"
+
+INTERNSHIP INDICATORS:
+- "intern", "internship", "student position", "summer program", "co-op"
+
+STEP 4: APPLY DEFAULT HIERARCHY WHEN AMBIGUOUS
+
+If the job type is ambiguous (from Step 2) AND no clear category indicators (from Step 3):
+
+DEFAULT RULE: Government → City
+
+Examples following the default rule:
+- "Find me teaching jobs" → category:"government" + governmentType:"city"
+  (Teachers can work city/state/private, but with no context → default to city government)
+
+- "I need a nurse position" → category:"government" + governmentType:"city"
+  (Nurses can work city/state/private, but with no context → default to city government)
+
+- "social worker jobs" → category:"government" + governmentType:"city"
+  (Social workers can work city/state/private, but with no context → default to city government)
+
+- "looking for counselor positions" → category:"government" + governmentType:"city"
+  (Counselors can work city/state/private, but with no context → default to city government)
+
+Examples WITH context that overrides the default:
+- "state teaching jobs" → category:"government" + governmentType:"state"
+  (Explicit "state" context)
+
+- "charter school teacher" → category:"private_sector"
+  (Charter schools are private sector)
+
+- "CVS pharmacist" → category:"private_sector"
+  (CVS is a known private employer)
+
+- "public school teacher" → category:"government" + governmentType:"city"
+  (Public schools K-12 are city government)
+
+- "SUNY professor" → category:"government" + governmentType:"state"
+  (SUNY is state university system)
+
+- "nursing internship" → category:"internships"
+  (Explicit internship indicator)
+
+Examples for non-ambiguous jobs (jobs that are typically one category):
+- "software engineer" → category:"private_sector"
+  (Software engineers are typically private sector unless explicitly stated otherwise)
+
+- "retail associate" → category:"private_sector"
+  (Retail jobs are private sector)
+
+- "sanitation worker" → category:"government" + governmentType:"city"
+  (Sanitation is almost exclusively city government)
+
+STEP 5: CONSTRUCT SEARCH TERM
+
+- Include the job title and relevant synonyms in a boolean search query
+- Follow the comprehensive boolean query construction rules already defined in this prompt
+- Example: "teacher" → searchTerm:"(teacher OR educator OR instructor OR teaching OR education OR faculty OR professor)"
+
+SUMMARY OF DECISION TREE:
+1. Specific employer mentioned? → Use that employer's category
+2. Job type ambiguous? → Check for context indicators
+3. Context indicators present? → Use indicated category/subcategory
+4. No context indicators? → Default to Government → City
+5. Always construct comprehensive boolean search term
+
+CRITICAL: This logic ensures users get relevant results even with ambiguous queries, while still respecting explicit context when provided.
+
 KNOWN EMPLOYERS IN DATABASE:
 ${employerList}
 
@@ -468,30 +584,60 @@ CIVIC & GOVERNMENT:
 ✓ "police precinct council" → /civics + organizationType:"police_precinct_council"
 ✓ "precinct community council" → /civics + organizationType:"police_precinct_council"
 
-JOB ROUTING EXAMPLES:
-✓ "government jobs" → /jobs + category:"government" + governmentType:"all"
-✓ "city jobs" → /jobs + category:"government" + governmentType:"city"
-✓ "state jobs" → /jobs + category:"government" + governmentType:"state"
-✓ "is the department of transportation hiring?" → /jobs + employer:"Department Of Transportation" + category:"government"
-✓ "jobs at target" → /jobs + employer:"Target" + category:"private_sector"
-✓ "amazon jobs" → /jobs + employer:"Amazon" + category:"private_sector"
+ENHANCED JOB ROUTING EXAMPLES WITH CATEGORY LOGIC:
+
+// Explicit employer (Step 1)
+✓ "jobs at Target" → /jobs + employer:"Target" + category:"private_sector"
+✓ "is DOT hiring" → /jobs + employer:"Department Of Transportation" + category:"government"
+✓ "NYC DOE positions" → /jobs + employer:"Department of Education" + category:"government" + governmentType:"city"
 ✓ "work at mta" → /jobs + employer:"MTA" + category:"government"
 ✓ "chase bank careers" → /jobs + employer:"Chase Bank" + category:"private_sector"
-✓ "private sector jobs" → /jobs + category:"private_sector"
+✓ "amazon jobs" → /jobs + employer:"Amazon" + category:"private_sector"
+
+// Ambiguous jobs with NO context (Step 4 - defaults to Government → City)
+✓ "teaching jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(teacher OR educator OR instructor OR teaching OR education OR faculty)"
+✓ "find me nurse positions" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(nurse OR nursing OR RN OR LPN OR registered nurse OR licensed nurse OR healthcare)"
+✓ "social worker jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(social worker OR caseworker OR case manager OR MSW OR LMSW OR LCSW)"
+✓ "counselor positions" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(counselor OR counseling OR therapist OR therapy OR guidance counselor)"
+✓ "teacher jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(teacher OR educator OR instructor OR teaching)"
+✓ "nursing positions" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(nurse OR nursing OR RN OR LPN)"
+
+// Ambiguous jobs WITH context (Step 3 - use context)
+✓ "state teaching jobs" → /jobs + category:"government" + governmentType:"state" + searchTerm:"(teacher OR educator OR instructor OR teaching OR professor OR faculty)"
+✓ "charter school teacher" → /jobs + category:"private_sector" + searchTerm:"(teacher OR educator OR instructor OR teaching OR charter)"
+✓ "public school nurse" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(nurse OR nursing OR RN OR school nurse)"
+✓ "SUNY professor" → /jobs + category:"government" + governmentType:"state" + searchTerm:"(professor OR instructor OR faculty OR teaching OR educator)"
+✓ "private hospital nurse" → /jobs + category:"private_sector" + searchTerm:"(nurse OR nursing OR RN OR LPN OR hospital)"
+✓ "nursing internship" → /jobs + category:"internships" + searchTerm:"(nursing OR nurse OR RN OR healthcare OR medical)"
+✓ "city government teacher" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(teacher OR educator OR instructor)"
+✓ "civil service nurse" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(nurse OR nursing OR RN)"
+
+// Non-ambiguous jobs (clear category)
+✓ "software engineer" → /jobs + category:"private_sector" + searchTerm:"(software OR engineer OR developer OR programming OR coding)"
+✓ "sanitation jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(sanitation OR sanit OR waste OR garbage OR trash)"
+✓ "retail associate" → /jobs + category:"private_sector" + searchTerm:"(retail OR sales OR associate OR cashier OR store)"
+
+// Explicit government/private/internship
+✓ "government jobs" → /jobs + category:"government" + governmentType:"all"
+✓ "city government jobs" → /jobs + category:"government" + governmentType:"city"
+✓ "city jobs" → /jobs + category:"government" + governmentType:"city"
+✓ "state jobs" → /jobs + category:"government" + governmentType:"state"
+✓ "private sector positions" → /jobs + category:"private_sector"
 ✓ "private jobs in jamaica" → /jobs + category:"private_sector" + location:"Jamaica"
-✓ "jobs in queens" → /jobs + location:"Queens"
-✓ "work in rosedale" → /jobs + location:"Rosedale"
-✓ "city sanitation jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"sanitation"
-✓ "state teaching jobs" → /jobs + category:"government" + governmentType:"state" + searchTerm:"teaching"
-✓ "sanitation jobs" → /jobs + category:"government" + searchTerm:"sanitation" + governmentType:"all"
-✓ "teaching jobs in queens" → /jobs + searchTerm:"teaching" + location:"Queens"
 ✓ "internships" → /jobs + category:"internships"
 ✓ "summer internships" → /jobs + category:"internships" + searchTerm:"summer"
 ✓ "engineering internship" → /jobs + category:"internships" + searchTerm:"engineering"
-✓ "city engineering jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"engineering"
-✓ "who is my councilperson" → /my-elected-lookup
-✓ "healthcare jobs" → /jobs + searchTerm:"(healthcare OR health care OR medical OR hospital OR clinic OR nursing OR nurse OR rn OR lpn OR cna OR hha OR home health aide OR medical assistant OR ma OR cma OR physician OR pa OR physician assistant OR np OR nurse practitioner OR pharmacist OR pharmacy OR phlebotomist OR lab OR laboratory OR radiology OR x ray OR imaging OR ultrasound OR sonography OR respiratory therapist OR physical therapist OR pt OR occupational therapist OR ot OR speech therapist OR slp OR social worker OR lmsw OR lcsw OR behavioral health OR mental health) AND (job OR jobs OR position OR positions OR opening OR openings OR hiring OR career OR careers) NOT (master of OR degree OR mba OR phd OR executive)"
-✓ "healthcare jobs in queens" → /jobs + location:"Queens" + searchTerm:"(healthcare OR health care OR medical OR hospital OR clinic OR nursing OR nurse OR rn OR lpn OR cna OR hha OR home health aide OR medical assistant OR ma OR cma OR physician OR pa OR physician assistant OR np OR nurse practitioner OR pharmacist OR pharmacy OR phlebotomist OR lab OR laboratory OR radiology OR x ray OR imaging OR ultrasound OR sonography OR respiratory therapist OR physical therapist OR pt OR occupational therapist OR ot OR speech therapist OR slp OR social worker OR lmsw OR lcsw OR behavioral health OR mental health) AND (job OR jobs OR position OR positions OR opening OR openings OR hiring OR career OR careers) NOT (master of OR degree OR mba OR phd OR executive)"
+
+// Location-based queries
+✓ "jobs in queens" → /jobs + location:"Queens"
+✓ "work in rosedale" → /jobs + location:"Rosedale"
+✓ "teaching jobs in queens" → /jobs + category:"government" + governmentType:"city" + location:"Queens" + searchTerm:"(teacher OR educator OR instructor)"
+
+// Combined context queries
+✓ "city sanitation jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(sanitation OR waste)"
+✓ "city engineering jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(engineering OR engineer)"
+✓ "healthcare jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(healthcare OR health care OR medical OR hospital OR clinic OR nursing OR nurse)"
+✓ "healthcare jobs in queens" → /jobs + category:"government" + governmentType:"city" + location:"Queens" + searchTerm:"(healthcare OR health care OR medical OR hospital OR clinic OR nursing)"
 RESOURCES ROUTING (CRITICAL - Follow fuzzy matching rules):
 ✓ "what resources are available for seniors" → /resources + category:"Senior Services" (NO searchTerm)
 ✓ "what senior services are available" → /resources + category:"Senior Services" (NO searchTerm)

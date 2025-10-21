@@ -12,7 +12,7 @@ import { Card, CardContent } from '@/components/ui/card';
 
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Briefcase, MapPin, Building, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
+import { Briefcase, MapPin, Building, ChevronDown, ChevronUp, ArrowLeft, Sparkles, X } from 'lucide-react';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { filterWithBooleanSearch } from '@/utils/booleanSearch';
@@ -43,6 +43,8 @@ export default function Jobs() {
   const [activeTab, setActiveTab] = useState('government');
   const [governmentFilter, setGovernmentFilter] = useState<'all' | 'city' | 'state'>('all');
   const [isAIPopulated, setIsAIPopulated] = useState(false);
+  const [showAIBadge, setShowAIBadge] = useState(false);
+  const [actualSearchQuery, setActualSearchQuery] = useState('');
   const itemsPerPage = 10;
   const location = useLocation();
   const navigate = useNavigate();
@@ -178,9 +180,24 @@ export default function Jobs() {
     setCurrentPage(1);
   }, [jobs, searchQuery, locationFilter, employerFilter, activeTab, governmentFilter]);
 
+  // Helper function to detect boolean operators
+  const hasBooleanOperators = (query: string): boolean => {
+    const upperQuery = query.toUpperCase();
+    return upperQuery.includes(' AND ') || 
+           upperQuery.includes(' OR ') || 
+           upperQuery.includes(' NOT ');
+  };
+
   const handleManualSearch = useCallback(() => {
+    if (hasBooleanOperators(searchQuery)) {
+      setShowAIBadge(true);
+      setActualSearchQuery(searchQuery);
+    } else {
+      setShowAIBadge(false);
+      setActualSearchQuery('');
+    }
     applyFilters();
-  }, [applyFilters]);
+  }, [applyFilters, searchQuery]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -188,11 +205,20 @@ export default function Jobs() {
     }
   };
 
+  const handleCloseBadge = () => {
+    setShowAIBadge(false);
+    setSearchQuery('');
+    setActualSearchQuery('');
+    clearFilters();
+  };
+
   const clearFilters = () => {
     setSearchQuery('');
     setLocationFilter('all');
     setEmployerFilter('all');
     setGovernmentFilter('all');
+    setShowAIBadge(false);
+    setActualSearchQuery('');
     // Auto-apply filters after clearing
     setTimeout(() => {
       applyFilters();
@@ -338,33 +364,57 @@ export default function Jobs() {
                         <Briefcase className="h-4 w-4" />
                         Job Title
                       </label>
-                      <div className="flex gap-2">
-                        <Input
-                          placeholder="Search job title..."
-                          value={searchQuery}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (value.length <= MAX_JOB_SEARCH_LENGTH) {
-                              setSearchQuery(value);
-                            } else {
-                              toast({
-                                title: "Character limit reached",
-                                description: "100 character limit please.",
-                                variant: "destructive"
-                              });
-                            }
-                          }}
-                          onKeyPress={handleKeyPress}
-                          className="flex-1"
-                        />
-                        <Button 
-                          onClick={handleManualSearch}
-                          disabled={isSearching}
-                          className="shrink-0"
-                        >
-                          {isSearching ? 'Searching...' : 'Search'}
-                        </Button>
-                      </div>
+                      {showAIBadge ? (
+                        <div className="relative">
+                          <div className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 border-2 border-blue-400 dark:border-blue-600 rounded-lg shadow-lg animate-in fade-in duration-500">
+                            <Sparkles className="h-5 w-5 text-blue-600 dark:text-blue-400 animate-pulse" />
+                            <span className="text-sm font-semibold text-blue-900 dark:text-blue-100 animate-pulse">
+                              AI Results
+                            </span>
+                            <span className="text-sm text-gray-600 dark:text-gray-300 ml-2">
+                              {actualSearchQuery}
+                            </span>
+                            <button
+                              onClick={handleCloseBadge}
+                              className="ml-auto p-1 hover:bg-blue-100 dark:hover:bg-blue-900 rounded-full transition-colors"
+                            >
+                              <X className="h-4 w-4 text-gray-500" />
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="Search job title (try: teacher AND math)..."
+                            value={searchQuery}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (value.length <= MAX_JOB_SEARCH_LENGTH) {
+                                setSearchQuery(value);
+                                if (hasBooleanOperators(value)) {
+                                  setShowAIBadge(true);
+                                  setActualSearchQuery(value);
+                                }
+                              } else {
+                                toast({
+                                  title: "Character limit reached",
+                                  description: "100 character limit please.",
+                                  variant: "destructive"
+                                });
+                              }
+                            }}
+                            onKeyPress={handleKeyPress}
+                            className="flex-1"
+                          />
+                          <Button 
+                            onClick={handleManualSearch}
+                            disabled={isSearching}
+                            className="shrink-0"
+                          >
+                            {isSearching ? 'Searching...' : 'Search'}
+                          </Button>
+                        </div>
+                      )}
                     </div>
 
                   {/* Advanced Search Toggle Button - only visible on mobile */}
@@ -444,33 +494,57 @@ export default function Jobs() {
                         <Briefcase className="h-4 w-4" />
                         Job Title
                       </label>
-                      <div className="flex gap-2">
-                        <Input
-                          placeholder="Search job title..."
-                          value={searchQuery}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (value.length <= MAX_JOB_SEARCH_LENGTH) {
-                              setSearchQuery(value);
-                            } else {
-                              toast({
-                                title: "Character limit reached",
-                                description: "100 character limit please.",
-                                variant: "destructive"
-                              });
-                            }
-                          }}
-                          onKeyPress={handleKeyPress}
-                          className="flex-1"
-                        />
-                        <Button 
-                          onClick={handleManualSearch}
-                          disabled={isSearching}
-                          className="shrink-0"
-                        >
-                          {isSearching ? 'Searching...' : 'Search'}
-                        </Button>
-                      </div>
+                      {showAIBadge ? (
+                        <div className="relative">
+                          <div className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 border-2 border-blue-400 dark:border-blue-600 rounded-lg shadow-lg animate-in fade-in duration-500">
+                            <Sparkles className="h-5 w-5 text-blue-600 dark:text-blue-400 animate-pulse" />
+                            <span className="text-sm font-semibold text-blue-900 dark:text-blue-100 animate-pulse">
+                              AI Results
+                            </span>
+                            <span className="text-sm text-gray-600 dark:text-gray-300 ml-2">
+                              {actualSearchQuery}
+                            </span>
+                            <button
+                              onClick={handleCloseBadge}
+                              className="ml-auto p-1 hover:bg-blue-100 dark:hover:bg-blue-900 rounded-full transition-colors"
+                            >
+                              <X className="h-4 w-4 text-gray-500" />
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="Search job title (try: teacher AND math)..."
+                            value={searchQuery}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (value.length <= MAX_JOB_SEARCH_LENGTH) {
+                                setSearchQuery(value);
+                                if (hasBooleanOperators(value)) {
+                                  setShowAIBadge(true);
+                                  setActualSearchQuery(value);
+                                }
+                              } else {
+                                toast({
+                                  title: "Character limit reached",
+                                  description: "100 character limit please.",
+                                  variant: "destructive"
+                                });
+                              }
+                            }}
+                            onKeyPress={handleKeyPress}
+                            className="flex-1"
+                          />
+                          <Button 
+                            onClick={handleManualSearch}
+                            disabled={isSearching}
+                            className="shrink-0"
+                          >
+                            {isSearching ? 'Searching...' : 'Search'}
+                          </Button>
+                        </div>
+                      )}
                     </div>
 
                   {/* Advanced Search Toggle Button - only visible on mobile */}
@@ -550,33 +624,57 @@ export default function Jobs() {
                         <Briefcase className="h-4 w-4" />
                         Job Title
                       </label>
-                      <div className="flex gap-2">
-                        <Input
-                          placeholder="Search job title..."
-                          value={searchQuery}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (value.length <= MAX_JOB_SEARCH_LENGTH) {
-                              setSearchQuery(value);
-                            } else {
-                              toast({
-                                title: "Character limit reached",
-                                description: "100 character limit please.",
-                                variant: "destructive"
-                              });
-                            }
-                          }}
-                          onKeyPress={handleKeyPress}
-                          className="flex-1"
-                        />
-                        <Button 
-                          onClick={handleManualSearch}
-                          disabled={isSearching}
-                          className="shrink-0"
-                        >
-                          {isSearching ? 'Searching...' : 'Search'}
-                        </Button>
-                      </div>
+                      {showAIBadge ? (
+                        <div className="relative">
+                          <div className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 border-2 border-blue-400 dark:border-blue-600 rounded-lg shadow-lg animate-in fade-in duration-500">
+                            <Sparkles className="h-5 w-5 text-blue-600 dark:text-blue-400 animate-pulse" />
+                            <span className="text-sm font-semibold text-blue-900 dark:text-blue-100 animate-pulse">
+                              AI Results
+                            </span>
+                            <span className="text-sm text-gray-600 dark:text-gray-300 ml-2">
+                              {actualSearchQuery}
+                            </span>
+                            <button
+                              onClick={handleCloseBadge}
+                              className="ml-auto p-1 hover:bg-blue-100 dark:hover:bg-blue-900 rounded-full transition-colors"
+                            >
+                              <X className="h-4 w-4 text-gray-500" />
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="Search job title (try: teacher AND math)..."
+                            value={searchQuery}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (value.length <= MAX_JOB_SEARCH_LENGTH) {
+                                setSearchQuery(value);
+                                if (hasBooleanOperators(value)) {
+                                  setShowAIBadge(true);
+                                  setActualSearchQuery(value);
+                                }
+                              } else {
+                                toast({
+                                  title: "Character limit reached",
+                                  description: "100 character limit please.",
+                                  variant: "destructive"
+                                });
+                              }
+                            }}
+                            onKeyPress={handleKeyPress}
+                            className="flex-1"
+                          />
+                          <Button 
+                            onClick={handleManualSearch}
+                            disabled={isSearching}
+                            className="shrink-0"
+                          >
+                            {isSearching ? 'Searching...' : 'Search'}
+                          </Button>
+                        </div>
+                      )}
                     </div>
 
                   {/* Advanced Search Toggle Button - only visible on mobile */}
