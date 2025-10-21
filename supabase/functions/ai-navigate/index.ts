@@ -23,6 +23,7 @@ interface NavigationResponse {
   answer?: string;
   isGeneralQuery?: boolean;
   organizationType?: string;
+  employerNotFound?: boolean;
   success: boolean;
   error?: string;
 }
@@ -446,18 +447,57 @@ CRITICAL: This logic ensures users get relevant results even with ambiguous quer
 KNOWN EMPLOYERS IN DATABASE:
 ${employerList}
 
-EMPLOYER RECOGNITION RULES:
-1. If the user's query mentions any name from the employer list (even partially), use the "employer" parameter with the EXACT name from the list
-2. Common patterns indicating employer search:
-   - "is [employer] hiring?"
-   - "jobs at [employer]"
-   - "[employer] positions"
-   - "work at [employer]"
-   - "employment at [employer]"
-   - "[employer] careers"
-3. Use fuzzy matching - "DOT" or "transportation" should match "Department Of Transportation"
-4. If unsure whether it's an employer or job title, prefer employer if it matches the list
-5. Always use the exact employer name from the database list to ensure proper filtering
+EMPLOYER RECOGNITION RULES (CRITICAL - FOLLOW THIS EXACT PROCESS):
+
+When a user mentions an employer name, follow this 3-step matching process:
+
+STEP 1: DIRECT MATCH
+- Check if the employer name EXACTLY matches any employer from the list above (case-insensitive)
+- Examples: "Target" matches "Target", "amazon" matches "Amazon"
+
+STEP 2: FUZZY MATCH (Abbreviations & Misspellings)
+If no direct match, check for common abbreviations and clear misspellings:
+- "DOE" → "Department of Education"
+- "DSNY" → "Department of Sanitation"
+- "DOT" → "Department of Transportation"
+- "MTA" → "Metropolitan Transportation Authority"
+- "NYPD" → "New York City Police Department"
+- "FDNY" → "Fire Department"
+- "deprment of edcation" → "Department of Education" (misspelling)
+- "dept of transportation" → "Department of Transportation" (abbreviation)
+- "sanitation department" → "Department of Sanitation" (reverse order)
+- Use intelligent reasoning to match misspellings and variations
+
+STEP 3: NO MATCH FOUND
+If neither direct nor fuzzy match works:
+- Set "employerNotFound": true in your response
+- DO NOT include the "employer" parameter
+- Continue with normal routing (category, searchTerm, location, etc.)
+- The frontend will show a toast: "We don't currently have jobs from the employer you requested, so we're showing you jobs that may match what you are looking for."
+
+EXAMPLES OF EMPLOYER MATCHING:
+
+✓ "jobs at Target" → Direct match → employer:"Target"
+✓ "DOE hiring" → Fuzzy match (abbreviation) → employer:"Department of Education"
+✓ "Department of Edcuation jobs" → Fuzzy match (misspelling) → employer:"Department of Education"
+✓ "work at MTA" → Fuzzy match (abbreviation) → employer:"Metropolitan Transportation Authority"
+✓ "sanitation dept careers" → Fuzzy match (abbreviation) → employer:"Department of Sanitation"
+✗ "jobs at Google" → No match → employerNotFound:true, no employer parameter (Google not in list)
+✗ "XYZ Corporation hiring" → No match → employerNotFound:true, no employer parameter (XYZ not in list)
+
+COMMON EMPLOYER SEARCH PATTERNS:
+- "is [employer] hiring?"
+- "jobs at [employer]"
+- "[employer] positions"
+- "work at [employer]"
+- "employment at [employer]"
+- "[employer] careers"
+
+CRITICAL RULES:
+1. If you find a match (direct or fuzzy), use the EXACT employer name from the database list
+2. If no match found, set employerNotFound:true and DO NOT include employer parameter
+3. When in doubt about fuzzy matching, be conservative - only match if you're confident it's the same organization
+4. Always prefer employer matching over job title interpretation if the pattern clearly indicates employer search
 
 CIVIC ORGANIZATION TYPES (for /civics page):
 - "community_board" → Community Boards (CB), Community Board meetings, district boards

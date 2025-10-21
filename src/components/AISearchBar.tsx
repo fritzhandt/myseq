@@ -21,6 +21,7 @@ interface AINavigationResponse {
   answer?: string;
   isGeneralQuery?: boolean;
   organizationType?: string;
+  employerNotFound?: boolean;
   success: boolean;
   error?: string;
 }
@@ -131,6 +132,15 @@ export default function AISearchBar() {
       trackAIPageRedirect();
       navigate(response.destination, { state: navigationState });
       setQuery("");
+      
+      // Show toast if employer was requested but not found
+      if (response.employerNotFound) {
+        toast({
+          title: "Employer not found",
+          description: "We don't currently have jobs from the employer you requested, so we're showing you jobs that may match what you are looking for.",
+          variant: "default"
+        });
+      }
       
     } catch (error) {
       console.error('AI search error:', error);
