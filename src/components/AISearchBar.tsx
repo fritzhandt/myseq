@@ -163,14 +163,12 @@ export default function AISearchBar() {
   const exampleQueries = isMobile 
     ? [
         "Who is my elected official?",
-        "Teaching jobs in Queens",
         "Find civic organizations"
       ]
     : [
         "Who is my elected official?",
         "There's a broken down car on my street",
         "How do I file for unemployment?", 
-        "Teaching jobs in Queens",
         "Which civic organization covers Rosedale?"
       ];
 
