@@ -7,7 +7,6 @@ import CommunityAlertBanner from '@/components/CommunityAlertBanner';
 import JobList from '@/components/JobList';
 import UserPagination from '@/components/UserPagination';
 import SearchableEmployerDropdown from '@/components/SearchableEmployerDropdown';
-import PublicJobSubmissionForm from '@/components/PublicJobSubmissionForm';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -15,7 +14,7 @@ import { Card, CardContent } from '@/components/ui/card';
 
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Briefcase, MapPin, Building, ChevronDown, ChevronUp, ArrowLeft, Sparkles, X, Plus } from 'lucide-react';
+import { Briefcase, MapPin, Building, ChevronDown, ChevronUp, ArrowLeft, Sparkles, X } from 'lucide-react';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { filterWithBooleanSearch } from '@/utils/booleanSearch';
@@ -48,7 +47,6 @@ export default function Jobs() {
   const [isAIPopulated, setIsAIPopulated] = useState(false);
   const [showAIBadge, setShowAIBadge] = useState(false);
   const [actualSearchQuery, setActualSearchQuery] = useState('');
-  const [showSubmitForm, setShowSubmitForm] = useState(false);
   const itemsPerPage = 10;
   const location = useLocation();
   const navigate = useNavigate();
@@ -286,17 +284,9 @@ export default function Jobs() {
             Find Your Next{' '}
             <span className="text-primary">Opportunity</span>
           </h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-6">
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             Discover job opportunities in your community and take the next step in your career
           </p>
-          <Button
-            size="lg"
-            onClick={() => setShowSubmitForm(true)}
-            className="flex items-center gap-2 mx-auto"
-          >
-            <Plus className="h-5 w-5" />
-            Submit a Job Posting
-          </Button>
         </div>
 
         {/* Search and Filters */}
@@ -786,21 +776,28 @@ export default function Jobs() {
         
         {/* Pagination */}
         {filteredJobs.length > 0 && (
-          <UserPagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            totalItems={filteredJobs.length}
-            itemsPerPage={itemsPerPage}
-            onPageChange={setCurrentPage}
-          />
+          <>
+            <UserPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={filteredJobs.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+            />
+            
+            {/* Disclaimer */}
+            <div className="mt-8 text-center">
+              <p className="text-sm text-muted-foreground">
+                All listings are aggregated from third parties; none are employer-posted. Please report errors or broken links to{' '}
+                <a href="mailto:mysoutheastqueens@gmail.com" className="text-primary hover:underline">
+                  mysoutheastqueens@gmail.com
+                </a>
+              </p>
+            </div>
+          </>
         )}
       </main>
       <Footer />
-      
-      <PublicJobSubmissionForm
-        open={showSubmitForm}
-        onOpenChange={setShowSubmitForm}
-      />
     </div>
     </>
   );

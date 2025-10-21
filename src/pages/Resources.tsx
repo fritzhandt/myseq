@@ -3,7 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Search, ArrowLeft, ChevronDown, Palette, GraduationCap, Heart, Users, Trophy, Leaf, Scale, Globe, UtensilsCrossed, Gavel, Baby, X, Sparkles } from "lucide-react";
+import { Search, ArrowLeft, ChevronDown, Palette, GraduationCap, Heart, Users, Trophy, Leaf, Scale, Globe, UtensilsCrossed, Gavel, Baby, X, Sparkles, Plus } from "lucide-react";
+import PublicResourceSubmissionForm from "@/components/PublicResourceSubmissionForm";
 import SkipLinks from "@/components/SkipLinks";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -59,6 +60,7 @@ export default function Resources() {
   const [fromAINavigation, setFromAINavigation] = useState(false);
   const [showAIBadge, setShowAIBadge] = useState(false);
   const [actualSearchQuery, setActualSearchQuery] = useState("");
+  const [showSubmitForm, setShowSubmitForm] = useState(false);
   const itemsPerPage = 12;
   const location = useLocation();
   const navigate = useNavigate();
@@ -456,6 +458,12 @@ export default function Resources() {
         )}
       </div>
       </main>
+      
+      <PublicResourceSubmissionForm 
+        open={showSubmitForm} 
+        onOpenChange={setShowSubmitForm}
+      />
+      
       <Footer />
     </>
   );

@@ -15,7 +15,6 @@ const jobSchema = z.object({
   employer: z.string().trim().min(1, "Employer is required").max(200, "Employer must be less than 200 characters"),
   title: z.string().trim().min(1, "Job title is required").max(200, "Title must be less than 200 characters"),
   location: z.string().trim().min(1, "Location is required").max(200, "Location must be less than 200 characters"),
-  salary: z.string().trim().min(1, "Salary is required").max(100, "Salary must be less than 100 characters"),
   description: z.string().trim().min(1, "Description is required").max(5000, "Description must be less than 5000 characters"),
   apply_info: z.string().trim().min(1, "Application info is required").max(500, "Application info must be less than 500 characters"),
   is_apply_link: z.boolean(),
@@ -39,7 +38,6 @@ export default function JobManualEntryForm({ open, onOpenChange, onSuccess }: Jo
     employer: '',
     title: '',
     location: '',
-    salary: '',
     description: '',
     apply_info: '',
     is_apply_link: false,
@@ -52,7 +50,6 @@ export default function JobManualEntryForm({ open, onOpenChange, onSuccess }: Jo
       employer: '',
       title: '',
       location: '',
-      salary: '',
       description: '',
       apply_info: '',
       is_apply_link: false,
@@ -249,18 +246,6 @@ export default function JobManualEntryForm({ open, onOpenChange, onSuccess }: Jo
               required
             />
             {errors.location && <p className="text-sm text-destructive">{errors.location}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="salary">Salary *</Label>
-            <Input
-              id="salary"
-              value={formData.salary}
-              onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
-              placeholder="e.g., $50,000 - $70,000"
-              required
-            />
-            {errors.salary && <p className="text-sm text-destructive">{errors.salary}</p>}
           </div>
 
           <div className="space-y-2">
