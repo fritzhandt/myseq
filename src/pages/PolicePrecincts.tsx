@@ -1,9 +1,12 @@
+import { useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import CommunityAlertBanner from "@/components/CommunityAlertBanner";
 import { useNavigate } from "react-router-dom";
 import { Phone, MapPin } from "lucide-react";
+import SkipLinks from '@/components/SkipLinks';
+import Footer from '@/components/Footer';
 
 const precincts = [
   {
@@ -43,12 +46,23 @@ const precincts = [
 export default function PolicePrecincts() {
   const navigate = useNavigate();
 
+  useEffect(() => {
+    document.title = 'Police Precincts - Southeast Queens | My SEQ';
+    return () => {
+      document.title = 'My SEQ - Southeast Queens Information Center';
+    };
+  }, []);
+
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <CommunityAlertBanner />
-      
-      <main className="container mx-auto px-4 py-8">
+    <>
+      <SkipLinks />
+      <div className="min-h-screen bg-background">
+        <header id="primary-navigation">
+          <Navbar />
+        </header>
+        <CommunityAlertBanner />
+        
+        <main id="main-content" className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <Button 
             variant="outline" 
@@ -133,7 +147,9 @@ export default function PolicePrecincts() {
             </p>
           </div>
         </div>
-      </main>
-    </div>
+        </main>
+      </div>
+      <Footer />
+    </>
   );
 }

@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Navbar from "@/components/Navbar";
+import SkipLinks from '@/components/SkipLinks';
+import Footer from '@/components/Footer';
 import AdminPagination from "@/components/AdminPagination";
 import { ArrowLeft, MapPin, Clock, Phone, Mail, Globe, Users, Calendar, FileText, Image, Link, Images } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -111,6 +113,15 @@ const CivicDetail = () => {
       trackTabView(activeTab, orgId);
     }
   }, [activeTab, orgId]);
+
+  useEffect(() => {
+    if (organization) {
+      document.title = `${organization.name} - Civic Organization | My SEQ`;
+    }
+    return () => {
+      document.title = 'My SEQ - Southeast Queens Information Center';
+    };
+  }, [organization]);
 
   const fetchOrganizationData = async () => {
     if (!orgId) return;
@@ -238,25 +249,35 @@ const CivicDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-        <Navbar />
-        <main className="container mx-auto px-4 py-8">
+      <>
+        <SkipLinks />
+        <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+          <header id="primary-navigation">
+            <Navbar />
+          </header>
+          <main id="main-content" className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
             <div className="animate-pulse space-y-6">
               <div className="h-8 bg-muted rounded w-1/3"></div>
               <div className="h-64 bg-muted rounded"></div>
             </div>
           </div>
-        </main>
-      </div>
+          </main>
+        </div>
+        <Footer />
+      </>
     );
   }
 
   if (!organization) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-        <Navbar />
-        <main className="container mx-auto px-4 py-8">
+      <>
+        <SkipLinks />
+        <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+          <header id="primary-navigation">
+            <Navbar />
+          </header>
+          <main id="main-content" className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-2xl font-bold mb-4">
               Organization Not Found
@@ -266,16 +287,22 @@ const CivicDetail = () => {
               Back to Organizations
             </Button>
           </div>
-        </main>
-      </div>
+          </main>
+        </div>
+        <Footer />
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar />
-      
-      <main className="container mx-auto px-4 py-8">
+    <>
+      <SkipLinks />
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+        <header id="primary-navigation">
+          <Navbar />
+        </header>
+        
+        <main id="main-content" className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="mb-8">
@@ -859,7 +886,9 @@ const CivicDetail = () => {
         isOpen={!!selectedAnnouncement}
         onClose={() => setSelectedAnnouncement(null)}
       />
-    </div>
+      </div>
+      <Footer />
+    </>
   );
 };
 

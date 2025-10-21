@@ -6,6 +6,8 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { Calendar, Clock, MapPin, Users, ArrowLeft, Tag, Download, Mail, ChevronLeft, ChevronRight, X, BookOpen, GraduationCap, Briefcase, Crown, UserPlus, Phone, AtSign, Building } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import SkipLinks from '@/components/SkipLinks';
+import Footer from '@/components/Footer';
 
 interface Event {
   id: string;
@@ -88,6 +90,15 @@ const EventDetail = () => {
       fetchEvent();
     }
   }, [id]);
+
+  useEffect(() => {
+    if (event) {
+      document.title = `${event.title} - Event Details | My SEQ`;
+    }
+    return () => {
+      document.title = 'My SEQ - Southeast Queens Information Center';
+    };
+  }, [event]);
 
   const fetchEvent = async () => {
     try {
@@ -192,15 +203,19 @@ const EventDetail = () => {
   if (loading) {
     return (
       <>
-        <Navbar />
-        <div className="min-h-screen bg-background py-16">
+        <SkipLinks />
+        <header id="primary-navigation">
+          <Navbar />
+        </header>
+        <main id="main-content" className="min-h-screen bg-background py-16">
           <div className="container mx-auto px-4">
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               <p className="mt-4 text-muted-foreground">Loading event...</p>
             </div>
           </div>
-        </div>
+        </main>
+        <Footer />
       </>
     );
   }
@@ -208,8 +223,11 @@ const EventDetail = () => {
   if (error || !event) {
     return (
       <>
-        <Navbar />
-        <div className="min-h-screen bg-background py-16">
+        <SkipLinks />
+        <header id="primary-navigation">
+          <Navbar />
+        </header>
+        <main id="main-content" className="min-h-screen bg-background py-16">
           <div className="container mx-auto px-4">
             <div className="text-center py-12">
               <h1 className="text-2xl font-bold mb-4">Event Not Found</h1>
@@ -222,15 +240,19 @@ const EventDetail = () => {
               </Link>
             </div>
           </div>
-        </div>
+        </main>
+        <Footer />
       </>
     );
   }
 
   return (
     <>
-      <Navbar />
-      <div className="min-h-screen bg-background">
+      <SkipLinks />
+      <header id="primary-navigation">
+        <Navbar />
+      </header>
+      <main id="main-content" className="min-h-screen bg-background">
         {/* Hero Section */}
         <div className="relative">
           {event.cover_photo_url && (
@@ -499,7 +521,8 @@ const EventDetail = () => {
             </div>
           </div>
         </div>
-      </div>
+      </main>
+      <Footer />
     </>
   );
 };
