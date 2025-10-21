@@ -17,7 +17,16 @@ export const AltTextGenerator = () => {
     processed: number;
     success: number;
     failed: number;
+    skipped: number;
   } | null>(null);
+
+  const isValidImageUrl = (url: string | null | undefined): boolean => {
+    if (!url || typeof url !== 'string') return false;
+    const trimmed = url.trim();
+    if (trimmed === '') return false;
+    // Must be either a full URL or a path starting with /
+    return trimmed.startsWith('http') || trimmed.startsWith('/');
+  };
 
   const generateAltTexts = async () => {
     setGenerating(true);
@@ -26,6 +35,7 @@ export const AltTextGenerator = () => {
     let successCount = 0;
     let failedCount = 0;
     let processedCount = 0;
+    let skippedCount = 0;
 
     try {
       // Fetch all images without alt text
@@ -45,13 +55,18 @@ export const AltTextGenerator = () => {
         .is('cover_photo_alt', null);
       
       eventsWithCover?.forEach(event => {
-        imagesToProcess.push({
-          table: 'events',
-          id: event.id,
-          imageUrl: event.cover_photo_url,
-          imageField: 'cover_photo_url',
-          altField: 'cover_photo_alt'
-        });
+        if (isValidImageUrl(event.cover_photo_url)) {
+          imagesToProcess.push({
+            table: 'events',
+            id: event.id,
+            imageUrl: event.cover_photo_url,
+            imageField: 'cover_photo_url',
+            altField: 'cover_photo_alt'
+          });
+        } else {
+          skippedCount++;
+          console.log('Skipped invalid URL in events:', event.id, event.cover_photo_url);
+        }
       });
 
       // Resources - logos
@@ -61,7 +76,8 @@ export const AltTextGenerator = () => {
         .not('logo_url', 'is', null)
         .is('logo_alt', null);
       
-      resourcesWithLogo?.forEach(resource => {
+    resourcesWithLogo?.forEach(resource => {
+      if (isValidImageUrl(resource.logo_url)) {
         imagesToProcess.push({
           table: 'resources',
           id: resource.id,
@@ -69,7 +85,11 @@ export const AltTextGenerator = () => {
           imageField: 'logo_url',
           altField: 'logo_alt'
         });
-      });
+      } else {
+        skippedCount++;
+        console.log('Skipped invalid URL in resources:', resource.id, resource.logo_url);
+      }
+    });
 
       // Resources - cover photos
       const { data: resourcesWithCover } = await supabase
@@ -79,13 +99,18 @@ export const AltTextGenerator = () => {
         .is('cover_photo_alt', null);
       
       resourcesWithCover?.forEach(resource => {
-        imagesToProcess.push({
-          table: 'resources',
-          id: resource.id,
-          imageUrl: resource.cover_photo_url,
-          imageField: 'cover_photo_url',
-          altField: 'cover_photo_alt'
-        });
+        if (isValidImageUrl(resource.cover_photo_url)) {
+          imagesToProcess.push({
+            table: 'resources',
+            id: resource.id,
+            imageUrl: resource.cover_photo_url,
+            imageField: 'cover_photo_url',
+            altField: 'cover_photo_alt'
+          });
+        } else {
+          skippedCount++;
+          console.log('Skipped invalid URL in resources cover:', resource.id, resource.cover_photo_url);
+        }
       });
 
       // Civic Gallery
@@ -96,13 +121,18 @@ export const AltTextGenerator = () => {
         .is('alt_text', null);
       
       galleryItems?.forEach(item => {
-        imagesToProcess.push({
-          table: 'civic_gallery',
-          id: item.id,
-          imageUrl: item.photo_url,
-          imageField: 'photo_url',
-          altField: 'alt_text'
-        });
+        if (isValidImageUrl(item.photo_url)) {
+          imagesToProcess.push({
+            table: 'civic_gallery',
+            id: item.id,
+            imageUrl: item.photo_url,
+            imageField: 'photo_url',
+            altField: 'alt_text'
+          });
+        } else {
+          skippedCount++;
+          console.log('Skipped invalid URL in civic_gallery:', item.id, item.photo_url);
+        }
       });
 
       // Civic Leadership
@@ -113,13 +143,18 @@ export const AltTextGenerator = () => {
         .is('photo_alt', null);
       
       leadershipItems?.forEach(item => {
-        imagesToProcess.push({
-          table: 'civic_leadership',
-          id: item.id,
-          imageUrl: item.photo_url,
-          imageField: 'photo_url',
-          altField: 'photo_alt'
-        });
+        if (isValidImageUrl(item.photo_url)) {
+          imagesToProcess.push({
+            table: 'civic_leadership',
+            id: item.id,
+            imageUrl: item.photo_url,
+            imageField: 'photo_url',
+            altField: 'photo_alt'
+          });
+        } else {
+          skippedCount++;
+          console.log('Skipped invalid URL in civic_leadership:', item.id, item.photo_url);
+        }
       });
 
       const totalImages = imagesToProcess.length;
@@ -127,7 +162,8 @@ export const AltTextGenerator = () => {
         total: totalImages,
         processed: 0,
         success: 0,
-        failed: 0
+        failed: 0,
+        skipped: skippedCount
       });
 
       if (totalImages === 0) {
@@ -193,7 +229,8 @@ export const AltTextGenerator = () => {
             total: totalImages,
             processed: processedCount,
             success: successCount,
-            failed: failedCount
+            failed: failedCount,
+            skipped: skippedCount
           });
         }));
 
@@ -205,7 +242,7 @@ export const AltTextGenerator = () => {
 
       toast({
         title: "Alt text generation complete",
-        description: `Successfully generated ${successCount} alt texts. ${failedCount} failed.`,
+        description: `Successfully generated ${successCount} alt texts. ${failedCount} failed. ${skippedCount} skipped (invalid URLs).`,
         variant: failedCount > 0 ? "destructive" : "default"
       });
 
@@ -246,6 +283,7 @@ export const AltTextGenerator = () => {
               <span>Progress: {stats.processed} / {stats.total}</span>
               <span className="text-muted-foreground">
                 ✓ {stats.success} · ✗ {stats.failed}
+                {stats.skipped > 0 && ` · ⊘ ${stats.skipped}`}
               </span>
             </div>
             <Progress value={progress} />
