@@ -242,12 +242,20 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="title">Event Title *</Label>
+                <Label htmlFor="title">
+                  Event Title
+                  <span aria-label="required" className="text-destructive ml-1">*</span>
+                </Label>
+                <p id="title-help" className="sr-only">
+                  Enter a clear and descriptive title for the event
+                </p>
                 <Input
                   id="title"
                   value={formData.title}
                   onChange={(e) => handleInputChange('title', e.target.value)}
                   placeholder="Enter event title"
+                  aria-describedby="title-help"
+                  aria-required="true"
                   required
                 />
               </div>
@@ -298,34 +306,58 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="event_date">Event Date *</Label>
+                <Label htmlFor="event_date">
+                  Event Date
+                  <span aria-label="required" className="text-destructive ml-1">*</span>
+                </Label>
+                <p id="event_date-help" className="sr-only">
+                  Select the date when the event will take place
+                </p>
                 <Input
                   id="event_date"
                   type="date"
                   value={formData.event_date}
                   onChange={(e) => handleInputChange('event_date', e.target.value)}
+                  aria-describedby="event_date-help"
+                  aria-required="true"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="event_time">Event Time *</Label>
+                <Label htmlFor="event_time">
+                  Event Time
+                  <span aria-label="required" className="text-destructive ml-1">*</span>
+                </Label>
+                <p id="event_time-help" className="sr-only">
+                  Select the start time for the event
+                </p>
                 <Input
                   id="event_time"
                   type="time"
                   value={formData.event_time}
                   onChange={(e) => handleInputChange('event_time', e.target.value)}
+                  aria-describedby="event_time-help"
+                  aria-required="true"
                   required
                 />
               </div>
 
               <div className="md:col-span-2 space-y-2">
-                <Label htmlFor="location">Location *</Label>
+                <Label htmlFor="location">
+                  Location
+                  <span aria-label="required" className="text-destructive ml-1">*</span>
+                </Label>
+                <p id="location-help" className="sr-only">
+                  Enter the address or venue name where the event will be held
+                </p>
                 <Input
                   id="location"
                   value={formData.location}
                   onChange={(e) => handleInputChange('location', e.target.value)}
                   placeholder="Enter event location"
+                  aria-describedby="location-help"
+                  aria-required="true"
                   required
                 />
               </div>
@@ -380,13 +412,21 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
               </div>
 
                <div className="md:col-span-2 space-y-2">
-                <Label htmlFor="description">Description *</Label>
+                <Label htmlFor="description">
+                  Description
+                  <span aria-label="required" className="text-destructive ml-1">*</span>
+                </Label>
+                <p id="description-help" className="text-sm text-muted-foreground mt-1">
+                  Provide a detailed description of the event, including what attendees can expect
+                </p>
                 <Textarea
                   id="description"
                   value={formData.description}
                   onChange={(e) => handleInputChange('description', e.target.value)}
                   placeholder="Enter event description"
                   rows={4}
+                  aria-describedby="description-help"
+                  aria-required="true"
                   required
                 />
               </div>
@@ -420,38 +460,47 @@ export const EventForm = ({ event, onClose, onSave }: EventFormProps) => {
                   <>
                     <div className="space-y-2">
                       <Label htmlFor="registration_link">Registration Form Link (Optional)</Label>
+                      <p id="registration_link-help" className="text-sm text-muted-foreground">
+                        If provided, this will show as a "Registration Form" button on the event
+                      </p>
                       <Input
                         id="registration_link"
                         type="url"
                         value={formData.registration_link}
                         onChange={(e) => handleInputChange('registration_link', e.target.value)}
                         placeholder="https://example.com/register"
+                        aria-describedby="registration_link-help"
                       />
-                      <p className="text-sm text-muted-foreground">
-                        If provided, this will show as a "Registration Form" button on the event
-                      </p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="registration_phone">Registration Phone</Label>
+                        <p id="registration_phone-help" className="sr-only">
+                          Phone number for event registration inquiries
+                        </p>
                         <Input
                           id="registration_phone"
                           type="tel"
                           value={formData.registration_phone}
                           onChange={(e) => handleInputChange('registration_phone', e.target.value)}
                           placeholder="(555) 123-4567"
+                          aria-describedby="registration_phone-help"
                         />
                       </div>
 
                       <div className="space-y-2">
                         <Label htmlFor="registration_email">Registration Email</Label>
+                        <p id="registration_email-help" className="sr-only">
+                          Email address for event registration inquiries
+                        </p>
                         <Input
                           id="registration_email"
                           type="email"
                           value={formData.registration_email}
                           onChange={(e) => handleInputChange('registration_email', e.target.value)}
                           placeholder="events@city.gov"
+                          aria-describedby="registration_email-help"
                         />
                       </div>
                     </div>

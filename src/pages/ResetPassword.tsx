@@ -100,7 +100,13 @@ const ResetPassword = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="newPassword">New Password</Label>
+              <Label htmlFor="newPassword">
+                New Password
+                <span aria-label="required" className="text-destructive ml-1">*</span>
+              </Label>
+              <p id="newPassword-help" className="text-sm text-muted-foreground">
+                Password must be at least 6 characters long
+              </p>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -110,6 +116,8 @@ const ResetPassword = () => {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   className="pl-10 pr-10"
+                  aria-describedby="newPassword-help"
+                  aria-required="true"
                   required
                 />
                 <Button
@@ -118,6 +126,7 @@ const ResetPassword = () => {
                   size="sm"
                   className="absolute right-1 top-1 h-8 w-8 p-0"
                   onClick={() => setShowNewPassword(!showNewPassword)}
+                  aria-label={showNewPassword ? "Hide password" : "Show password"}
                 >
                   {showNewPassword ? (
                     <EyeOff className="h-4 w-4" />
@@ -129,7 +138,13 @@ const ResetPassword = () => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">
+                Confirm Password
+                <span aria-label="required" className="text-destructive ml-1">*</span>
+              </Label>
+              <p id="confirmPassword-help" className="sr-only">
+                Re-enter your new password to confirm
+              </p>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -139,6 +154,8 @@ const ResetPassword = () => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className="pl-10 pr-10"
+                  aria-describedby="confirmPassword-help"
+                  aria-required="true"
                   required
                 />
                 <Button
@@ -147,6 +164,7 @@ const ResetPassword = () => {
                   size="sm"
                   className="absolute right-1 top-1 h-8 w-8 p-0"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                 >
                   {showConfirmPassword ? (
                     <EyeOff className="h-4 w-4" />

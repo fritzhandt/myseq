@@ -120,7 +120,13 @@ const Auth = () => {
           {showForgotPassword ? (
             <form onSubmit={handleForgotPassword} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">
+                  Email
+                  <span aria-label="required" className="text-destructive ml-1">*</span>
+                </Label>
+                <p id="email-help" className="sr-only">
+                  Enter your email address to receive a password reset link
+                </p>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -130,6 +136,8 @@ const Auth = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-10"
+                    aria-describedby="email-help"
+                    aria-required="true"
                     required
                   />
                 </div>
@@ -155,7 +163,13 @@ const Auth = () => {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">
+                  Email
+                  <span aria-label="required" className="text-destructive ml-1">*</span>
+                </Label>
+                <p id="email-signin-help" className="sr-only">
+                  Enter your admin email address
+                </p>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -165,13 +179,21 @@ const Auth = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-10"
+                    aria-describedby="email-signin-help"
+                    aria-required="true"
                     required
                   />
                 </div>
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">
+                  Password
+                  <span aria-label="required" className="text-destructive ml-1">*</span>
+                </Label>
+                <p id="password-help" className="sr-only">
+                  Enter your password
+                </p>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -181,6 +203,8 @@ const Auth = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="pl-10 pr-10"
+                    aria-describedby="password-help"
+                    aria-required="true"
                     required
                   />
                   <Button
@@ -189,6 +213,7 @@ const Auth = () => {
                     size="sm"
                     className="absolute right-1 top-1 h-8 w-8 p-0"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? (
                       <EyeOff className="h-4 w-4" />

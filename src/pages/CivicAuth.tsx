@@ -134,7 +134,13 @@ const CivicAuth = () => {
             <CardContent>
               <form onSubmit={handleLogin} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="accessCode">Access Code</Label>
+                  <Label htmlFor="accessCode">
+                    Access Code
+                    <span aria-label="required" className="text-destructive ml-1">*</span>
+                  </Label>
+                  <p id="accessCode-help" className="sr-only">
+                    Enter your organization's unique access code
+                  </p>
                   <Input
                     id="accessCode"
                     type="text"
@@ -143,11 +149,19 @@ const CivicAuth = () => {
                     onChange={(e) => setAccessCode(e.target.value)}
                     className="text-center font-mono"
                     maxLength={20}
+                    aria-describedby="accessCode-help"
+                    aria-required="true"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">
+                    Password
+                    <span aria-label="required" className="text-destructive ml-1">*</span>
+                  </Label>
+                  <p id="password-help" className="sr-only">
+                    Enter your organization password
+                  </p>
                   <div className="relative">
                     <Input
                       id="password"
@@ -155,6 +169,8 @@ const CivicAuth = () => {
                       placeholder="Enter your password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      aria-describedby="password-help"
+                      aria-required="true"
                     />
                     <Button
                       type="button"
@@ -162,6 +178,7 @@ const CivicAuth = () => {
                       size="sm"
                       className="absolute right-2 top-1/2 -translate-y-1/2 h-auto p-1"
                       onClick={() => setShowPassword(!showPassword)}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? (
                         <EyeOff className="h-4 w-4" />

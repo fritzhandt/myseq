@@ -226,9 +226,9 @@ const Civics = () => {
             ) : filteredOrgs.length === 0 ? (
               <div className="col-span-full text-center py-12">
                 <Vote className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-xl font-semibold mb-2">
+                <h2 className="text-xl font-semibold mb-2">
                   {searchQuery ? "No organizations found" : "No organizations yet"}
-                </h3>
+                </h2>
                 <p className="text-muted-foreground">
                   {searchQuery ? "Try adjusting your search terms" : "Check back later for civic organizations in your area"}
                 </p>

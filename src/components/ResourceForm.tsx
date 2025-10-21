@@ -451,7 +451,13 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="organization_name">Organization Name *</Label>
+              <Label htmlFor="organization_name">
+                Organization Name
+                <span aria-label="required" className="text-destructive ml-1">*</span>
+              </Label>
+              <p id="organization_name-help" className="sr-only">
+                Enter the full name of the organization
+              </p>
               <Input
                 id="organization_name"
                 value={formData.organization_name}
@@ -459,11 +465,19 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
                   setFormData(prev => ({ ...prev, organization_name: e.target.value }))
                 }
                 placeholder="Enter organization name"
+                aria-describedby="organization_name-help"
+                aria-required="true"
               />
             </div>
 
             <div>
-              <Label htmlFor="description">Description *</Label>
+              <Label htmlFor="description">
+                Description
+                <span aria-label="required" className="text-destructive ml-1">*</span>
+              </Label>
+              <p id="description-help" className="text-sm text-muted-foreground mt-1">
+                Provide a clear description of the organization and its services
+              </p>
               <Textarea
                 id="description"
                 value={formData.description}
@@ -472,11 +486,16 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
                 }
                 placeholder="Enter description"
                 rows={3}
+                aria-describedby="description-help"
+                aria-required="true"
               />
             </div>
 
             <div>
               <Label htmlFor="phone">Phone Number</Label>
+              <p id="phone-help" className="sr-only">
+                Contact phone number for the organization
+              </p>
               <Input
                 id="phone"
                 type="tel"
@@ -485,11 +504,15 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
                   setFormData(prev => ({ ...prev, phone: e.target.value }))
                 }
                 placeholder="(555) 123-4567"
+                aria-describedby="phone-help"
               />
             </div>
 
             <div>
               <Label htmlFor="email">Email Address</Label>
+              <p id="email-help" className="sr-only">
+                Contact email address for the organization
+              </p>
               <Input
                 id="email"
                 type="email"
@@ -498,6 +521,7 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
                   setFormData(prev => ({ ...prev, email: e.target.value }))
                 }
                 placeholder="contact@organization.com"
+                aria-describedby="email-help"
               />
             </div>
 

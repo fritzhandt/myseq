@@ -238,7 +238,7 @@ const Admin = () => {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
+          <h2 className="text-2xl font-bold mb-4">Access Denied</h2>
           <p className="text-muted-foreground mb-4">You don't have admin access to this page.</p>
           <Button onClick={() => navigate('/')}>Go Home</Button>
         </div>
