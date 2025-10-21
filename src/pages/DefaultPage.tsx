@@ -1,20 +1,31 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import SkipLinks from "@/components/SkipLinks";
 import CommunityAlertBanner from "@/components/CommunityAlertBanner";
 import AISearchBar from "@/components/AISearchBar";
 import { useNavbar } from "@/contexts/NavbarContext";
 import { Calendar, Users, Briefcase, ArrowRight, MapPin, Heart, HelpCircle, Building2, Landmark, Zap, Info } from "lucide-react";
+import { useEffect } from "react";
 
 export default function DefaultPage() {
   const { openMenu } = useNavbar();
   
+  useEffect(() => {
+    document.title = "My SEQ - Southeast Queens Information Center";
+  }, []);
+  
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <Navbar />
-      <CommunityAlertBanner />
-      
-      <main className="relative">
+    <>
+      <SkipLinks />
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-background via-background to-primary/5">
+        <header id="primary-navigation">
+          <Navbar />
+        </header>
+        <CommunityAlertBanner />
+        
+        <main id="main-content" className="relative flex-1">
         {/* Hero Section */}
         <section className="relative py-16 px-4 text-center overflow-hidden">
           {/* Background Pattern */}
@@ -223,6 +234,8 @@ export default function DefaultPage() {
           </div>
         </section>
       </main>
+      <Footer />
     </div>
+    </>
   );
 }

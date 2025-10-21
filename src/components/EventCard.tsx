@@ -122,7 +122,7 @@ export const EventCard = ({ event }: EventCardProps) => {
         <div className="relative h-40 sm:h-48 overflow-hidden">
           <img
             src={event.cover_photo_url}
-            alt={event.title}
+            alt={`Event cover photo: ${event.title} - ${formatDate(event.event_date)} at ${event.location}`}
             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
           />
           <div className="absolute top-2 sm:top-3 right-2 sm:right-3 flex gap-1">

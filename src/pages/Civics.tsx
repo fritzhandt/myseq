@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import SkipLinks from "@/components/SkipLinks";
 import AdminPagination from "@/components/AdminPagination";
 import { Users, MapPin, Search, Vote, ExternalLink, Phone, Mail, ArrowLeft, Building2, Shield, Globe } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -38,6 +40,7 @@ const Civics = () => {
 
   // Handle AI navigation state for civic search  
   useEffect(() => {
+    document.title = "Civic Organizations - My SEQ";
     const state = location.state as any;
     if (state?.searchTerm) {
       setSearchQuery(state.searchTerm);
@@ -121,25 +124,29 @@ const Civics = () => {
   const paginatedOrgs = filteredOrgs.slice(startIndex, endIndex);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar />
-      
-      {/* Back to Main Menu */}
-      <div className="bg-muted/50 border-b">
-        <div className="container mx-auto px-4 py-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => window.location.href = '/'}
-            className="flex items-center text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Main Menu
-          </Button>
+    <>
+      <SkipLinks />
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-background via-muted/20 to-background">
+        <header id="primary-navigation">
+          <Navbar />
+        </header>
+        
+        {/* Back to Main Menu */}
+        <div className="bg-muted/50 border-b">
+          <div className="container mx-auto px-4 py-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => window.location.href = '/'}
+              className="flex items-center text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Main Menu
+            </Button>
+          </div>
         </div>
-      </div>
-      
-      <main className="container mx-auto px-4 py-8">
+        
+        <main id="main-content" className="container mx-auto px-4 py-8 flex-1">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
@@ -359,7 +366,9 @@ const Civics = () => {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
+    </>
   );
 };
 

@@ -8,6 +8,8 @@ import { ArrowLeft, Phone, Mail, MapPin, User, ChevronDown, ChevronUp, ExternalL
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import SkipLinks from '@/components/SkipLinks';
 import { cn } from '@/lib/utils';
 
 interface ElectedOfficial {
@@ -73,6 +75,7 @@ const ContactElected = () => {
   };
 
   useEffect(() => {
+    document.title = "Contact Elected Officials - My SEQ";
     fetchOfficials();
   }, []);
 
@@ -194,7 +197,13 @@ const ContactElected = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <>
+        <SkipLinks />
+        <div className="min-h-screen flex flex-col">
+          <header id="primary-navigation">
+            <Navbar />
+          </header>
+          <main id="main-content" className="flex-1">
         <Navbar />
         <div className="py-16">
           <div className="container mx-auto px-4">
@@ -207,16 +216,23 @@ const ContactElected = () => {
             </div>
           </div>
         </div>
+        </main>
+        <Footer />
       </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <div className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
+    <>
+      <SkipLinks />
+      <div className="min-h-screen flex flex-col">
+        <header id="primary-navigation">
+          <Navbar />
+        </header>
+        <main id="main-content" className="py-16 flex-1">
+          <div className="container mx-auto px-4">
+            <div className="max-w-6xl mx-auto">
             <Button
               variant="ghost"
               onClick={() => navigate('/')}
@@ -656,11 +672,13 @@ const ContactElected = () => {
                 </div>
               </div>
             </div>
+            </div>
           </div>
-        </div>
+        </main>
+        <Footer />
       </div>
-    </div>
-  );
+      </>
+    );
 };
 
 export default ContactElected;

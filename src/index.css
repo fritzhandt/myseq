@@ -174,3 +174,61 @@ All colors MUST be HSL.
     filter: invert(1) hue-rotate(180deg);
   }
 }
+
+/* Skip Links - WCAG 2.4.1 */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  z-index: 999;
+  padding: 1rem 1.5rem;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: 0 0 0.5rem 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.skip-link:focus {
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+/* Screen reader only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Enhanced Focus Visibility - WCAG 2.4.7 & 2.4.11 (2.2) */
+*:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: 3px solid hsl(var(--primary));
+  outline-offset: 3px;
+}
+
+[role="dialog"] *:focus-visible {
+  outline-color: hsl(var(--primary));
+  outline-width: 3px;
+  outline-offset: 2px;
+}
+
+/* Focus not obscured - WCAG 2.4.11 (2.2) */
+:focus {
+  scroll-margin-top: 5rem;
+}

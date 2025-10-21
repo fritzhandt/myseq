@@ -2,6 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, HelpCircle } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import SkipLinks from '@/components/SkipLinks';
 import CommunityAlertBanner from '@/components/CommunityAlertBanner';
 import {
   Accordion,
@@ -9,9 +11,14 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useEffect } from 'react';
 
 const FAQ = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    document.title = "FAQ - My SEQ";
+  }, []);
 
   const faqs = [
     {
@@ -47,12 +54,16 @@ const FAQ = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <CommunityAlertBanner />
-      <div className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
+    <>
+      <SkipLinks />
+      <div className="min-h-screen flex flex-col">
+        <header id="primary-navigation">
+          <Navbar />
+        </header>
+        <CommunityAlertBanner />
+        <main id="main-content" className="py-16 flex-1">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
             <Button
               variant="ghost"
               onClick={() => navigate('/')}
@@ -97,11 +108,13 @@ const FAQ = () => {
                 </a>
               </Button>
             </div>
+            </div>
           </div>
-        </div>
+        </main>
+        <Footer />
       </div>
-    </div>
-  );
+      </>
+    );
 };
 
 export default FAQ;

@@ -2,18 +2,29 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import SkipLinks from '@/components/SkipLinks';
 import CommunityAlertBanner from '@/components/CommunityAlertBanner';
+import { useEffect } from 'react';
 
 const About = () => {
   const navigate = useNavigate();
 
+  useEffect(() => {
+    document.title = "About - My SEQ";
+  }, []);
+
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <CommunityAlertBanner />
-      <div className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
+    <>
+      <SkipLinks />
+      <div className="min-h-screen flex flex-col">
+        <header id="primary-navigation">
+          <Navbar />
+        </header>
+        <CommunityAlertBanner />
+        <main id="main-content" className="py-16 flex-1">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
             <Button
               variant="ghost"
               onClick={() => navigate('/')}
@@ -46,7 +57,7 @@ const About = () => {
               <h2 className="text-2xl font-semibold mb-4">Get Involved</h2>
               <p className="text-muted-foreground">
                 Have resources, jobs, suggestions to better My SEQ, or other opportunities? Let us know by contacting us{' '}
-                <a 
+                 <a 
                   href="mailto:mysoutheastqueens@gmail.com?subject=MY%20SEQ%20SUPPORT/INQUIRY" 
                   className="text-primary hover:text-primary/80 underline underline-offset-4"
                 >
@@ -54,11 +65,13 @@ const About = () => {
                 </a>.
               </p>
             </div>
-          </div>
+            </div>
           </div>
         </div>
-      </div>
+      </main>
+      <Footer />
     </div>
+    </>
   );
 };
 

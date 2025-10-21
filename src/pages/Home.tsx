@@ -5,6 +5,8 @@ import { EventCard } from '@/components/EventCard';
 import { EventCalendar } from '@/components/EventCalendar';
 import SearchBar from '@/components/SearchBar';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import SkipLinks from '@/components/SkipLinks';
 import CommunityAlertBanner from '@/components/CommunityAlertBanner';
 import UserPagination from '@/components/UserPagination';
 
@@ -69,6 +71,7 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
 
   // Track page view
   useEffect(() => {
+    document.title = "Events - My SEQ";
     trackPageView('/home');
   }, [trackPageView]);
 
@@ -212,9 +215,14 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
 
   return (
     <>
-      <Navbar />
-      <CommunityAlertBanner />
-      <div className="min-h-screen bg-background">
+      <SkipLinks />
+      <div className="min-h-screen flex flex-col">
+        <header id="primary-navigation">
+          <Navbar />
+        </header>
+        <CommunityAlertBanner />
+        
+        <main id="main-content" className="flex-1">
         
         {/* Back to Home Button */}
         <div className="bg-muted/50 border-b">
@@ -428,6 +436,8 @@ const Home = ({ activeSpecialEvent, onGoToSpecialEvent }: HomeProps = {}) => {
           )}
         </div>
       </section>
+      </main>
+      <Footer />
       </div>
     </>
   );

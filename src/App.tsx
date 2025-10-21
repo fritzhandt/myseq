@@ -24,6 +24,7 @@ import CivicDetail from "./pages/CivicDetail";
 import CivicAuth from "./pages/CivicAuth";
 import CivicAdmin from "./pages/CivicAdmin";
 import NotFound from "./pages/NotFound";
+import Accessibility from "./pages/Accessibility";
 import "./index.css";
 
 const queryClient = new QueryClient({
@@ -61,6 +62,7 @@ const App = () => (
             <Route path="/civics/:orgId" element={<CivicDetail />} />
             <Route path="/civic-auth" element={<CivicAuth />} />
             <Route path="/civic-admin" element={<CivicAdmin />} />
+            <Route path="/accessibility" element={<Accessibility />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Toaster />

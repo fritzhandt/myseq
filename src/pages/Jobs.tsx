@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import SkipLinks from '@/components/SkipLinks';
 import CommunityAlertBanner from '@/components/CommunityAlertBanner';
 import JobList from '@/components/JobList';
 import UserPagination from '@/components/UserPagination';
@@ -56,6 +58,7 @@ export default function Jobs() {
 
   // Track page view
   useEffect(() => {
+    document.title = "Career Opportunities - My SEQ";
     trackPageView('/jobs');
   }, [trackPageView]);
 
@@ -250,26 +253,30 @@ export default function Jobs() {
   const paginatedJobs = filteredJobs.slice(startIndex, startIndex + itemsPerPage);
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <CommunityAlertBanner />
-      
-      {/* Back to Main Menu */}
-      <div className="bg-muted/50 border-b">
-        <div className="container mx-auto px-4 py-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => window.location.href = '/'}
-            className="flex items-center text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Main Menu
-          </Button>
+    <>
+      <SkipLinks />
+      <div className="min-h-screen flex flex-col">
+        <header id="primary-navigation">
+          <Navbar />
+        </header>
+        <CommunityAlertBanner />
+        
+        {/* Back to Main Menu */}
+        <div className="bg-muted/50 border-b">
+          <div className="container mx-auto px-4 py-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => window.location.href = '/'}
+              className="flex items-center text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Main Menu
+            </Button>
+          </div>
         </div>
-      </div>
-      
-      <main className="container mx-auto px-4 py-8">
+        
+        <main id="main-content" className="container mx-auto px-4 py-8 flex-1">
 
         {/* Header */}
         <div className="text-center mb-12">
@@ -768,6 +775,8 @@ export default function Jobs() {
           />
         )}
       </main>
+      <Footer />
     </div>
+    </>
   );
 }
