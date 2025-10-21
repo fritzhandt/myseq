@@ -288,7 +288,7 @@ const Admin = () => {
 
         <main id="main-content" className="container mx-auto px-4 py-8">
         <Tabs defaultValue={isMainAdmin ? "pending-approvals" : (isSubAdmin ? "my-submissions" : "events")} className="w-full">
-          <TabsList className={`grid w-full ${isMainAdmin ? 'grid-cols-10' : (isSubAdmin ? 'grid-cols-7' : 'grid-cols-7')} mb-8`}>
+          <TabsList className={`grid w-full ${isMainAdmin ? 'grid-cols-9' : (isSubAdmin ? 'grid-cols-7' : 'grid-cols-7')} mb-8`}>
             {isMainAdmin && (
               <TabsTrigger value="pending-approvals" className="flex items-center gap-2 relative">
                 <Clock className="h-4 w-4" />
@@ -350,12 +350,13 @@ const Admin = () => {
                 AI Limits
               </TabsTrigger>
             )}
-            {isMainAdmin && (
+            {/* Temporarily hidden - Alt text generator complete */}
+            {/* {isMainAdmin && (
               <TabsTrigger value="accessibility" className="flex items-center gap-2">
                 <Accessibility className="h-4 w-4" />
                 Accessibility
               </TabsTrigger>
-            )}
+            )} */}
             {isMainAdmin && (
               <TabsTrigger value="stats" className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />
@@ -582,7 +583,8 @@ const Admin = () => {
             </TabsContent>
           )}
 
-          {isMainAdmin && (
+          {/* Temporarily hidden - Alt text generator complete */}
+          {/* {isMainAdmin && (
             <TabsContent value="accessibility">
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
@@ -592,7 +594,7 @@ const Admin = () => {
                 <AltTextGenerator />
               </div>
             </TabsContent>
-          )}
+          )} */}
 
           {isMainAdmin && (
             <TabsContent value="stats">
