@@ -15,6 +15,7 @@ serve(async (req) => {
   try {
     const { imageUrl, imageUrls } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
     
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY is not configured');
@@ -27,10 +28,33 @@ serve(async (req) => {
       throw new Error('No image URL(s) provided');
     }
 
+    // Helper function to convert relative paths to full URLs
+    const toFullUrl = (url: string): string => {
+      // If it's already a full URL, return as-is
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        return url;
+      }
+      // Convert relative public paths to full URLs
+      if (url.startsWith('/')) {
+        // This is a public folder file, construct the full URL
+        const baseUrl = SUPABASE_URL?.replace('/rest/v1', '') || 'https://qdqmhgwjupsoradhktzu.supabase.co';
+        return `${baseUrl}${url}`;
+      }
+      return url;
+    };
+
     const results = [];
 
     for (const url of urls) {
-      console.log('Generating alt text for:', url);
+      const fullUrl = toFullUrl(url);
+      console.log('Generating alt text for:', fullUrl);
+      
+      // Skip unsupported formats
+      if (fullUrl.toLowerCase().endsWith('.avif') || fullUrl.toLowerCase().endsWith('.svg')) {
+        console.log('Skipping unsupported format:', fullUrl);
+        results.push({ url, altText: '' });
+        continue;
+      }
       
       const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
         method: 'POST',
@@ -51,7 +75,7 @@ serve(async (req) => {
                 {
                   type: 'image_url',
                   image_url: {
-                    url: url
+                    url: fullUrl
                   }
                 }
               ]
