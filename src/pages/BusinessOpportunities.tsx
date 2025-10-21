@@ -151,22 +151,12 @@ export default function BusinessOpportunities() {
         
         <main id="main-content" className="container mx-auto px-4 py-8 flex-1">
         <div className="text-center mb-8">
-          <div className="flex-1">
-            <h1 className="text-4xl font-bold mb-4">
-              Business Opportunities
-            </h1>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-6">
-              Explore business opportunities and entrepreneurship resources in your community
-            </p>
-            <Button
-              size="lg"
-              onClick={() => setShowSubmitForm(true)}
-              className="flex items-center gap-2 mx-auto"
-            >
-              <Plus className="h-5 w-5" />
-              Submit Your Opportunity
-            </Button>
-          </div>
+          <h1 className="text-4xl font-bold mb-4">
+            Business Opportunities
+          </h1>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            Explore business opportunities and entrepreneurship resources in your community
+          </p>
         </div>
 
         {/* Search Bar */}
@@ -247,6 +237,18 @@ export default function BusinessOpportunities() {
               itemsPerPage={itemsPerPage}
               onPageChange={setCurrentPage}
             />
+            
+            {/* Submit Form Button */}
+            <div className="mt-12 text-center">
+              <Button
+                size="lg"
+                onClick={() => setShowSubmitForm(true)}
+                className="flex items-center gap-2 mx-auto"
+              >
+                <Plus className="h-5 w-5" />
+                Submit Your Opportunity
+              </Button>
+            </div>
           </>
         )}
       </main>

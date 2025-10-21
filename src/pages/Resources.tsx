@@ -246,22 +246,12 @@ export default function Resources() {
       
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-8">
-          <div className="flex-1">
-            <h1 className="text-4xl font-bold mb-4">
-              Programs & Services
-            </h1>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-6">
-              Discover local organizations and services available in your community
-            </p>
-            <Button
-              size="lg"
-              onClick={() => setShowSubmitForm(true)}
-              className="flex items-center gap-2 mx-auto"
-            >
-              <Plus className="h-5 w-5" />
-              Add Your Organization
-            </Button>
-          </div>
+          <h1 className="text-4xl font-bold mb-4">
+            Programs & Services
+          </h1>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            Discover local organizations and services available in your community
+          </p>
         </div>
 
         {/* Category Filter Navigation */}
@@ -454,6 +444,18 @@ export default function Resources() {
               itemsPerPage={itemsPerPage}
               onPageChange={setCurrentPage}
             />
+            
+            {/* Submit Form Button */}
+            <div className="mt-12 text-center">
+              <Button
+                size="lg"
+                onClick={() => setShowSubmitForm(true)}
+                className="flex items-center gap-2 mx-auto"
+              >
+                <Plus className="h-5 w-5" />
+                Add Your Organization
+              </Button>
+            </div>
           </>
         )}
       </div>
