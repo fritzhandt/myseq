@@ -1046,7 +1046,7 @@ export type Database = {
           reviewed_by: string | null
           status: string
           submitted_at: string
-          submitted_by: string
+          submitted_by: string | null
           submitter_name: string | null
           submitter_phone: string | null
           type: string
@@ -1071,7 +1071,7 @@ export type Database = {
           reviewed_by?: string | null
           status?: string
           submitted_at?: string
-          submitted_by: string
+          submitted_by?: string | null
           submitter_name?: string | null
           submitter_phone?: string | null
           type?: string
@@ -1096,7 +1096,7 @@ export type Database = {
           reviewed_by?: string | null
           status?: string
           submitted_at?: string
-          submitted_by?: string
+          submitted_by?: string | null
           submitter_name?: string | null
           submitter_phone?: string | null
           type?: string
