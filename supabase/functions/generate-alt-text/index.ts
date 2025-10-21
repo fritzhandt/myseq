@@ -28,17 +28,16 @@ serve(async (req) => {
       throw new Error('No image URL(s) provided');
     }
 
-    // Helper function to convert relative paths to full URLs
-    const toFullUrl = (url: string): string => {
+    // Helper function to validate and convert URLs
+    const toFullUrl = (url: string): string | null => {
       // If it's already a full URL, return as-is
       if (url.startsWith('http://') || url.startsWith('https://')) {
         return url;
       }
-      // Convert relative public paths to full URLs
+      // Skip public folder images - they can't be accessed by the edge function
       if (url.startsWith('/')) {
-        // This is a public folder file, construct the full URL
-        const baseUrl = SUPABASE_URL?.replace('/rest/v1', '') || 'https://qdqmhgwjupsoradhktzu.supabase.co';
-        return `${baseUrl}${url}`;
+        console.log('Skipping public folder image:', url);
+        return null;
       }
       return url;
     };
@@ -47,6 +46,13 @@ serve(async (req) => {
 
     for (const url of urls) {
       const fullUrl = toFullUrl(url);
+      
+      // Skip if URL is invalid (null returned for public folder images)
+      if (!fullUrl) {
+        results.push({ url, altText: '' });
+        continue;
+      }
+      
       console.log('Generating alt text for:', fullUrl);
       
       // Skip unsupported formats

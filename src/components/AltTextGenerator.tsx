@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 export const AltTextGenerator = () => {
   const { toast } = useToast();
   const [generating, setGenerating] = useState(false);
+  const [shouldStop, setShouldStop] = useState(false);
   const [progress, setProgress] = useState(0);
   const [stats, setStats] = useState<{
     total: number;
@@ -20,6 +21,7 @@ export const AltTextGenerator = () => {
 
   const generateAltTexts = async () => {
     setGenerating(true);
+    setShouldStop(false);
     setProgress(0);
     let successCount = 0;
     let failedCount = 0;
@@ -145,6 +147,14 @@ export const AltTextGenerator = () => {
       // Process images in batches to avoid rate limits
       const batchSize = 3;
       for (let i = 0; i < imagesToProcess.length; i += batchSize) {
+        if (shouldStop) {
+          toast({
+            title: "Generation stopped",
+            description: `Stopped after processing ${processedCount} of ${totalImages} images.`,
+          });
+          break;
+        }
+        
         const batch = imagesToProcess.slice(i, Math.min(i + batchSize, imagesToProcess.length));
         
         await Promise.all(batch.map(async (item) => {
@@ -242,15 +252,27 @@ export const AltTextGenerator = () => {
           </div>
         )}
 
-        <Button 
-          onClick={generateAltTexts} 
-          disabled={generating}
-          size="lg"
-          className="w-full"
-        >
-          <Wand2 className="h-4 w-4 mr-2" />
-          {generating ? 'Generating Alt Text...' : 'Generate Missing Alt Tags'}
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={generateAltTexts} 
+            disabled={generating}
+            size="lg"
+            className="flex-1"
+          >
+            <Wand2 className="h-4 w-4 mr-2" />
+            {generating ? 'Generating Alt Text...' : 'Generate Missing Alt Tags'}
+          </Button>
+          
+          {generating && (
+            <Button 
+              onClick={() => setShouldStop(true)} 
+              variant="destructive"
+              size="lg"
+            >
+              Stop
+            </Button>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
