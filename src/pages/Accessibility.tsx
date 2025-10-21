@@ -156,21 +156,6 @@ const Accessibility = () => {
               </CardContent>
             </Card>
 
-            {/* Alternative Formats */}
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Alternative Formats</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p>
-                  If you need information from this website in an alternative format (such as large print, audio recording, or Braille), please contact us and we will work with you to provide the information in a format that meets your needs.
-                </p>
-                <p>
-                  We strive to respond to all accessibility-related requests within 5 business days.
-                </p>
-              </CardContent>
-            </Card>
-
             {/* Contact Section */}
             <Card className="mb-6">
               <CardHeader>
