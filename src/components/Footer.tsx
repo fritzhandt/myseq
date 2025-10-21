@@ -65,12 +65,6 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="mt-8 pt-6 border-t border-border">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
-            <p>
-              © {currentYear} My SEQ. All rights reserved.
-            </p>
-            <p>
-              Committed to WCAG 2.1 Level AA compliance | Target: WCAG 2.2 Level AA by January 1, 2027
-            </p>
           </div>
         </div>
       </div>
