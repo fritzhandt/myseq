@@ -302,7 +302,7 @@ export default function PublicBusinessOpportunityForm({ open, onOpenChange }: Pu
             Submit Your Opportunity
           </DialogTitle>
           <DialogDescription>
-            Submit your business opportunity for review. All submissions are reviewed before being published.
+            Submit your business opportunity for review. Business opportunities are those that provide support, including funding and mentorship, to businesses. All submissions are reviewed before being published.
           </DialogDescription>
         </DialogHeader>
         
