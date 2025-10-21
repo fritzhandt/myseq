@@ -91,7 +91,7 @@ const Footer = () => {
                 mysoutheastqueens@gmail.com
               </a>
               <p className="text-sm text-muted-foreground mt-4">
-                For accessibility assistance or alternative formats, please contact us via email.
+                For any questions, issues, or comments, please contact us via email.
               </p>
             </div>
           </div>
