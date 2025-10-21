@@ -444,6 +444,7 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
             variant="ghost"
             size="icon"
             onClick={onClose}
+            aria-label="Close form"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -552,8 +553,9 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
             </div>
 
             <div>
-              <Label>Cover Photo</Label>
-              <div className="space-y-4">
+              <Label htmlFor="cover-photo-upload">Cover Photo (Optional)</Label>
+              <div className="space-y-4" role="group" aria-labelledby="cover-photo-label">
+                <span id="cover-photo-label" className="sr-only">Cover photo upload section</span>
                 {/* Cover Photo Preview */}
                 {coverPreviewUrl && (
                   <div className="relative">
@@ -634,10 +636,12 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
 
                 <input
                   ref={coverFileInputRef}
+                  id="cover-photo-upload"
                   type="file"
                   accept="image/*"
                   onChange={handleCoverFileSelect}
                   className="hidden"
+                  aria-label="Upload cover photo"
                 />
 
                 <p className="text-xs text-muted-foreground">
@@ -647,8 +651,9 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
             </div>
 
             <div>
-              <Label>Organization Logo</Label>
-              <div className="space-y-4">
+              <Label htmlFor="logo-upload">Organization Logo (Optional)</Label>
+              <div className="space-y-4" role="group" aria-labelledby="logo-label">
+                <span id="logo-label" className="sr-only">Organization logo upload section</span>
                 {/* Logo Preview */}
                 {logoPreviewUrl && (
                   <div className="relative">
@@ -729,10 +734,12 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
 
                 <input
                   ref={logoFileInputRef}
+                  id="logo-upload"
                   type="file"
                   accept="image/*"
                   onChange={handleLogoFileSelect}
                   className="hidden"
+                  aria-label="Upload organization logo"
                 />
 
                 <p className="text-xs text-muted-foreground">
@@ -743,12 +750,16 @@ export default function ResourceForm({ resource, onClose, onSave, isBusinessOppo
 
             {!isBusinessOpportunity && (
               <div>
-                <Label>Category *</Label>
+                <Label htmlFor="category">
+                  Category
+                  <span aria-label="required" className="text-destructive ml-1">*</span>
+                </Label>
                 <Select 
                   value={formData.category || ""} 
                   onValueChange={handleCategoryChange}
+                  required
                 >
-                  <SelectTrigger className="mt-2">
+                  <SelectTrigger id="category" className="mt-2" aria-required="true">
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                   <SelectContent>

@@ -247,20 +247,32 @@ export default function PublicResourceSubmissionForm({ open, onOpenChange }: Pub
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Live region for error announcements */}
+          <div aria-live="polite" aria-atomic="true" className="sr-only">
+            {Object.keys(errors).length > 0 && `Form has ${Object.keys(errors).length} error${Object.keys(errors).length > 1 ? 's' : ''}`}
+          </div>
+
           <div className="space-y-2">
-            <Label htmlFor="organization_name">Organization Name *</Label>
+            <Label htmlFor="organization_name">
+              Organization Name
+              <span aria-label="required" className="text-destructive ml-1">*</span>
+            </Label>
             <Input
               id="organization_name"
               value={formData.organization_name}
               onChange={(e) => setFormData({ ...formData, organization_name: e.target.value })}
               placeholder="Enter organization name"
               required
+              aria-required="true"
             />
-            {errors.organization_name && <p className="text-sm text-destructive">{errors.organization_name}</p>}
+            {errors.organization_name && <p className="text-sm text-destructive" role="alert">{errors.organization_name}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description *</Label>
+            <Label htmlFor="description">
+              Description
+              <span aria-label="required" className="text-destructive ml-1">*</span>
+            </Label>
             <Textarea
               id="description"
               value={formData.description}
@@ -268,17 +280,22 @@ export default function PublicResourceSubmissionForm({ open, onOpenChange }: Pub
               placeholder="Describe your organization and services"
               rows={4}
               required
+              aria-required="true"
             />
-            {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
+            {errors.description && <p className="text-sm text-destructive" role="alert">{errors.description}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="category">Category *</Label>
+            <Label htmlFor="category">
+              Category
+              <span aria-label="required" className="text-destructive ml-1">*</span>
+            </Label>
             <Select
               value={formData.categories[0] || ''}
               onValueChange={(value) => setFormData({ ...formData, categories: [value] })}
+              required
             >
-              <SelectTrigger>
+              <SelectTrigger id="category" aria-required="true">
                 <SelectValue placeholder="Select a category" />
               </SelectTrigger>
               <SelectContent>
@@ -289,24 +306,31 @@ export default function PublicResourceSubmissionForm({ open, onOpenChange }: Pub
                 ))}
               </SelectContent>
             </Select>
-            {errors.categories && <p className="text-sm text-destructive">{errors.categories}</p>}
+            {errors.categories && <p className="text-sm text-destructive" role="alert">{errors.categories}</p>}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone *</Label>
+              <Label htmlFor="phone">
+                Phone
+                <span aria-label="required" className="text-destructive ml-1">*</span>
+              </Label>
               <Input
                 id="phone"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 placeholder="(555) 123-4567"
                 required
+                aria-required="true"
               />
-              {errors.phone && <p className="text-sm text-destructive">{errors.phone}</p>}
+              {errors.phone && <p className="text-sm text-destructive" role="alert">{errors.phone}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email *</Label>
+              <Label htmlFor="email">
+                Email
+                <span aria-label="required" className="text-destructive ml-1">*</span>
+              </Label>
               <Input
                 id="email"
                 type="email"
@@ -314,36 +338,45 @@ export default function PublicResourceSubmissionForm({ open, onOpenChange }: Pub
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="contact@organization.org"
                 required
+                aria-required="true"
               />
-              {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
+              {errors.email && <p className="text-sm text-destructive" role="alert">{errors.email}</p>}
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="website">Website (Required if no address provided)</Label>
+            <Label htmlFor="website">
+              Website
+              <span className="text-muted-foreground ml-1">(Required if no address provided)</span>
+            </Label>
             <Input
               id="website"
               value={formData.website}
               onChange={(e) => setFormData({ ...formData, website: e.target.value })}
               placeholder="https://www.organization.org"
             />
-            {errors.website && <p className="text-sm text-destructive">{errors.website}</p>}
+            {errors.website && <p className="text-sm text-destructive" role="alert">{errors.website}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="address">Address (Required if no website provided)</Label>
+            <Label htmlFor="address">
+              Address
+              <span className="text-muted-foreground ml-1">(Required if no website provided)</span>
+            </Label>
             <Input
               id="address"
               value={formData.address}
               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
               placeholder="123 Main St, City, State ZIP"
             />
-            {errors.address && <p className="text-sm text-destructive">{errors.address}</p>}
+            {errors.address && <p className="text-sm text-destructive" role="alert">{errors.address}</p>}
           </div>
 
           {/* Logo Upload */}
           <div className="space-y-2">
-            <Label>Logo (Optional)</Label>
+            <Label htmlFor="logo-upload">Logo (Optional)</Label>
+            <div role="group" aria-labelledby="logo-upload-label">
+              <span id="logo-upload-label" className="sr-only">Logo upload section</span>
             <div
               className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
                 isDragOverLogo ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
@@ -399,11 +432,14 @@ export default function PublicResourceSubmissionForm({ open, onOpenChange }: Pub
             </div>
             <input
               ref={logoFileInputRef}
+              id="logo-upload"
               type="file"
               accept="image/*"
               onChange={handleLogoFileSelect}
               className="hidden"
+              aria-label="Upload organization logo"
             />
+            </div>
           </div>
 
           <div className="border-t pt-4">

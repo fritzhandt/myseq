@@ -167,31 +167,47 @@ export default function JobManualEntryForm({ open, onOpenChange, onSuccess }: Jo
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Live region for error announcements */}
+          <div aria-live="polite" aria-atomic="true" className="sr-only">
+            {Object.keys(errors).length > 0 && `Form has ${Object.keys(errors).length} error${Object.keys(errors).length > 1 ? 's' : ''}`}
+          </div>
+
           <div className="space-y-2">
-            <Label htmlFor="title">Job Title *</Label>
+            <Label htmlFor="title">
+              Job Title
+              <span aria-label="required" className="text-destructive ml-1">*</span>
+            </Label>
             <Input
               id="title"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               required
+              aria-required="true"
             />
-            {errors.title && <p className="text-sm text-destructive">{errors.title}</p>}
+            {errors.title && <p className="text-sm text-destructive" role="alert">{errors.title}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="employer">Employer *</Label>
+            <Label htmlFor="employer">
+              Employer
+              <span aria-label="required" className="text-destructive ml-1">*</span>
+            </Label>
             <Input
               id="employer"
               value={formData.employer}
               onChange={(e) => setFormData({ ...formData, employer: e.target.value })}
               required
+              aria-required="true"
             />
-            {errors.employer && <p className="text-sm text-destructive">{errors.employer}</p>}
+            {errors.employer && <p className="text-sm text-destructive" role="alert">{errors.employer}</p>}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="category">Category *</Label>
+              <Label htmlFor="category">
+                Category
+                <span aria-label="required" className="text-destructive ml-1">*</span>
+              </Label>
               <Select
                 value={formData.category}
                 onValueChange={(value: 'government' | 'private' | 'internships') => {
@@ -201,8 +217,9 @@ export default function JobManualEntryForm({ open, onOpenChange, onSuccess }: Jo
                     subcategory: value === 'government' ? 'city' : 'city'
                   });
                 }}
+                required
               >
-                <SelectTrigger>
+                <SelectTrigger id="category" aria-required="true">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -212,19 +229,23 @@ export default function JobManualEntryForm({ open, onOpenChange, onSuccess }: Jo
                   <SelectItem value="internships">Internships</SelectItem>
                 </SelectContent>
               </Select>
-              {errors.category && <p className="text-sm text-destructive">{errors.category}</p>}
+              {errors.category && <p className="text-sm text-destructive" role="alert">{errors.category}</p>}
             </div>
 
             {formData.category === 'government' && (
               <div className="space-y-2">
-                <Label htmlFor="subcategory">Subcategory *</Label>
+                <Label htmlFor="subcategory">
+                  Subcategory
+                  <span aria-label="required" className="text-destructive ml-1">*</span>
+                </Label>
                 <Select
                   value={formData.subcategory}
                   onValueChange={(value: 'city' | 'state') => 
                     setFormData({ ...formData, subcategory: value })
                   }
+                  required
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="subcategory" aria-required="true">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -237,19 +258,26 @@ export default function JobManualEntryForm({ open, onOpenChange, onSuccess }: Jo
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="location">Location *</Label>
+            <Label htmlFor="location">
+              Location
+              <span aria-label="required" className="text-destructive ml-1">*</span>
+            </Label>
             <Input
               id="location"
               value={formData.location}
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
               placeholder="e.g., New York, NY"
               required
+              aria-required="true"
             />
-            {errors.location && <p className="text-sm text-destructive">{errors.location}</p>}
+            {errors.location && <p className="text-sm text-destructive" role="alert">{errors.location}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Job Description *</Label>
+            <Label htmlFor="description">
+              Job Description
+              <span aria-label="required" className="text-destructive ml-1">*</span>
+            </Label>
             <Textarea
               id="description"
               value={formData.description}
@@ -257,20 +285,25 @@ export default function JobManualEntryForm({ open, onOpenChange, onSuccess }: Jo
               rows={6}
               placeholder="Enter detailed job description, requirements, and responsibilities..."
               required
+              aria-required="true"
             />
-            {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
+            {errors.description && <p className="text-sm text-destructive" role="alert">{errors.description}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="apply_info">Application Info/Link *</Label>
+            <Label htmlFor="apply_info">
+              Application Info/Link
+              <span aria-label="required" className="text-destructive ml-1">*</span>
+            </Label>
             <Input
               id="apply_info"
               value={formData.apply_info}
               onChange={(e) => setFormData({ ...formData, apply_info: e.target.value })}
               placeholder="e.g., https://company.com/apply or email@company.com"
               required
+              aria-required="true"
             />
-            {errors.apply_info && <p className="text-sm text-destructive">{errors.apply_info}</p>}
+            {errors.apply_info && <p className="text-sm text-destructive" role="alert">{errors.apply_info}</p>}
           </div>
 
           <div className="flex items-center space-x-2">
