@@ -59,9 +59,6 @@ const Accessibility = () => {
                 <p>
                   <strong>Current Compliance:</strong> We are committed to conforming with the Web Content Accessibility Guidelines (WCAG) 2.1 Level AA standards.
                 </p>
-                <p>
-                  <strong>Future Goal:</strong> We are working toward full WCAG 2.2 Level AA compliance by January 1, 2027, in accordance with New York State requirements.
-                </p>
               </CardContent>
             </Card>
 
@@ -193,44 +190,6 @@ const Accessibility = () => {
               </CardContent>
             </Card>
 
-            {/* Testing & Compliance */}
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Testing & Continuous Improvement</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p>
-                  <strong>Testing Schedule:</strong> We conduct comprehensive accessibility testing at least every 2 years, and before major updates to the website.
-                </p>
-                <p>
-                  <strong>Testing Methods:</strong>
-                </p>
-                <ul className="list-disc list-inside space-y-1 ml-4">
-                  <li>Automated accessibility scanning tools</li>
-                  <li>Manual keyboard navigation testing</li>
-                  <li>Screen reader compatibility testing</li>
-                  <li>User testing with people with disabilities</li>
-                  <li>Color contrast verification</li>
-                  <li>Mobile responsiveness and touch target testing</li>
-                </ul>
-                <p className="text-sm text-muted-foreground mt-4">
-                  We are actively working to identify and remediate any accessibility barriers. Known issues and their remediation timelines are tracked and addressed in priority order.
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Third Party Content */}
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Third-Party Content</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>
-                  Some content on this website is provided by third parties. While we make every effort to ensure all content is accessible, we may not have full control over third-party content. If you encounter accessibility issues with third-party content, please let us know so we can work with the provider to address the issue.
-                </p>
-              </CardContent>
-            </Card>
-
             {/* Standards & Guidelines */}
             <Card>
               <CardHeader>
@@ -246,9 +205,6 @@ const Accessibility = () => {
                   <li>New York State web accessibility requirements</li>
                   <li>Section 508 of the Rehabilitation Act</li>
                 </ul>
-                <p className="text-sm text-muted-foreground mt-4">
-                  <strong>Target Compliance Date for WCAG 2.2 Level AA:</strong> January 1, 2027
-                </p>
               </CardContent>
             </Card>
           </div>
