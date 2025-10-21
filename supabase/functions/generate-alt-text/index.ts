@@ -15,10 +15,14 @@ serve(async (req) => {
   try {
     const { imageUrl, imageUrls } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
+    const FRONTEND_URL = Deno.env.get('FRONTEND_URL');
     
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY is not configured');
+    }
+
+    if (!FRONTEND_URL) {
+      throw new Error('FRONTEND_URL is not configured');
     }
 
     // Handle single or multiple images
@@ -34,10 +38,11 @@ serve(async (req) => {
       if (url.startsWith('http://') || url.startsWith('https://')) {
         return url;
       }
-      // Skip public folder images - they can't be accessed by the edge function
+      // Convert public folder paths to full URLs
       if (url.startsWith('/')) {
-        console.log('Skipping public folder image:', url);
-        return null;
+        const fullUrl = `${FRONTEND_URL}${url}`;
+        console.log('Converted public folder image:', url, '->', fullUrl);
+        return fullUrl;
       }
       return url;
     };
@@ -69,7 +74,7 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'openai/gpt-5-mini',
+          model: 'google/gemini-2.5-flash',
           messages: [
             {
               role: 'user',
