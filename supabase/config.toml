@@ -89,3 +89,6 @@ verify_jwt = false
 
 [functions.civic-password-reset]
 verify_jwt = false
+
+[functions.generate-alt-text]
+verify_jwt = true

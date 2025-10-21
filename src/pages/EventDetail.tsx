@@ -19,7 +19,9 @@ interface Event {
   age_group: string[];
   elected_officials: string[];
   cover_photo_url: string | null;
+  cover_photo_alt?: string | null;
   additional_images: string[];
+  additional_images_alt?: string[] | null;
   tags: string[];
   registration_link?: string | null;
   registration_phone?: string | null;
@@ -259,7 +261,7 @@ const EventDetail = () => {
             <div className="h-64 md:h-80 bg-muted">
               <img
                 src={event.cover_photo_url}
-                alt={event.title}
+                alt={event.cover_photo_alt || event.title}
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-black/40" />

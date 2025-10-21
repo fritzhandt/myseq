@@ -14,7 +14,9 @@ interface Event {
   age_group: string[];
   elected_officials: string[];
   cover_photo_url: string | null;
+  cover_photo_alt?: string | null;
   additional_images: string[];
+  additional_images_alt?: string[] | null;
   registration_link?: string | null;
   registration_phone?: string | null;
   registration_email?: string | null;
@@ -122,7 +124,7 @@ export const EventCard = ({ event }: EventCardProps) => {
         <div className="relative h-40 sm:h-48 overflow-hidden">
           <img
             src={event.cover_photo_url}
-            alt={`Event cover photo: ${event.title} - ${formatDate(event.event_date)} at ${event.location}`}
+            alt={event.cover_photo_alt || `Event cover photo: ${event.title} - ${formatDate(event.event_date)} at ${event.location}`}
             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
           />
           <div className="absolute top-2 sm:top-3 right-2 sm:right-3 flex gap-1">

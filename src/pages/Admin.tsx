@@ -26,9 +26,10 @@ import MyPendingSubmissions from '@/components/MyPendingSubmissions';
 import { AdminStats } from '@/components/AdminStats';
 import ProfileSettings from '@/components/ProfileSettings';
 import AIRateLimitManager from '@/components/AIRateLimitManager';
+import { AltTextGenerator } from '@/components/AltTextGenerator';
 import { useToast } from '@/hooks/use-toast';
 import { useUserRole } from '@/hooks/useUserRole';
-import { Plus, Calendar, LogOut, Star, AlertTriangle, Users, MapPin, FileText, Building2, Clock, BarChart3, Briefcase, User, Zap, MonitorSmartphone } from 'lucide-react';
+import { Plus, Calendar, LogOut, Star, AlertTriangle, Users, MapPin, FileText, Building2, Clock, BarChart3, Briefcase, User, Zap, MonitorSmartphone, Accessibility } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
@@ -350,6 +351,12 @@ const Admin = () => {
               </TabsTrigger>
             )}
             {isMainAdmin && (
+              <TabsTrigger value="accessibility" className="flex items-center gap-2">
+                <Accessibility className="h-4 w-4" />
+                Accessibility
+              </TabsTrigger>
+            )}
+            {isMainAdmin && (
               <TabsTrigger value="stats" className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />
                 Stats
@@ -571,6 +578,18 @@ const Admin = () => {
                   <p className="text-sm text-muted-foreground">Monitor and manage AI search usage</p>
                 </div>
                 <AIRateLimitManager />
+              </div>
+            </TabsContent>
+          )}
+
+          {isMainAdmin && (
+            <TabsContent value="accessibility">
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-3xl font-bold">Accessibility</h2>
+                  <p className="text-sm text-muted-foreground">WCAG compliance and image alt text management</p>
+                </div>
+                <AltTextGenerator />
               </div>
             </TabsContent>
           )}

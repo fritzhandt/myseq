@@ -89,6 +89,7 @@ export type Database = {
           created_at: string
           id: string
           photos: string[] | null
+          photos_alt: string[] | null
           title: string
           updated_at: string
         }
@@ -98,6 +99,7 @@ export type Database = {
           created_at?: string
           id?: string
           photos?: string[] | null
+          photos_alt?: string[] | null
           title: string
           updated_at?: string
         }
@@ -107,6 +109,7 @@ export type Database = {
           created_at?: string
           id?: string
           photos?: string[] | null
+          photos_alt?: string[] | null
           title?: string
           updated_at?: string
         }
@@ -122,6 +125,7 @@ export type Database = {
       }
       civic_gallery: {
         Row: {
+          alt_text: string | null
           civic_org_id: string
           created_at: string
           description: string | null
@@ -132,6 +136,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          alt_text?: string | null
           civic_org_id: string
           created_at?: string
           description?: string | null
@@ -142,6 +147,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          alt_text?: string | null
           civic_org_id?: string
           created_at?: string
           description?: string | null
@@ -197,6 +203,7 @@ export type Database = {
           id: string
           name: string
           order_index: number | null
+          photo_alt: string | null
           photo_url: string | null
           title: string
           updated_at: string
@@ -208,6 +215,7 @@ export type Database = {
           id?: string
           name: string
           order_index?: number | null
+          photo_alt?: string | null
           photo_url?: string | null
           title: string
           updated_at?: string
@@ -219,6 +227,7 @@ export type Database = {
           id?: string
           name?: string
           order_index?: number | null
+          photo_alt?: string | null
           photo_url?: string | null
           title?: string
           updated_at?: string
@@ -364,6 +373,7 @@ export type Database = {
           is_active: boolean
           long_description: string
           photos: string[] | null
+          photos_alt: string[] | null
           short_description: string
           title: string
           updated_at: string
@@ -374,6 +384,7 @@ export type Database = {
           is_active?: boolean
           long_description: string
           photos?: string[] | null
+          photos_alt?: string[] | null
           short_description: string
           title: string
           updated_at?: string
@@ -384,6 +395,7 @@ export type Database = {
           is_active?: boolean
           long_description?: string
           photos?: string[] | null
+          photos_alt?: string[] | null
           short_description?: string
           title?: string
           updated_at?: string
@@ -450,9 +462,11 @@ export type Database = {
       events: {
         Row: {
           additional_images: string[] | null
+          additional_images_alt: string[] | null
           age_group: string[] | null
           archived: boolean
           civic_org_id: string | null
+          cover_photo_alt: string | null
           cover_photo_url: string | null
           created_at: string
           description: string
@@ -473,9 +487,11 @@ export type Database = {
         }
         Insert: {
           additional_images?: string[] | null
+          additional_images_alt?: string[] | null
           age_group?: string[] | null
           archived?: boolean
           civic_org_id?: string | null
+          cover_photo_alt?: string | null
           cover_photo_url?: string | null
           created_at?: string
           description: string
@@ -496,9 +512,11 @@ export type Database = {
         }
         Update: {
           additional_images?: string[] | null
+          additional_images_alt?: string[] | null
           age_group?: string[] | null
           archived?: boolean
           civic_org_id?: string | null
+          cover_photo_alt?: string | null
           cover_photo_url?: string | null
           created_at?: string
           description?: string
@@ -739,6 +757,7 @@ export type Database = {
           is_active: boolean
           long_description: string
           photos: string[] | null
+          photos_alt: string[] | null
           review_notes: string | null
           reviewed_at: string | null
           reviewed_by: string | null
@@ -757,6 +776,7 @@ export type Database = {
           is_active?: boolean
           long_description: string
           photos?: string[] | null
+          photos_alt?: string[] | null
           review_notes?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -775,6 +795,7 @@ export type Database = {
           is_active?: boolean
           long_description?: string
           photos?: string[] | null
+          photos_alt?: string[] | null
           review_notes?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -792,8 +813,10 @@ export type Database = {
       pending_events: {
         Row: {
           additional_images: string[] | null
+          additional_images_alt: string[] | null
           age_group: string[] | null
           civic_org_id: string | null
+          cover_photo_alt: string | null
           cover_photo_url: string | null
           created_at: string
           description: string
@@ -822,8 +845,10 @@ export type Database = {
         }
         Insert: {
           additional_images?: string[] | null
+          additional_images_alt?: string[] | null
           age_group?: string[] | null
           civic_org_id?: string | null
+          cover_photo_alt?: string | null
           cover_photo_url?: string | null
           created_at?: string
           description: string
@@ -852,8 +877,10 @@ export type Database = {
         }
         Update: {
           additional_images?: string[] | null
+          additional_images_alt?: string[] | null
           age_group?: string[] | null
           civic_org_id?: string | null
+          cover_photo_alt?: string | null
           cover_photo_url?: string | null
           created_at?: string
           description?: string
@@ -1004,11 +1031,13 @@ export type Database = {
         Row: {
           address: string | null
           categories: string[]
+          cover_photo_alt: string | null
           cover_photo_url: string | null
           created_at: string
           description: string
           email: string | null
           id: string
+          logo_alt: string | null
           logo_url: string | null
           organization_name: string
           phone: string | null
@@ -1027,11 +1056,13 @@ export type Database = {
         Insert: {
           address?: string | null
           categories?: string[]
+          cover_photo_alt?: string | null
           cover_photo_url?: string | null
           created_at?: string
           description: string
           email?: string | null
           id?: string
+          logo_alt?: string | null
           logo_url?: string | null
           organization_name: string
           phone?: string | null
@@ -1050,11 +1081,13 @@ export type Database = {
         Update: {
           address?: string | null
           categories?: string[]
+          cover_photo_alt?: string | null
           cover_photo_url?: string | null
           created_at?: string
           description?: string
           email?: string | null
           id?: string
+          logo_alt?: string | null
           logo_url?: string | null
           organization_name?: string
           phone?: string | null
@@ -1136,11 +1169,13 @@ export type Database = {
         Row: {
           address: string | null
           categories: string[]
+          cover_photo_alt: string | null
           cover_photo_url: string | null
           created_at: string
           description: string
           email: string | null
           id: string
+          logo_alt: string | null
           logo_url: string | null
           organization_name: string
           phone: string | null
@@ -1151,11 +1186,13 @@ export type Database = {
         Insert: {
           address?: string | null
           categories?: string[]
+          cover_photo_alt?: string | null
           cover_photo_url?: string | null
           created_at?: string
           description: string
           email?: string | null
           id?: string
+          logo_alt?: string | null
           logo_url?: string | null
           organization_name: string
           phone?: string | null
@@ -1166,11 +1203,13 @@ export type Database = {
         Update: {
           address?: string | null
           categories?: string[]
+          cover_photo_alt?: string | null
           cover_photo_url?: string | null
           created_at?: string
           description?: string
           email?: string | null
           id?: string
+          logo_alt?: string | null
           logo_url?: string | null
           organization_name?: string
           phone?: string | null

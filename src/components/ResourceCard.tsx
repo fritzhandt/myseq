@@ -13,7 +13,9 @@ interface Resource {
   address?: string;
   website?: string;
   logo_url?: string;
+  logo_alt?: string;
   cover_photo_url?: string;
+  cover_photo_alt?: string;
   categories: string[];
 }
 
@@ -31,7 +33,7 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
           {resource.logo_url ? (
             <img
               src={resource.logo_url}
-              alt={`${resource.organization_name} logo`}
+              alt={resource.logo_alt || `${resource.organization_name} logo`}
               className="w-12 h-12 object-cover rounded-lg flex-shrink-0"
             />
           ) : (
