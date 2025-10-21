@@ -739,108 +739,127 @@ KEYWORD MAPPING:
 
 AI COMPREHENSIVE BOOLEAN QUERY CONSTRUCTION:
 
-**CRITICAL INSTRUCTION**: The "searchTerm" field MUST contain a comprehensive boolean search query, NOT just simple keywords!
+**CRITICAL TOKEN MANAGEMENT**: Your responses MUST stay within token limits to avoid truncation. PRIORITIZE including the category parameter over creating exhaustive searchTerms!
 
-When users search for ANY topic, construct an extremely comprehensive boolean query for the "searchTerm" field that captures:
-1. All synonym variations (both formal and casual language)
-2. How organizations phrase services (technical/professional terms)
-3. How users phrase searches (common/everyday terms)
-4. Common misspellings and typos
-5. Related concepts and terminology
-6. Age/demographic variations when applicable
+**PRIORITY ORDER** (most to least important):
+1. destination (required)
+2. category (CRITICAL - always include when routing to /resources or /jobs)
+3. searchTerm (keep focused and concise - 5-10 key terms maximum)
+4. other parameters (location, employer, etc.)
+
+**RESPONSE LENGTH RULE**: If your response exceeds ~150 tokens, you MUST simplify the searchTerm to stay within limits. A truncated response that loses the category parameter is WORSE than a shorter searchTerm.
+
+When users search for ANY topic, construct a FOCUSED boolean search query for the "searchTerm" field that captures:
+1. Core synonyms (5-10 focused variations - NOT 15+)
+2. Most common phrasings users and organizations use
+3. 1-2 critical misspellings only (if common)
+4. Keep demographic modifiers SHORT
 
 QUERY CONSTRUCTION STRATEGY:
 
 Step 1: Identify the CORE CONCEPT
-- What is the user fundamentally asking for? (e.g., financial education, therapy, sports programs, job training)
+- What is the user fundamentally asking for? (e.g., art, therapy, sports, job training)
 
-Step 2: Expand with OR clauses for SYNONYMS (8-15 variations minimum)
-- Think of ALL ways this concept could be phrased
-- Include formal/professional terms AND casual/everyday terms
+Step 2: Expand with OR clauses for SYNONYMS (5-10 focused variations - MAXIMUM)
+- Include the MOST IMPORTANT ways this concept could be phrased
+- Prioritize common terms over exhaustive lists
 - Examples:
-  * Financial: "financial literacy" OR "money management" OR "personal finance" OR "budgeting" OR "finance" OR "money skills" OR "banking" OR "credit" OR "saving"
-  * Therapy: "therapy" OR "counseling" OR "mental health services" OR "behavioral health" OR "psychological services" OR "emotional support"
-  * Sports: "sports" OR "athletics" OR "recreation" OR "physical activity" OR "fitness" OR "exercise"
-  * Job Training: "job training" OR "workforce development" OR "vocational training" OR "career skills" OR "employment training"
+  * Art: "art OR arts OR drawing OR painting OR creative OR classes"
+  * Therapy: "therapy OR counseling OR mental health OR wellness OR support"
+  * Sports: "sports OR athletics OR fitness OR recreation OR exercise"
+  * Financial: "financial OR finance OR money OR budget OR literacy"
 
-Step 3: Add SPECIFIC VARIATIONS that organizations use in their descriptions
-- How do service providers describe this in their materials?
+Step 3: Add ONLY 2-3 SPECIFIC VARIATIONS if critical
+- Only the most relevant organization terms
+- Examples for art:
+  * "art education OR art lessons OR art programs"
 - Examples for therapy:
-  * "trauma-informed care" OR "licensed therapy" OR "clinical services" OR "psychotherapy" OR "personalized care plans" OR "care coordination"
-- Examples for financial literacy:
-  * "financial education" OR "financial capability" OR "financial wellness" OR "financial empowerment" OR "credit counseling" OR "debt management" OR "homebuyer education"
-- Examples for sports:
-  * "league" OR "team" OR "coaching" OR "training" OR "clinic" OR "camp" OR "lessons"
+  * "therapy sessions OR counseling services"
 
-Step 4: Include COMMON MISSPELLINGS (2-4 variations)
-- Examples: "financal" OR "finacial" OR "litercy" OR "counceling" OR "theraphy"
+Step 4: Include ONLY 1-2 MOST COMMON MISSPELLINGS (if very common)
+- Examples: "counceling" OR "theraphy" (only if these are frequent)
 
-Step 5: Add PROGRAM/SERVICE TYPE words with AND
-- What format does this come in?
-- Examples: AND (program OR class OR workshop OR training OR course OR service OR initiative OR center OR clinic OR lessons)
+Step 5: OPTIONAL - Add PROGRAM/SERVICE TYPE words ONLY if searchTerm is still short
+- Only if your total query is under 80 tokens
+- Examples: AND (program OR class OR lessons)
 
-Step 6: Add DEMOGRAPHIC MODIFIERS if specified (use OR for variations)
-- If user mentions age group, include ALL variations:
-  * Youth: "youth" OR "teen" OR "teenager" OR "adolescent" OR "young people" OR "young adult" OR "kids" OR "children" OR "student" OR "K-12" OR "middle school" OR "high school"
-  * Senior: "senior" OR "elderly" OR "older adult" OR "aging" OR "65+" OR "retiree" OR "geriatric"
-  * Adult: "adult" OR "18+" OR "grown-up" OR "mature"
+Step 6: KEEP DEMOGRAPHIC MODIFIERS SHORT (3-5 terms maximum)
+- If user mentions age group, include only MOST COMMON variations:
+  * Youth: "youth OR teen OR kids OR children"
+  * Senior: "senior OR elderly OR older adult"
+  * Adult: "adult OR 18+"
 
-Step 7: EXCLUDE clearly irrelevant results with NOT
-- What should definitely NOT be included?
-- For community programs: NOT (MBA OR "master of" OR degree OR "corporate training" OR "executive" OR CPA OR CFA OR PhD OR "investment banking")
-- For youth programs: NOT ("adult only" OR "21+" OR "seniors only" OR geriatric)
-- For senior programs: NOT (youth OR teen OR kids OR children OR "under 18")
+Step 7: SKIP NOT clauses unless absolutely critical
+- Only use NOT if truly necessary to avoid wrong results
+- Prefer shorter queries over exclusions
 
-**COMPREHENSIVE EXAMPLES - THE "searchTerm" FIELD MUST LOOK LIKE THIS:**
+**FOCUSED EXAMPLES - THE "searchTerm" FIELD MUST LOOK LIKE THIS:**
+
+User query: "my son wants to learn art"
+❌ WRONG (too long, causes truncation): "(art OR arts OR drawing OR painting OR sculpture OR creative OR creativity OR visual arts OR fine arts OR artistic OR design OR crafts OR crafting OR sketching OR illustration OR graphic design OR digital art OR art classes OR art lessons...)" [50+ terms]
+✅ CORRECT (focused): "(art OR arts OR drawing OR painting OR creative OR classes)"
+✅ MUST INCLUDE: category:"Arts"
 
 User query: "youth financial literacy programs"
-❌ WRONG searchTerm: "financial literacy"
-✅ CORRECT searchTerm: "(financial OR finance OR money OR budget OR budgeting OR saving OR savings OR credit OR banking OR investing OR personal finance OR money management OR money skills OR financial skills OR financial education OR financial capability OR financial wellness OR financial empowerment OR financial literacy OR credit counseling OR debt management OR financal OR finacial OR litercy) AND (program OR class OR workshop OR training OR course OR education OR coaching OR counseling OR seminar OR initiative) AND (youth OR teen OR teenager OR adolescent OR student OR young people OR young adult OR kids OR children OR K-12 OR middle school OR high school) NOT (MBA OR degree OR master of OR corporate OR investment banking OR CPA OR CFA OR PhD OR executive training)"
+❌ WRONG searchTerm: "financial literacy" (too simple)
+❌ WRONG searchTerm: "(financial OR finance OR money OR budget OR budgeting OR saving OR savings OR credit OR banking OR investing OR personal finance OR money management OR money skills OR financial skills OR financial education OR financial capability OR financial wellness OR financial empowerment OR financial literacy OR credit counseling OR debt management OR financal OR finacial OR litercy) AND (program OR class OR workshop OR training OR course OR education OR coaching OR counseling OR seminar OR initiative) AND (youth OR teen OR teenager OR adolescent OR student OR young people OR young adult OR kids OR children OR K-12 OR middle school OR high school) NOT (MBA OR degree OR master of OR corporate OR investment banking OR CPA OR CFA OR PhD OR executive training)" (TOO LONG - causes truncation!)
+✅ CORRECT searchTerm: "(financial OR finance OR money OR budget OR literacy) AND (program OR class) AND (youth OR teen OR kids)"
+✅ MUST INCLUDE: category:"Educational"
 
 User query: "are there any financial literacy programs for young kids"
-❌ WRONG searchTerm: "financial literacy"
-✅ CORRECT searchTerm: "(financial OR finance OR money OR budget OR budgeting OR saving OR savings OR credit OR banking OR investing OR personal finance OR money management OR money skills OR financial skills OR financial education OR financial capability OR financial wellness OR financial empowerment OR financial literacy OR credit counseling OR homebuyer education OR debt management OR financal OR finacial OR litercy) AND (program OR class OR workshop OR training OR course OR education OR coaching OR counseling OR seminar OR initiative OR lessons) AND (youth OR teen OR teenager OR adolescent OR student OR young people OR young adult OR kids OR children OR K-12 OR elementary OR middle school OR primary) NOT (MBA OR degree OR master of OR corporate OR investment banking OR CPA OR CFA OR PhD OR executive training OR adult only)"
+❌ WRONG searchTerm: "financial literacy" (too simple)
+❌ WRONG searchTerm: "(financial OR finance OR money OR budget OR budgeting OR saving OR savings OR credit OR banking OR investing OR personal finance OR money management OR money skills OR financial skills OR financial education OR financial capability OR financial wellness OR financial empowerment OR financial literacy OR credit counseling OR homebuyer education OR debt management OR financal OR finacial OR litercy) AND (program OR class OR workshop OR training OR course OR education OR coaching OR counseling OR seminar OR initiative OR lessons) AND (youth OR teen OR teenager OR adolescent OR student OR young people OR young adult OR kids OR children OR K-12 OR elementary OR middle school OR primary) NOT (MBA OR degree OR master of OR corporate OR investment banking OR CPA OR CFA OR PhD OR executive training OR adult only)" (TOO LONG!)
+✅ CORRECT searchTerm: "(financial OR finance OR money OR budget) AND (program OR class) AND (youth OR kids OR children)"
+✅ MUST INCLUDE: category:"Educational"
 
 User query: "therapy for teens"
-❌ WRONG searchTerm: "therapy"
-✅ CORRECT searchTerm: "(therapy OR counseling OR mental health OR behavioral health OR psychological OR psychiatric OR emotional support OR psychotherapy OR clinical services OR trauma-informed care OR licensed therapy OR mental wellness OR care coordination OR personalized care plans OR individual therapy OR group therapy OR family therapy OR counceling OR theraphy OR counciling) AND (teen OR teenager OR adolescent OR youth OR young adult OR student OR middle school OR high school OR young people) AND (service OR program OR treatment OR care OR support OR clinic OR center OR counseling) NOT (adult only OR 18+ OR geriatric OR elderly OR seniors only)"
+❌ WRONG searchTerm: "therapy" (too simple)
+❌ WRONG searchTerm: "(therapy OR counseling OR mental health OR behavioral health OR psychological OR psychiatric OR emotional support OR psychotherapy OR clinical services OR trauma-informed care OR licensed therapy OR mental wellness OR care coordination OR personalized care plans OR individual therapy OR group therapy OR family therapy OR counceling OR theraphy OR counciling) AND (teen OR teenager OR adolescent OR youth OR young adult OR student OR middle school OR high school OR young people) AND (service OR program OR treatment OR care OR support OR clinic OR center OR counseling) NOT (adult only OR 18+ OR geriatric OR elderly OR seniors only)" (TOO LONG!)
+✅ CORRECT searchTerm: "(therapy OR counseling OR mental health OR wellness) AND (teen OR youth OR adolescent)"
+✅ MUST INCLUDE: category:"Mental Health/Wellness"
 
 User query: "sports programs"
-❌ WRONG searchTerm: "sports"
-✅ CORRECT searchTerm: "(sports OR sport OR athletic OR athletics OR recreation OR recreational OR fitness OR physical activity OR basketball OR soccer OR football OR baseball OR tennis OR swimming OR volleyball OR track OR track and field OR martial arts OR karate OR boxing OR yoga OR dance OR exercise OR running OR cycling) AND (program OR league OR team OR class OR training OR lessons OR coaching OR clinic OR camp OR club OR activity OR instruction) NOT (professional OR NCAA OR college sports OR varsity OR professional athlete)"
+❌ WRONG searchTerm: "sports" (too simple)
+❌ WRONG searchTerm: "(sports OR sport OR athletic OR athletics OR recreation OR recreational OR fitness OR physical activity OR basketball OR soccer OR football OR baseball OR tennis OR swimming OR volleyball OR track OR track and field OR martial arts OR karate OR boxing OR yoga OR dance OR exercise OR running OR cycling) AND (program OR league OR team OR class OR training OR lessons OR coaching OR clinic OR camp OR club OR activity OR instruction) NOT (professional OR NCAA OR college sports OR varsity OR professional athlete)" (TOO LONG!)
+✅ CORRECT searchTerm: "(sports OR athletics OR recreation OR fitness OR physical activity) AND (program OR league OR class)"
+✅ MUST INCLUDE: category:"Sports"
 
 User query: "job training programs"
-❌ WRONG searchTerm: "job training"
-✅ CORRECT searchTerm: "(job OR employment OR career OR workforce OR vocational OR work OR skills training OR apprenticeship OR internship OR on-the-job training OR job skills OR career development OR workforce development OR vocational training OR employment training) AND (training OR development OR education OR program OR course OR workshop OR preparation OR readiness OR placement OR skills OR certification OR certificate) NOT (executive OR C-level OR senior management OR MBA OR graduate degree OR PhD)"
+❌ WRONG searchTerm: "job training" (too simple)
+❌ WRONG searchTerm: "(job OR employment OR career OR workforce OR vocational OR work OR skills training OR apprenticeship OR internship OR on-the-job training OR job skills OR career development OR workforce development OR vocational training OR employment training) AND (training OR development OR education OR program OR course OR workshop OR preparation OR readiness OR placement OR skills OR certification OR certificate) NOT (executive OR C-level OR senior management OR MBA OR graduate degree OR PhD)" (TOO LONG!)
+✅ CORRECT searchTerm: "(job OR employment OR career OR workforce) AND (training OR development OR program)"
+✅ MUST INCLUDE: category:"Educational"
 
 User query: "senior fitness classes"
-❌ WRONG searchTerm: "senior fitness"
-✅ CORRECT searchTerm: "(senior OR elderly OR older adult OR aging OR 65+ OR retiree OR geriatric OR mature) AND (fitness OR exercise OR physical OR wellness OR health OR active OR physical activity OR yoga OR tai chi OR walking OR strength OR balance OR aerobic OR aerobics OR movement OR stretch OR stretching OR low impact) AND (class OR classes OR program OR group OR session OR workshop OR activity OR club OR instruction) NOT (youth OR teen OR teenager OR kids OR children OR under 18)"
+❌ WRONG searchTerm: "senior fitness" (too simple)
+❌ WRONG searchTerm: "(senior OR elderly OR older adult OR aging OR 65+ OR retiree OR geriatric OR mature) AND (fitness OR exercise OR physical OR wellness OR health OR active OR physical activity OR yoga OR tai chi OR walking OR strength OR balance OR aerobic OR aerobics OR movement OR stretch OR stretching OR low impact) AND (class OR classes OR program OR group OR session OR workshop OR activity OR club OR instruction) NOT (youth OR teen OR teenager OR kids OR children OR under 18)" (TOO LONG!)
+✅ CORRECT searchTerm: "(senior OR elderly OR older adult) AND (fitness OR exercise OR wellness) AND (class OR program)"
+✅ MUST INCLUDE: category:"Senior Services"
 
 **RULES FOR CONSTRUCTION:**
-1. ALWAYS think of at least 8-15 synonym variations for the main concept
-2. Include both formal/professional language AND casual/everyday language
-3. Think like a service provider (how they describe it) AND a user (how they search for it)
-4. Add 2-4 common misspellings for complex terms
-5. Use AND to combine different concept groups (concept + format + demographic)
-6. Use OR within each concept group for all variations
-7. Use NOT to exclude clearly irrelevant results (academic degrees, corporate programs, wrong age groups)
-8. Make queries comprehensive but logical - don't over-exclude
-9. Prefer broad matching over narrow - better to get extra results than miss relevant ones
+1. KEEP QUERIES FOCUSED - aim for 5-10 key synonym variations maximum
+2. PRIORITIZE category parameter over exhaustive searchTerms
+3. Include most common formal AND casual terms
+4. Add only 1-2 common misspellings if truly frequent
+5. Use AND sparingly to combine concept groups (concept + format + demographic)
+6. Use OR within each concept group for key variations
+7. SKIP NOT clauses unless absolutely critical to avoid wrong results
+8. Prefer concise matching - better to have shorter query with category than long query that gets truncated
+9. **CRITICAL: Your entire response must be under 150 tokens to avoid truncation**
 10. **THE BOOLEAN QUERY MUST GO IN THE "searchTerm" FIELD - DO NOT JUST PUT KEYWORDS!**
 
-WHEN TO USE COMPREHENSIVE QUERIES:
+WHEN TO USE FOCUSED QUERIES:
 - ANY search that involves finding programs, services, or resources
-- When user asks about a specific topic (financial literacy, therapy, sports, job training, etc.)
+- When user asks about a specific topic (art, therapy, sports, job training, etc.)
 - When combining demographics + topics (youth sports, senior fitness, teen counseling, etc.)
-- Anytime you want to maximize recall and find ALL relevant results
+- **ALWAYS prioritize including category parameter over making searchTerm comprehensive**
 
 WHEN TO USE SIMPLE QUERIES:
 - Proper names (specific organizations, people, places)
 - Very specific unique terms that won't have synonyms
 - Already detailed user queries that contain multiple specific terms
 
-CRITICAL: The goal is MAXIMUM COVERAGE. We want to find EVERY relevant result, regardless of how the organization phrases their services. Better to cast a wide net with OR clauses than to miss results.
+CRITICAL: The goal is FOCUSED COVERAGE with proper categorization. Category parameter is MORE important than exhaustive searchTerm. A truncated response that loses the category is USELESS.
 
 CRITICAL: Return ONLY valid JSON, no other text or explanations.
 
