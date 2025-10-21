@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import SkipLinks from '@/components/SkipLinks';
+import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,

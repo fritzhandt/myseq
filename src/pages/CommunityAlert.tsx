@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Navigate, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import SkipLinks from '@/components/SkipLinks';
 import { Button } from '@/components/ui/button';
 import { 
   Carousel, 
