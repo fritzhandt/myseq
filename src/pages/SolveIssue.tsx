@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
+import SkipLinks from '@/components/SkipLinks';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import CommunityAlertBanner from '@/components/CommunityAlertBanner';
 import SolveMyIssue from '@/components/SolveMyIssue';
 import { Button } from '@/components/ui/button';
@@ -8,6 +10,10 @@ import { seedGovernmentAgencies } from '@/utils/seedAgencies';
 
 const SolveIssue = () => {
   useEffect(() => {
+    document.title = "Solve My Issue - My SEQ";
+  }, []);
+
+  useEffect(() => {
     // Seed agencies when the page loads
     seedGovernmentAgencies().then(result => {
       console.log('Seed result:', result);
@@ -15,9 +21,14 @@ const SolveIssue = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <CommunityAlertBanner />
+    <>
+      <SkipLinks />
+      <header id="primary-navigation">
+        <Navbar />
+      </header>
+      
+      <main id="main-content" className="min-h-screen bg-background">
+        <CommunityAlertBanner />
       
       {/* Back to Main Menu */}
       <div className="bg-muted/50 border-b">
@@ -34,10 +45,12 @@ const SolveIssue = () => {
         </div>
       </div>
       
-      <main className="container mx-auto px-4 py-8">
-        <SolveMyIssue />
+        <div className="container mx-auto px-4 py-8">
+          <SolveMyIssue />
+        </div>
       </main>
-    </div>
+      <Footer />
+    </>
   );
 };
 

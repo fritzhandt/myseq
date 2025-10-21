@@ -63,8 +63,10 @@ const CommunityAlert = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <>
+      <SkipLinks />
+      <main id="main-content" className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Back Button */}
         <Button
           variant="ghost"
@@ -139,7 +141,8 @@ const CommunityAlert = () => {
           </div>
         </div>
       </div>
-    </div>
+      </main>
+    </>
   );
 };
 

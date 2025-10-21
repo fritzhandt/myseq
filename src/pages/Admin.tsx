@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import SkipLinks from '@/components/SkipLinks';
+import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -55,6 +57,10 @@ const Admin = () => {
   const [editingCommunityAlert, setEditingCommunityAlert] = useState<any>(null);
   const [editingResource, setEditingResource] = useState<any>(null);
   const [editingBusinessOpportunity, setEditingBusinessOpportunity] = useState<any>(null);
+
+  useEffect(() => {
+    document.title = "Admin Panel - My SEQ";
+  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -241,9 +247,11 @@ const Admin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Mobile Warning Banner */}
-      {isMobile && (
+    <>
+      <SkipLinks />
+      <div className="min-h-screen bg-background">
+        {/* Mobile Warning Banner */}
+        {isMobile && (
         <Alert variant="destructive" className="rounded-none border-x-0 border-t-0">
           <MonitorSmartphone className="h-5 w-5" />
           <AlertTitle className="font-bold">Desktop Only</AlertTitle>
@@ -251,10 +259,10 @@ const Admin = () => {
             The admin panel has many complex features that are optimized for desktop use only. Please use a computer for the best experience.
           </AlertDescription>
         </Alert>
-      )}
+        )}
 
-      {/* Header */}
-      <header className="bg-card border-b shadow-sm">
+        {/* Header */}
+        <header id="primary-navigation" className="bg-card border-b shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
             <div>
@@ -275,9 +283,9 @@ const Admin = () => {
             </div>
           </div>
         </div>
-      </header>
+        </header>
 
-      <div className="container mx-auto px-4 py-8">
+        <main id="main-content" className="container mx-auto px-4 py-8">
         <Tabs defaultValue={isMainAdmin ? "pending-approvals" : (isSubAdmin ? "my-submissions" : "events")} className="w-full">
           <TabsList className={`grid w-full ${isMainAdmin ? 'grid-cols-10' : (isSubAdmin ? 'grid-cols-7' : 'grid-cols-7')} mb-8`}>
             {isMainAdmin && (
@@ -579,8 +587,10 @@ const Admin = () => {
             </TabsContent>
           )}
         </Tabs>
+        </main>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 };
 

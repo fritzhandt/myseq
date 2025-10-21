@@ -5,7 +5,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { EventCard } from '@/components/EventCard';
 import { EventCalendar } from '@/components/EventCalendar';
 import SearchBar from '@/components/SearchBar';
+import SkipLinks from '@/components/SkipLinks';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { supabase } from '@/integrations/supabase/client';
 import { Calendar, Grid, CalendarDays } from 'lucide-react';
 import { format } from 'date-fns';
@@ -65,6 +67,12 @@ const SpecialEventPage = ({ onExit }: SpecialEventPageProps) => {
   });
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (specialEvent) {
+      document.title = `${specialEvent.title} - My SEQ`;
+    }
+  }, [specialEvent]);
 
   useEffect(() => {
     fetchActiveSpecialEvent();
@@ -259,8 +267,13 @@ const SpecialEventPage = ({ onExit }: SpecialEventPageProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
+    <>
+      <SkipLinks />
+      <header id="primary-navigation">
+        <Navbar />
+      </header>
+      
+      <main id="main-content" className="min-h-screen bg-background">
       {/* Header */}
       <div className="gradient-hero text-primary-foreground py-16 md:py-20 px-4 shadow-urban">
         <div className="container mx-auto text-center">
@@ -399,7 +412,9 @@ const SpecialEventPage = ({ onExit }: SpecialEventPageProps) => {
           </div>
         )}
       </div>
-    </div>
+      </main>
+      <Footer />
+    </>
   );
 };
 

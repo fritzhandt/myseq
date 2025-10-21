@@ -57,8 +57,13 @@ const MyElectedLookup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
+    <>
+      <SkipLinks />
+      <header id="primary-navigation">
+        <Navbar />
+      </header>
+      
+      <main id="main-content" className="min-h-screen bg-background">
       <div className="py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
@@ -138,7 +143,9 @@ const MyElectedLookup = () => {
           </div>
         </div>
       </div>
-    </div>
+      </main>
+      <Footer />
+    </>
   );
 };
 

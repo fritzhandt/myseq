@@ -4,7 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import SkipLinks from "@/components/SkipLinks";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { Building2, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -101,10 +103,14 @@ const CivicAuth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar />
-      
-      <main className="container mx-auto px-4 py-8">
+    <>
+      <SkipLinks />
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+        <header id="primary-navigation">
+          <Navbar />
+        </header>
+        
+        <main id="main-content" className="container mx-auto px-4 py-8">
         <div className="max-w-md mx-auto">
           <Button 
             variant="ghost" 
@@ -185,7 +191,9 @@ const CivicAuth = () => {
           </Card>
         </div>
       </main>
-    </div>
+      </div>
+      <Footer />
+    </>
   );
 };
 

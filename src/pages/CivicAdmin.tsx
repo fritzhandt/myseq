@@ -4,7 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import SkipLinks from "@/components/SkipLinks";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { Building2, LogOut, Settings, Users, FileText, Megaphone, Link, Images, Calendar, BarChart3, MonitorSmartphone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -30,6 +32,10 @@ const CivicAdmin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
+
+  useEffect(() => {
+    document.title = "Civic Organization Admin - My SEQ";
+  }, []);
 
   useEffect(() => {
     checkAuthentication();
@@ -131,17 +137,22 @@ const CivicAdmin = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-        <Navbar />
-        <main className="container mx-auto px-4 py-8">
-          <div className="max-w-4xl mx-auto">
-            <div className="animate-pulse space-y-6">
-              <div className="h-8 bg-muted rounded w-1/3"></div>
-              <div className="h-64 bg-muted rounded"></div>
+      <>
+        <SkipLinks />
+        <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+          <header id="primary-navigation">
+            <Navbar />
+          </header>
+          <main className="container mx-auto px-4 py-8">
+            <div className="max-w-4xl mx-auto">
+              <div className="animate-pulse space-y-6">
+                <div className="h-8 bg-muted rounded w-1/3"></div>
+                <div className="h-64 bg-muted rounded"></div>
+              </div>
             </div>
-          </div>
-        </main>
-      </div>
+          </main>
+        </div>
+      </>
     );
   }
 
@@ -150,8 +161,13 @@ const CivicAdmin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar />
+    <>
+      <SkipLinks />
+      <header id="primary-navigation">
+        <Navbar />
+      </header>
+      
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
 
       {/* Mobile Warning Banner */}
       {isMobile && (
@@ -162,9 +178,9 @@ const CivicAdmin = () => {
             The admin panel is optimized for desktop use only. Please use a desktop or laptop computer for the best experience.
           </AlertDescription>
         </Alert>
-      )}
-      
-      <main className="container mx-auto px-4 py-8">
+        )}
+        
+        <main id="main-content" className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
@@ -272,8 +288,10 @@ const CivicAdmin = () => {
             </TabsContent>
           </Tabs>
         </div>
-      </main>
-    </div>
+        </main>
+      </div>
+      <Footer />
+    </>
   );
 };
 

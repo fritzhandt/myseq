@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Search, ArrowLeft, ChevronDown, Palette, GraduationCap, Heart, Users, Trophy, Leaf, Scale, Globe, UtensilsCrossed, Gavel, Baby, X, Sparkles } from "lucide-react";
+import SkipLinks from "@/components/SkipLinks";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import ResourceCard from "@/components/ResourceCard";
 import UserPagination from "@/components/UserPagination";
 import { supabase } from "@/integrations/supabase/client";
@@ -61,6 +63,11 @@ export default function Resources() {
   const location = useLocation();
   const navigate = useNavigate();
   const { trackPageView } = useAnalytics();
+
+  // Set document title
+  useEffect(() => {
+    document.title = "Programs & Services - My SEQ";
+  }, []);
 
   // Track page view
   useEffect(() => {
@@ -213,11 +220,15 @@ export default function Resources() {
   const paginatedResources = filteredResources.slice(startIndex, startIndex + itemsPerPage);
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
+    <>
+      <SkipLinks />
+      <header id="primary-navigation">
+        <Navbar />
+      </header>
       
-      {/* Back to Home Button */}
-      <div className="bg-muted/50 border-b">
+      <main id="main-content" className="min-h-screen bg-background">
+        {/* Back to Home Button */}
+        <div className="bg-muted/50 border-b">
         <div className="container mx-auto px-4 py-3">
           <Button
             variant="ghost"
@@ -231,7 +242,7 @@ export default function Resources() {
         </div>
       </div>
       
-      <main className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-8">
           <div className="flex-1">
             <h1 className="text-4xl font-bold mb-4">
@@ -421,7 +432,9 @@ export default function Resources() {
             />
           </>
         )}
+      </div>
       </main>
-    </div>
+      <Footer />
+    </>
   );
 }
