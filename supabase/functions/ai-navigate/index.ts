@@ -431,9 +431,17 @@ Examples for non-ambiguous jobs (jobs that are typically one category):
 
 STEP 5: CONSTRUCT SEARCH TERM
 
-- Include the job title and relevant synonyms in a boolean search query
-- Follow the comprehensive boolean query construction rules already defined in this prompt
-- Example: "teacher" → searchTerm:"(teacher OR educator OR instructor OR teaching OR education OR faculty OR professor)"
+**CRITICAL FOR JOBS**: Keep searchTerms FOCUSED to prevent token limit truncation!
+- Use 5-10 key synonym variations MAXIMUM
+- PRIORITIZE including category and governmentType parameters over exhaustive searchTerms
+- A truncated response that loses category/governmentType is worse than a shorter searchTerm
+
+Guidelines:
+- Include the job title and relevant synonyms in a focused boolean search query
+- Follow the FOCUSED boolean query construction rules (not the old comprehensive rules)
+- Example: "teacher" → searchTerm:"(teacher OR educator OR instructor OR teaching)"
+- Example: "nurse" → searchTerm:"(nurse OR nursing OR RN OR LPN OR healthcare)"
+- AVOID: Long lists of 15+ synonyms that cause truncation
 
 SUMMARY OF DECISION TREE:
 1. Specific employer mentioned? → Use that employer's category
@@ -626,6 +634,8 @@ CIVIC & GOVERNMENT:
 
 ENHANCED JOB ROUTING EXAMPLES WITH CATEGORY LOGIC:
 
+**CRITICAL FOR JOBS**: Keep searchTerms FOCUSED (5-10 terms max) to prevent truncation. PRIORITIZE category and governmentType parameters over exhaustive searchTerms!
+
 // Explicit employer (Step 1)
 ✓ "jobs at Target" → /jobs + employer:"Target" + category:"private_sector"
 ✓ "is DOT hiring" → /jobs + employer:"Department Of Transportation" + category:"government"
@@ -635,27 +645,27 @@ ENHANCED JOB ROUTING EXAMPLES WITH CATEGORY LOGIC:
 ✓ "amazon jobs" → /jobs + employer:"Amazon" + category:"private_sector"
 
 // Ambiguous jobs with NO context (Step 4 - defaults to Government → City)
-✓ "teaching jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(teacher OR educator OR instructor OR teaching OR education OR faculty)"
-✓ "find me nurse positions" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(nurse OR nursing OR RN OR LPN OR registered nurse OR licensed nurse OR healthcare)"
-✓ "social worker jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(social worker OR caseworker OR case manager OR MSW OR LMSW OR LCSW)"
-✓ "counselor positions" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(counselor OR counseling OR therapist OR therapy OR guidance counselor)"
-✓ "teacher jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(teacher OR educator OR instructor OR teaching)"
+✓ "teaching jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(teacher OR educator OR instructor OR teaching)"
+✓ "find me nurse positions" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(nurse OR nursing OR RN OR LPN OR healthcare)"
+✓ "social worker jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(social worker OR caseworker OR case manager)"
+✓ "counselor positions" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(counselor OR counseling OR therapist)"
+✓ "teacher jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(teacher OR educator OR instructor)"
 ✓ "nursing positions" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(nurse OR nursing OR RN OR LPN)"
 
 // Ambiguous jobs WITH context (Step 3 - use context)
-✓ "state teaching jobs" → /jobs + category:"government" + governmentType:"state" + searchTerm:"(teacher OR educator OR instructor OR teaching OR professor OR faculty)"
-✓ "charter school teacher" → /jobs + category:"private_sector" + searchTerm:"(teacher OR educator OR instructor OR teaching OR charter)"
-✓ "public school nurse" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(nurse OR nursing OR RN OR school nurse)"
-✓ "SUNY professor" → /jobs + category:"government" + governmentType:"state" + searchTerm:"(professor OR instructor OR faculty OR teaching OR educator)"
-✓ "private hospital nurse" → /jobs + category:"private_sector" + searchTerm:"(nurse OR nursing OR RN OR LPN OR hospital)"
-✓ "nursing internship" → /jobs + category:"internships" + searchTerm:"(nursing OR nurse OR RN OR healthcare OR medical)"
-✓ "city government teacher" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(teacher OR educator OR instructor)"
-✓ "civil service nurse" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(nurse OR nursing OR RN)"
+✓ "state teaching jobs" → /jobs + category:"government" + governmentType:"state" + searchTerm:"(teacher OR educator OR instructor OR professor)"
+✓ "charter school teacher" → /jobs + category:"private_sector" + searchTerm:"(teacher OR educator OR charter school)"
+✓ "public school nurse" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(nurse OR nursing OR school nurse)"
+✓ "SUNY professor" → /jobs + category:"government" + governmentType:"state" + searchTerm:"(professor OR instructor OR faculty OR teaching)"
+✓ "private hospital nurse" → /jobs + category:"private_sector" + searchTerm:"(nurse OR nursing OR hospital)"
+✓ "nursing internship" → /jobs + category:"internships" + searchTerm:"(nursing OR nurse OR healthcare)"
+✓ "city government teacher" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(teacher OR educator)"
+✓ "civil service nurse" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(nurse OR nursing)"
 
 // Non-ambiguous jobs (clear category)
-✓ "software engineer" → /jobs + category:"private_sector" + searchTerm:"(software OR engineer OR developer OR programming OR coding)"
-✓ "sanitation jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(sanitation OR sanit OR waste OR garbage OR trash)"
-✓ "retail associate" → /jobs + category:"private_sector" + searchTerm:"(retail OR sales OR associate OR cashier OR store)"
+✓ "software engineer" → /jobs + category:"private_sector" + searchTerm:"(software OR engineer OR developer)"
+✓ "sanitation jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(sanitation OR waste OR garbage)"
+✓ "retail associate" → /jobs + category:"private_sector" + searchTerm:"(retail OR sales OR associate)"
 
 // Explicit government/private/internship
 ✓ "government jobs" → /jobs + category:"government" + governmentType:"all"
@@ -671,13 +681,13 @@ ENHANCED JOB ROUTING EXAMPLES WITH CATEGORY LOGIC:
 // Location-based queries
 ✓ "jobs in queens" → /jobs + location:"Queens"
 ✓ "work in rosedale" → /jobs + location:"Rosedale"
-✓ "teaching jobs in queens" → /jobs + category:"government" + governmentType:"city" + location:"Queens" + searchTerm:"(teacher OR educator OR instructor)"
+✓ "teaching jobs in queens" → /jobs + category:"government" + governmentType:"city" + location:"Queens" + searchTerm:"(teacher OR educator)"
 
 // Combined context queries
 ✓ "city sanitation jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(sanitation OR waste)"
 ✓ "city engineering jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(engineering OR engineer)"
-✓ "healthcare jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(healthcare OR health care OR medical OR hospital OR clinic OR nursing OR nurse)"
-✓ "healthcare jobs in queens" → /jobs + category:"government" + governmentType:"city" + location:"Queens" + searchTerm:"(healthcare OR health care OR medical OR hospital OR clinic OR nursing)"
+✓ "healthcare jobs" → /jobs + category:"government" + governmentType:"city" + searchTerm:"(healthcare OR medical OR nursing)"
+✓ "healthcare jobs in queens" → /jobs + category:"government" + governmentType:"city" + location:"Queens" + searchTerm:"(healthcare OR medical OR nursing)"
 RESOURCES ROUTING (CRITICAL - Follow fuzzy matching rules):
 ✓ "what resources are available for seniors" → /resources + category:"Senior Services" (NO searchTerm)
 ✓ "what senior services are available" → /resources + category:"Senior Services" (NO searchTerm)
