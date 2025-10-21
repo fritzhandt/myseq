@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, ArrowLeft } from "lucide-react";
+import { Search, ArrowLeft, Plus } from "lucide-react";
+import PublicBusinessOpportunityForm from '@/components/PublicBusinessOpportunityForm';
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SkipLinks from "@/components/SkipLinks";
@@ -33,6 +34,7 @@ export default function BusinessOpportunities() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [showSubmitForm, setShowSubmitForm] = useState(false);
   const itemsPerPage = 12;
   const location = useLocation();
   const navigate = useNavigate();
@@ -153,9 +155,17 @@ export default function BusinessOpportunities() {
             <h1 className="text-4xl font-bold mb-4">
               Business Opportunities
             </h1>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-6">
               Explore business opportunities and entrepreneurship resources in your community
             </p>
+            <Button
+              size="lg"
+              onClick={() => setShowSubmitForm(true)}
+              className="flex items-center gap-2 mx-auto"
+            >
+              <Plus className="h-5 w-5" />
+              Submit Your Opportunity
+            </Button>
           </div>
         </div>
 
@@ -241,6 +251,11 @@ export default function BusinessOpportunities() {
         )}
       </main>
       <Footer />
+      
+      <PublicBusinessOpportunityForm
+        open={showSubmitForm}
+        onOpenChange={setShowSubmitForm}
+      />
     </div>
     </>
   );

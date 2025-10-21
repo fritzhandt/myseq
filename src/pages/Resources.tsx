@@ -248,9 +248,17 @@ export default function Resources() {
             <h1 className="text-4xl font-bold mb-4">
               Programs & Services
             </h1>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-6">
               Discover local organizations and services available in your community
             </p>
+            <Button
+              size="lg"
+              onClick={() => setShowSubmitForm(true)}
+              className="flex items-center gap-2 mx-auto"
+            >
+              <Plus className="h-5 w-5" />
+              Add Your Organization
+            </Button>
           </div>
         </div>
 

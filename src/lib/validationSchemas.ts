@@ -101,3 +101,33 @@ export const sanitizeUrl = (url: string): string => {
     return '';
   }
 };
+
+// Public submission schemas with either/or validation for website/address
+export const publicResourceSchema = z.object({
+  organization_name: z.string().trim().min(1, "Organization name is required").max(200, "Name must be less than 200 characters"),
+  description: z.string().trim().min(1, "Description is required").max(5000, "Description must be less than 5000 characters"),
+  website: z.string().trim().optional().or(z.literal('')),
+  email: z.string().email("Invalid email").optional().or(z.literal('')),
+  phone: z.string().max(20, "Phone number too long").optional().or(z.literal('')),
+  address: z.string().max(500, "Address must be less than 500 characters").optional().or(z.literal('')),
+  categories: z.array(z.string()).min(1, "At least one category is required"),
+  logo_url: z.string().optional().or(z.literal('')),
+  cover_photo_url: z.string().optional().or(z.literal('')),
+}).refine(
+  (data) => data.website || data.address,
+  { message: "Either website or address must be provided", path: ["website"] }
+);
+
+export const publicJobSchema = z.object({
+  title: z.string().trim().min(1, "Job title is required").max(200, "Title must be less than 200 characters"),
+  employer: z.string().trim().min(1, "Employer is required").max(200, "Employer must be less than 200 characters"),
+  description: z.string().trim().min(1, "Description is required").max(5000, "Description must be less than 5000 characters"),
+  location: z.string().trim().min(1, "Location is required").max(200, "Location must be less than 200 characters"),
+  salary: z.string().trim().min(1, "Salary information is required").max(100, "Salary must be less than 100 characters"),
+  apply_info: z.string().trim().min(1, "Application information is required").max(1000, "Application info must be less than 1000 characters"),
+  category: z.enum(['government', 'private', 'nonprofit']),
+  subcategory: z.string().max(100, "Subcategory must be less than 100 characters").optional().or(z.literal('')),
+  is_apply_link: z.boolean(),
+  contact_email: z.string().email("Invalid email").optional().or(z.literal('')),
+  contact_phone: z.string().max(20, "Phone number too long").optional().or(z.literal('')),
+});

@@ -377,20 +377,41 @@ export const PendingApprovalsManager = () => {
           </div>
         );
       case 'resource':
+        const isJob = data.type === 'job';
+        const jobData = isJob ? JSON.parse(data.description) : null;
+        
         return (
           <div className="space-y-4">
             {submitterInfo}
+            {isJob && <Badge>Job Posting</Badge>}
+            {data.type === 'business_opportunity' && <Badge>Business Opportunity</Badge>}
             <div>
-              <Label className="font-semibold">Organization</Label>
+              <Label className="font-semibold">{isJob ? 'Employer' : 'Organization'}</Label>
               <p className="text-sm">{data.organization_name}</p>
             </div>
+            {isJob && (
+              <>
+                <div>
+                  <Label className="font-semibold">Job Title</Label>
+                  <p className="text-sm">{jobData.title}</p>
+                </div>
+                <div>
+                  <Label className="font-semibold">Location</Label>
+                  <p className="text-sm">{jobData.location}</p>
+                </div>
+                <div>
+                  <Label className="font-semibold">Salary</Label>
+                  <p className="text-sm">{jobData.salary}</p>
+                </div>
+              </>
+            )}
             <div>
               <Label className="font-semibold">Description</Label>
-              <p className="text-sm">{data.description}</p>
+              <p className="text-sm">{isJob ? jobData.description : data.description}</p>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="font-semibold">Website</Label>
+                <Label className="font-semibold">{isJob ? 'Apply Info' : 'Website'}</Label>
                 <p className="text-sm">{data.website || 'N/A'}</p>
               </div>
               <div>
