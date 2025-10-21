@@ -38,9 +38,11 @@ serve(async (req) => {
       if (url.startsWith('http://') || url.startsWith('https://')) {
         return url;
       }
-      // Convert public folder paths to full URLs
+      // Convert public folder paths to full URLs with protocol
       if (url.startsWith('/')) {
-        const fullUrl = `${FRONTEND_URL}${url}`;
+        // Ensure FRONTEND_URL has protocol
+        const baseUrl = FRONTEND_URL.startsWith('http') ? FRONTEND_URL : `https://${FRONTEND_URL}`;
+        const fullUrl = `${baseUrl}${url}`;
         console.log('Converted public folder image:', url, '->', fullUrl);
         return fullUrl;
       }
