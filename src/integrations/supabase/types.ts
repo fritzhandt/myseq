@@ -1497,14 +1497,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      archive_expired_events: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      cleanup_expired_civic_sessions: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      archive_expired_events: { Args: never; Returns: undefined }
+      cleanup_expired_civic_sessions: { Args: never; Returns: undefined }
       get_current_civic_org: {
         Args: { session_token: string }
         Returns: string
@@ -1523,10 +1517,7 @@ export type Database = {
         Args: { user_id: string }
         Returns: Database["public"]["Enums"]["user_role"]
       }
-      is_main_admin: {
-        Args: { user_id: string }
-        Returns: boolean
-      }
+      is_main_admin: { Args: { user_id: string }; Returns: boolean }
     }
     Enums: {
       user_role: "main_admin" | "sub_admin"
