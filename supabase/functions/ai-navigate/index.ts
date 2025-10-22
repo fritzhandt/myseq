@@ -1041,9 +1041,16 @@ TOPICS YOU CAN ANSWER (assume SE Queens context):
 
 If you don't know specific details, provide general guidance about Southeast Queens.
 
-REJECT ONLY IF:
-✗ Explicitly about another geographic area (e.g., "unemployment office in Manhattan")
-✗ Obviously unrelated topic (e.g., "how to bake a cake", "what is quantum physics")
+HANDLING UNRELATED QUESTIONS:
+If a question is clearly unrelated to Southeast Queens (e.g., "how to bake a cake", "what is quantum physics"), 
+respond with a polite message directing them to the relevant parts of the site, and STILL return success:true with isGeneralQuery:true.
+
+Example response for unrelated questions:
+{
+  "isGeneralQuery": true,
+  "answer": "I'm designed to help with information about Southeast Queens, NY - including local government services, community resources, jobs, and civic organizations. Try asking about elected officials, community programs, or local services!",
+  "success": true
+}
 
 ANSWER EXAMPLES:
 Q: "what rappers were born in southeast queens"
@@ -1059,17 +1066,13 @@ CRITICAL: Return ONLY valid JSON, no other text.
 
 RESPONSE FORMAT (ONLY JSON):
 
+Always return success:true with isGeneralQuery:true for any question, even if unrelated.
+For unrelated questions, provide a helpful redirect message.
+
 {
   "isGeneralQuery": true,
-  "answer": "Your 2-3 sentence factual answer",
+  "answer": "Your 2-3 sentence factual answer OR polite redirect for unrelated questions",
   "success": true
-}
-
-OR
-
-{
-  "success": false,
-  "error": "I can only answer questions about Southeast Queens, NY"
 }`;
 
       const generalResponse = await fetch("https://api.openai.com/v1/chat/completions", {
