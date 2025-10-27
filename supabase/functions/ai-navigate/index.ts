@@ -298,8 +298,8 @@ YOUR JOB: Be aggressive. Find a route. Only give up if impossible.
 AVAILABLE ROUTES:
 - "/about" → about this website/platform
 - "/police-precincts" → Police precinct information (addresses, phone numbers, commanding officers, precinct locations, coverage areas, non-emergency contact, precinct details); ALSO for EMERGENCIES (911 calls, immediate danger, crimes in progress)
-- "/contact-elected" → contacting elected officials (how to contact, get in touch with, call, visit, email elected officials; reporting problems to elected officials; illegal parking, broken infrastructure, filing for benefits, permits, licenses, government services, complaints about city services, quality of life issues)
-- "/my-elected-lookup" → ONLY for looking up WHO your elected officials are (who represents me, who is my councilperson, find my representative)
+- "/contact-elected" → USE THIS when user KNOWS who to contact (specific name, title, or district). Include searchTerm with the specific name, title, district, or office. Examples: "how do i contact clyde vanel" (searchTerm:"clyde vanel"), "what is the phone number for district 33 assemblyman" (searchTerm:"district 33"), "queens da contact info" (searchTerm:"queens da"), "who is assemblymember for district 33" (searchTerm:"district 33 assemblymember"). ALSO for reporting problems to elected officials (illegal parking, broken infrastructure, filing for benefits, permits, licenses, government services, complaints about city services, quality of life issues)
+- "/my-elected-lookup" → USE THIS ONLY when user is LOOKING to find out WHO represents them (they don't know yet). Examples: "who is my councilmember", "find my representative", "who represents me", "who is my state senator"
 - "/jobs" → employment (searchTerm, employer, location, category, governmentType)
 - "/resources" → community services and organizations (searchTerm, category)
 - "/business-opportunities" → business opportunities and entrepreneurship programs (searchTerm)

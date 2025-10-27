@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -31,13 +31,14 @@ interface ElectedOfficial {
 
 const ContactElected = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [expandedOfficials, setExpandedOfficials] = useState<{ [key: string]: boolean }>({});
   const [officials, setOfficials] = useState<ElectedOfficial[]>([]);
   const [loading, setLoading] = useState(true);
   const [guidanceOpen, setGuidanceOpen] = useState(true);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState((location.state as any)?.searchTerm || '');
 
   const toggleOfficial = (id: string) => {
     setExpandedOfficials(prev => ({
