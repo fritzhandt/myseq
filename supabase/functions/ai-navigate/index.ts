@@ -127,6 +127,16 @@ serve(async (req) => {
     const resourceCategoryList = resourceCategories.join(", ");
     console.log("Fetched resource categories:", resourceCategoryList);
 
+    // Fetch elected officials from database for contact routing
+    const { data: officialsData } = await supabase
+      .from("elected_officials")
+      .select("name, title, office, district, level");
+
+    const officialsList = officialsData?.map(o => 
+      `${o.name} - ${o.title} (${o.office}${o.district ? `, District ${o.district}` : ''}, ${o.level})`
+    ).join("\n") || "";
+    console.log("Fetched elected officials for routing");
+
     if (!openAIApiKey) {
       console.error("OpenAI API key not found");
       return new Response(
@@ -298,12 +308,28 @@ YOUR JOB: Be aggressive. Find a route. Only give up if impossible.
 AVAILABLE ROUTES:
 - "/about" → about this website/platform
 - "/police-precincts" → Police precinct information (addresses, phone numbers, commanding officers, precinct locations, coverage areas, non-emergency contact, precinct details); ALSO for EMERGENCIES (911 calls, immediate danger, crimes in progress)
-- "/contact-elected" → USE THIS when user KNOWS who to contact (specific name, title, or district). Include searchTerm with the specific name, title, district, or office. Examples: "how do i contact clyde vanel" (searchTerm:"clyde vanel"), "what is the phone number for district 33 assemblyman" (searchTerm:"district 33"), "queens da contact info" (searchTerm:"queens da"), "who is assemblymember for district 33" (searchTerm:"district 33 assemblymember"). ALSO for reporting problems to elected officials (illegal parking, broken infrastructure, filing for benefits, permits, licenses, government services, complaints about city services, quality of life issues)
-- "/my-elected-lookup" → USE THIS ONLY when user is LOOKING to find out WHO represents them (they don't know yet). Examples: "who is my councilmember", "find my representative", "who represents me", "who is my state senator"
+- "/contact-elected" → USE THIS when user asks about a SPECIFIC person, district, or position from the list below. Extract the most relevant search term (name, district number, or office title) and include it as searchTerm. Examples: "how do i contact clyde vanel" (searchTerm:"clyde vanel"), "who is the district 33 assemblyman" (searchTerm:"district 33"), "queens da phone number" (searchTerm:"melinda katz" or searchTerm:"queens da"). ALSO for reporting problems to elected officials (illegal parking, broken infrastructure, filing for benefits, permits, licenses, government services, complaints about city services, quality of life issues)
+- "/my-elected-lookup" → USE THIS ONLY when user is asking WHO represents them personally (they don't know the specific person yet). Examples: "who is my councilmember", "find my representative", "who represents me", "who is my state senator"
 - "/jobs" → employment (searchTerm, employer, location, category, governmentType)
 - "/resources" → community services and organizations (searchTerm, category)
 - "/business-opportunities" → business opportunities and entrepreneurship programs (searchTerm)
 - "/civics" → civic organizations/community boards/police precinct councils (searchTerm, organizationType)
+
+ELECTED OFFICIALS DATABASE (use this to match specific queries to /contact-elected):
+${officialsList}
+
+CRITICAL ROUTING RULES FOR ELECTED OFFICIALS:
+1. If query mentions a SPECIFIC name, district number, or office title from the list above → /contact-elected with searchTerm
+2. If query is a GENERAL "who is my..." question (no specific person/district mentioned) → /my-elected-lookup
+3. Extract the most specific searchTerm possible (prefer name > district > office title)
+
+Examples:
+✓ "how do i contact clyde vanel?" → /contact-elected + searchTerm:"clyde vanel"
+✓ "who is the district 33 assemblyman?" → /contact-elected + searchTerm:"district 33"
+✓ "what is the queens da phone number?" → /contact-elected + searchTerm:"melinda katz"
+✓ "contact info for senator toby ann stavisky" → /contact-elected + searchTerm:"toby ann stavisky"
+✗ "who is my councilmember?" → /my-elected-lookup (no specific person/district mentioned)
+✗ "find my state senator" → /my-elected-lookup (general lookup request)
 
 TOPICS THAT SHOULD NOT BE ROUTED (answer these in general query):
 - Voter registration → Tell users to click the menu (☰) in top right and select "Register to Vote"
