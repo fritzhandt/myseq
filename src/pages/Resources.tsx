@@ -3,12 +3,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Search, ArrowLeft, ChevronDown, Palette, GraduationCap, Heart, Users, Trophy, Leaf, Scale, Globe, UtensilsCrossed, Gavel, Baby, X, Sparkles, Plus } from "lucide-react";
+import { Search, ArrowLeft, ChevronDown, Palette, GraduationCap, Heart, Users, Trophy, Leaf, Scale, Globe, UtensilsCrossed, Gavel, Baby, X, Sparkles, Plus, Map, Grid3x3 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PublicResourceSubmissionForm from "@/components/PublicResourceSubmissionForm";
 import SkipLinks from "@/components/SkipLinks";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ResourceCard from "@/components/ResourceCard";
+import ResourceMap from "@/components/ResourceMap";
 import UserPagination from "@/components/UserPagination";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -26,6 +28,8 @@ interface Resource {
   logo_url?: string;
   cover_photo_url?: string;
   categories: string[];
+  latitude?: number;
+  longitude?: number;
 }
 
 // Main categories with icons
@@ -61,6 +65,7 @@ export default function Resources() {
   const [showAIBadge, setShowAIBadge] = useState(false);
   const [actualSearchQuery, setActualSearchQuery] = useState("");
   const [showSubmitForm, setShowSubmitForm] = useState(false);
+  const [viewMode, setViewMode] = useState<"grid" | "map">("grid");
   const itemsPerPage = 12;
   const location = useLocation();
   const navigate = useNavigate();
@@ -397,7 +402,23 @@ export default function Resources() {
           {loading ? 'Loading resources...' : `${filteredResources.length} resources found`}
         </div>
 
-        {/* Resources Grid */}
+        {/* View Toggle */}
+        <div className="flex justify-center mb-6">
+          <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as "grid" | "map")} className="w-auto">
+            <TabsList>
+              <TabsTrigger value="grid" className="flex items-center gap-2">
+                <Grid3x3 className="h-4 w-4" />
+                Grid View
+              </TabsTrigger>
+              <TabsTrigger value="map" className="flex items-center gap-2">
+                <Map className="h-4 w-4" />
+                Map View
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+
+        {/* Resources Display */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-muted-foreground">
@@ -426,24 +447,30 @@ export default function Resources() {
           </div>
         ) : (
           <>
-            <div 
-              role="region" 
-              aria-label="Resources search results"
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-            >
-              {paginatedResources.map((resource) => (
-                <ResourceCard key={resource.id} resource={resource} />
-              ))}
-            </div>
-            
-            {/* Pagination */}
-            <UserPagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={filteredResources.length}
-              itemsPerPage={itemsPerPage}
-              onPageChange={setCurrentPage}
-            />
+            {viewMode === "grid" ? (
+              <>
+                <div 
+                  role="region" 
+                  aria-label="Resources search results"
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                >
+                  {paginatedResources.map((resource) => (
+                    <ResourceCard key={resource.id} resource={resource} />
+                  ))}
+                </div>
+                
+                {/* Pagination */}
+                <UserPagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalItems={filteredResources.length}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={setCurrentPage}
+                />
+              </>
+            ) : (
+              <ResourceMap resources={filteredResources} />
+            )}
             
             {/* Submit Form Button */}
             <div className="mt-12 text-center">

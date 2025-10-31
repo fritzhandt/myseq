@@ -92,3 +92,9 @@ verify_jwt = false
 
 [functions.generate-alt-text]
 verify_jwt = true
+
+[functions.geocode-resources]
+verify_jwt = true
+
+[functions.ai-resource-search]
+verify_jwt = false

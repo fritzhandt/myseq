@@ -2,7 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+/* Leaflet map styles */
+@import 'leaflet/dist/leaflet.css';
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here.
 All colors MUST be HSL.
 */
 
@@ -231,4 +234,32 @@ a:focus-visible,
 /* Focus not obscured - WCAG 2.4.11 (2.2) */
 :focus {
   scroll-margin-top: 5rem;
+}
+
+/* Custom Leaflet marker styles */
+.custom-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Leaflet popup customization */
+.leaflet-popup-content-wrapper {
+  @apply rounded-lg shadow-lg;
+}
+
+.leaflet-popup-content {
+  @apply m-0;
+}
+
+.dark .leaflet-popup-content-wrapper {
+  @apply bg-card text-card-foreground;
+}
+
+/* Leaflet cluster customization */
+.marker-cluster {
+  @apply bg-primary/20 border-2 border-primary rounded-full;
+}
+
+.marker-cluster div {
+  @apply bg-primary text-primary-foreground font-semibold rounded-full flex items-center justify-center;
 }
