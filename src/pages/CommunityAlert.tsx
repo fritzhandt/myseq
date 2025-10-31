@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/carousel';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
+import { linkifyText } from '@/utils/linkify';
 
 interface CommunityAlert {
   id: string;
@@ -127,8 +128,8 @@ const CommunityAlert = () => {
 
         {/* Long Description */}
         <div className="prose prose-lg max-w-none mb-8">
-          <div className="whitespace-pre-wrap text-foreground leading-relaxed">
-            {alert.long_description}
+          <div className="text-foreground leading-relaxed">
+            {linkifyText(alert.long_description)}
           </div>
         </div>
 
