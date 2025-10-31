@@ -26,21 +26,16 @@ function isPOBox(address: string): boolean {
 }
 
 /**
- * Normalize Queens hyphenated addresses (e.g., "219-07" to "21907")
- */
-function normalizeQueensAddress(address: string): string {
-  // Queens uses hyphenated addresses like "219-07 Street Name"
-  // Try removing the hyphen: "219-07" becomes "21907"
-  return address.replace(/^(\d{2,3})-(\d{2})\s/, '$1$2 ');
-}
-
-/**
  * Try geocoding with multiple address format variations
+ * Respects Nominatim's 1 request per second rate limit
  */
-async function tryGeocode(addressVariations: string[]): Promise<{ lat: number; lon: number; matchedAddress: string } | null> {
-  for (const addr of addressVariations) {
+async function tryGeocode(addressVariations: string[], sleep: (ms: number) => Promise<void>): Promise<{ lat: number; lon: number; matchedAddress: string } | null> {
+  for (let i = 0; i < addressVariations.length; i++) {
+    const addr = addressVariations[i];
     const encodedAddress = encodeURIComponent(addr);
     const url = `https://nominatim.openstreetmap.org/search?q=${encodedAddress}&format=json&limit=1`;
+    
+    console.log(`  Trying variation ${i + 1}/${addressVariations.length}: "${addr}"`);
     
     const response = await fetch(url, {
       headers: {
@@ -48,16 +43,38 @@ async function tryGeocode(addressVariations: string[]): Promise<{ lat: number; l
       },
     });
 
-    if (!response.ok) continue;
+    if (!response.ok) {
+      console.warn(`  ✗ Nominatim request failed (${response.status}) for "${addr}"`);
+      
+      // If we get rate limited, wait longer before next attempt
+      if (response.status === 429) {
+        console.warn(`  ⏳ Rate limited, waiting 5 seconds...`);
+        await sleep(5000);
+      }
+      
+      // Still wait between variations to respect rate limits
+      if (i < addressVariations.length - 1) {
+        await sleep(1100);
+      }
+      continue;
+    }
 
     const data: NominatimResponse[] = await response.json();
     
     if (data && data.length > 0) {
+      console.log(`  ✓ Match found with variation ${i + 1}`);
       return {
         lat: parseFloat(data[0].lat),
         lon: parseFloat(data[0].lon),
         matchedAddress: addr,
       };
+    }
+    
+    console.log(`  ✗ No results for variation ${i + 1}`);
+    
+    // Wait 1.1 seconds between variations to respect Nominatim's rate limit
+    if (i < addressVariations.length - 1) {
+      await sleep(1100);
     }
   }
   
@@ -66,8 +83,8 @@ async function tryGeocode(addressVariations: string[]): Promise<{ lat: number; l
 
 /**
  * Geocode an address using Nominatim (OpenStreetMap)
- * Tries multiple format variations for Queens addresses
- * Rate limited to 1 request per second
+ * Tries multiple NYC-aware format variations
+ * Rate limited to 1 request per second per variation
  */
 async function geocodeAddress(address: string): Promise<{ lat: number; lon: number } | null> {
   try {
@@ -77,16 +94,18 @@ async function geocodeAddress(address: string): Promise<{ lat: number; lon: numb
       return null;
     }
 
-    // Try multiple address format variations
+    // Try multiple NYC-aware address format variations
+    // Don't remove Queens hyphens - OSM often understands them better
     const addressVariations = [
-      address, // Original format
-      normalizeQueensAddress(address), // Queens format without hyphen
-      address.replace(/,/g, ''), // Without commas
+      address, // Original format (e.g., "219-07 46th Ave, Queens Village, NY 11429")
+      `${address}, Queens, NY`, // Explicit Queens
+      `${address}, Queens, New York, USA`, // Full explicit format
+      address.replace(/,/g, ''), // Without commas as fallback
     ];
 
-    console.log(`Trying address variations for: ${address}`);
+    console.log(`Geocoding: ${address}`);
     
-    const result = await tryGeocode(addressVariations);
+    const result = await tryGeocode(addressVariations, sleep);
     
     if (result) {
       console.log(`✓ Successfully geocoded: ${address} using format: ${result.matchedAddress}`);
@@ -211,8 +230,9 @@ Deno.serve(async (req) => {
         });
       }
 
-      // Rate limiting: wait 1.5 seconds between resources (allows for multiple format attempts)
-      await sleep(1500);
+      // Rate limiting is now handled inside tryGeocode (1.1s between variations)
+      // Small delay between resources to be extra safe
+      await sleep(500);
     }
 
     console.log(`Geocoding complete: ${geocoded} successful, ${failed} failed, ${skipped} skipped`);
