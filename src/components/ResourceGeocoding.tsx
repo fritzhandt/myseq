@@ -16,10 +16,12 @@ interface GeocodingResult {
   success: boolean;
   geocoded: number;
   failed: number;
+  skipped?: number;
   failedResources?: Array<{
     id: string;
     name: string;
     address: string;
+    reason?: string;
   }>;
   message: string;
 }
@@ -201,18 +203,26 @@ export function ResourceGeocoding() {
                 <div className="text-sm space-y-1">
                   <div>✓ Successfully geocoded: {result.geocoded}</div>
                   <div>✗ Failed to geocode: {result.failed}</div>
+                  {result.skipped && result.skipped > 0 && (
+                    <div>⊘ Skipped (P.O. Boxes): {result.skipped}</div>
+                  )}
                 </div>
               </AlertDescription>
             </Alert>
 
             {result.failedResources && result.failedResources.length > 0 && (
               <div className="border rounded-lg p-4">
-                <h4 className="font-semibold mb-2 text-sm">Failed Resources ({result.failedResources.length}):</h4>
+                <h4 className="font-semibold mb-2 text-sm">Unable to Geocode ({result.failedResources.length}):</h4>
                 <div className="space-y-2 max-h-48 overflow-y-auto">
                   {result.failedResources.map((resource) => (
                     <div key={resource.id} className="text-sm bg-muted p-2 rounded">
                       <div className="font-medium">{resource.name}</div>
                       <div className="text-muted-foreground text-xs">{resource.address}</div>
+                      {resource.reason && (
+                        <div className="text-muted-foreground text-xs italic mt-1">
+                          Reason: {resource.reason}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
