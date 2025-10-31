@@ -26,7 +26,47 @@ function isPOBox(address: string): boolean {
 }
 
 /**
+ * Normalize Queens hyphenated addresses (e.g., "219-07" to "21907")
+ */
+function normalizeQueensAddress(address: string): string {
+  // Queens uses hyphenated addresses like "219-07 Street Name"
+  // Try removing the hyphen: "219-07" becomes "21907"
+  return address.replace(/^(\d{2,3})-(\d{2})\s/, '$1$2 ');
+}
+
+/**
+ * Try geocoding with multiple address format variations
+ */
+async function tryGeocode(addressVariations: string[]): Promise<{ lat: number; lon: number; matchedAddress: string } | null> {
+  for (const addr of addressVariations) {
+    const encodedAddress = encodeURIComponent(addr);
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodedAddress}&format=json&limit=1`;
+    
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'MySEQ Community Platform (contact: admin@myseq.org)',
+      },
+    });
+
+    if (!response.ok) continue;
+
+    const data: NominatimResponse[] = await response.json();
+    
+    if (data && data.length > 0) {
+      return {
+        lat: parseFloat(data[0].lat),
+        lon: parseFloat(data[0].lon),
+        matchedAddress: addr,
+      };
+    }
+  }
+  
+  return null;
+}
+
+/**
  * Geocode an address using Nominatim (OpenStreetMap)
+ * Tries multiple format variations for Queens addresses
  * Rate limited to 1 request per second
  */
 async function geocodeAddress(address: string): Promise<{ lat: number; lon: number } | null> {
@@ -37,28 +77,22 @@ async function geocodeAddress(address: string): Promise<{ lat: number; lon: numb
       return null;
     }
 
-    // Pass address as-is since they already contain complete city/state/ZIP
-    const encodedAddress = encodeURIComponent(address);
-    const url = `https://nominatim.openstreetmap.org/search?q=${encodedAddress}&format=json&limit=1`;
-    
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'MySEQ Community Platform (contact: admin@myseq.org)',
-      },
-    });
+    // Try multiple address format variations
+    const addressVariations = [
+      address, // Original format
+      normalizeQueensAddress(address), // Queens format without hyphen
+      address.replace(/,/g, ''), // Without commas
+    ];
 
-    if (!response.ok) {
-      console.error(`Nominatim API error: ${response.status} for address: ${address}`);
-      return null;
-    }
-
-    const data: NominatimResponse[] = await response.json();
+    console.log(`Trying address variations for: ${address}`);
     
-    if (data && data.length > 0) {
-      console.log(`✓ Successfully geocoded: ${address} -> ${data[0].display_name}`);
+    const result = await tryGeocode(addressVariations);
+    
+    if (result) {
+      console.log(`✓ Successfully geocoded: ${address} using format: ${result.matchedAddress}`);
       return {
-        lat: parseFloat(data[0].lat),
-        lon: parseFloat(data[0].lon),
+        lat: result.lat,
+        lon: result.lon,
       };
     }
     
@@ -119,7 +153,13 @@ Deno.serve(async (req) => {
     let skipped = 0;
     const failedResources: { id: string; name: string; address: string; reason?: string }[] = [];
 
-    // Process each resource with rate limiting (1 request per second)
+    // Process in batches of 20 to avoid timeout
+    const BATCH_SIZE = 20;
+    const totalBatches = Math.ceil(resources.length / BATCH_SIZE);
+    
+    console.log(`Processing ${resources.length} resources in ${totalBatches} batches of ${BATCH_SIZE}`);
+
+    // Process each resource with rate limiting (1 request per second per variation)
     for (const resource of resources as Resource[]) {
       console.log(`Geocoding: ${resource.organization_name} - ${resource.address}`);
       
@@ -171,11 +211,12 @@ Deno.serve(async (req) => {
         });
       }
 
-      // Rate limiting: wait 1 second between requests
-      await sleep(1000);
+      // Rate limiting: wait 1.5 seconds between resources (allows for multiple format attempts)
+      await sleep(1500);
     }
 
     console.log(`Geocoding complete: ${geocoded} successful, ${failed} failed, ${skipped} skipped`);
+    console.log(`Processed ${resources.length} total resources`);
 
     return new Response(
       JSON.stringify({

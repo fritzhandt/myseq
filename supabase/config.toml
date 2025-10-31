@@ -95,6 +95,7 @@ verify_jwt = true
 
 [functions.geocode-resources]
 verify_jwt = true
+timeout = 300
 
 [functions.ai-resource-search]
 verify_jwt = false
