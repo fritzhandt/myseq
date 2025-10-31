@@ -1175,10 +1175,8 @@ export type Database = {
           description: string
           email: string | null
           id: string
-          latitude: number | null
           logo_alt: string | null
           logo_url: string | null
-          longitude: number | null
           organization_name: string
           phone: string | null
           type: string
@@ -1194,10 +1192,8 @@ export type Database = {
           description: string
           email?: string | null
           id?: string
-          latitude?: number | null
           logo_alt?: string | null
           logo_url?: string | null
-          longitude?: number | null
           organization_name: string
           phone?: string | null
           type?: string
@@ -1213,10 +1209,8 @@ export type Database = {
           description?: string
           email?: string | null
           id?: string
-          latitude?: number | null
           logo_alt?: string | null
           logo_url?: string | null
-          longitude?: number | null
           organization_name?: string
           phone?: string | null
           type?: string
