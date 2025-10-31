@@ -27,6 +27,7 @@ import { AdminStats } from '@/components/AdminStats';
 import ProfileSettings from '@/components/ProfileSettings';
 import AIRateLimitManager from '@/components/AIRateLimitManager';
 import { AltTextGenerator } from '@/components/AltTextGenerator';
+import { ResourceGeocoding } from '@/components/ResourceGeocoding';
 import { useToast } from '@/hooks/use-toast';
 import { useUserRole } from '@/hooks/useUserRole';
 import { Plus, Calendar, LogOut, Star, AlertTriangle, Users, MapPin, FileText, Building2, Clock, BarChart3, Briefcase, User, Zap, MonitorSmartphone, Accessibility } from 'lucide-react';
@@ -469,9 +470,10 @@ const Admin = () => {
                 </div>
                 
                 <Tabs defaultValue="manage" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2">
+                  <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="upload">Upload Programs/Services</TabsTrigger>
                     <TabsTrigger value="manage">Manage Programs/Services</TabsTrigger>
+                    <TabsTrigger value="geocoding">Map Geocoding</TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="upload" className="mt-4">
@@ -480,6 +482,10 @@ const Admin = () => {
 
                   <TabsContent value="manage" className="mt-4">
                     <ResourcesList onEdit={handleEditResource} refreshTrigger={resourcesRefresh} />
+                  </TabsContent>
+
+                  <TabsContent value="geocoding" className="mt-4">
+                    <ResourceGeocoding />
                   </TabsContent>
                 </Tabs>
               </div>
