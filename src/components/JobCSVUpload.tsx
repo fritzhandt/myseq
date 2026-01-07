@@ -192,6 +192,11 @@ export default function JobCSVUpload() {
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
+
+      // Notify admin lists to refetch (e.g., Manage Jobs)
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('jobs:refresh'));
+      }
     } catch (error: any) {
       toast({
         title: "Error importing jobs",
