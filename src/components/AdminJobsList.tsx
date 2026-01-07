@@ -70,7 +70,7 @@ export default function AdminJobsList() {
       const { data: privateJobs, error: privateError } = await supabase
         .from('jobs')
         .select('*')
-        .eq('category', 'private')
+        .in('category', ['private_sector', 'private'])
         .order('created_at', { ascending: false });
 
       const { data: internJobs, error: internError } = await supabase
@@ -100,6 +100,10 @@ export default function AdminJobsList() {
 
   useEffect(() => {
     fetchJobs();
+
+    const onRefresh = () => fetchJobs();
+    window.addEventListener('jobs:refresh', onRefresh);
+    return () => window.removeEventListener('jobs:refresh', onRefresh);
   }, []);
 
   // Filter jobs based on search term
