@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { civicApi } from "@/lib/civicApi";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -76,21 +77,15 @@ const CivicGeneralSettings = ({ orgId }: CivicGeneralSettingsProps) => {
     setSaving(true);
     
     try {
-      const { error } = await supabase
-        .from('civic_organizations')
-        .update({
-          name: orgData.name,
-          description: orgData.description,
-          coverage_area: orgData.coverage_area,
-          contact_info: orgData.contact_info,
-          meeting_info: orgData.meeting_info,
-          meeting_address: orgData.meeting_address,
-          organization_type: orgData.organization_type,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', orgId);
-
-      if (error) throw error;
+      await civicApi.updateGeneralSettings({
+        name: orgData.name,
+        description: orgData.description,
+        coverage_area: orgData.coverage_area,
+        contact_info: orgData.contact_info,
+        meeting_info: orgData.meeting_info,
+        meeting_address: orgData.meeting_address,
+        organization_type: orgData.organization_type,
+      });
 
       toast({
         title: "Success",
